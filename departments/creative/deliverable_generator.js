@@ -5,7 +5,7 @@
 
 const PDFDocument = require("pdfkit");
 const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = require("docx");
-const { geminiJson, geminiFlash } = require("../../integrations/gemini");
+const { geminiJson, geminiFlash, geminiImage } = require("../../integrations/gemini");
 const THEMES = require("./themes");
 
 const MAX_TENTATIVAS = 3;
@@ -59,6 +59,46 @@ function sanitizeAndParse(raw) {
   text = text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "");
 
   return JSON.parse(text);
+}
+
+// ──────────────────────────────────────────
+// Gera capa com Nano Banana (gemini-2.5-flash-image)
+// Prompt contextualizado por tema + tipo + título
+// ──────────────────────────────────────────
+const TEMA_VISUAL_PROMPTS = {
+  impacto:      "bold dramatic sports energy, deep black and vivid red, strong geometric shapes, martial arts or athletics silhouette, powerful composition",
+  elegancia:    "elegant feminine grace, soft rose pink and deep purple palette, ballet dancer silhouette, delicate floral elements, luxurious feel",
+  sabedoria:    "spiritual sacred atmosphere, warm golden and deep brown tones, ancient book or cross motif, soft candle light, reverent calm",
+  produtividade:"clean modern corporate, deep blue and white, geometric minimal design, professional executive aesthetic",
+  bemestar:     "serene natural wellness, lush green and soft white, leaves or nature elements, calm light, organic texture",
+  criatividade: "vibrant creative digital, deep purple and electric cyan, abstract geometric shapes, innovative modern design",
+};
+
+async function gerarCapaComGemini(tipo, titulo, descricao, temaKey) {
+  const temaDesc = TEMA_VISUAL_PROMPTS[temaKey] || TEMA_VISUAL_PROMPTS.produtividade;
+  const tipoLabel = { ebook: "ebook", checklist: "checklist guide", workbook: "workbook",
+    planner: "planner", script_vsl: "video script guide", cheat_sheet: "quick reference card",
+    certificado: "certificate" }[tipo] || "digital guide";
+
+  const prompt = `Create a stunning professional ${tipoLabel} PDF cover image.
+Title concept: "${titulo}"
+Subject: ${descricao || titulo}
+Visual style: ${temaDesc}
+Requirements:
+- Portrait A4 format, full bleed, no white borders
+- NO text, numbers, or letters anywhere in the image
+- Professional quality suitable for a Brazilian digital product market
+- Rich, deep colors with strong contrast
+- Cinematic lighting and depth`;
+
+  try {
+    const { buffer } = await geminiImage(prompt);
+    console.log(`[Nano Banana] Capa gerada para "${titulo}": ${(buffer.length / 1024).toFixed(0)}KB`);
+    return buffer;
+  } catch (e) {
+    console.warn("[Nano Banana] Geração de capa falhou:", e.message);
+    return null;
+  }
 }
 
 // ──────────────────────────────────────────
@@ -336,7 +376,7 @@ function gerarPDF(config, conteudo) {
       }
       // Overlay escuro ajustável — preserva imagem mas garante legibilidade
       const opacidade = config.capaImagemOpacidade !== undefined
-        ? config.capaImagemOpacidade : 0.48;
+        ? config.capaImagemOpacidade : 0.40;
       doc.fillOpacity(opacidade).fillColor("#000000").rect(0, 0, W, H).fill();
       doc.fillOpacity(1); // reseta para o resto do documento
     } else {
@@ -535,12 +575,23 @@ async function generate(config) {
     } else if (Buffer.isBuffer(config.capaImagem)) {
       imagemBuffer = config.capaImagem;
     }
+  }
 
-    if (imagemBuffer && config.extrairCores !== false) {
-      coresExtraidas = await extrairCoresDaImagem(imagemBuffer);
-      if (coresExtraidas) {
-        console.log("[Creative] Cores extraídas da imagem:", coresExtraidas.primary, coresExtraidas.accent);
-      }
+  // Gera capa com Nano Banana (se não foi fornecida imagem manual)
+  if (!imagemBuffer && config.capaGemini !== false) {
+    imagemBuffer = await gerarCapaComGemini(
+      config.tipo || "ebook",
+      config.titulo || "Entregável",
+      config.descricao || config.titulo,
+      temaKey,
+    );
+  }
+
+  // Extrai cores da imagem (manual ou gerada pelo Nano Banana)
+  if (imagemBuffer && config.extrairCores !== false) {
+    coresExtraidas = await extrairCoresDaImagem(imagemBuffer);
+    if (coresExtraidas) {
+      console.log("[Creative] Cores extraídas:", coresExtraidas.primary, coresExtraidas.accent);
     }
   }
 

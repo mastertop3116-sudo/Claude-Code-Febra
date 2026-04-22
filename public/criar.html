@@ -276,36 +276,49 @@
         </label>
       </div>
 
-      <!-- Imagem de capa (wallpaper) -->
+      <!-- Capa com IA (Nano Banana) -->
       <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 18px;">
-        <label class="custom-toggle">
+
+        <!-- Status Nano Banana (padrão ON) -->
+        <div id="nanoBananaStatus" style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;">
+          <span style="font-size:18px;">🍌</span>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600;color:var(--text)">Nano Banana ativo — capa gerada por IA</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">Gemini cria uma capa exclusiva baseada no tema e título escolhidos</div>
+          </div>
+          <label class="toggle" title="Desativar Nano Banana"><input type="checkbox" id="capaGeminiAtivo" checked /><span class="slider"></span></label>
+        </div>
+
+        <!-- Overlay slider (para imagem do Nano Banana ou upload manual) -->
+        <div id="overlaySliderSection">
+          <div class="opacity-row">
+            <label>Escurecimento sobre a capa:</label>
+            <input type="range" id="capaOpacidade" min="10" max="75" value="40" step="1" />
+            <span id="opacityVal">40%</span>
+          </div>
+        </div>
+
+        <!-- Upload manual (substitui Nano Banana) -->
+        <label class="custom-toggle" style="margin-top: 14px;">
           <input type="checkbox" id="useCapaImagem" />
-          <span>Usar imagem como wallpaper da capa</span>
+          <span>Usar minha própria imagem (substitui Nano Banana)</span>
         </label>
         <div id="capaImagemSection">
           <div id="imageDropZone">
             <input type="file" id="capaImagemFile" accept="image/jpeg,image/png,image/webp" style="display:none" />
             <div id="imagePrompt">
               Clique ou arraste uma imagem aqui
-              <small>JPEG / PNG — será redimensionada automaticamente</small>
+              <small>JPEG / PNG — será redimensionada automaticamente para A4</small>
             </div>
             <div id="imagePreview">
               <img id="previewImg" alt="Preview da capa" />
               <button type="button" id="changeImgBtn">trocar</button>
             </div>
           </div>
-          <div class="opacity-row">
-            <label>Escurecimento do overlay:</label>
-            <input type="range" id="capaOpacidade" min="10" max="80" value="48" step="1" />
-            <span id="opacityVal">48%</span>
-          </div>
           <label class="custom-toggle" style="margin-top: 12px;">
             <input type="checkbox" id="extrairCores" checked />
             <span>Extrair cores da imagem automaticamente</span>
           </label>
-          <p style="font-size: 11px; color: #555; margin-top: 4px;">
-            A IA detecta as cores dominantes da imagem e aplica no tema interno do documento.
-          </p>
         </div>
       </div>
 
@@ -422,11 +435,19 @@
     });
   });
 
-  // ── Imagem de capa ──
+  // ── Nano Banana + Imagem de capa ──
   let capaImagemBase64 = null;
+
+  // Toggle Nano Banana
+  document.getElementById('capaGeminiAtivo').addEventListener('change', function() {
+    document.getElementById('nanoBananaStatus').style.opacity = this.checked ? '1' : '0.45';
+    document.getElementById('overlaySliderSection').style.display = this.checked || document.getElementById('useCapaImagem').checked ? 'block' : 'none';
+  });
 
   document.getElementById('useCapaImagem').addEventListener('change', function() {
     document.getElementById('capaImagemSection').style.display = this.checked ? 'block' : 'none';
+    document.getElementById('overlaySliderSection').style.display =
+      (this.checked || document.getElementById('capaGeminiAtivo').checked) ? 'block' : 'none';
   });
 
   const dropZone = document.getElementById('imageDropZone');
@@ -525,9 +546,9 @@
     errorBox.style.display = 'none';
 
     const stepMsgs = [
-      'Gerando conteúdo com IA...',
+      payload.capaGemini ? '🍌 Nano Banana gerando sua capa exclusiva...' : 'Gerando conteúdo com IA...',
       'Estruturando seções e capítulos...',
-      'Aplicando tema visual...',
+      'Extraindo cores da imagem gerada...',
       'Montando layout do PDF...',
       'Finalizando arquivo...',
     ];
@@ -549,7 +570,8 @@
     const cabAtivo = document.getElementById('cabActive').checked;
     const rodAtivo = document.getElementById('rodActive').checked;
 
-    const useImagem = document.getElementById('useCapaImagem').checked && capaImagemBase64;
+    const useManualImg = document.getElementById('useCapaImagem').checked && capaImagemBase64;
+    const useNanoBanana = document.getElementById('capaGeminiAtivo').checked;
 
     const payload = {
       tipo: form.tipo.value,
@@ -571,10 +593,12 @@
         copyright: document.getElementById('rodCopyright').value,
       },
       formato: document.getElementById('formato').value,
-      ...(useImagem && {
+      capaGemini: useNanoBanana && !useManualImg,
+      capaImagemOpacidade: parseInt(opSlider.value) / 100,
+      ...(useManualImg && {
         capaImagem: capaImagemBase64,
-        capaImagemOpacidade: parseInt(opSlider.value) / 100,
         extrairCores: document.getElementById('extrairCores').checked,
+        capaGemini: false,
       }),
     };
 

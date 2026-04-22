@@ -231,12 +231,13 @@ module.exports = function registerHandlers(bot) {
     const titulo = tituloMatch[1];
     const temaKey = (temaMatch && temaMatch[1] !== tipo) ? temaMatch[1] : "impacto";
 
-    bot.sendMessage(msg.chat.id, `⚙️ Gerando *"${titulo}"*...\nIsso pode levar 30-60 segundos.`, { parse_mode: "Markdown" });
+    bot.sendMessage(msg.chat.id, `🍌 Nano Banana criando a capa...\n⚙️ Gerando *"${titulo}"* (${temaKey})\nAguarde ~30s.`, { parse_mode: "Markdown" });
     bot.sendChatAction(msg.chat.id, "upload_document");
 
     try {
       const resultado = await gerarEntregavel({
         tipo, titulo, temaKey, paginas: 10, descricao: titulo, formato: "pdf",
+        // capaGemini: true por padrão no generate()
       });
 
       await bot.sendDocument(

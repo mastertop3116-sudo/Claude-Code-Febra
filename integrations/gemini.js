@@ -13,6 +13,8 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const FLASH_MODEL = "gemini-2.5-flash";
 // Modelo premium: Pro (para tarefas que exigem mais raciocínio)
 const PRO_MODEL = "gemini-2.5-pro";
+// Nano Banana — geração de imagens (Gemini com visão criativa)
+const IMAGE_MODEL = "gemini-2.5-flash-image";
 
 /**
  * Geração de texto com Gemini Flash (trabalho bruto)
@@ -67,4 +69,29 @@ async function geminiJson(prompt, usePro = false) {
   return result.response.text();
 }
 
-module.exports = { geminiFlash, geminiPro, geminiChat, geminiJson };
+/**
+ * Geração de imagem com Nano Banana (gemini-2.5-flash-image)
+ * Retorna { buffer: Buffer, mimeType: string }
+ * Use para: capas de entregáveis, banners, ilustrações
+ */
+async function geminiImage(prompt) {
+  const model = genAI.getGenerativeModel({
+    model: IMAGE_MODEL,
+    generationConfig: { responseModalities: ["IMAGE", "TEXT"] },
+  });
+
+  const result = await model.generateContent(prompt);
+  const parts = result.response.candidates?.[0]?.content?.parts || [];
+
+  for (const part of parts) {
+    if (part.inlineData?.mimeType?.startsWith("image/")) {
+      return {
+        buffer: Buffer.from(part.inlineData.data, "base64"),
+        mimeType: part.inlineData.mimeType,
+      };
+    }
+  }
+  throw new Error("Nano Banana não retornou imagem");
+}
+
+module.exports = { geminiFlash, geminiPro, geminiChat, geminiJson, geminiImage };
