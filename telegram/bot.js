@@ -147,6 +147,41 @@ bot.onText(/\/conselho (.+)/, async (msg, match) => {
 });
 
 // ──────────────────────────────────────────
+// /claude — Fala direto comigo (Claude/Anthropic)
+// ──────────────────────────────────────────
+bot.onText(/\/claude (.+)/, async (msg, match) => {
+  if (!isAuthorized(msg.chat.id)) return deny(msg.chat.id);
+
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  if (!anthropicKey) {
+    return bot.sendMessage(msg.chat.id, "Chave da Anthropic não configurada. Adicione ANTHROPIC_API_KEY no .env.");
+  }
+
+  const pergunta = match[1];
+  bot.sendMessage(msg.chat.id, `Consultando Claude...`);
+
+  try {
+    const Anthropic = require("@anthropic-ai/sdk");
+    const anthropic = new Anthropic.default({ apiKey: anthropicKey });
+
+    const response = await anthropic.messages.create({
+      model: "claude-sonnet-4-6",
+      max_tokens: 1024,
+      system: `Você é Claude, da Anthropic, integrado à Nexus Digital Holding como arquiteto e revisor crítico.
+Você trabalha ao lado do MAX (Gemini) — enquanto ele executa o trabalho bruto, você cuida da revisão estratégica, decisões críticas e respostas que exigem raciocínio profundo.
+Responda em português brasileiro, de forma direta e objetiva.`,
+      messages: [{ role: "user", content: pergunta }],
+    });
+
+    const resposta = response.content[0].text;
+    bot.sendMessage(msg.chat.id, `*[Claude]*\n\n${resposta}`, { parse_mode: "Markdown" });
+    await saveMemory("claude", "conversation", pergunta, { resposta });
+  } catch (e) {
+    bot.sendMessage(msg.chat.id, `Erro ao consultar Claude: ${e.message}`);
+  }
+});
+
+// ──────────────────────────────────────────
 // /paulo — Análise DISC
 // ──────────────────────────────────────────
 bot.onText(/\/paulo (.+)/, async (msg, match) => {
@@ -260,6 +295,45 @@ bot.onText(/\/status/, (msg) => {
 bot.on("message", async (msg) => {
   if (!isAuthorized(msg.chat.id)) return deny(msg.chat.id);
   if (msg.text && msg.text.startsWith("/")) return;
+
+  // Imagens/prints — analisa via Gemini Vision
+  if (msg.photo) {
+    try {
+      bot.sendChatAction(msg.chat.id, "typing");
+      const photo = msg.photo[msg.photo.length - 1]; // maior resolução
+      const fileUrl = await bot.getFileLink(photo.file_id);
+      const caption = msg.caption || "Analise esta imagem e me diga o que vê. Se for um print de negócio, métricas ou estratégia, dê insights acionáveis.";
+
+      const https = require("https");
+      const http = require("http");
+      const client = fileUrl.startsWith("https") ? https : http;
+
+      const imageBuffer = await new Promise((resolve, reject) => {
+        client.get(fileUrl, (res) => {
+          const chunks = [];
+          res.on("data", chunk => chunks.push(chunk));
+          res.on("end", () => resolve(Buffer.concat(chunks)));
+          res.on("error", reject);
+        });
+      });
+
+      const { GoogleGenerativeAI } = require("@google/generative-ai");
+      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+      const result = await model.generateContent([
+        { text: `Você é MAX, COO da Nexus Digital Holding. ${caption}` },
+        { inlineData: { mimeType: "image/jpeg", data: imageBuffer.toString("base64") } },
+      ]);
+
+      const resposta = result.response.text();
+      bot.sendMessage(msg.chat.id, resposta, { parse_mode: "Markdown" });
+      await saveMemory("MAX", "image_analysis", caption, { resposta });
+    } catch (e) {
+      bot.sendMessage(msg.chat.id, `Erro ao analisar imagem: ${e.message}`);
+    }
+    return;
+  }
 
   // Áudio/voz — transcreve via Gemini
   if (msg.voice || msg.audio) {
