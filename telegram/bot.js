@@ -196,6 +196,54 @@ bot.on("message", async (msg) => {
   if (!isAuthorized(msg.chat.id)) return deny(msg.chat.id);
   if (msg.text && msg.text.startsWith("/")) return;
 
+  // Áudio/voz — transcreve via Gemini
+  if (msg.voice || msg.audio) {
+    try {
+      bot.sendChatAction(msg.chat.id, "typing");
+      const fileId = msg.voice ? msg.voice.file_id : msg.audio.file_id;
+      const fileUrl = await bot.getFileLink(fileId);
+
+      const https = require("https");
+      const http = require("http");
+      const client = fileUrl.startsWith("https") ? https : http;
+
+      const audioBuffer = await new Promise((resolve, reject) => {
+        client.get(fileUrl, (res) => {
+          const chunks = [];
+          res.on("data", chunk => chunks.push(chunk));
+          res.on("end", () => resolve(Buffer.concat(chunks)));
+          res.on("error", reject);
+        });
+      });
+
+      const { GoogleGenerativeAI } = require("@google/generative-ai");
+      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+      const result = await model.generateContent([
+        {
+          inlineData: {
+            mimeType: "audio/ogg",
+            data: audioBuffer.toString("base64"),
+          },
+        },
+        `Você é MAX, COO da Nexus Digital Holding.
+Primeiro transcreva o áudio. Depois responda ao que foi dito de forma direta e estratégica.
+Responda em português brasileiro.`,
+      ]);
+
+      const resposta = result.response.text();
+      bot.sendMessage(msg.chat.id, resposta, { parse_mode: "Markdown" });
+      await saveMemory("MAX", "voice", "[áudio]", { resposta });
+    } catch (e) {
+      bot.sendMessage(msg.chat.id, `Erro ao processar áudio: ${e.message}`);
+    }
+    return;
+  }
+
+  // Mensagem de texto
+  if (!msg.text) return;
+
   try {
     bot.sendChatAction(msg.chat.id, "typing");
     const resultado = await maxProcess(msg.text);
