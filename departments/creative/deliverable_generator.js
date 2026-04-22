@@ -352,83 +352,149 @@ function gerarPDF(config, conteudo) {
     // ── Divisor leve ──
     function writeDivider() {
       if (cy + 14 > CB) return;
-      doc.rect(ML + CW * 0.3, cy + 6, CW * 0.4, 1).fill(C.primary + "55");
+      doc.save();
+      doc.fillOpacity(0.3).fillColor(C.primary)
+        .rect(ML + CW * 0.3, cy + 6, CW * 0.4, 1).fill();
+      doc.restore();
+      doc.fillOpacity(1);
       doc.circle(W / 2, cy + 6, 3).fill(C.primary);
       cy += 18;
     }
 
     // ════════════════════════════════════════
-    // CAPA — wallpaper opcional + decoração geométrica
+    // CAPA — dois caminhos separados e limpos
     // ════════════════════════════════════════
     pageNum++;
     doc.addPage({ size: "A4", margin: 0 });
     const COV     = C.coverBg || C.secondary || "#1D1D1D";
     const COV_ACC = C.coverAccent || C.accent || C.primary;
-    // Com imagem: texto sempre branco (overlay escuro garante contraste)
-    const COV_TEXT = config.capaImagem ? "#FFFFFF" : (C.coverText || "#FFFFFF");
 
     if (config.capaImagem) {
-      // Wallpaper: imagem preenche a página inteira
+      // ── CAPA COM IMAGEM: overlay + texto limpo, zero caixas de cor ──
       try {
         doc.image(config.capaImagem, 0, 0, { width: W, height: H });
       } catch (_) {
-        doc.rect(0, 0, W, H).fill(COV);
+        doc.rect(0, 0, W, H).fill("#1A1A1A");
       }
-      // Overlay escuro ajustável — preserva imagem mas garante legibilidade
+
+      // Overlay geral (escurece a imagem para o texto ficar legível)
       const opacidade = config.capaImagemOpacidade !== undefined
         ? config.capaImagemOpacidade : 0.40;
+      doc.save();
       doc.fillOpacity(opacidade).fillColor("#000000").rect(0, 0, W, H).fill();
-      doc.fillOpacity(1); // reseta para o resto do documento
+      doc.restore();
+      doc.fillOpacity(1);
+
+      // Zona inferior com degradê escuro (gradual, sem borda visível)
+      doc.save();
+      doc.fillOpacity(0.72).fillColor("#000000").rect(0, H * 0.65, W, H * 0.35).fill();
+      doc.restore();
+      doc.fillOpacity(1);
+
+      // Barra accent fina no topo
+      doc.rect(0, 0, W, 5).fill(COV_ACC);
+
+      // Linha accent antes do título
+      doc.rect(ML, H * 0.28, 44, 4).fill(COV_ACC);
+
+      // Título (branco direto sobre imagem escurecida — sem caixa)
+      doc.fillColor("#FFFFFF").font(F.title).fontSize(34)
+        .text(conteudo.capa.titulo || config.titulo, ML, H * 0.30,
+          { width: CW, lineGap: 5 });
+
+      const aft = doc.y + 14;
+
+      // Separador
+      doc.rect(ML, aft, CW * 0.22, 2).fill(COV_ACC);
+
+      // Subtítulo (branco levemente opaco — sem concatenar hex)
+      if (conteudo.capa.subtitulo) {
+        doc.save();
+        doc.fillOpacity(0.82).fillColor("#FFFFFF").font(F.body).fontSize(13)
+          .text(conteudo.capa.subtitulo, ML, aft + 14, { width: CW });
+        doc.restore();
+        doc.fillOpacity(1);
+      }
+
+      // Tagline e autor na zona escura inferior
+      if (conteudo.capa.tagline) {
+        doc.fillColor("#FFFFFF").font(F.body).fontSize(11)
+          .text(conteudo.capa.tagline, ML, H * 0.74, { width: CW, align: "center" });
+      }
+      if (config.autor) {
+        doc.fillColor(COV_ACC).font(F.title).fontSize(10)
+          .text(config.autor.toUpperCase(), ML, H * 0.82,
+            { width: CW, align: "center", characterSpacing: 1.2 });
+      }
+      doc.save();
+      doc.fillOpacity(0.5).fillColor("#FFFFFF").font(F.body).fontSize(8)
+        .text(String(new Date().getFullYear()), ML, H * 0.855, { width: CW, align: "center" });
+      doc.restore();
+      doc.fillOpacity(1);
+
     } else {
+      // ── CAPA SEM IMAGEM: design geométrico sólido ──
       doc.rect(0, 0, W, H).fill(COV);
+
+      // Retângulo accent no topo
+      doc.rect(0, 0, W * 0.45, 8).fill(COV_ACC);
+
+      // Bloco de cor inferior (28%)
+      doc.rect(0, H * 0.72, W, H * 0.28).fill(COV_ACC);
+
+      // Círculo decorativo — fillOpacity em vez de hex+"22"
+      doc.save();
+      doc.fillOpacity(0.13).fillColor(COV_ACC).circle(W + 30, H * 0.38, 210).fill();
+      doc.restore();
+      doc.fillOpacity(1);
+
+      // Fundo do bloco de título — fillOpacity em vez de hex+"CC"
+      doc.save();
+      doc.fillOpacity(0.72).fillColor(COV).rect(ML - 10, H * 0.28, CW + 20, 200).fill();
+      doc.restore();
+      doc.fillOpacity(1);
+
+      // Linha accent antes do título
+      doc.rect(ML, H * 0.29, 48, 4).fill(COV_ACC);
+
+      // Título
+      const COV_TEXT = C.coverText || "#FFFFFF";
+      doc.fillColor(COV_TEXT).font(F.title).fontSize(34)
+        .text(conteudo.capa.titulo || config.titulo, ML, H * 0.31,
+          { width: CW, lineGap: 6 });
+
+      const afterTitle = doc.y + 16;
+
+      // Linha separadora
+      doc.rect(ML, afterTitle, CW * 0.28, 2).fill(COV_ACC);
+
+      // Subtítulo
+      if (conteudo.capa.subtitulo) {
+        doc.save();
+        doc.fillOpacity(0.78).fillColor(COV_TEXT).font(F.body).fontSize(13)
+          .text(conteudo.capa.subtitulo, ML, afterTitle + 14, { width: CW });
+        doc.restore();
+        doc.fillOpacity(1);
+      }
+
+      // Tagline na faixa inferior
+      if (conteudo.capa.tagline) {
+        doc.fillColor(COV).font(F.body).fontSize(11)
+          .text(conteudo.capa.tagline, ML, H * 0.745, { width: CW, align: "center" });
+      }
+
+      if (config.autor) {
+        doc.fillColor(COV).font(F.title).fontSize(10)
+          .text(config.autor.toUpperCase(), ML, H * 0.81,
+            { width: CW, align: "center", characterSpacing: 1 });
+      }
+      doc.save();
+      doc.fillOpacity(0.55).fillColor(COV).font(F.body).fontSize(8)
+        .text(String(new Date().getFullYear()), ML, H * 0.84,
+          { width: CW, align: "center" });
+      doc.restore();
+      doc.fillOpacity(1);
     }
-
-    // Retângulo de acento no canto superior esquerdo
-    doc.rect(0, 0, W * 0.45, 8).fill(COV_ACC);
-
-    // Bloco de cor no terço inferior (faz a capa "partir" em 2 zonas)
-    doc.rect(0, H * 0.72, W, H * 0.28).fill(COV_ACC);
-
-    // Círculo decorativo grande (direita, meio)
-    doc.circle(W + 30, H * 0.38, 210).fill(COV_ACC + "22");
-
-    // Área do título: fundo semi-sólido para garantir contraste
-    doc.rect(ML - 10, H * 0.28, CW + 20, 200).fill(COV + "CC");
-
-    // Linha accent antes do título
-    doc.rect(ML, H * 0.29, 48, 4).fill(COV_ACC);
-
-    // Título
-    doc.fillColor(COV_TEXT).font(F.title).fontSize(34)
-      .text(conteudo.capa.titulo || config.titulo, ML, H * 0.31,
-        { width: CW, lineGap: 6 });
-
-    const afterTitle = doc.y + 16;
-
-    // Linha separadora
-    doc.rect(ML, afterTitle, CW * 0.28, 2).fill(COV_ACC);
-
-    // Subtítulo
-    if (conteudo.capa.subtitulo) {
-      doc.fillColor(COV_TEXT + "CC").font(F.body).fontSize(13)
-        .text(conteudo.capa.subtitulo, ML, afterTitle + 14, { width: CW });
-    }
-
-    // Tagline (na faixa inferior colorida)
-    if (conteudo.capa.tagline) {
-      doc.fillColor(COV).font(F.body).fontSize(11)
-        .text(conteudo.capa.tagline, ML, H * 0.745, { width: CW, align: "center" });
-    }
-
-    // Autor
-    if (config.autor) {
-      doc.fillColor(COV).font(F.title).fontSize(10)
-        .text(config.autor.toUpperCase(), ML, H * 0.81,
-          { width: CW, align: "center", characterSpacing: 1 });
-    }
-    doc.fillColor(COV + "AA").font(F.body).fontSize(8)
-      .text(String(new Date().getFullYear()), ML, H * 0.84,
-        { width: CW, align: "center" });
 
     // ════════════════════════════════════════
     // INTRODUÇÃO
