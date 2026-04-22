@@ -128,7 +128,7 @@ Idioma: português brasileiro. Tom: direto e prático.`;
 }
 
 // ──────────────────────────────────────────
-// Gerar PDF — Design profissional v2
+// Gerar PDF — Design profissional v3
 // ──────────────────────────────────────────
 function gerarPDF(config, conteudo) {
   return new Promise((resolve, reject) => {
@@ -151,52 +151,60 @@ function gerarPDF(config, conteudo) {
 
     // ── Dimensões ──
     const W = 595.28, H = 841.89;
-    const ML = 52, MR = 52;
-    const CW = W - ML - MR;
-    const TOP_STRIPE = 6;
-    const HEADER_H = cabAtivo ? 34 : 0;
-    const FOOTER_H = rodAtivo ? 36 : 0;
-    const CT = TOP_STRIPE + HEADER_H + 10;   // content top
-    const CB = H - FOOTER_H - 10;             // content bottom
+    const ML = 52, MR = 52, CW = W - ML - MR;
+    const STRIPE = 5;
+    const CAB_H  = cabAtivo ? 32 : 0;
+    const ROD_H  = rodAtivo ? 34 : 0;
+    const CT = STRIPE + CAB_H + 16;
+    const CB = H - ROD_H - 12;
+
+    // Cor de fundo das páginas de conteúdo: usa o background do tema
+    const PAGE_BG = C.background || "#FFFFFF";
+    // Cor sólida para callout (branca com borda) — sempre legível
+    const CALLOUT_BG = "#FFFFFF";
+    const TEXT_DARK  = "#1A1A1A";
+    const TEXT_MID   = "#555555";
 
     let pageNum = 0;
-    let cy = CT;  // current Y — manual tracker
+    let cy = CT;
 
-    // ── Chrome (cabeçalho/rodapé) de cada página ──
+    // ── Chrome de cada página de conteúdo ──
     function drawChrome() {
+      // Fundo completo da página
+      doc.rect(0, 0, W, H).fill(PAGE_BG);
       // Stripe topo
-      doc.rect(0, 0, W, TOP_STRIPE).fill(C.primary);
+      doc.rect(0, 0, W, STRIPE).fill(C.primary);
 
       if (cabAtivo) {
-        doc.rect(0, TOP_STRIPE, W, HEADER_H).fill(C.headerBg || "#F4F4F4");
-        // Linha separadora sutil
-        doc.save().opacity(0.15)
-          .rect(0, TOP_STRIPE + HEADER_H - 1, W, 1).fill(C.primary)
-          .restore();
-        doc.fillColor(C.primary).font(F.body).fontSize(8.5)
-          .text(cabTexto, ML, TOP_STRIPE + 11, { width: CW * 0.55 });
+        // Fundo cabeçalho branco
+        doc.rect(0, STRIPE, W, CAB_H).fill("#FFFFFF");
+        // Linha divisória leve
+        doc.rect(0, STRIPE + CAB_H - 1, W, 1).fill("#E8E8E8");
+        // Texto marca (cor primária)
+        doc.fillColor(C.primary).font(F.title).fontSize(8)
+          .text(cabTexto.toUpperCase(), ML, STRIPE + 10, { width: CW * 0.6, characterSpacing: 0.5 });
+        // Título doc (cinza, alinhado à direita)
         if (pageNum > 1) {
-          doc.fillColor("#999999").font(F.body).fontSize(8)
-            .text(config.titulo, ML, TOP_STRIPE + 11, { width: CW, align: "right" });
+          doc.fillColor("#AAAAAA").font(F.body).fontSize(7.5)
+            .text(config.titulo, ML, STRIPE + 11, { width: CW, align: "right" });
         }
       }
 
       if (rodAtivo) {
-        const fy = H - FOOTER_H;
-        // Linha separadora rodapé
-        doc.save().opacity(0.12)
-          .rect(ML, fy + 2, CW, 1).fill(C.primary)
-          .restore();
+        const fy = H - ROD_H;
+        // Linha topo do rodapé
+        doc.rect(0, fy, W, 1).fill("#E8E8E8");
+        // Fundo rodapé branco
+        doc.rect(0, fy + 1, W, ROD_H).fill("#FFFFFF");
         if (rodTexto.trim()) {
-          doc.fillColor("#AAAAAA").font(F.body).fontSize(7.5)
-            .text(rodTexto, ML, fy + 10, { width: CW - 36 });
+          doc.fillColor("#BBBBBB").font(F.body).fontSize(7.5)
+            .text(rodTexto, ML, fy + 12, { width: CW - 40 });
         }
         if (showPagNum) {
-          // Círculo com número de página
-          const cx = W - ML - 12, cy2 = fy + 17;
-          doc.circle(cx, cy2, 13).fill(C.primary);
-          doc.fillColor("#FFFFFF").font(F.title).fontSize(8)
-            .text(String(pageNum), cx - 13, cy2 - 5, { width: 26, align: "center" });
+          const pcx = W - ML - 13, pcy = fy + 17;
+          doc.circle(pcx, pcy, 13).fill(C.primary);
+          doc.fillColor("#FFFFFF").font(F.title).fontSize(8.5)
+            .text(String(pageNum), pcx - 13, pcy - 6, { width: 26, align: "center" });
         }
       }
     }
@@ -204,163 +212,158 @@ function gerarPDF(config, conteudo) {
     function newPage() {
       pageNum++;
       doc.addPage({ size: "A4", margin: 0 });
-      doc.rect(0, 0, W, H).fill(C.background || "#FFFFFF");
       drawChrome();
       cy = CT;
     }
 
-    // ── Cabeçalho de seção (banda colorida) ──
-    function sectionBand(titulo, numStr = null) {
-      const BH = 78;
-      // Fundo da banda
-      doc.rect(0, cy, W, BH).fill(C.primary);
-      // Círculo decorativo direita
-      doc.save().opacity(0.10)
-        .circle(W - 55, cy + BH / 2, 62).fill("#FFFFFF")
-        .restore();
-      // Número grande fantasma
+    // ── Título de seção (inline, sem forçar nova página) ──
+    function sectionTitle(titulo, numStr) {
+      // Se não tiver espaço suficiente para o título + algum conteúdo, nova página
+      if (cy + 80 > CB) newPage();
+
+      // Barra lateral esquerda colorida
+      const barH = 38;
+      doc.rect(ML, cy, 5, barH).fill(C.primary);
+
+      // Número pequeno acima do título
       if (numStr) {
-        doc.save().opacity(0.18)
-          .fillColor("#FFFFFF").font(F.title).fontSize(58)
-          .text(numStr, W - 130, cy + 4, { width: 90, align: "right" })
-          .restore();
+        doc.fillColor(C.accent || C.primary).font(F.title).fontSize(9)
+          .text(numStr, ML + 14, cy + 2, { width: 30, characterSpacing: 1 });
       }
-      // Título
-      doc.fillColor("#FFFFFF").font(F.title).fontSize(21)
-        .text(titulo, ML, cy + (BH / 2) - 13, { width: CW - 100 });
-      cy += BH + 22;
+
+      // Título principal
+      const titleY = numStr ? cy + 13 : cy + 8;
+      doc.fillColor(C.primary).font(F.title).fontSize(18)
+        .text(titulo, ML + 14, titleY, { width: CW - 18 });
+
+      cy = doc.y + 14;
     }
 
     // ── Texto corrido ──
     function writeBody(text) {
       if (!text) return;
-      const parts = String(text).split(/;\s*/).filter(p => p.trim());
+      // Divide por ponto-e-vírgula (separador seguro do Gemini) ou por ponto seguido de espaço
+      const parts = String(text)
+        .replace(/([.!?])\s+/g, "$1|")
+        .split(/[;|]/)
+        .map(p => p.trim())
+        .filter(Boolean);
+
       for (const part of parts) {
-        if (cy + 28 > CB) { newPage(); }
-        doc.fillColor(C.text || "#2C2C2C").font(F.body).fontSize(11)
-          .text(part.trim(), ML, cy, { width: CW, lineGap: 5 });
-        cy = doc.y + 10;
+        if (cy + 26 > CB) newPage();
+        doc.fillColor(TEXT_DARK).font(F.body).fontSize(11)
+          .text(part, ML, cy, { width: CW, lineGap: 4, paragraphGap: 0 });
+        cy = doc.y + 8;
       }
     }
 
-    // ── Callout / destaque ──
+    // ── Callout box (branco + borda sólida = sempre legível) ──
     function writeCallout(text) {
-      const BH = 46;
-      if (cy + BH + 8 > CB) { newPage(); }
-      // Background suave
-      doc.save().opacity(0.07)
-        .roundedRect(ML, cy, CW, BH, 5).fill(C.primary)
-        .restore();
-      // Borda esquerda
-      doc.roundedRect(ML, cy, 5, BH, 2).fill(C.accent || C.primary);
-      // Seta/bullet
-      doc.fillColor(C.accent || C.primary).font(F.title).fontSize(13)
-        .text("›", ML + 12, cy + 15, { width: 14 });
-      // Texto
-      doc.fillColor(C.text || "#2C2C2C").font(F.title).fontSize(9.5)
-        .text(text.trim(), ML + 30, cy + 14, { width: CW - 40, lineGap: 3 });
-      cy += BH + 10;
+      if (!text) return;
+      const est = doc.heightOfString(text, { width: CW - 50, fontSize: 10 });
+      const boxH = Math.max(40, est + 24);
+      if (cy + boxH + 6 > CB) newPage();
+
+      // Fundo branco
+      doc.rect(ML, cy, CW, boxH).fill(CALLOUT_BG);
+      // Borda externa sutil
+      doc.rect(ML, cy, CW, boxH).lineWidth(0.5).strokeColor("#DDDDDD").stroke();
+      // Borda esquerda colorida sólida
+      doc.rect(ML, cy, 5, boxH).fill(C.accent || C.primary);
+      // Marcador
+      doc.fillColor(C.accent || C.primary).font(F.title).fontSize(12)
+        .text("▸", ML + 12, cy + (boxH / 2) - 7, { width: 14 });
+      // Texto sempre escuro
+      doc.fillColor(TEXT_DARK).font(F.body).fontSize(10)
+        .text(text.trim(), ML + 30, cy + 12, { width: CW - 42, lineGap: 3 });
+      cy = doc.y + 12;
     }
 
-    // ── Divisor ──
+    // ── Divisor leve ──
     function writeDivider() {
-      if (cy + 18 > CB) return;
-      doc.save().opacity(0.18)
-        .moveTo(ML + CW * 0.25, cy + 9).lineTo(ML + CW * 0.75, cy + 9)
-        .strokeColor(C.primary).lineWidth(1).stroke()
-        .restore();
-      doc.save().opacity(0.4)
-        .circle(W / 2, cy + 9, 3).fill(C.primary)
-        .restore();
-      cy += 22;
+      if (cy + 14 > CB) return;
+      doc.rect(ML + CW * 0.3, cy + 6, CW * 0.4, 1).fill(C.primary + "55");
+      doc.circle(W / 2, cy + 6, 3).fill(C.primary);
+      cy += 18;
     }
 
     // ════════════════════════════════════════
-    // CAPA
+    // CAPA — fundo escuro + decoração geométrica
     // ════════════════════════════════════════
     pageNum++;
     doc.addPage({ size: "A4", margin: 0 });
-    doc.rect(0, 0, W, H).fill(C.coverBg || C.secondary || "#1D1D1D");
+    const COV = C.coverBg || C.secondary || "#1D1D1D";
+    const COV_TEXT = C.coverText || "#FFFFFF";
+    const COV_ACC  = C.coverAccent || C.accent || C.primary;
 
-    // Círculo grande canto superior direito
-    doc.save().opacity(0.09)
-      .circle(W + 20, -40, 240).fill(C.primary)
-      .restore();
-    // Círculo médio canto inferior esquerdo
-    doc.save().opacity(0.13)
-      .circle(-30, H + 20, 160).fill(C.coverAccent || C.accent || C.primary)
-      .restore();
-    // Triângulo/banda diagonal decorativa (simulado com rect inclinado estreito)
-    doc.save().opacity(0.08)
-      .rect(0, H * 0.48, W * 0.4, H * 0.54).fill(C.coverAccent || C.accent || C.primary)
-      .restore();
-    // Banda horizontal accent
-    const bY = H * 0.63;
-    doc.rect(0, bY, W, 5).fill(C.coverAccent || C.accent || C.primary);
-    // Linha fina adicional
-    doc.save().opacity(0.25)
-      .rect(0, bY - 3, W * 0.55, 1.5).fill(C.coverText || "#FFFFFF")
-      .restore();
+    doc.rect(0, 0, W, H).fill(COV);
+
+    // Retângulo de acento no canto superior esquerdo
+    doc.rect(0, 0, W * 0.45, 8).fill(COV_ACC);
+
+    // Bloco de cor no terço inferior (faz a capa "partir" em 2 zonas)
+    doc.rect(0, H * 0.72, W, H * 0.28).fill(COV_ACC);
+
+    // Círculo decorativo grande (direita, meio)
+    doc.circle(W + 30, H * 0.38, 210).fill(COV_ACC + "22");
+
+    // Área do título: fundo semi-sólido para garantir contraste
+    doc.rect(ML - 10, H * 0.28, CW + 20, 200).fill(COV + "CC");
+
+    // Linha accent antes do título
+    doc.rect(ML, H * 0.29, 48, 4).fill(COV_ACC);
 
     // Título
-    const tY = H * 0.25;
-    doc.fillColor(C.coverText || "#FFFFFF").font(F.title).fontSize(38)
-      .text(conteudo.capa.titulo || config.titulo, ML, tY, {
-        width: CW, align: "center", lineGap: 8,
-      });
+    doc.fillColor(COV_TEXT).font(F.title).fontSize(34)
+      .text(conteudo.capa.titulo || config.titulo, ML, H * 0.31,
+        { width: CW, lineGap: 6 });
 
-    let afterT = doc.y + 18;
+    const afterTitle = doc.y + 16;
 
-    // Separador sob título
-    const lw = CW * 0.32;
-    doc.save().opacity(0.45)
-      .rect((W - lw) / 2, afterT, lw, 2).fill(C.coverAccent || C.accent || "#FFFFFF")
-      .restore();
+    // Linha separadora
+    doc.rect(ML, afterTitle, CW * 0.28, 2).fill(COV_ACC);
 
     // Subtítulo
     if (conteudo.capa.subtitulo) {
-      doc.save().opacity(0.82)
-        .fillColor(C.coverText || "#FFFFFF").font(F.body).fontSize(14)
-        .text(conteudo.capa.subtitulo, ML, afterT + 14, { width: CW, align: "center" })
-        .restore();
-      afterT = doc.y + 8;
+      doc.fillColor(COV_TEXT + "CC").font(F.body).fontSize(13)
+        .text(conteudo.capa.subtitulo, ML, afterTitle + 14, { width: CW });
     }
 
-    // Tagline
+    // Tagline (na faixa inferior colorida)
     if (conteudo.capa.tagline) {
-      doc.fillColor(C.coverAccent || C.accent || "#E0E0E0").font(F.body).fontSize(11)
-        .text(conteudo.capa.tagline, ML, afterT + 12, { width: CW, align: "center" });
+      doc.fillColor(COV).font(F.body).fontSize(11)
+        .text(conteudo.capa.tagline, ML, H * 0.745, { width: CW, align: "center" });
     }
 
     // Autor
     if (config.autor) {
-      doc.save().opacity(0.6)
-        .fillColor(C.coverText || "#FFFFFF").font(F.body).fontSize(10)
-        .text(config.autor, ML, H - 72, { width: CW, align: "center" })
-        .restore();
+      doc.fillColor(COV).font(F.title).fontSize(10)
+        .text(config.autor.toUpperCase(), ML, H * 0.81,
+          { width: CW, align: "center", characterSpacing: 1 });
     }
-    doc.save().opacity(0.3)
-      .fillColor(C.coverText || "#FFFFFF").font(F.body).fontSize(8)
-      .text(String(new Date().getFullYear()), ML, H - 54, { width: CW, align: "center" })
-      .restore();
+    doc.fillColor(COV + "AA").font(F.body).fontSize(8)
+      .text(String(new Date().getFullYear()), ML, H * 0.84,
+        { width: CW, align: "center" });
 
     // ════════════════════════════════════════
     // INTRODUÇÃO
     // ════════════════════════════════════════
     newPage();
-    sectionBand("Introdução");
+    sectionTitle("Introdução", null);
     writeBody(conteudo.introducao);
 
     // ════════════════════════════════════════
-    // SEÇÕES
+    // SEÇÕES — fluem na mesma página se houver espaço
     // ════════════════════════════════════════
     for (let i = 0; i < (conteudo.secoes || []).length; i++) {
       const secao = conteudo.secoes[i];
-      newPage();
-      sectionBand(secao.titulo, String(i + 1).padStart(2, "0"));
+      // Só nova página se restar menos de 200pt de espaço
+      if (cy + 200 > CB) newPage();
+      else cy += 20; // espaço entre seções na mesma página
+      sectionTitle(secao.titulo, String(i + 1).padStart(2, "0"));
       writeBody(secao.conteudo);
       if (secao.destaques?.length) {
-        cy += 8;
+        cy += 6;
         writeDivider();
         for (const d of secao.destaques) writeCallout(d);
       }
@@ -369,8 +372,9 @@ function gerarPDF(config, conteudo) {
     // ════════════════════════════════════════
     // CONCLUSÃO
     // ════════════════════════════════════════
-    newPage();
-    sectionBand("Conclusão & Próximos Passos");
+    if (cy + 200 > CB) newPage();
+    else cy += 20;
+    sectionTitle("Conclusão & Próximos Passos", null);
     writeBody(conteudo.conclusao);
 
     // ════════════════════════════════════════
@@ -378,19 +382,18 @@ function gerarPDF(config, conteudo) {
     // ════════════════════════════════════════
     if (conteudo.sobre_autor) {
       if (cy + 110 > CB) newPage();
-      cy += 20;
+      cy += 18;
       writeDivider();
-      const boxH = 82;
-      // Box estilizado
-      doc.save().opacity(0.06)
-        .roundedRect(ML, cy, CW, boxH, 6).fill(C.primary)
-        .restore();
-      doc.roundedRect(ML, cy, 6, boxH, 3).fill(C.primary);
-      doc.fillColor(C.primary).font(F.title).fontSize(12)
-        .text("Sobre o Autor", ML + 18, cy + 10, { width: CW - 28 });
-      doc.fillColor(C.text || "#333").font(F.body).fontSize(10)
-        .text(conteudo.sobre_autor, ML + 18, cy + 30, { width: CW - 28, lineGap: 4 });
-      cy += boxH + 16;
+      // Box "Sobre o Autor" com fundo branco e borda primária
+      const sobreH = Math.max(76, doc.heightOfString(conteudo.sobre_autor, { width: CW - 32, fontSize: 10 }) + 36);
+      doc.rect(ML, cy, CW, sobreH).fill("#FFFFFF");
+      doc.rect(ML, cy, CW, sobreH).lineWidth(0.5).strokeColor("#DDDDDD").stroke();
+      doc.rect(ML, cy, 5, sobreH).fill(C.primary);
+      doc.fillColor(C.primary).font(F.title).fontSize(11)
+        .text("Sobre o Autor", ML + 16, cy + 10, { width: CW - 26 });
+      doc.fillColor(TEXT_DARK).font(F.body).fontSize(10)
+        .text(conteudo.sobre_autor, ML + 16, cy + 30, { width: CW - 26, lineGap: 4 });
+      cy = doc.y + 16;
     }
 
     doc.end();
