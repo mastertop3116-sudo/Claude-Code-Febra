@@ -6,6 +6,7 @@
 const TelegramBot = require("node-telegram-bot-api");
 const { maxProcess, maxCouncil } = require("../core/max");
 const { getMetas, getTarefas, getReports, saveMemory } = require("../integrations/supabase");
+const { analisarYoutube, pesquisarMercado, analisarCopy, analisarURL } = require("../departments/research/research_agent");
 require("dotenv").config();
 
 const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true });
@@ -38,7 +39,11 @@ bot.onText(/\/start/, (msg) => {
     `/tarefas — Status dos departamentos\n` +
     `/report — Stark Report\n` +
     `/conselho [decisão] — Convocar os Titãs\n` +
-    `/paulo — Análise comportamental DISC\n` +
+    `/paulo [contexto] — Análise DISC\n` +
+    `/yt [url] — Analisar vídeo YouTube\n` +
+    `/pesquisa [tema] — Pesquisa de mercado\n` +
+    `/copy [texto] — Analisar copy/VSL\n` +
+    `/url [link] — Analisar landing page\n` +
     `/status — Status do sistema\n\n` +
     `Ou simplesmente me dê uma ordem direta.`,
     { parse_mode: "Markdown" }
@@ -167,6 +172,66 @@ CONTEXTO: ${contexto}
     bot.sendMessage(msg.chat.id, resultado, { parse_mode: "Markdown" });
   } catch (e) {
     bot.sendMessage(msg.chat.id, `Erro na análise: ${e.message}`);
+  }
+});
+
+// ──────────────────────────────────────────
+// /yt — Analisar vídeo do YouTube
+// ──────────────────────────────────────────
+bot.onText(/\/yt (.+)/, async (msg, match) => {
+  if (!isAuthorized(msg.chat.id)) return deny(msg.chat.id);
+  const url = match[1];
+  bot.sendMessage(msg.chat.id, `Analisando vídeo... aguarda.`);
+  try {
+    const resultado = await analisarYoutube(url);
+    bot.sendMessage(msg.chat.id, resultado, { parse_mode: "Markdown" });
+  } catch (e) {
+    bot.sendMessage(msg.chat.id, `Erro: ${e.message}`);
+  }
+});
+
+// ──────────────────────────────────────────
+// /pesquisa — Pesquisa de mercado
+// ──────────────────────────────────────────
+bot.onText(/\/pesquisa (.+)/, async (msg, match) => {
+  if (!isAuthorized(msg.chat.id)) return deny(msg.chat.id);
+  const tema = match[1];
+  bot.sendMessage(msg.chat.id, `Pesquisando mercado de "${tema}"... aguarda.`);
+  try {
+    const resultado = await pesquisarMercado(tema);
+    bot.sendMessage(msg.chat.id, resultado, { parse_mode: "Markdown" });
+  } catch (e) {
+    bot.sendMessage(msg.chat.id, `Erro: ${e.message}`);
+  }
+});
+
+// ──────────────────────────────────────────
+// /copy — Analisar copy/VSL
+// ──────────────────────────────────────────
+bot.onText(/\/copy (.+)/, async (msg, match) => {
+  if (!isAuthorized(msg.chat.id)) return deny(msg.chat.id);
+  const texto = match[1];
+  bot.sendMessage(msg.chat.id, `Analisando copy...`);
+  try {
+    const resultado = await analisarCopy(texto);
+    bot.sendMessage(msg.chat.id, resultado, { parse_mode: "Markdown" });
+  } catch (e) {
+    bot.sendMessage(msg.chat.id, `Erro: ${e.message}`);
+  }
+});
+
+// ──────────────────────────────────────────
+// /url — Analisar landing page/site
+// ──────────────────────────────────────────
+bot.onText(/\/url (.+)/, async (msg, match) => {
+  if (!isAuthorized(msg.chat.id)) return deny(msg.chat.id);
+  const url = match[1];
+  bot.sendMessage(msg.chat.id, `Analisando página...`);
+  try {
+    const resultado = await analisarURL(url);
+    bot.sendMessage(msg.chat.id, resultado, { parse_mode: "Markdown" });
+  } catch (e) {
+    bot.sendMessage(msg.chat.id, `Erro: ${e.message}`);
   }
 });
 
