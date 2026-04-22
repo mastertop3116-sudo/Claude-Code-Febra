@@ -116,11 +116,18 @@ module.exports = function registerHandlers(bot) {
     } catch (e) { bot.sendMessage(msg.chat.id, `Erro ao buscar financeiro: ${e.message}`); }
   });
 
-  bot.onText(/\/conselho (.+)/, async (msg, match) => {
+  bot.onText(/\/conselho(.*)/, async (msg, match) => {
     if (!isAuthorized(msg.chat.id)) return deny(bot, msg.chat.id);
+    const tema = (match[1] || "").trim();
+    if (!tema) {
+      return bot.sendMessage(msg.chat.id,
+        `*CONSELHO DE TITÃS*\n\nMe diga qual decisão ou questão quer levar ao conselho.\n\nEx: \`/conselho Devo escalar o orçamento do BIDCAP esta semana?\``,
+        { parse_mode: "Markdown" }
+      );
+    }
     bot.sendMessage(msg.chat.id, `Convocando o Conselho de Titãs...`, { parse_mode: "Markdown" });
     try {
-      const resultado = await maxCouncil(match[1]);
+      const resultado = await maxCouncil(tema);
       bot.sendMessage(msg.chat.id, resultado, { parse_mode: "Markdown" });
     } catch (e) { bot.sendMessage(msg.chat.id, `Erro: ${e.message}`); }
   });

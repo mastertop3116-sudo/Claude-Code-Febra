@@ -6,6 +6,7 @@
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { saveMemory, getMemory, supabase } = require("../integrations/supabase");
+const { getUTMifyReport, formatarRelatorio, getRelatorioVendasHoje } = require("../departments/finance/finance_agent");
 require("dotenv").config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -21,6 +22,7 @@ SEU ESTILO:
 - Responde curto quando a pergunta é simples, detalhado quando necessário
 - Nunca começa resposta com "Claro!", "Certamente!" ou "Olá!"
 - Tom: executivo confiante, não robô e não vendedor de curso
+- NUNCA prometa consultar ferramentas externas (UTMify, Google, etc.) — use apenas o que está no contexto. Se não tiver dados, diga: "Não tenho dados atualizados. Use /financeiro para ver as métricas."
 
 SUAS FUNÇÕES:
 - Orquestra todos os departamentos da Nexus
@@ -40,11 +42,21 @@ Ao receber uma ordem, identifique o departamento e execute. Sem burocracia.
 `;
 
 // ──────────────────────────────────────────
-// Busca histórico + memórias do Supabase
+// Detecta se a mensagem é sobre finanças/métricas
 // ──────────────────────────────────────────
-async function buildContext(telegramId) {
+function isFinanceQuery(order) {
+  const keywords = ["utmify", "vendas", "receita", "faturamento", "roi", "investimento",
+    "tráfego", "métricas", "financeiro", "resultado", "lucro", "custo", "campanha",
+    "bidcap", "ballet", "bíblico", "5d", "teste bm", "quanto", "como estamos"];
+  const lower = order.toLowerCase();
+  return keywords.some(k => lower.includes(k));
+}
+
+// ──────────────────────────────────────────
+// Busca histórico + memórias + dados UTMify
+// ──────────────────────────────────────────
+async function buildContext(telegramId, order = "") {
   try {
-    // Últimas 10 mensagens da conversa
     const { data: history } = await supabase
       .from("conversations")
       .select("role, content, created_at")
@@ -52,7 +64,6 @@ async function buildContext(telegramId) {
       .order("created_at", { ascending: false })
       .limit(10);
 
-    // Últimos aprendizados registrados
     const learnings = await getMemory("MAX", "learning", 5);
 
     let context = "";
@@ -61,6 +72,32 @@ async function buildContext(telegramId) {
       context += "APRENDIZADOS ANTERIORES:\n";
       learnings.forEach(l => { context += `- ${l.content}\n`; });
       context += "\n";
+    }
+
+    // Injeta dados financeiros se a pergunta for sobre métricas/vendas
+    if (isFinanceQuery(order)) {
+      try {
+        const utmRow = await getUTMifyReport();
+        const { totalReceita, totalConversoes } = await getRelatorioVendasHoje();
+
+        context += "DADOS FINANCEIROS ATUAIS (use para responder):\n";
+        if (utmRow) {
+          const d = utmRow.context || utmRow.data || {};
+          const atualizado = d.atualizadoEm
+            ? new Date(d.atualizadoEm).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })
+            : "sem data";
+          context += `UTMify (atualizado ${atualizado}):\n`;
+          if (d.dashboards) {
+            for (const dash of d.dashboards) {
+              context += `- ${dash.nome || dash.dashboardId}: Receita R$${(dash.receita||0).toFixed(2)}, Investimento R$${(dash.investimento||0).toFixed(2)}, Vendas ${dash.vendas||0}\n`;
+            }
+          }
+        } else {
+          context += "UTMify: sem dados em cache. Oriente o fundador a pedir atualização.\n";
+        }
+        context += `GG Checkout (hoje): ${totalConversoes} venda(s) confirmada(s), R$ ${totalReceita.toFixed(2)}\n`;
+        context += "\n";
+      } catch (_) {}
     }
 
     if (history && history.length > 0) {
@@ -139,8 +176,7 @@ Aprendizado:`);
 async function maxProcess(order, telegramId = null) {
   console.log(`\n[MAX] Ordem recebida: ${order}\n`);
 
-  // Busca contexto histórico do Supabase
-  const context = telegramId ? await buildContext(telegramId) : "";
+  const context = telegramId ? await buildContext(telegramId, order) : "";
 
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
