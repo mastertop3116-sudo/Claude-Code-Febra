@@ -128,195 +128,269 @@ Idioma: português brasileiro. Tom: direto e prático.`;
 }
 
 // ──────────────────────────────────────────
-// Gerar PDF
+// Gerar PDF — Design profissional v2
 // ──────────────────────────────────────────
 function gerarPDF(config, conteudo) {
   return new Promise((resolve, reject) => {
     const tema = config.tema || THEMES.produtividade;
-    const cores = config.cores || tema.colors;
-    const fontes = config.fontes || tema.fonts;
-    const cabecalho = config.cabecalho || { ativo: true, texto: config.autor || "Nexus Digital" };
-    const rodape = config.rodape || { ativo: true, texto: "", numeroPagina: true };
+    const C = config.cores ? { ...tema.colors, ...config.cores } : tema.colors;
+    const F = config.fontes ? { ...tema.fonts, ...config.fontes } : tema.fonts;
+    const cabAtivo = config.cabecalho?.ativo !== false;
+    const rodAtivo = config.rodape?.ativo !== false;
+    const cabTexto = config.cabecalho?.texto || config.autor || "Nexus Digital";
+    const rodTexto = config.rodape?.texto || `© ${new Date().getFullYear()} ${config.autor || ""}`;
+    const showPagNum = config.rodape?.numeroPagina !== false;
 
-    const doc = new PDFDocument({
-      size: "A4",
-      margin: 0,
-      autoFirstPage: false,
-      info: {
-        Title: config.titulo,
-        Author: config.autor || "Nexus Digital Holding",
-        Creator: "Nexus MAX",
-      },
+    const doc = new PDFDocument({ size: "A4", margin: 0, autoFirstPage: false,
+      info: { Title: config.titulo, Author: config.autor || "Nexus Digital Holding", Creator: "Nexus MAX" },
     });
-
     const chunks = [];
     doc.on("data", c => chunks.push(c));
     doc.on("end", () => resolve(Buffer.concat(chunks)));
     doc.on("error", reject);
 
-    const PAGE_W = 595.28;
-    const PAGE_H = 841.89;
-    const MARGIN = 50;
-    const CONTENT_W = PAGE_W - MARGIN * 2;
-    const HEADER_H = cabecalho.ativo ? 40 : 0;
-    const FOOTER_H = rodape.ativo ? 35 : 0;
-    const CONTENT_TOP = MARGIN + HEADER_H;
-    const CONTENT_BOTTOM = PAGE_H - MARGIN - FOOTER_H;
+    // ── Dimensões ──
+    const W = 595.28, H = 841.89;
+    const ML = 52, MR = 52;
+    const CW = W - ML - MR;
+    const TOP_STRIPE = 6;
+    const HEADER_H = cabAtivo ? 34 : 0;
+    const FOOTER_H = rodAtivo ? 36 : 0;
+    const CT = TOP_STRIPE + HEADER_H + 10;   // content top
+    const CB = H - FOOTER_H - 10;             // content bottom
 
     let pageNum = 0;
+    let cy = CT;  // current Y — manual tracker
 
-    function hexToRgb(hex) {
-      const r = parseInt(hex.slice(1, 3), 16);
-      const g = parseInt(hex.slice(3, 5), 16);
-      const b = parseInt(hex.slice(5, 7), 16);
-      return [r, g, b];
-    }
+    // ── Chrome (cabeçalho/rodapé) de cada página ──
+    function drawChrome() {
+      // Stripe topo
+      doc.rect(0, 0, W, TOP_STRIPE).fill(C.primary);
 
-    function addHeader(title) {
-      if (!cabecalho.ativo) return;
-      doc.rect(0, MARGIN, PAGE_W, HEADER_H).fill(cores.headerBg || cores.primary);
-      doc.fillColor(cores.headerText || "#FFFFFF")
-        .font(fontes.body)
-        .fontSize(9)
-        .text(cabecalho.texto || title, MARGIN, MARGIN + 14, {
-          width: CONTENT_W - 60,
-          align: "left",
-        });
-      if (pageNum > 1) {
-        doc.fillColor(cores.headerText || "#FFFFFF")
-          .font(fontes.body)
-          .fontSize(9)
-          .text(config.titulo, 0, MARGIN + 14, { width: PAGE_W - MARGIN, align: "right" });
+      if (cabAtivo) {
+        doc.rect(0, TOP_STRIPE, W, HEADER_H).fill(C.headerBg || "#F4F4F4");
+        // Linha separadora sutil
+        doc.save().opacity(0.15)
+          .rect(0, TOP_STRIPE + HEADER_H - 1, W, 1).fill(C.primary)
+          .restore();
+        doc.fillColor(C.primary).font(F.body).fontSize(8.5)
+          .text(cabTexto, ML, TOP_STRIPE + 11, { width: CW * 0.55 });
+        if (pageNum > 1) {
+          doc.fillColor("#999999").font(F.body).fontSize(8)
+            .text(config.titulo, ML, TOP_STRIPE + 11, { width: CW, align: "right" });
+        }
       }
-    }
 
-    function addFooter() {
-      if (!rodape.ativo) return;
-      const y = PAGE_H - MARGIN - FOOTER_H;
-      doc.moveTo(MARGIN, y + 6).lineTo(PAGE_W - MARGIN, y + 6)
-        .strokeColor(cores.primary).lineWidth(0.5).stroke();
-      const footerText = rodape.texto || (config.autor ? `© ${new Date().getFullYear()} ${config.autor}` : "");
-      if (footerText) {
-        doc.fillColor(cores.text).font(fontes.body).fontSize(8)
-          .text(footerText, MARGIN, y + 12, { width: CONTENT_W - 60, align: "left" });
-      }
-      if (rodape.numeroPagina !== false) {
-        doc.fillColor(cores.text).font(fontes.body).fontSize(8)
-          .text(`${pageNum}`, 0, y + 12, { width: PAGE_W - MARGIN, align: "right" });
+      if (rodAtivo) {
+        const fy = H - FOOTER_H;
+        // Linha separadora rodapé
+        doc.save().opacity(0.12)
+          .rect(ML, fy + 2, CW, 1).fill(C.primary)
+          .restore();
+        if (rodTexto.trim()) {
+          doc.fillColor("#AAAAAA").font(F.body).fontSize(7.5)
+            .text(rodTexto, ML, fy + 10, { width: CW - 36 });
+        }
+        if (showPagNum) {
+          // Círculo com número de página
+          const cx = W - ML - 12, cy2 = fy + 17;
+          doc.circle(cx, cy2, 13).fill(C.primary);
+          doc.fillColor("#FFFFFF").font(F.title).fontSize(8)
+            .text(String(pageNum), cx - 13, cy2 - 5, { width: 26, align: "center" });
+        }
       }
     }
 
     function newPage() {
       pageNum++;
       doc.addPage({ size: "A4", margin: 0 });
-      doc.rect(0, 0, PAGE_W, PAGE_H).fill(cores.background);
-      addHeader(config.titulo);
-      addFooter();
-      doc.y = CONTENT_TOP + 10;
+      doc.rect(0, 0, W, H).fill(C.background || "#FFFFFF");
+      drawChrome();
+      cy = CT;
     }
 
-    function writeTitle(text, level = 1) {
-      const sizes = { 1: 22, 2: 16, 3: 13 };
-      const size = sizes[level] || 13;
-      const font = level === 1 ? fontes.title : fontes.body;
-      const color = level === 1 ? cores.primary : cores.secondary || cores.primary;
-
-      if (doc.y + size * 2.5 > CONTENT_BOTTOM) newPage();
-      doc.fillColor(color).font(font).fontSize(size)
-        .text(text, MARGIN, doc.y, { width: CONTENT_W });
-      doc.y += level === 1 ? 12 : 8;
+    // ── Cabeçalho de seção (banda colorida) ──
+    function sectionBand(titulo, numStr = null) {
+      const BH = 78;
+      // Fundo da banda
+      doc.rect(0, cy, W, BH).fill(C.primary);
+      // Círculo decorativo direita
+      doc.save().opacity(0.10)
+        .circle(W - 55, cy + BH / 2, 62).fill("#FFFFFF")
+        .restore();
+      // Número grande fantasma
+      if (numStr) {
+        doc.save().opacity(0.18)
+          .fillColor("#FFFFFF").font(F.title).fontSize(58)
+          .text(numStr, W - 130, cy + 4, { width: 90, align: "right" })
+          .restore();
+      }
+      // Título
+      doc.fillColor("#FFFFFF").font(F.title).fontSize(21)
+        .text(titulo, ML, cy + (BH / 2) - 13, { width: CW - 100 });
+      cy += BH + 22;
     }
 
-    function writeText(text) {
+    // ── Texto corrido ──
+    function writeBody(text) {
       if (!text) return;
-      const lines = text.split("\n");
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed) { doc.y += 6; continue; }
-        if (doc.y + 30 > CONTENT_BOTTOM) newPage();
-        doc.fillColor(cores.text).font(fontes.body).fontSize(10.5)
-          .text(trimmed, MARGIN, doc.y, { width: CONTENT_W, lineGap: 3 });
-        doc.y += 6;
+      const parts = String(text).split(/;\s*/).filter(p => p.trim());
+      for (const part of parts) {
+        if (cy + 28 > CB) { newPage(); }
+        doc.fillColor(C.text || "#2C2C2C").font(F.body).fontSize(11)
+          .text(part.trim(), ML, cy, { width: CW, lineGap: 5 });
+        cy = doc.y + 10;
       }
     }
 
-    function writeHighlight(text) {
-      if (doc.y + 40 > CONTENT_BOTTOM) newPage();
-      const boxY = doc.y;
-      doc.rect(MARGIN, boxY, CONTENT_W, 32).fill(cores.primary + "18");
-      doc.moveTo(MARGIN, boxY).lineTo(MARGIN, boxY + 32)
-        .strokeColor(cores.accent || cores.primary).lineWidth(3).stroke();
-      doc.fillColor(cores.text).font(fontes.title).fontSize(9.5)
-        .text(`  ${text}`, MARGIN + 10, boxY + 10, { width: CONTENT_W - 20 });
-      doc.y = boxY + 38;
+    // ── Callout / destaque ──
+    function writeCallout(text) {
+      const BH = 46;
+      if (cy + BH + 8 > CB) { newPage(); }
+      // Background suave
+      doc.save().opacity(0.07)
+        .roundedRect(ML, cy, CW, BH, 5).fill(C.primary)
+        .restore();
+      // Borda esquerda
+      doc.roundedRect(ML, cy, 5, BH, 2).fill(C.accent || C.primary);
+      // Seta/bullet
+      doc.fillColor(C.accent || C.primary).font(F.title).fontSize(13)
+        .text("›", ML + 12, cy + 15, { width: 14 });
+      // Texto
+      doc.fillColor(C.text || "#2C2C2C").font(F.title).fontSize(9.5)
+        .text(text.trim(), ML + 30, cy + 14, { width: CW - 40, lineGap: 3 });
+      cy += BH + 10;
     }
 
-    // ── CAPA ──────────────────────────────
+    // ── Divisor ──
+    function writeDivider() {
+      if (cy + 18 > CB) return;
+      doc.save().opacity(0.18)
+        .moveTo(ML + CW * 0.25, cy + 9).lineTo(ML + CW * 0.75, cy + 9)
+        .strokeColor(C.primary).lineWidth(1).stroke()
+        .restore();
+      doc.save().opacity(0.4)
+        .circle(W / 2, cy + 9, 3).fill(C.primary)
+        .restore();
+      cy += 22;
+    }
+
+    // ════════════════════════════════════════
+    // CAPA
+    // ════════════════════════════════════════
     pageNum++;
     doc.addPage({ size: "A4", margin: 0 });
-    doc.rect(0, 0, PAGE_W, PAGE_H).fill(cores.coverBg || cores.secondary);
+    doc.rect(0, 0, W, H).fill(C.coverBg || C.secondary || "#1D1D1D");
 
-    // Barra decorativa
-    doc.rect(0, PAGE_H * 0.55, PAGE_W, 6).fill(cores.coverAccent || cores.accent || cores.primary);
+    // Círculo grande canto superior direito
+    doc.save().opacity(0.09)
+      .circle(W + 20, -40, 240).fill(C.primary)
+      .restore();
+    // Círculo médio canto inferior esquerdo
+    doc.save().opacity(0.13)
+      .circle(-30, H + 20, 160).fill(C.coverAccent || C.accent || C.primary)
+      .restore();
+    // Triângulo/banda diagonal decorativa (simulado com rect inclinado estreito)
+    doc.save().opacity(0.08)
+      .rect(0, H * 0.48, W * 0.4, H * 0.54).fill(C.coverAccent || C.accent || C.primary)
+      .restore();
+    // Banda horizontal accent
+    const bY = H * 0.63;
+    doc.rect(0, bY, W, 5).fill(C.coverAccent || C.accent || C.primary);
+    // Linha fina adicional
+    doc.save().opacity(0.25)
+      .rect(0, bY - 3, W * 0.55, 1.5).fill(C.coverText || "#FFFFFF")
+      .restore();
 
-    // Título na capa
-    doc.fillColor(cores.coverText || "#FFFFFF")
-      .font(fontes.title).fontSize(32)
-      .text(conteudo.capa.titulo || config.titulo, MARGIN, PAGE_H * 0.28, {
-        width: CONTENT_W, align: "center",
+    // Título
+    const tY = H * 0.25;
+    doc.fillColor(C.coverText || "#FFFFFF").font(F.title).fontSize(38)
+      .text(conteudo.capa.titulo || config.titulo, ML, tY, {
+        width: CW, align: "center", lineGap: 8,
       });
 
+    let afterT = doc.y + 18;
+
+    // Separador sob título
+    const lw = CW * 0.32;
+    doc.save().opacity(0.45)
+      .rect((W - lw) / 2, afterT, lw, 2).fill(C.coverAccent || C.accent || "#FFFFFF")
+      .restore();
+
+    // Subtítulo
     if (conteudo.capa.subtitulo) {
-      doc.fillColor((cores.coverText || "#FFFFFF") + "CC")
-        .font(fontes.body).fontSize(15)
-        .text(conteudo.capa.subtitulo, MARGIN, doc.y + 16, {
-          width: CONTENT_W, align: "center",
-        });
+      doc.save().opacity(0.82)
+        .fillColor(C.coverText || "#FFFFFF").font(F.body).fontSize(14)
+        .text(conteudo.capa.subtitulo, ML, afterT + 14, { width: CW, align: "center" })
+        .restore();
+      afterT = doc.y + 8;
     }
 
+    // Tagline
     if (conteudo.capa.tagline) {
-      doc.fillColor(cores.coverAccent || cores.accent || "#FFFFFF")
-        .font(fontes.body).fontSize(11)
-        .text(conteudo.capa.tagline, MARGIN, doc.y + 20, {
-          width: CONTENT_W, align: "center",
-        });
+      doc.fillColor(C.coverAccent || C.accent || "#E0E0E0").font(F.body).fontSize(11)
+        .text(conteudo.capa.tagline, ML, afterT + 12, { width: CW, align: "center" });
     }
 
+    // Autor
     if (config.autor) {
-      doc.fillColor((cores.coverText || "#FFFFFF") + "AA")
-        .font(fontes.body).fontSize(10)
-        .text(config.autor, MARGIN, PAGE_H - 80, { width: CONTENT_W, align: "center" });
+      doc.save().opacity(0.6)
+        .fillColor(C.coverText || "#FFFFFF").font(F.body).fontSize(10)
+        .text(config.autor, ML, H - 72, { width: CW, align: "center" })
+        .restore();
     }
+    doc.save().opacity(0.3)
+      .fillColor(C.coverText || "#FFFFFF").font(F.body).fontSize(8)
+      .text(String(new Date().getFullYear()), ML, H - 54, { width: CW, align: "center" })
+      .restore();
 
-    // ── INTRODUÇÃO ──────────────────────────
+    // ════════════════════════════════════════
+    // INTRODUÇÃO
+    // ════════════════════════════════════════
     newPage();
-    writeTitle("Introdução", 1);
-    writeText(conteudo.introducao);
+    sectionBand("Introdução");
+    writeBody(conteudo.introducao);
 
-    // ── SEÇÕES ──────────────────────────────
-    for (const secao of (conteudo.secoes || [])) {
+    // ════════════════════════════════════════
+    // SEÇÕES
+    // ════════════════════════════════════════
+    for (let i = 0; i < (conteudo.secoes || []).length; i++) {
+      const secao = conteudo.secoes[i];
       newPage();
-      writeTitle(secao.titulo, 1);
-      writeText(secao.conteudo);
-      if (secao.destaques && secao.destaques.length) {
-        doc.y += 6;
-        for (const d of secao.destaques) writeHighlight(d);
+      sectionBand(secao.titulo, String(i + 1).padStart(2, "0"));
+      writeBody(secao.conteudo);
+      if (secao.destaques?.length) {
+        cy += 8;
+        writeDivider();
+        for (const d of secao.destaques) writeCallout(d);
       }
     }
 
-    // ── CONCLUSÃO ──────────────────────────
+    // ════════════════════════════════════════
+    // CONCLUSÃO
+    // ════════════════════════════════════════
     newPage();
-    writeTitle("Conclusão & Próximos Passos", 1);
-    writeText(conteudo.conclusao);
+    sectionBand("Conclusão & Próximos Passos");
+    writeBody(conteudo.conclusao);
 
-    // ── SOBRE O AUTOR ──────────────────────
+    // ════════════════════════════════════════
+    // SOBRE O AUTOR
+    // ════════════════════════════════════════
     if (conteudo.sobre_autor) {
-      doc.y += 20;
-      if (doc.y + 80 > CONTENT_BOTTOM) newPage();
-      doc.rect(MARGIN, doc.y, CONTENT_W, 2).fill(cores.primary);
-      doc.y += 10;
-      writeTitle("Sobre o Autor", 2);
-      writeText(conteudo.sobre_autor);
+      if (cy + 110 > CB) newPage();
+      cy += 20;
+      writeDivider();
+      const boxH = 82;
+      // Box estilizado
+      doc.save().opacity(0.06)
+        .roundedRect(ML, cy, CW, boxH, 6).fill(C.primary)
+        .restore();
+      doc.roundedRect(ML, cy, 6, boxH, 3).fill(C.primary);
+      doc.fillColor(C.primary).font(F.title).fontSize(12)
+        .text("Sobre o Autor", ML + 18, cy + 10, { width: CW - 28 });
+      doc.fillColor(C.text || "#333").font(F.body).fontSize(10)
+        .text(conteudo.sobre_autor, ML + 18, cy + 30, { width: CW - 28, lineGap: 4 });
+      cy += boxH + 16;
     }
 
     doc.end();
