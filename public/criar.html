@@ -95,6 +95,27 @@
     .custom-toggle span { font-size: 13px; color: var(--muted); }
     #customColors { display: none; }
 
+    /* Image upload */
+    #capaImagemSection { display: none; margin-bottom: 16px; }
+    #imageDropZone {
+      border: 2px dashed var(--border); border-radius: 8px; padding: 20px;
+      text-align: center; cursor: pointer; transition: border-color 0.2s; position: relative;
+    }
+    #imageDropZone:hover, #imageDropZone.dragover { border-color: var(--primary); }
+    #imageDropZone.has-image { border-color: var(--primary); border-style: solid; padding: 0; overflow: hidden; }
+    #imagePrompt { color: var(--muted); font-size: 13px; }
+    #imagePrompt small { display: block; font-size: 11px; margin-top: 4px; color: #555; }
+    #imagePreview { display: none; }
+    #previewImg { width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; display: block; }
+    #changeImgBtn {
+      position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6);
+      color: white; border: none; border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer;
+    }
+    .opacity-row { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+    .opacity-row label { font-size: 12px; color: var(--muted); white-space: nowrap; min-width: 160px; }
+    .opacity-row input[type=range] { flex: 1; accent-color: var(--primary); }
+    #opacityVal { font-size: 12px; color: var(--text); min-width: 36px; text-align: right; }
+
     /* Formato */
     .format-row { display: flex; gap: 10px; }
     .format-btn {
@@ -255,6 +276,39 @@
         </label>
       </div>
 
+      <!-- Imagem de capa (wallpaper) -->
+      <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 18px;">
+        <label class="custom-toggle">
+          <input type="checkbox" id="useCapaImagem" />
+          <span>Usar imagem como wallpaper da capa</span>
+        </label>
+        <div id="capaImagemSection">
+          <div id="imageDropZone">
+            <input type="file" id="capaImagemFile" accept="image/jpeg,image/png,image/webp" style="display:none" />
+            <div id="imagePrompt">
+              Clique ou arraste uma imagem aqui
+              <small>JPEG / PNG — será redimensionada automaticamente</small>
+            </div>
+            <div id="imagePreview">
+              <img id="previewImg" alt="Preview da capa" />
+              <button type="button" id="changeImgBtn">trocar</button>
+            </div>
+          </div>
+          <div class="opacity-row">
+            <label>Escurecimento do overlay:</label>
+            <input type="range" id="capaOpacidade" min="10" max="80" value="48" step="1" />
+            <span id="opacityVal">48%</span>
+          </div>
+          <label class="custom-toggle" style="margin-top: 12px;">
+            <input type="checkbox" id="extrairCores" checked />
+            <span>Extrair cores da imagem automaticamente</span>
+          </label>
+          <p style="font-size: 11px; color: #555; margin-top: 4px;">
+            A IA detecta as cores dominantes da imagem e aplica no tema interno do documento.
+          </p>
+        </div>
+      </div>
+
       <!-- Cores customizadas -->
       <label class="custom-toggle" style="margin-top: 18px;">
         <input type="checkbox" id="useCustomColors" />
@@ -368,6 +422,72 @@
     });
   });
 
+  // ── Imagem de capa ──
+  let capaImagemBase64 = null;
+
+  document.getElementById('useCapaImagem').addEventListener('change', function() {
+    document.getElementById('capaImagemSection').style.display = this.checked ? 'block' : 'none';
+  });
+
+  const dropZone = document.getElementById('imageDropZone');
+  const fileInput = document.getElementById('capaImagemFile');
+
+  dropZone.addEventListener('click', () => { if (!capaImagemBase64) fileInput.click(); });
+  document.getElementById('changeImgBtn').addEventListener('click', (e) => {
+    e.stopPropagation(); capaImagemBase64 = null;
+    fileInput.click();
+  });
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault(); dropZone.classList.add('dragover');
+  });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault(); dropZone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) handleImageFile(file);
+  });
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files[0]) handleImageFile(e.target.files[0]);
+  });
+
+  async function handleImageFile(file) {
+    if (!file.type.startsWith('image/')) return;
+    capaImagemBase64 = await resizeForUpload(file);
+    const img = document.getElementById('previewImg');
+    img.src = 'data:image/jpeg;base64,' + capaImagemBase64;
+    document.getElementById('imagePreview').style.display = 'block';
+    document.getElementById('imagePrompt').style.display = 'none';
+    dropZone.classList.add('has-image');
+  }
+
+  function resizeForUpload(file) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxW = 794, maxH = 1123; // A4 @ 96dpi
+        let w = img.width, h = img.height;
+        if (w > maxW || h > maxH) {
+          const r = Math.min(maxW / w, maxH / h);
+          w = Math.round(w * r); h = Math.round(h * r);
+        }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        canvas.toBlob(blob => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result.split(',')[1]);
+          reader.readAsDataURL(blob);
+        }, 'image/jpeg', 0.88);
+      };
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  // Slider de opacidade
+  const opSlider = document.getElementById('capaOpacidade');
+  const opVal = document.getElementById('opacityVal');
+  opSlider.addEventListener('input', () => { opVal.textContent = opSlider.value + '%'; });
+
   // Custom colors toggle
   document.getElementById('useCustomColors').addEventListener('change', function() {
     document.getElementById('customColors').style.display = this.checked ? 'block' : 'none';
@@ -429,6 +549,8 @@
     const cabAtivo = document.getElementById('cabActive').checked;
     const rodAtivo = document.getElementById('rodActive').checked;
 
+    const useImagem = document.getElementById('useCapaImagem').checked && capaImagemBase64;
+
     const payload = {
       tipo: form.tipo.value,
       titulo: form.titulo.value,
@@ -449,6 +571,11 @@
         copyright: document.getElementById('rodCopyright').value,
       },
       formato: document.getElementById('formato').value,
+      ...(useImagem && {
+        capaImagem: capaImagemBase64,
+        capaImagemOpacidade: parseInt(opSlider.value) / 100,
+        extrairCores: document.getElementById('extrairCores').checked,
+      }),
     };
 
     try {

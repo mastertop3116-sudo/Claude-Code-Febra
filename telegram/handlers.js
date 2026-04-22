@@ -8,6 +8,7 @@ const { getMetas, getTarefas, getReports, saveMemory } = require("../integration
 const { getUTMifyReport, formatarRelatorio, getRelatorioVendasHoje } = require("../departments/finance/finance_agent");
 const { analisarYoutube, pesquisarMercado, analisarCopy, analisarURL } = require("../departments/research/research_agent");
 const { generate: gerarEntregavel } = require("../departments/creative/deliverable_generator");
+const { revisarEntregavel, formatarReview } = require("../departments/creative/design_reviewer");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { geminiPro } = require("../integrations/gemini");
 require("dotenv").config();
@@ -235,24 +236,27 @@ module.exports = function registerHandlers(bot) {
 
     try {
       const resultado = await gerarEntregavel({
-        tipo,
-        titulo,
-        temaKey,
-        paginas: 10,
-        descricao: titulo,
-        formato: "pdf",
+        tipo, titulo, temaKey, paginas: 10, descricao: titulo, formato: "pdf",
       });
 
       await bot.sendDocument(
         msg.chat.id,
         resultado.pdf,
-        { caption: `✅ *${titulo}*\n\nGerado com tema ${temaKey}. Use /criar para mais entregáveis.`, parse_mode: "Markdown" },
+        { caption: `✅ *${titulo}*\nTema: ${temaKey}`, parse_mode: "Markdown" },
         { filename: resultado.pdfFilename, contentType: "application/pdf" }
       );
+
+      // Revisor de design — roda em background, envia como segunda mensagem
+      revisarEntregavel(tipo, titulo, resultado.conteudo).then(review => {
+        bot.sendMessage(msg.chat.id, formatarReview(review, titulo), { parse_mode: "Markdown" });
+      }).catch(() => {});
     } catch (e) {
       bot.sendMessage(msg.chat.id, `Erro ao gerar entregável: ${e.message}`);
     }
   });
+
+  // /criar com FOTO — envia foto com legenda: /criar ebook "Título" tema
+  // A imagem vira o wallpaper da capa + cores extraídas automaticamente
 
   bot.onText(/\/status/, (msg) => {
     if (!isAuthorized(msg.chat.id)) return deny(bot, msg.chat.id);
@@ -269,15 +273,57 @@ module.exports = function registerHandlers(bot) {
 
     // Imagem/print
     if (msg.photo) {
+      const caption = (msg.caption || "").trim();
+
+      // Prioridade: /criar com imagem → gera entregável com wallpaper
+      if (caption.match(/^\/criar/i)) {
+        const match = caption.match(/\/criar\s+(\w+)\s+"([^"]+)"\s*(\w+)?/i);
+        if (!match) {
+          bot.sendMessage(msg.chat.id,
+            `📸 *Envie a foto com legenda no formato:*\n\`/criar ebook "Título" tema\`\n\nEx: \`/criar ebook "Guia de Ballet" elegancia\``,
+            { parse_mode: "Markdown" }
+          );
+          return;
+        }
+        const [, tipo, titulo, temaKey = "impacto"] = match;
+        bot.sendMessage(msg.chat.id, `🖼️ Imagem recebida! Gerando *"${titulo}"* com wallpaper personalizado...`, { parse_mode: "Markdown" });
+        bot.sendChatAction(msg.chat.id, "upload_document");
+        try {
+          const fileUrl = await bot.getFileLink(msg.photo[msg.photo.length - 1].file_id);
+          const imageBuffer = await downloadFile(fileUrl);
+
+          const resultado = await gerarEntregavel({
+            tipo, titulo, temaKey, paginas: 10, descricao: titulo,
+            formato: "pdf", capaImagem: imageBuffer, extrairCores: true,
+          });
+
+          await bot.sendDocument(
+            msg.chat.id,
+            resultado.pdf,
+            { caption: `✅ *${titulo}*\nTema: ${temaKey} + cores da imagem`, parse_mode: "Markdown" },
+            { filename: resultado.pdfFilename, contentType: "application/pdf" }
+          );
+
+          // Revisor de design em background
+          revisarEntregavel(tipo, titulo, resultado.conteudo).then(review => {
+            bot.sendMessage(msg.chat.id, formatarReview(review, titulo), { parse_mode: "Markdown" });
+          }).catch(() => {});
+        } catch (e) {
+          bot.sendMessage(msg.chat.id, `Erro ao gerar com imagem: ${e.message}`);
+        }
+        return;
+      }
+
+      // Análise genérica de imagem via Gemini
       try {
         bot.sendChatAction(msg.chat.id, "typing");
         const fileUrl = await bot.getFileLink(msg.photo[msg.photo.length - 1].file_id);
-        const caption = msg.caption || "Analise esta imagem. Se for print de negócio, dê insights acionáveis.";
+        const prompt = caption || "Analise esta imagem. Se for print de negócio, dê insights acionáveis.";
         const buf = await downloadFile(fileUrl);
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         const result = await model.generateContent([
-          { text: `Você é MAX, COO da Nexus Digital Holding. ${caption}` },
+          { text: `Você é MAX, COO da Nexus Digital Holding. ${prompt}` },
           { inlineData: { mimeType: "image/jpeg", data: buf.toString("base64") } },
         ]);
         bot.sendMessage(msg.chat.id, result.response.text(), { parse_mode: "Markdown" });

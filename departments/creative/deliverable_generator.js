@@ -11,6 +11,36 @@ const THEMES = require("./themes");
 const MAX_TENTATIVAS = 3;
 
 // ──────────────────────────────────────────
+// Extrai paleta de cores dominantes da imagem
+// ──────────────────────────────────────────
+async function extrairCoresDaImagem(imageBuffer) {
+  try {
+    const Vibrant = require("node-vibrant");
+    const palette = await Vibrant.from(imageBuffer).getPalette();
+    const hex = (s) => s ? (s.hex || "#000000") : null;
+
+    const vibrant    = hex(palette.Vibrant);
+    const dark       = hex(palette.DarkVibrant);
+    const light      = hex(palette.LightVibrant);
+    const darkMuted  = hex(palette.DarkMuted);
+
+    return {
+      primary:    vibrant   || "#E63946",
+      secondary:  dark      || "#1D1D1D",
+      accent:     light     || vibrant  || "#FF6B35",
+      background: "#FFFFFF",
+      text:       "#1A1A1A",
+      coverBg:    darkMuted || dark     || "#1D1D1D",
+      coverText:  "#FFFFFF",
+      coverAccent: vibrant  || "#E63946",
+    };
+  } catch (e) {
+    console.warn("[Creative] Extração de cores falhou:", e.message);
+    return null;
+  }
+}
+
+// ──────────────────────────────────────────
 // Sanitiza e parseia JSON de forma robusta
 // ──────────────────────────────────────────
 function sanitizeAndParse(raw) {
@@ -288,15 +318,30 @@ function gerarPDF(config, conteudo) {
     }
 
     // ════════════════════════════════════════
-    // CAPA — fundo escuro + decoração geométrica
+    // CAPA — wallpaper opcional + decoração geométrica
     // ════════════════════════════════════════
     pageNum++;
     doc.addPage({ size: "A4", margin: 0 });
-    const COV = C.coverBg || C.secondary || "#1D1D1D";
-    const COV_TEXT = C.coverText || "#FFFFFF";
-    const COV_ACC  = C.coverAccent || C.accent || C.primary;
+    const COV     = C.coverBg || C.secondary || "#1D1D1D";
+    const COV_ACC = C.coverAccent || C.accent || C.primary;
+    // Com imagem: texto sempre branco (overlay escuro garante contraste)
+    const COV_TEXT = config.capaImagem ? "#FFFFFF" : (C.coverText || "#FFFFFF");
 
-    doc.rect(0, 0, W, H).fill(COV);
+    if (config.capaImagem) {
+      // Wallpaper: imagem preenche a página inteira
+      try {
+        doc.image(config.capaImagem, 0, 0, { width: W, height: H });
+      } catch (_) {
+        doc.rect(0, 0, W, H).fill(COV);
+      }
+      // Overlay escuro ajustável — preserva imagem mas garante legibilidade
+      const opacidade = config.capaImagemOpacidade !== undefined
+        ? config.capaImagemOpacidade : 0.48;
+      doc.fillOpacity(opacidade).fillColor("#000000").rect(0, 0, W, H).fill();
+      doc.fillOpacity(1); // reseta para o resto do documento
+    } else {
+      doc.rect(0, 0, W, H).fill(COV);
+    }
 
     // Retângulo de acento no canto superior esquerdo
     doc.rect(0, 0, W * 0.45, 8).fill(COV_ACC);
@@ -480,6 +525,25 @@ async function generate(config) {
   const temaKey = config.temaKey || "produtividade";
   const temaBase = THEMES[temaKey] || THEMES.produtividade;
 
+  // Imagem de capa: aceita Buffer (Telegram) ou base64 string (web)
+  let imagemBuffer = null;
+  let coresExtraidas = null;
+
+  if (config.capaImagem) {
+    if (typeof config.capaImagem === "string") {
+      imagemBuffer = Buffer.from(config.capaImagem, "base64");
+    } else if (Buffer.isBuffer(config.capaImagem)) {
+      imagemBuffer = config.capaImagem;
+    }
+
+    if (imagemBuffer && config.extrairCores !== false) {
+      coresExtraidas = await extrairCoresDaImagem(imagemBuffer);
+      if (coresExtraidas) {
+        console.log("[Creative] Cores extraídas da imagem:", coresExtraidas.primary, coresExtraidas.accent);
+      }
+    }
+  }
+
   const finalConfig = {
     tipo: config.tipo || "ebook",
     titulo: config.titulo || "Meu Entregável",
@@ -489,7 +553,12 @@ async function generate(config) {
     descricao: config.descricao || config.titulo,
     tema: temaBase,
     temaKey,
-    cores: config.cores ? { ...temaBase.colors, ...config.cores } : temaBase.colors,
+    // Prioridade: tema base → cores da imagem → cores customizadas pelo user
+    cores: {
+      ...temaBase.colors,
+      ...(coresExtraidas || {}),
+      ...(config.cores || {}),
+    },
     fontes: config.fontes ? { ...temaBase.fonts, ...config.fontes } : temaBase.fonts,
     cabecalho: config.cabecalho !== undefined ? config.cabecalho : {
       ativo: true,
@@ -501,6 +570,8 @@ async function generate(config) {
       numeroPagina: true,
     },
     formato: config.formato || "pdf",
+    capaImagem: imagemBuffer,
+    capaImagemOpacidade: config.capaImagemOpacidade,
   };
 
   const conteudo = await gerarConteudo(
@@ -525,4 +596,4 @@ async function generate(config) {
   return resultado;
 }
 
-module.exports = { generate, gerarConteudo, gerarPDF, gerarDOCX, THEMES };
+module.exports = { generate, gerarConteudo, gerarPDF, gerarDOCX, extrairCoresDaImagem, THEMES };
