@@ -4,12 +4,35 @@
 // ============================================
 
 const PDFDocument = require("pdfkit");
-const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle } = require("docx");
-const { geminiFlash } = require("../../integrations/gemini");
+const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = require("docx");
+const { geminiJson, geminiFlash } = require("../../integrations/gemini");
 const THEMES = require("./themes");
 
+const MAX_TENTATIVAS = 3;
+
 // ──────────────────────────────────────────
-// Geração de conteúdo via Gemini
+// Sanitiza e parseia JSON de forma robusta
+// ──────────────────────────────────────────
+function sanitizeAndParse(raw) {
+  let text = raw.trim();
+
+  // Remove blocos de markdown ```json ... ```
+  text = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/, "");
+
+  // Extrai o bloco { ... } mais externo
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  if (start === -1 || end === -1) throw new Error("Nenhum bloco JSON encontrado na resposta");
+  text = text.slice(start, end + 1);
+
+  // Remove caracteres de controle inválidos em JSON (exceto \n \r \t)
+  text = text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "");
+
+  return JSON.parse(text);
+}
+
+// ──────────────────────────────────────────
+// Geração de conteúdo via Gemini (com retries)
 // ──────────────────────────────────────────
 async function gerarConteudo(tipo, titulo, descricao, paginas = 10) {
   const tipoMap = {
@@ -22,36 +45,86 @@ async function gerarConteudo(tipo, titulo, descricao, paginas = 10) {
     certificado: "certificado de conclusão",
   };
 
-  const prompt = `Crie o conteúdo completo para um ${tipoMap[tipo] || tipo} chamado "${titulo}".
-Contexto/nicho: ${descricao}
-Número aproximado de páginas: ${paginas}
+  const numSecoes = Math.min(Math.max(3, Math.round(paginas / 2)), 8);
 
-Retorne SOMENTE um JSON válido com esta estrutura:
+  // Prompt defensivo: strings curtas e sem caracteres especiais
+  const prompt = `Crie conteúdo para um ${tipoMap[tipo] || tipo} chamado "${titulo}".
+Nicho: ${descricao}
+Número de seções: ${numSecoes}
+
+REGRAS OBRIGATÓRIAS:
+- Retorne APENAS JSON válido, sem markdown, sem texto antes ou depois
+- Strings não podem conter aspas duplas internas — use aspas simples se necessário
+- Não use quebras de linha dentro de valores de string — use ponto e vírgula para separar ideias
+- Cada string deve ter no máximo 500 caracteres
+
+JSON com exatamente esta estrutura:
 {
   "capa": {
-    "titulo": "título principal",
-    "subtitulo": "subtítulo opcional",
-    "tagline": "frase de impacto curta"
+    "titulo": "titulo aqui",
+    "subtitulo": "subtitulo aqui",
+    "tagline": "frase de impacto"
   },
-  "introducao": "texto de introdução (2-3 parágrafos)",
+  "introducao": "texto corrido sem quebras de linha",
   "secoes": [
     {
-      "titulo": "título da seção",
-      "conteudo": "conteúdo da seção (2-4 parágrafos ou lista de itens)",
-      "destaques": ["dica ou ponto importante 1", "dica ou ponto importante 2"]
+      "titulo": "nome da secao",
+      "conteudo": "conteudo da secao sem quebras de linha",
+      "destaques": ["destaque 1", "destaque 2", "destaque 3"]
     }
   ],
-  "conclusao": "texto de conclusão com call-to-action",
-  "sobre_autor": "texto sobre o autor/empresa (2-3 linhas)"
+  "conclusao": "texto de conclusao com call-to-action",
+  "sobre_autor": "texto sobre o autor"
 }
 
-Gere entre ${Math.max(3, Math.round(paginas / 2))} e ${paginas} seções ricas em conteúdo prático.
-Escreva em português brasileiro. Seja direto, prático e valioso para o leitor.`;
+Idioma: português brasileiro. Tom: direto e prático.`;
 
-  const raw = await geminiFlash(prompt);
-  const jsonMatch = raw.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error("Gemini não retornou JSON válido");
-  return JSON.parse(jsonMatch[0]);
+  let ultimoErro = null;
+
+  for (let tentativa = 1; tentativa <= MAX_TENTATIVAS; tentativa++) {
+    try {
+      // Tentativa 1 e 2: modo JSON nativo (mais confiável)
+      // Tentativa 3: fallback para geminiFlash com sanitização mais agressiva
+      let raw;
+      if (tentativa < MAX_TENTATIVAS) {
+        raw = await geminiJson(prompt);
+      } else {
+        console.log("[Creative] Última tentativa — usando fallback com sanitização");
+        raw = await geminiFlash(prompt);
+      }
+
+      const conteudo = sanitizeAndParse(raw);
+
+      // Valida estrutura mínima
+      if (!conteudo.capa || !conteudo.secoes || !Array.isArray(conteudo.secoes)) {
+        throw new Error("JSON retornado não tem a estrutura esperada (capa/secoes)");
+      }
+
+      if (tentativa > 1) {
+        console.log(`[Creative] Sucesso na tentativa ${tentativa}`);
+      }
+      return conteudo;
+
+    } catch (err) {
+      ultimoErro = err;
+      console.error(`[Creative] Tentativa ${tentativa}/${MAX_TENTATIVAS} falhou: ${err.message}`);
+
+      // Aprende com o erro — salva no Supabase de forma assíncrona
+      try {
+        const { saveMemory } = require("../../integrations/supabase");
+        await saveMemory("creative", "json_error", `Erro tentativa ${tentativa}: ${err.message}`, {
+          tipo, titulo, tentativa, erro: err.message, timestamp: new Date().toISOString(),
+        });
+      } catch (_) {}
+
+      if (tentativa < MAX_TENTATIVAS) {
+        // Espera crescente entre tentativas
+        await new Promise(r => setTimeout(r, tentativa * 1000));
+      }
+    }
+  }
+
+  throw new Error(`Falha após ${MAX_TENTATIVAS} tentativas. Último erro: ${ultimoErro?.message}`);
 }
 
 // ──────────────────────────────────────────

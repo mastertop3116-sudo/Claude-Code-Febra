@@ -54,4 +54,17 @@ function geminiChat(systemInstruction = null, usePro = false) {
   return model.startChat({ history: [] });
 }
 
-module.exports = { geminiFlash, geminiPro, geminiChat };
+/**
+ * Geração em modo JSON — força output JSON válido via responseMimeType
+ * Use para: qualquer geração onde o resultado precisa ser parseado como JSON
+ */
+async function geminiJson(prompt, usePro = false) {
+  const model = genAI.getGenerativeModel({
+    model: usePro ? PRO_MODEL : FLASH_MODEL,
+    generationConfig: { responseMimeType: "application/json" },
+  });
+  const result = await model.generateContent(prompt);
+  return result.response.text();
+}
+
+module.exports = { geminiFlash, geminiPro, geminiChat, geminiJson };
