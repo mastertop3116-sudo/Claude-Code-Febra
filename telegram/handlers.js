@@ -5,7 +5,9 @@
 
 const { maxProcess, maxCouncil } = require("../core/max");
 const { getMetas, getTarefas, getReports, saveMemory } = require("../integrations/supabase");
+const { getUTMifyReport, formatarRelatorio, getRelatorioVendasHoje } = require("../departments/finance/finance_agent");
 const { analisarYoutube, pesquisarMercado, analisarCopy, analisarURL } = require("../departments/research/research_agent");
+const { generate: gerarEntregavel } = require("../departments/creative/deliverable_generator");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { geminiPro } = require("../integrations/gemini");
 require("dotenv").config();
@@ -42,6 +44,8 @@ module.exports = function registerHandlers(bot) {
       `/metas — Caderno Preto\n` +
       `/tarefas — Status dos departamentos\n` +
       `/report — Stark Report\n` +
+      `/financeiro — Métricas UTMify em tempo real\n` +
+      `/criar — Gerar entregável PDF/Word\n` +
       `/conselho [decisão] — Convocar os Titãs\n` +
       `/paulo [contexto] — Análise DISC\n` +
       `/claude [pergunta] — Falar com Claude\n` +
@@ -92,6 +96,24 @@ module.exports = function registerHandlers(bot) {
         { parse_mode: "Markdown" }
       );
     } catch (e) { bot.sendMessage(msg.chat.id, `Erro: ${e.message}`); }
+  });
+
+  bot.onText(/\/financeiro/, async (msg) => {
+    if (!isAuthorized(msg.chat.id)) return deny(bot, msg.chat.id);
+    bot.sendChatAction(msg.chat.id, "typing");
+    try {
+      // Métricas UTMify (cache Supabase)
+      const rows = await getUTMifyReport();
+      const textoUTM = formatarRelatorio(rows ? [rows] : null);
+
+      // Vendas do dia via GG Checkout
+      const { totalReceita, totalConversoes } = await getRelatorioVendasHoje();
+      const textoGG = totalConversoes > 0
+        ? `\n*VENDAS HOJE (GG Checkout)*\nVendas confirmadas: ${totalConversoes}\nReceita: R$ ${totalReceita.toFixed(2)}`
+        : "";
+
+      bot.sendMessage(msg.chat.id, textoUTM + textoGG, { parse_mode: "Markdown" });
+    } catch (e) { bot.sendMessage(msg.chat.id, `Erro ao buscar financeiro: ${e.message}`); }
   });
 
   bot.onText(/\/conselho (.+)/, async (msg, match) => {
@@ -165,6 +187,64 @@ module.exports = function registerHandlers(bot) {
       const resultado = await analisarURL(match[1]);
       bot.sendMessage(msg.chat.id, resultado, { parse_mode: "Markdown" });
     } catch (e) { bot.sendMessage(msg.chat.id, `Erro: ${e.message}`); }
+  });
+
+  // /criar [tipo] "titulo" [tema]
+  // Ex: /criar ebook "Fundamentos do Jiu-Jitsu" impacto
+  bot.onText(/\/criar(.*)/, async (msg, match) => {
+    if (!isAuthorized(msg.chat.id)) return deny(bot, msg.chat.id);
+    const args = (match[1] || "").trim();
+
+    if (!args) {
+      return bot.sendMessage(msg.chat.id,
+        `*GERADOR DE ENTREGÁVEIS*\n\n` +
+        `Uso: \`/criar [tipo] "título" [tema]\`\n\n` +
+        `*Tipos:*\nebook, checklist, workbook, planner, script_vsl, cheat_sheet, certificado\n\n` +
+        `*Temas:*\nimpacto, elegancia, sabedoria, produtividade, bemestar, criatividade\n\n` +
+        `*Exemplos:*\n` +
+        `/criar ebook "10 Fundamentos do Jiu-Jitsu" impacto\n` +
+        `/criar checklist "Rotina Matinal Bíblica" sabedoria\n` +
+        `/criar workbook "Ballet para Iniciantes" elegancia\n\n` +
+        `Ou acesse: ${process.env.RENDER_URL || "http://localhost:3000"}/criar`,
+        { parse_mode: "Markdown" }
+      );
+    }
+
+    // Extrai tipo, título entre aspas, e tema
+    const tipoMatch = args.match(/^(\w+)/);
+    const tituloMatch = args.match(/"([^"]+)"/);
+    const temaMatch = args.match(/"[^"]+"\s+(\w+)/) || args.match(/(\w+)\s*$/);
+
+    if (!tituloMatch) {
+      return bot.sendMessage(msg.chat.id, `⚠ Coloque o título entre aspas.\nEx: /criar ebook *"Título do Entregável"* impacto`, { parse_mode: "Markdown" });
+    }
+
+    const tipo = tipoMatch ? tipoMatch[1] : "ebook";
+    const titulo = tituloMatch[1];
+    const temaKey = (temaMatch && temaMatch[1] !== tipo) ? temaMatch[1] : "impacto";
+
+    bot.sendMessage(msg.chat.id, `⚙️ Gerando *"${titulo}"*...\nIsso pode levar 30-60 segundos.`, { parse_mode: "Markdown" });
+    bot.sendChatAction(msg.chat.id, "upload_document");
+
+    try {
+      const resultado = await gerarEntregavel({
+        tipo,
+        titulo,
+        temaKey,
+        paginas: 10,
+        descricao: titulo,
+        formato: "pdf",
+      });
+
+      await bot.sendDocument(
+        msg.chat.id,
+        resultado.pdf,
+        { caption: `✅ *${titulo}*\n\nGerado com tema ${temaKey}. Use /criar para mais entregáveis.`, parse_mode: "Markdown" },
+        { filename: resultado.pdfFilename, contentType: "application/pdf" }
+      );
+    } catch (e) {
+      bot.sendMessage(msg.chat.id, `Erro ao gerar entregável: ${e.message}`);
+    }
   });
 
   bot.onText(/\/status/, (msg) => {

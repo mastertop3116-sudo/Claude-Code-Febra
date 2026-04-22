@@ -30,18 +30,29 @@ router.post("/ggcheckout", async (req, res) => {
 
     console.log(`[Finance] Evento recebido: ${evento}`, payload);
 
-    // Monta mensagem para o Telegram
-    const produto = payload.product?.name || payload.product_name || "Produto";
-    const valor   = payload.amount ? `R$ ${(payload.amount / 100).toFixed(2)}` : "—";
-    const cliente = payload.customer?.name || payload.buyer_name || "—";
-    const email   = payload.customer?.email || payload.buyer_email || "—";
+    // Extrai campos — GG Checkout pode variar o formato do payload
+    const produto = payload.product?.name || payload.product_name || payload.productName || payload.item_name || "Produto";
+    const cliente = payload.customer?.name || payload.buyer_name || payload.customerName || payload.name || "—";
+    const email   = payload.customer?.email || payload.buyer_email || payload.customerEmail || payload.email || "—";
+
+    // Valor: tenta vários campos (centavos ou reais)
+    let valorNum = 0;
+    const rawAmount = payload.amount ?? payload.price ?? payload.sale_price ?? payload.order_value ?? payload.value ?? payload.total;
+    if (rawAmount !== undefined && rawAmount !== null) {
+      valorNum = Number(rawAmount);
+      // Se valor parecer estar em centavos (> 1000 para produto de R$10+), converte
+      if (valorNum > 1000 && !String(rawAmount).includes(".")) {
+        valorNum = valorNum / 100;
+      }
+    }
+    const valorStr = valorNum > 0 ? `R$ ${valorNum.toFixed(2)}` : "—";
 
     const mensagem =
       `${info.emoji} *${info.label}*\n\n` +
-      `Produto: ${produto}\n` +
-      `Valor: *${valor}*\n` +
-      `Cliente: ${cliente}\n` +
-      `Email: ${email}`;
+      `💰 Valor: *${valorStr}*\n` +
+      `📦 Produto: ${produto}\n` +
+      `👤 Cliente: ${cliente}\n` +
+      `📧 Email: ${email}`;
 
     // Notifica o fundador via Telegram
     await notify(mensagem);
@@ -49,7 +60,6 @@ router.post("/ggcheckout", async (req, res) => {
     // Se foi venda confirmada, salva no financeiro e atualiza metas
     const eVenda = ["pix_paid", "card_approved"].includes(evento);
     if (eVenda) {
-      const valorNum = payload.amount ? payload.amount / 100 : 0;
 
       await salvarReport({
         receitaBruta: valorNum,

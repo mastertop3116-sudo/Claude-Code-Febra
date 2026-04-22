@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexus — Gerador de Entregáveis</title>
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --surface: #161616;
+      --surface2: #1e1e1e;
+      --border: #2a2a2a;
+      --primary: #e63946;
+      --accent: #ff6b35;
+      --text: #f0f0f0;
+      --muted: #888;
+      --radius: 10px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 32px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    header .logo { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+    header .logo span { color: var(--primary); }
+    header p { font-size: 13px; color: var(--muted); margin-left: auto; }
+
+    main { max-width: 860px; margin: 40px auto; padding: 0 20px 60px; }
+
+    h2 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+    .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+
+    .section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; }
+    .section-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--primary); margin-bottom: 18px; }
+
+    .field { margin-bottom: 18px; }
+    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+    input[type=text], input[type=number], select, textarea {
+      width: 100%; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-size: 14px; outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+    textarea { resize: vertical; min-height: 80px; }
+    select option { background: var(--surface2); }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+    /* Temas */
+    .themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    @media(max-width: 600px) { .themes { grid-template-columns: 1fr 1fr; } .grid2, .grid3 { grid-template-columns: 1fr; } }
+    .theme-card {
+      border: 2px solid var(--border); border-radius: 8px; padding: 14px 12px; cursor: pointer;
+      transition: all 0.2s; position: relative;
+    }
+    .theme-card:hover { border-color: var(--muted); }
+    .theme-card.selected { border-color: var(--primary); background: var(--primary)12; }
+    .theme-card input[type=radio] { position: absolute; opacity: 0; }
+    .theme-swatch { display: flex; gap: 5px; margin-bottom: 10px; }
+    .swatch { width: 18px; height: 18px; border-radius: 50%; }
+    .theme-name { font-size: 13px; font-weight: 600; }
+    .theme-niche { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+    /* Toggle switches */
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .toggle-label { font-size: 14px; }
+    .toggle-label small { display: block; font-size: 12px; color: var(--muted); }
+    .toggle { position: relative; width: 44px; height: 24px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; inset: 0; background: var(--border); border-radius: 24px;
+      transition: 0.2s;
+    }
+    .slider:before {
+      content: ''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px;
+      background: white; border-radius: 50%; transition: 0.2s;
+    }
+    input:checked + .slider { background: var(--primary); }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    /* Color pickers */
+    .color-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    .color-field { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+    .color-field label { font-size: 11px; color: var(--muted); text-align: center; }
+    input[type=color] { width: 48px; height: 36px; border: none; background: none; cursor: pointer; border-radius: 6px; }
+
+    /* Custom section toggle */
+    .custom-toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 16px; }
+    .custom-toggle input { accent-color: var(--primary); }
+    .custom-toggle span { font-size: 13px; color: var(--muted); }
+    #customColors { display: none; }
+
+    /* Formato */
+    .format-row { display: flex; gap: 10px; }
+    .format-btn {
+      flex: 1; padding: 10px; border: 2px solid var(--border); border-radius: 8px; cursor: pointer;
+      background: var(--surface2); color: var(--text); font-size: 13px; font-weight: 600; transition: all 0.2s;
+      text-align: center;
+    }
+    .format-btn:hover { border-color: var(--muted); }
+    .format-btn.active { border-color: var(--primary); color: var(--primary); background: var(--primary)12; }
+
+    /* Gerar button */
+    #btnGerar {
+      width: 100%; padding: 16px; background: var(--primary); border: none; border-radius: var(--radius);
+      color: white; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity 0.2s;
+      margin-top: 8px;
+    }
+    #btnGerar:hover { opacity: 0.9; }
+    #btnGerar:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Progress */
+    #progress { display: none; text-align: center; padding: 32px; }
+    .spinner { display: inline-block; width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #progressText { color: var(--muted); font-size: 14px; }
+
+    /* Success */
+    #successBox { display: none; background: var(--surface); border: 1px solid #2d6a2d; border-radius: var(--radius); padding: 24px; text-align: center; margin-top: 20px; }
+    #successBox h3 { color: #4caf50; margin-bottom: 12px; }
+    .dl-btn {
+      display: inline-block; margin: 6px; padding: 12px 24px; border-radius: 8px; font-weight: 600;
+      font-size: 14px; text-decoration: none; cursor: pointer; border: none;
+    }
+    .dl-pdf { background: var(--primary); color: white; }
+    .dl-docx { background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
+    .dl-btn:hover { opacity: 0.85; }
+
+    /* Error */
+    #errorBox { display: none; background: #1a0a0a; border: 1px solid #6a2d2d; border-radius: var(--radius); padding: 16px; margin-top: 12px; color: #f48989; font-size: 13px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">NEXUS <span>MAX</span></div>
+  <p>Gerador de Entregáveis Digitais</p>
+</header>
+
+<main>
+  <h2>Criar Entregável</h2>
+  <p class="subtitle">Conteúdo gerado por IA + layout profissional automático</p>
+
+  <form id="form">
+
+    <!-- BÁSICO -->
+    <div class="section">
+      <div class="section-title">01 — Informações Básicas</div>
+      <div class="grid2">
+        <div class="field">
+          <label>Tipo de entregável</label>
+          <select name="tipo" id="tipo">
+            <option value="ebook">📚 Ebook / Guia Completo</option>
+            <option value="workbook">✍️ Workbook / Caderno de Exercícios</option>
+            <option value="checklist">✅ Checklist</option>
+            <option value="planner">📅 Planner / Organizador</option>
+            <option value="script_vsl">🎥 Script VSL / Vídeo de Vendas</option>
+            <option value="cheat_sheet">⚡ Guia de Consulta Rápida</option>
+            <option value="certificado">🏆 Certificado de Conclusão</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Número de páginas</label>
+          <input type="number" name="paginas" value="10" min="3" max="50" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Título do entregável</label>
+        <input type="text" name="titulo" placeholder="Ex: 10 Fundamentos do Jiu-Jitsu para Iniciantes" required />
+      </div>
+      <div class="field">
+        <label>Subtítulo (opcional)</label>
+        <input type="text" name="subtitulo" placeholder="Ex: O guia definitivo para quem está começando" />
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label>Nome do autor / marca</label>
+          <input type="text" name="autor" placeholder="Ex: João Silva | Academia XYZ" />
+        </div>
+        <div class="field">
+          <label>Nicho / descrição do público</label>
+          <input type="text" name="descricao" placeholder="Ex: Iniciantes no Jiu-Jitsu adultos 25-45 anos" />
+        </div>
+      </div>
+    </div>
+
+    <!-- TEMA VISUAL -->
+    <div class="section">
+      <div class="section-title">02 — Tema Visual</div>
+      <div class="themes" id="themes">
+        <label class="theme-card selected">
+          <input type="radio" name="temaKey" value="impacto" checked />
+          <div class="theme-swatch">
+            <div class="swatch" style="background:#E63946"></div>
+            <div class="swatch" style="background:#1D1D1D"></div>
+            <div class="swatch" style="background:#FF6B35"></div>
+          </div>
+          <div class="theme-name">⚡ Impacto & Ação</div>
+          <div class="theme-niche">Jiu-Jitsu, Fitness, Empreend.</div>
+        </label>
+        <label class="theme-card">
+          <input type="radio" name="temaKey" value="elegancia" />
+          <div class="theme-swatch">
+            <div class="swatch" style="background:#C2798A"></div>
+            <div class="swatch" style="background:#7B5EA7"></div>
+            <div class="swatch" style="background:#C9A84C"></div>
+          </div>
+          <div class="theme-name">🌸 Elegância & Harmonia</div>
+          <div class="theme-niche">Ballet, Bem-estar Feminino</div>
+        </label>
+        <label class="theme-card">
+          <input type="radio" name="temaKey" value="sabedoria" />
+          <div class="theme-swatch">
+            <div class="swatch" style="background:#8B4513"></div>
+            <div class="swatch" style="background:#556B2F"></div>
+            <div class="swatch" style="background:#DAA520"></div>
+          </div>
+          <div class="theme-name">📖 Sabedoria & Tradição</div>
+          <div class="theme-niche">Bíblico, Espiritualidade</div>
+        </label>
+        <label class="theme-card">
+          <input type="radio" name="temaKey" value="produtividade" />
+          <div class="theme-swatch">
+            <div class="swatch" style="background:#1565C0"></div>
+            <div class="swatch" style="background:#00897B"></div>
+            <div class="swatch" style="background:#FF8F00"></div>
+          </div>
+          <div class="theme-name">🎯 Produtividade & Foco</div>
+          <div class="theme-niche">Gestão, Finanças, Carreira</div>
+        </label>
+        <label class="theme-card">
+          <input type="radio" name="temaKey" value="bemestar" />
+          <div class="theme-swatch">
+            <div class="swatch" style="background:#558B2F"></div>
+            <div class="swatch" style="background:#1976D2"></div>
+            <div class="swatch" style="background:#F06292"></div>
+          </div>
+          <div class="theme-name">🌿 Bem-estar & Leveza</div>
+          <div class="theme-niche">Yoga, Saúde, Maternidade</div>
+        </label>
+        <label class="theme-card">
+          <input type="radio" name="temaKey" value="criatividade" />
+          <div class="theme-swatch">
+            <div class="swatch" style="background:#7C4DFF"></div>
+            <div class="swatch" style="background:#00BCD4"></div>
+            <div class="swatch" style="background:#FF4081"></div>
+          </div>
+          <div class="theme-name">🚀 Criatividade & Inovação</div>
+          <div class="theme-niche">Design, Marketing, Criativo</div>
+        </label>
+      </div>
+
+      <!-- Cores customizadas -->
+      <label class="custom-toggle" style="margin-top: 18px;">
+        <input type="checkbox" id="useCustomColors" />
+        <span>Personalizar cores manualmente</span>
+      </label>
+      <div id="customColors">
+        <div class="color-grid">
+          <div class="color-field">
+            <label>Cor principal</label>
+            <input type="color" id="cPrimary" value="#E63946" />
+          </div>
+          <div class="color-field">
+            <label>Cor secundária</label>
+            <input type="color" id="cSecondary" value="#1D1D1D" />
+          </div>
+          <div class="color-field">
+            <label>Cor de destaque</label>
+            <input type="color" id="cAccent" value="#FF6B35" />
+          </div>
+          <div class="color-field">
+            <label>Cor do fundo</label>
+            <input type="color" id="cBackground" value="#FFFFFF" />
+          </div>
+          <div class="color-field">
+            <label>Cor do texto</label>
+            <input type="color" id="cText" value="#1D1D1D" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CABEÇALHO E RODAPÉ -->
+    <div class="section">
+      <div class="section-title">03 — Cabeçalho & Rodapé</div>
+
+      <div class="toggle-row">
+        <div class="toggle-label">
+          Cabeçalho
+          <small>Barra superior com nome da marca em cada página</small>
+        </div>
+        <label class="toggle"><input type="checkbox" id="cabActive" checked /><span class="slider"></span></label>
+      </div>
+      <div class="field" id="cabTextoField">
+        <label>Texto do cabeçalho</label>
+        <input type="text" id="cabTexto" placeholder="Deixe vazio para usar o nome do autor" />
+      </div>
+
+      <div class="toggle-row" style="margin-top:16px">
+        <div class="toggle-label">
+          Rodapé
+          <small>Linha inferior com texto e número de páginas</small>
+        </div>
+        <label class="toggle"><input type="checkbox" id="rodActive" checked /><span class="slider"></span></label>
+      </div>
+      <div id="rodapeFields">
+        <div class="grid2">
+          <div class="field">
+            <label>Texto do rodapé</label>
+            <input type="text" id="rodTexto" placeholder="Ex: www.seusite.com.br | @suainstagram" />
+          </div>
+          <div class="field" style="display:flex;align-items:flex-end;gap:10px;padding-bottom:2px">
+            <div class="toggle-row" style="margin:0;flex:1">
+              <div class="toggle-label">Número de páginas</div>
+              <label class="toggle"><input type="checkbox" id="rodNumPag" checked /><span class="slider"></span></label>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Texto de copyright (opcional)</label>
+          <input type="text" id="rodCopyright" placeholder="Ex: © 2025 Academia XYZ. Todos os direitos reservados." />
+        </div>
+      </div>
+    </div>
+
+    <!-- FORMATO DE SAÍDA -->
+    <div class="section">
+      <div class="section-title">04 — Formato de Saída</div>
+      <div class="format-row">
+        <div class="format-btn active" data-fmt="pdf" onclick="selectFmt(this,'pdf')">📄 PDF</div>
+        <div class="format-btn" data-fmt="docx" onclick="selectFmt(this,'docx')">📝 Word (.docx)</div>
+        <div class="format-btn" data-fmt="ambos" onclick="selectFmt(this,'ambos')">📦 Ambos</div>
+      </div>
+      <input type="hidden" id="formato" value="pdf" />
+    </div>
+
+    <button type="submit" id="btnGerar">✨ Gerar Entregável</button>
+  </form>
+
+  <div id="progress">
+    <div class="spinner"></div>
+    <div id="progressText">Gerando conteúdo com IA...</div>
+  </div>
+
+  <div id="successBox">
+    <h3>✅ Entregável criado com sucesso!</h3>
+    <p id="successMsg" style="color:var(--muted);font-size:13px;margin-bottom:16px"></p>
+    <div id="downloadBtns"></div>
+    <br/>
+    <button class="dl-btn dl-docx" onclick="resetForm()">← Criar outro</button>
+  </div>
+
+  <div id="errorBox"></div>
+</main>
+
+<script>
+  // Tema cards
+  document.querySelectorAll('.theme-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+    });
+  });
+
+  // Custom colors toggle
+  document.getElementById('useCustomColors').addEventListener('change', function() {
+    document.getElementById('customColors').style.display = this.checked ? 'block' : 'none';
+  });
+
+  // Header/Footer toggles
+  document.getElementById('cabActive').addEventListener('change', function() {
+    document.getElementById('cabTextoField').style.display = this.checked ? 'block' : 'none';
+  });
+  document.getElementById('rodActive').addEventListener('change', function() {
+    document.getElementById('rodapeFields').style.display = this.checked ? 'block' : 'none';
+  });
+
+  // Format selection
+  function selectFmt(el, fmt) {
+    document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('formato').value = fmt;
+  }
+
+  // Form submit
+  document.getElementById('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+
+    const btn = document.getElementById('btnGerar');
+    const progress = document.getElementById('progress');
+    const successBox = document.getElementById('successBox');
+    const errorBox = document.getElementById('errorBox');
+
+    btn.disabled = true;
+    form.style.display = 'none';
+    progress.style.display = 'block';
+    successBox.style.display = 'none';
+    errorBox.style.display = 'none';
+
+    const stepMsgs = [
+      'Gerando conteúdo com IA...',
+      'Estruturando seções e capítulos...',
+      'Aplicando tema visual...',
+      'Montando layout do PDF...',
+      'Finalizando arquivo...',
+    ];
+    let step = 0;
+    const interval = setInterval(() => {
+      document.getElementById('progressText').textContent = stepMsgs[step % stepMsgs.length];
+      step++;
+    }, 3500);
+
+    const useCustom = document.getElementById('useCustomColors').checked;
+    const cores = useCustom ? {
+      primary: document.getElementById('cPrimary').value,
+      secondary: document.getElementById('cSecondary').value,
+      accent: document.getElementById('cAccent').value,
+      background: document.getElementById('cBackground').value,
+      text: document.getElementById('cText').value,
+    } : null;
+
+    const cabAtivo = document.getElementById('cabActive').checked;
+    const rodAtivo = document.getElementById('rodActive').checked;
+
+    const payload = {
+      tipo: form.tipo.value,
+      titulo: form.titulo.value,
+      subtitulo: form.subtitulo.value,
+      autor: form.autor.value,
+      descricao: form.descricao.value,
+      paginas: parseInt(form.paginas.value),
+      temaKey: form.querySelector('input[name=temaKey]:checked').value,
+      cores,
+      cabecalho: {
+        ativo: cabAtivo,
+        texto: document.getElementById('cabTexto').value,
+      },
+      rodape: {
+        ativo: rodAtivo,
+        texto: document.getElementById('rodTexto').value,
+        numeroPagina: document.getElementById('rodNumPag').checked,
+        copyright: document.getElementById('rodCopyright').value,
+      },
+      formato: document.getElementById('formato').value,
+    };
+
+    try {
+      const res = await fetch('/api/criar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      clearInterval(interval);
+      progress.style.display = 'none';
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Erro desconhecido' }));
+        throw new Error(err.error || 'Erro ao gerar entregável');
+      }
+
+      const data = await res.json();
+      document.getElementById('successMsg').textContent = `"${payload.titulo}" gerado com sucesso!`;
+
+      const btns = document.getElementById('downloadBtns');
+      btns.innerHTML = '';
+
+      if (data.pdf) {
+        const a = document.createElement('a');
+        a.href = 'data:application/pdf;base64,' + data.pdf;
+        a.download = data.pdfFilename || 'entregavel.pdf';
+        a.className = 'dl-btn dl-pdf';
+        a.textContent = '⬇ Baixar PDF';
+        btns.appendChild(a);
+      }
+      if (data.docx) {
+        const a = document.createElement('a');
+        a.href = 'data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,' + data.docx;
+        a.download = data.docxFilename || 'entregavel.docx';
+        a.className = 'dl-btn dl-docx';
+        a.textContent = '⬇ Baixar Word';
+        btns.appendChild(a);
+      }
+
+      successBox.style.display = 'block';
+    } catch (err) {
+      clearInterval(interval);
+      progress.style.display = 'none';
+      form.style.display = 'block';
+      btn.disabled = false;
+      errorBox.style.display = 'block';
+      errorBox.textContent = '⚠ ' + err.message;
+    }
+  });
+
+  function resetForm() {
+    document.getElementById('form').style.display = 'block';
+    document.getElementById('btnGerar').disabled = false;
+    document.getElementById('successBox').style.display = 'none';
+    document.getElementById('errorBox').style.display = 'none';
+  }
+</script>
+</body>
+</html>

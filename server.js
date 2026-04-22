@@ -45,6 +45,36 @@ const ggCheckout = require("./departments/finance/webhook_ggcheckout");
 app.use("/webhook", ggCheckout);
 
 // ──────────────────────────────────────────
+// Gerador de Entregáveis (web + API)
+// ──────────────────────────────────────────
+const path = require("path");
+app.use(express.static(path.join(__dirname, "public")));
+
+app.get("/criar", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "criar.html"));
+});
+
+app.post("/api/criar", async (req, res) => {
+  try {
+    const { generate } = require("./departments/creative/deliverable_generator");
+    const resultado = await generate(req.body);
+    const resposta = { titulo: resultado.titulo };
+    if (resultado.pdf) {
+      resposta.pdf = resultado.pdf.toString("base64");
+      resposta.pdfFilename = resultado.pdfFilename;
+    }
+    if (resultado.docx) {
+      resposta.docx = resultado.docx.toString("base64");
+      resposta.docxFilename = resultado.docxFilename;
+    }
+    res.json(resposta);
+  } catch (e) {
+    console.error("[/api/criar]", e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ──────────────────────────────────────────
 // Health check
 // ──────────────────────────────────────────
 app.get("/", (req, res) => res.json({ status: "NEXUS online", version: "1.0.0" }));

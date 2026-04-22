@@ -1,0 +1,126 @@
+// ============================================
+// NEXUS — Temas Visuais para Entregáveis
+// 6 temas prontos para nichos brasileiros
+// ============================================
+
+module.exports = {
+  impacto: {
+    key: "impacto",
+    name: "Impacto & Ação",
+    emoji: "⚡",
+    niche: "Jiu-Jitsu, Fitness, Empreendedorismo",
+    colors: {
+      primary: "#E63946",
+      secondary: "#1D1D1D",
+      accent: "#FF6B35",
+      background: "#FFFFFF",
+      text: "#1D1D1D",
+      headerBg: "#1D1D1D",
+      headerText: "#FFFFFF",
+      coverBg: "#1D1D1D",
+      coverText: "#FFFFFF",
+      coverAccent: "#E63946",
+    },
+    fonts: { title: "Helvetica-Bold", body: "Helvetica" },
+  },
+
+  elegancia: {
+    key: "elegancia",
+    name: "Elegância & Harmonia",
+    emoji: "🌸",
+    niche: "Ballet, Bem-estar Feminino, Artes",
+    colors: {
+      primary: "#C2798A",
+      secondary: "#7B5EA7",
+      accent: "#C9A84C",
+      background: "#FFF8F5",
+      text: "#3D2B3D",
+      headerBg: "#FFF0ED",
+      headerText: "#3D2B3D",
+      coverBg: "#7B5EA7",
+      coverText: "#FFFFFF",
+      coverAccent: "#C9A84C",
+    },
+    fonts: { title: "Times-Bold", body: "Times-Roman" },
+  },
+
+  sabedoria: {
+    key: "sabedoria",
+    name: "Sabedoria & Tradição",
+    emoji: "📖",
+    niche: "Pack Bíblico, Espiritualidade, História",
+    colors: {
+      primary: "#8B4513",
+      secondary: "#556B2F",
+      accent: "#DAA520",
+      background: "#FDF6E3",
+      text: "#3E2723",
+      headerBg: "#FDF6E3",
+      headerText: "#8B4513",
+      coverBg: "#3E2723",
+      coverText: "#FDF6E3",
+      coverAccent: "#DAA520",
+    },
+    fonts: { title: "Times-Bold", body: "Times-Roman" },
+  },
+
+  produtividade: {
+    key: "produtividade",
+    name: "Produtividade & Foco",
+    emoji: "🎯",
+    niche: "Gestão, Finanças, Desenvolvimento",
+    colors: {
+      primary: "#1565C0",
+      secondary: "#00897B",
+      accent: "#FF8F00",
+      background: "#FFFFFF",
+      text: "#212121",
+      headerBg: "#1565C0",
+      headerText: "#FFFFFF",
+      coverBg: "#1565C0",
+      coverText: "#FFFFFF",
+      coverAccent: "#FF8F00",
+    },
+    fonts: { title: "Helvetica-Bold", body: "Helvetica" },
+  },
+
+  bemestar: {
+    key: "bemestar",
+    name: "Bem-estar & Leveza",
+    emoji: "🌿",
+    niche: "Meditação, Yoga, Saúde, Maternidade",
+    colors: {
+      primary: "#558B2F",
+      secondary: "#1976D2",
+      accent: "#F06292",
+      background: "#F1F8E9",
+      text: "#2E4A3E",
+      headerBg: "#E8F5E9",
+      headerText: "#2E4A3E",
+      coverBg: "#558B2F",
+      coverText: "#FFFFFF",
+      coverAccent: "#F06292",
+    },
+    fonts: { title: "Helvetica-Bold", body: "Helvetica" },
+  },
+
+  criatividade: {
+    key: "criatividade",
+    name: "Criatividade & Inovação",
+    emoji: "🚀",
+    niche: "Design, Marketing Digital, Escrita Criativa",
+    colors: {
+      primary: "#7C4DFF",
+      secondary: "#00BCD4",
+      accent: "#FF4081",
+      background: "#FAFAFA",
+      text: "#212121",
+      headerBg: "#7C4DFF",
+      headerText: "#FFFFFF",
+      coverBg: "#212121",
+      coverText: "#FFFFFF",
+      coverAccent: "#7C4DFF",
+    },
+    fonts: { title: "Helvetica-Bold", body: "Helvetica" },
+  },
+};
