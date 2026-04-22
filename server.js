@@ -3,9 +3,9 @@
 // Bot Telegram (webhook mode) + GG Checkout
 // ============================================
 
+require("dotenv").config();
 const express = require("express");
 const app = express();
-const https = require("https");
 
 app.use(express.json());
 
