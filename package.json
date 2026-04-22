@@ -2,7 +2,7 @@
   "name": "nexus-digital-holding",
   "version": "1.0.0",
   "description": "Nexus Digital Holding — Ecossistema de IA Autônomo",
-  "main": "core/max.js",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "test:gemini": "node integrations/gemini.js",
