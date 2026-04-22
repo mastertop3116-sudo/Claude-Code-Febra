@@ -311,9 +311,8 @@ Responda em português brasileiro.`,
 
   try {
     bot.sendChatAction(msg.chat.id, "typing");
-    const resultado = await maxProcess(msg.text);
+    const resultado = await maxProcess(msg.text, msg.chat.id);
     bot.sendMessage(msg.chat.id, resultado, { parse_mode: "Markdown" });
-    await saveMemory("MAX", "conversation", msg.text, { resposta: resultado });
   } catch (e) {
     bot.sendMessage(msg.chat.id, `Erro ao processar: ${e.message}`);
   }

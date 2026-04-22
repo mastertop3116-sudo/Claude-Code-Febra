@@ -4,8 +4,11 @@
 // Interface: Telegram | Motor: Claude + Gemini
 // ============================================
 
-const { geminiFlash, geminiPro } = require("../integrations/gemini");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { saveMemory, getMemory, supabase } = require("../integrations/supabase");
 require("dotenv").config();
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const MAX_SYSTEM_PROMPT = `
 Você é MAX, o COO e cérebro central da Nexus Digital Holding.
@@ -24,6 +27,7 @@ SUAS FUNÇÕES:
 - Gerencia o fluxo de operações e metas do Caderno Preto
 - Revisa TODO trabalho antes de entregar
 - Pensa em escala bilionária, executa com precisão cirúrgica
+- Aprende continuamente com cada conversa e decisão tomada
 
 DEPARTAMENTOS:
 - growth: Funis, copy, tráfego, conversão
@@ -35,25 +39,133 @@ DEPARTAMENTOS:
 Ao receber uma ordem, identifique o departamento e execute. Sem burocracia.
 `;
 
-/**
- * MAX processa uma ordem e a executa via Gemini (trabalho bruto)
- * Claude revisará o resultado final em tarefas críticas
- */
-async function maxProcess(order) {
-  console.log(`\n[MAX] Ordem recebida: ${order}\n`);
+// ──────────────────────────────────────────
+// Busca histórico + memórias do Supabase
+// ──────────────────────────────────────────
+async function buildContext(telegramId) {
+  try {
+    // Últimas 10 mensagens da conversa
+    const { data: history } = await supabase
+      .from("conversations")
+      .select("role, content, created_at")
+      .eq("telegram_id", String(telegramId))
+      .order("created_at", { ascending: false })
+      .limit(10);
 
-  // Gemini faz o trabalho bruto (economiza tokens Claude)
-  const result = await geminiFlash(order, MAX_SYSTEM_PROMPT);
+    // Últimos aprendizados registrados
+    const learnings = await getMemory("MAX", "learning", 5);
 
-  console.log(`[MAX] Resultado gerado. Aguardando validação...\n`);
-  return result;
+    let context = "";
+
+    if (learnings && learnings.length > 0) {
+      context += "APRENDIZADOS ANTERIORES:\n";
+      learnings.forEach(l => { context += `- ${l.content}\n`; });
+      context += "\n";
+    }
+
+    if (history && history.length > 0) {
+      context += "HISTÓRICO RECENTE DA CONVERSA:\n";
+      [...history].reverse().forEach(h => {
+        context += `${h.role === "user" ? "Fundador" : "MAX"}: ${h.content}\n`;
+      });
+      context += "\n";
+    }
+
+    return context;
+  } catch (e) {
+    console.error("[MAX] Erro ao buscar contexto:", e.message);
+    return "";
+  }
 }
 
-/**
- * MAX convoca o Conselho de Titãs para grandes decisões
- */
+// ──────────────────────────────────────────
+// Salva conversa e extrai aprendizados
+// ──────────────────────────────────────────
+async function saveConversation(telegramId, userMsg, maxReply) {
+  try {
+    // Salva mensagem do usuário
+    await supabase.from("conversations").insert({
+      telegram_id: String(telegramId),
+      role: "user",
+      content: userMsg,
+      agent: "MAX",
+    });
+
+    // Salva resposta do MAX
+    await supabase.from("conversations").insert({
+      telegram_id: String(telegramId),
+      role: "assistant",
+      content: maxReply,
+      agent: "MAX",
+    });
+
+    // Extrai aprendizado se a conversa tiver conteúdo relevante
+    await extractLearning(userMsg, maxReply);
+  } catch (e) {
+    console.error("[MAX] Erro ao salvar conversa:", e.message);
+  }
+}
+
+// ──────────────────────────────────────────
+// Extrai aprendizados automaticamente
+// ──────────────────────────────────────────
+async function extractLearning(userMsg, maxReply) {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+    const result = await model.generateContent(`
+Analise esta interação entre o Fundador e MAX da Nexus Digital Holding.
+Se houver algo importante para aprender ou lembrar (preferência, decisão estratégica, dado do negócio, padrão de comportamento), escreva em UMA linha curta.
+Se não houver nada relevante para aprender, responda apenas: NADA.
+
+Fundador: ${userMsg}
+MAX: ${maxReply}
+
+Aprendizado:`);
+
+    const learning = result.response.text().trim();
+    if (learning && learning !== "NADA" && !learning.includes("NADA")) {
+      await saveMemory("MAX", "learning", learning, { origem: "conversa" });
+      console.log(`[MAX] Aprendizado registrado: ${learning}`);
+    }
+  } catch (e) {
+    // Silencioso — aprendizado é secundário
+  }
+}
+
+// ──────────────────────────────────────────
+// maxProcess — Processa ordem com memória
+// ──────────────────────────────────────────
+async function maxProcess(order, telegramId = null) {
+  console.log(`\n[MAX] Ordem recebida: ${order}\n`);
+
+  // Busca contexto histórico do Supabase
+  const context = telegramId ? await buildContext(telegramId) : "";
+
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+  const fullPrompt = context
+    ? `${MAX_SYSTEM_PROMPT}\n\n${context}NOVA MENSAGEM DO FUNDADOR:\n${order}`
+    : order;
+
+  const result = await model.generateContent(fullPrompt);
+  const reply = result.response.text();
+
+  // Salva no Supabase e aprende
+  if (telegramId) {
+    await saveConversation(telegramId, order, reply);
+  }
+
+  return reply;
+}
+
+// ──────────────────────────────────────────
+// maxCouncil — Conselho de Titãs
+// ──────────────────────────────────────────
 async function maxCouncil(decision) {
-  const councilPrompt = `
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+
+  const result = await model.generateContent(`
 ${MAX_SYSTEM_PROMPT}
 
 MODO: CONSELHO DE TITÃS ATIVADO
@@ -68,9 +180,11 @@ DECISÃO A ANALISAR: ${decision}
 
 Cada conselheiro deve dar sua análise e recomendação.
 MAX fecha com o veredito final consolidado.
-`;
+`);
 
-  return await geminiPro(councilPrompt);
+  const reply = result.response.text();
+  await saveMemory("MAX", "council", decision, { veredito: reply });
+  return reply;
 }
 
 module.exports = { maxProcess, maxCouncil };
