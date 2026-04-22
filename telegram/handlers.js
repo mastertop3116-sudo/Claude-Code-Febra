@@ -10,11 +10,15 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { geminiPro } = require("../integrations/gemini");
 require("dotenv").config();
 
-const AUTHORIZED_ID = process.env.TELEGRAM_CHAT_ID;
+// Sócios com acesso total (separados por vírgula no .env)
+// Ex: TELEGRAM_AUTHORIZED=1515555638,987654321
+const AUTHORIZED_IDS = process.env.TELEGRAM_AUTHORIZED
+  ? process.env.TELEGRAM_AUTHORIZED.split(",").map(id => id.trim())
+  : [process.env.TELEGRAM_CHAT_ID];
 
 function isAuthorized(chatId) {
-  if (!AUTHORIZED_ID) return true;
-  return String(chatId) === String(AUTHORIZED_ID);
+  if (!AUTHORIZED_IDS[0]) return true;
+  return AUTHORIZED_IDS.includes(String(chatId));
 }
 
 function deny(bot, chatId) {
