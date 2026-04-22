@@ -10,9 +10,9 @@ require("dotenv").config();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Modelo padrão: Flash (mais rápido e barato)
-const FLASH_MODEL = "gemini-1.5-flash";
+const FLASH_MODEL = "gemini-2.5-flash";
 // Modelo premium: Pro (para tarefas que exigem mais raciocínio)
-const PRO_MODEL = "gemini-1.5-pro";
+const PRO_MODEL = "gemini-2.5-pro";
 
 /**
  * Geração de texto com Gemini Flash (trabalho bruto)
