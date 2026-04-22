@@ -1,0 +1,17 @@
+{
+  "name": "nexus-digital-holding",
+  "version": "1.0.0",
+  "description": "Nexus Digital Holding — Ecossistema de IA Autônomo",
+  "main": "core/max.js",
+  "scripts": {
+    "start": "node telegram/bot.js",
+    "test:gemini": "node integrations/gemini.js",
+    "test:max": "node core/max.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "@anthropic-ai/sdk": "^0.36.0",
+    "dotenv": "^16.4.5",
+    "node-telegram-bot-api": "^0.66.0"
+  }
+}
