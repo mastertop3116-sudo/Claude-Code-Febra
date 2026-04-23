@@ -7,8 +7,6 @@ const { maxProcess, maxCouncil } = require("../core/max");
 const { getMetas, getTarefas, getReports, saveMemory } = require("../integrations/supabase");
 const { getUTMifyReport, formatarRelatorio, getRelatorioVendasHoje } = require("../departments/finance/finance_agent");
 const { analisarYoutube, pesquisarMercado, analisarCopy, analisarURL } = require("../departments/research/research_agent");
-const { generate: gerarEntregavel } = require("../departments/creative/deliverable_generator");
-const { revisarEntregavel, formatarReview } = require("../departments/creative/design_reviewer");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { geminiPro } = require("../integrations/gemini");
 require("dotenv").config();
@@ -235,9 +233,11 @@ module.exports = function registerHandlers(bot) {
     bot.sendChatAction(msg.chat.id, "upload_document");
 
     try {
+      const { generate: gerarEntregavel } = require("../departments/creative/deliverable_generator");
+      const { revisarEntregavel, formatarReview } = require("../departments/creative/design_reviewer");
+
       const resultado = await gerarEntregavel({
         tipo, titulo, temaKey, paginas: 10, descricao: titulo, formato: "pdf",
-        // capaGemini: true por padrão no generate()
       });
 
       await bot.sendDocument(
@@ -247,7 +247,6 @@ module.exports = function registerHandlers(bot) {
         { filename: resultado.pdfFilename, contentType: "application/pdf" }
       );
 
-      // Revisor de design — conteúdo + visual — roda em background
       revisarEntregavel(tipo, titulo, resultado.conteudo, resultado.coverImageBuffer).then(review => {
         bot.sendMessage(msg.chat.id, formatarReview(review, titulo), { parse_mode: "Markdown" });
       }).catch(() => {});
@@ -290,6 +289,8 @@ module.exports = function registerHandlers(bot) {
         bot.sendMessage(msg.chat.id, `🖼️ Imagem recebida! Gerando *"${titulo}"* com wallpaper personalizado...`, { parse_mode: "Markdown" });
         bot.sendChatAction(msg.chat.id, "upload_document");
         try {
+          const { generate: gerarEntregavel } = require("../departments/creative/deliverable_generator");
+          const { revisarEntregavel, formatarReview } = require("../departments/creative/design_reviewer");
           const fileUrl = await bot.getFileLink(msg.photo[msg.photo.length - 1].file_id);
           const imageBuffer = await downloadFile(fileUrl);
 
@@ -305,7 +306,6 @@ module.exports = function registerHandlers(bot) {
             { filename: resultado.pdfFilename, contentType: "application/pdf" }
           );
 
-          // Revisor de design (conteúdo + visual) em background
           revisarEntregavel(tipo, titulo, resultado.conteudo, resultado.coverImageBuffer).then(review => {
             bot.sendMessage(msg.chat.id, formatarReview(review, titulo), { parse_mode: "Markdown" });
           }).catch(() => {});
