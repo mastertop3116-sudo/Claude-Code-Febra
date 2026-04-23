@@ -341,9 +341,12 @@ function gerarPDF(config, conteudo) {
       doc.rect(ML, cy, CW, boxH).lineWidth(0.5).strokeColor("#DDDDDD").stroke();
       // Borda esquerda colorida sólida
       doc.rect(ML, cy, 5, boxH).fill(C.accent || C.primary);
-      // Marcador
-      doc.fillColor(C.accent || C.primary).font(F.title).fontSize(12)
-        .text("▸", ML + 12, cy + (boxH / 2) - 7, { width: 14 });
+      // Marcador — losango desenhado (sem depender de glifo da fonte)
+      const mx = ML + 17, my = cy + boxH / 2;
+      doc.save();
+      doc.fillColor(C.accent || C.primary)
+        .moveTo(mx, my - 5).lineTo(mx + 5, my).lineTo(mx, my + 5).lineTo(mx - 5, my).closePath().fill();
+      doc.restore();
       // Texto sempre escuro
       doc.fillColor(TEXT_DARK).font(F.body).fontSize(10)
         .text(text.trim(), ML + 30, cy + 12, { width: CW - 42, lineGap: 3 });
