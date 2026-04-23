@@ -6,6 +6,7 @@
 const PDFDocument = require("pdfkit");
 const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = require("docx");
 const { geminiJson, geminiFlash, geminiImage } = require("../../integrations/gemini");
+const { gerarConteudoRico } = require("./content_specialist");
 const THEMES = require("./themes");
 
 const MAX_TENTATIVAS = 3;
@@ -498,6 +499,49 @@ function gerarPDF(config, conteudo) {
     }
 
     // ════════════════════════════════════════
+    // ÍNDICE
+    // ════════════════════════════════════════
+    newPage();
+
+    // Título "ÍNDICE" centralizado com barra accent
+    doc.rect(ML, cy, CW, 3).fill(C.primary);
+    cy += 14;
+    doc.fillColor(C.primary).font(F.title).fontSize(20)
+      .text("ÍNDICE", ML, cy, { width: CW, align: "center", characterSpacing: 3 });
+    cy = doc.y + 20;
+    doc.rect(ML + CW * 0.3, cy, CW * 0.4, 1).fill(C.primary);
+    cy += 16;
+
+    // Introdução
+    const indiceItens = [{ num: null, nome: "Introdução", sub: "" }];
+    for (let i = 0; i < (conteudo.secoes || []).length; i++) {
+      const s = conteudo.secoes[i];
+      indiceItens.push({ num: String(i + 1).padStart(2, "0"), nome: s.titulo, sub: "" });
+    }
+    indiceItens.push({ num: null, nome: "Conclusão & Próximos Passos", sub: "" });
+
+    for (const item of indiceItens) {
+      if (cy + 26 > CB) newPage();
+      const numTxt = item.num ? `${item.num}.` : "  ";
+      const dotsFill = "·".repeat(60);
+      // Número
+      doc.fillColor(C.primary).font(F.title).fontSize(11)
+        .text(numTxt, ML, cy, { width: 28, lineBreak: false });
+      // Título do capítulo
+      doc.fillColor(TEXT_DARK).font(F.title).fontSize(11)
+        .text(item.nome, ML + 34, cy, { width: CW - 34, lineBreak: false });
+      cy = doc.y + 12;
+
+      // Linha pontilhada separadora leve
+      doc.save();
+      doc.fillOpacity(0.15).fillColor(C.primary)
+        .rect(ML + 34, cy - 4, CW - 34, 0.8).fill();
+      doc.restore();
+      doc.fillOpacity(1);
+    }
+    cy += 10;
+
+    // ════════════════════════════════════════
     // INTRODUÇÃO
     // ════════════════════════════════════════
     newPage();
@@ -692,12 +736,15 @@ async function generate(config) {
     capaImagemOpacidade: config.capaImagemOpacidade,
   };
 
-  const conteudo = await gerarConteudo(
-    finalConfig.tipo,
-    finalConfig.titulo,
-    finalConfig.descricao,
-    finalConfig.paginas,
-  );
+  const conteudo = await gerarConteudoRico({
+    tipo: finalConfig.tipo,
+    titulo: finalConfig.titulo,
+    descricao: finalConfig.descricao,
+    temaKey,
+    paginas: finalConfig.paginas,
+    avatar: config.avatar || "",
+    numCapitulos: config.numCapitulos,
+  });
 
   const resultado = { titulo: finalConfig.titulo, conteudo, coverImageBuffer: imagemBuffer };
 

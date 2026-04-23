@@ -1,7 +1,8 @@
 // ============================================
 // NEXUS — Design Reviewer (Gestor Criativo)
 // Duas revisões: conteúdo (texto) + visual (imagem)
-// Score < 7 na capa → regera com prompt melhorado
+// Score < 8 na capa → regera com prompt melhorado
+// Critérios específicos por nicho
 // ============================================
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
@@ -11,6 +12,46 @@ require("dotenv").config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// Critérios visuais específicos por nicho/tema
+const NICHE_VISUAL_CRITERIA = {
+  impacto: `
+- Energia dinâmica: a imagem transmite força, movimento, poder marcial?
+- Paleta: tons profundos (preto, vermelho, dourado) — evita cores pastéis ou suaves
+- Elemento central: silhueta ou figura de lutador/atleta reconhecível
+- Para público infantil: personagem estilizado (sticker-art) com expressão de foco e determinação
+- Ausência de elementos femininos ou delicados — é esportivo, intenso, masculino`,
+  elegancia: `
+- Refinamento: a imagem tem leveza, fluidez e beleza estética?
+- Paleta: rosa, lilás, dourado ou branco — tons suaves e sofisticados
+- Elemento central: silhueta de bailarina ou pose de dança reconhecível
+- Textura: fundo com elementos delicados (flores, véu, luzes suaves)
+- Ausência de elementos agressivos, escuros ou rústicos`,
+  sabedoria: `
+- Atmosfera: reverência, espiritualidade, paz e propósito
+- Paleta: dourado, sépia, marrom profundo, creme
+- Elementos: cruz, livro aberto, raios de luz, natureza serena
+- Composição: equilibrada, centralizada, transmite autoridade espiritual
+- Ausência de elementos profanos, modernos ou destoantes`,
+  produtividade: `
+- Clareza: design limpo, moderno, corporativo e inspirador
+- Paleta: azul profundo, branco, cinza — identidade executiva
+- Elementos: formas geométricas, gráficos, ícones minimalistas
+- Composição: organizada, hierárquica, transmite competência
+- Ausência de elementos orgânicos ou artísticos demais`,
+  bemestar: `
+- Serenidade: a imagem transmite calma, saúde, equilíbrio?
+- Paleta: verde natural, branco, azul suave — orgânico e limpo
+- Elementos: natureza (folhas, água, luz), corpo humano em movimento suave
+- Composição: aberta, com respiro, sem excessos visuais
+- Ausência de elementos violentos, escuros ou industriais`,
+  criatividade: `
+- Inovação: a imagem é surpreendente, única, visualmente estimulante?
+- Paleta: vibrante — roxo + ciano, laranja + azul, ou combinação ousada
+- Elementos: formas abstratas, geometria dinâmica, texturas digitais
+- Composição: assimétrica, moderna, que faz o olho explorar
+- Ausência de clichês fotográficos ou designs convencionais`,
+};
+
 // ──────────────────────────────────────────
 // Revisão VISUAL da capa (manda a imagem para o Gemini)
 // Retorna { score, aprovado, feedback, melhoriaPrompt }
@@ -18,29 +59,34 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 async function revisarCapaVisual(coverImageBuffer, titulo, temaKey) {
   if (!coverImageBuffer) return null;
 
+  const critEspecificos = NICHE_VISUAL_CRITERIA[temaKey] || NICHE_VISUAL_CRITERIA.produtividade;
+
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     const result = await model.generateContent([
       {
-        text: `Você é um diretor de arte especialista em materiais digitais para o mercado brasileiro de infoprodutos.
-Avalie esta imagem gerada por IA para ser usada como capa de um entregável digital chamado "${titulo}" (tema: ${temaKey}).
+        text: `Você é um diretor de arte RIGOROSO especialista em capas de produtos digitais para o mercado brasileiro de infoprodutos.
+Avalie esta imagem para ser usada como capa do entregável "${titulo}" (nicho: ${temaKey}).
 
-Critérios de avaliação:
-1. Impacto visual — chama atenção, é marcante?
-2. Coerência com o tema — a imagem combina com o nicho?
-3. Qualidade estética — cores harmoniosas, composição equilibrada?
-4. Profissionalismo — parece material pago, de valor?
-5. Adequação ao mercado BR — apropriado para o público brasileiro?
+CRITÉRIOS GERAIS (peso 50%):
+1. Impacto visual imediato — em 3 segundos chama atenção e comunica o valor?
+2. Profissionalismo — parece produto pago de alto valor (R$47-R$97+)?
+3. Hierarquia visual — composição clara com foco bem definido?
+4. Qualidade técnica — sem artefatos, desfoque, ou erros de IA visíveis?
+5. Ausência de texto na imagem — imagem pura, sem letras ou números?
+
+CRITÉRIOS ESPECÍFICOS DO NICHO "${temaKey}" (peso 50%):
+${critEspecificos}
 
 Responda EM JSON puro (sem markdown):
 {
   "score": 8,
   "aprovado": true,
-  "feedback": "descrição curta do que está bom e ruim",
-  "melhoria_prompt": "instrução específica em inglês para melhorar o prompt de geração de imagem"
+  "feedback": "feedback específico sobre os critérios do nicho — o que está correto e o que falhou",
+  "melhoria_prompt": "instrução detalhada em inglês para melhorar a imagem no próximo prompt de geração"
 }
 
-Score: 1-10. Aprovado = true se score >= 7.`,
+Score: 1-10. Aprovado = true APENAS se score >= 8. Seja rigoroso — score 8+ significa produto competitivo no mercado atual.`,
       },
       {
         inlineData: {
@@ -87,7 +133,7 @@ JSON (sem texto fora):
   "instrucao_regeneracao": "instrução para melhorar"
 }
 
-Score 1-10. Aprovado = true se >= 7.`;
+Score 1-10. Aprovado = true APENAS se >= 8. Seja criterioso — qualidade de mercado.`;
 
   try {
     const raw = await geminiJson(prompt, true);
