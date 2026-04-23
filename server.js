@@ -45,7 +45,7 @@ const ggCheckout = require("./departments/finance/webhook_ggcheckout");
 app.use("/webhook", ggCheckout);
 
 // ──────────────────────────────────────────
-// Gerador de Entregáveis (web + API)
+// Gerador de Entregáveis (web + API com progresso SSE)
 // ──────────────────────────────────────────
 const path = require("path");
 app.use(express.static(path.join(__dirname, "public")));
@@ -54,24 +54,75 @@ app.get("/criar", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "criar.html"));
 });
 
-app.post("/api/criar", async (req, res) => {
-  try {
-    const { generate } = require("./departments/creative/deliverable_generator");
-    const resultado = await generate(req.body);
-    const resposta = { titulo: resultado.titulo };
-    if (resultado.pdf) {
-      resposta.pdf = resultado.pdf.toString("base64");
-      resposta.pdfFilename = resultado.pdfFilename;
-    }
-    if (resultado.docx) {
-      resposta.docx = resultado.docx.toString("base64");
-      resposta.docxFilename = resultado.docxFilename;
-    }
-    res.json(resposta);
-  } catch (e) {
-    console.error("[/api/criar]", e.message);
-    res.status(500).json({ error: e.message });
+// Jobs em memória: jobId → { status, progress, message, result, error }
+const criarJobs = new Map();
+function limparJobsAntigos() {
+  const limite = Date.now() - 10 * 60 * 1000; // 10 min
+  for (const [id, job] of criarJobs.entries()) {
+    if (job.criadoEm < limite) criarJobs.delete(id);
   }
+}
+
+// POST /api/criar → inicia job, retorna jobId imediatamente
+app.post("/api/criar", (req, res) => {
+  limparJobsAntigos();
+  const jobId = Math.random().toString(36).slice(2, 10);
+  criarJobs.set(jobId, { status: "running", progress: 0, message: "Iniciando...", criadoEm: Date.now() });
+  res.json({ jobId });
+
+  const { generate } = require("./departments/creative/deliverable_generator");
+  generate({
+    ...req.body,
+    onProgress: async (pct, msg) => {
+      const job = criarJobs.get(jobId);
+      if (job) { job.progress = pct; job.message = msg; }
+    },
+  }).then(resultado => {
+    criarJobs.set(jobId, {
+      status: "done", progress: 100, message: "Pronto!", criadoEm: Date.now(),
+      titulo: resultado.titulo,
+      pdf: resultado.pdf ? resultado.pdf.toString("base64") : null,
+      pdfFilename: resultado.pdfFilename,
+      docx: resultado.docx ? resultado.docx.toString("base64") : null,
+      docxFilename: resultado.docxFilename,
+    });
+  }).catch(e => {
+    console.error("[/api/criar]", e.message);
+    criarJobs.set(jobId, { status: "error", message: e.message, criadoEm: Date.now() });
+  });
+});
+
+// GET /api/criar/progress/:jobId → SSE stream de progresso em tempo real
+app.get("/api/criar/progress/:jobId", (req, res) => {
+  const { jobId } = req.params;
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.flushHeaders();
+
+  const enviar = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
+
+  const tick = setInterval(() => {
+    const job = criarJobs.get(jobId);
+    if (!job) { enviar({ error: "Job não encontrado" }); clearInterval(tick); res.end(); return; }
+
+    enviar({ progress: job.progress, message: job.message, status: job.status });
+
+    if (job.status === "done") {
+      enviar({ done: true, titulo: job.titulo, pdf: job.pdf, pdfFilename: job.pdfFilename,
+        docx: job.docx, docxFilename: job.docxFilename });
+      clearInterval(tick);
+      criarJobs.delete(jobId);
+      res.end();
+    } else if (job.status === "error") {
+      enviar({ error: job.message });
+      clearInterval(tick);
+      criarJobs.delete(jobId);
+      res.end();
+    }
+  }, 600);
+
+  req.on("close", () => clearInterval(tick));
 });
 
 // ──────────────────────────────────────────

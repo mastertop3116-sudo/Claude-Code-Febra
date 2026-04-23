@@ -136,10 +136,17 @@
     #btnGerar:disabled { opacity: 0.5; cursor: not-allowed; }
 
     /* Progress */
-    #progress { display: none; text-align: center; padding: 32px; }
-    .spinner { display: inline-block; width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px; }
+    #progress { display: none; padding: 32px 16px; }
+    .progress-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+    .spinner { display: inline-block; width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    #progressText { color: var(--muted); font-size: 14px; }
+    .progress-title { font-size: 16px; font-weight: 700; }
+    .progress-title small { display: block; font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 2px; }
+    .progress-bar-wrap { background: var(--border); border-radius: 99px; height: 10px; overflow: hidden; margin-bottom: 10px; }
+    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); border-radius: 99px; transition: width 0.5s ease; width: 0%; }
+    .progress-meta { display: flex; justify-content: space-between; align-items: center; }
+    #progressPct { font-size: 22px; font-weight: 800; color: var(--primary); }
+    #progressText { color: var(--muted); font-size: 13px; font-style: italic; }
 
     /* Success */
     #successBox { display: none; background: var(--surface); border: 1px solid #2d6a2d; border-radius: var(--radius); padding: 24px; text-align: center; margin-top: 20px; }
@@ -411,8 +418,20 @@
   </form>
 
   <div id="progress">
-    <div class="spinner"></div>
-    <div id="progressText">Gerando conteúdo com IA...</div>
+    <div class="progress-header">
+      <div class="spinner"></div>
+      <div class="progress-title">
+        Gerando entregável...
+        <small>Não feche esta aba</small>
+      </div>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-meta">
+      <div id="progressText">Iniciando...</div>
+      <div id="progressPct">0%</div>
+    </div>
   </div>
 
   <div id="successBox">
@@ -529,34 +548,22 @@
     document.getElementById('formato').value = fmt;
   }
 
-  // Form submit
+  // Atualiza barra de progresso na tela
+  function atualizarBarra(pct, msg) {
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressPct').textContent = pct + '%';
+    document.getElementById('progressText').textContent = msg || '';
+  }
+
+  // Form submit — usa SSE para progresso em tempo real
   document.getElementById('form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const form = e.target;
 
     const btn = document.getElementById('btnGerar');
-    const progress = document.getElementById('progress');
+    const progressEl = document.getElementById('progress');
     const successBox = document.getElementById('successBox');
     const errorBox = document.getElementById('errorBox');
-
-    btn.disabled = true;
-    form.style.display = 'none';
-    progress.style.display = 'block';
-    successBox.style.display = 'none';
-    errorBox.style.display = 'none';
-
-    const stepMsgs = [
-      payload.capaGemini ? '🍌 Nano Banana gerando sua capa exclusiva...' : 'Gerando conteúdo com IA...',
-      'Estruturando seções e capítulos...',
-      'Extraindo cores da imagem gerada...',
-      'Montando layout do PDF...',
-      'Finalizando arquivo...',
-    ];
-    let step = 0;
-    const interval = setInterval(() => {
-      document.getElementById('progressText').textContent = stepMsgs[step % stepMsgs.length];
-      step++;
-    }, 3500);
 
     const useCustom = document.getElementById('useCustomColors').checked;
     const cores = useCustom ? {
@@ -566,9 +573,6 @@
       background: document.getElementById('cBackground').value,
       text: document.getElementById('cText').value,
     } : null;
-
-    const cabAtivo = document.getElementById('cabActive').checked;
-    const rodAtivo = document.getElementById('rodActive').checked;
 
     const useManualImg = document.getElementById('useCapaImagem').checked && capaImagemBase64;
     const useNanoBanana = document.getElementById('capaGeminiAtivo').checked;
@@ -583,11 +587,11 @@
       temaKey: form.querySelector('input[name=temaKey]:checked').value,
       cores,
       cabecalho: {
-        ativo: cabAtivo,
+        ativo: document.getElementById('cabActive').checked,
         texto: document.getElementById('cabTexto').value,
       },
       rodape: {
-        ativo: rodAtivo,
+        ativo: document.getElementById('rodActive').checked,
         texto: document.getElementById('rodTexto').value,
         numeroPagina: document.getElementById('rodNumPag').checked,
         copyright: document.getElementById('rodCopyright').value,
@@ -602,48 +606,79 @@
       }),
     };
 
+    btn.disabled = true;
+    form.style.display = 'none';
+    progressEl.style.display = 'block';
+    successBox.style.display = 'none';
+    errorBox.style.display = 'none';
+    atualizarBarra(0, 'Conectando ao servidor...');
+
     try {
-      const res = await fetch('/api/criar', {
+      // 1) Inicia o job no servidor
+      const initRes = await fetch('/api/criar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
+      if (!initRes.ok) throw new Error('Falha ao iniciar geração');
+      const { jobId } = await initRes.json();
 
-      clearInterval(interval);
-      progress.style.display = 'none';
+      // 2) Escuta progresso via SSE
+      await new Promise((resolve, reject) => {
+        const es = new EventSource(`/api/criar/progress/${jobId}`);
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Erro desconhecido' }));
-        throw new Error(err.error || 'Erro ao gerar entregável');
-      }
+        es.onmessage = (event) => {
+          const data = JSON.parse(event.data);
 
-      const data = await res.json();
-      document.getElementById('successMsg').textContent = `"${payload.titulo}" gerado com sucesso!`;
+          if (data.error) {
+            es.close();
+            reject(new Error(data.error));
+            return;
+          }
 
-      const btns = document.getElementById('downloadBtns');
-      btns.innerHTML = '';
+          if (data.progress !== undefined) {
+            atualizarBarra(data.progress, data.message);
+          }
 
-      if (data.pdf) {
-        const a = document.createElement('a');
-        a.href = 'data:application/pdf;base64,' + data.pdf;
-        a.download = data.pdfFilename || 'entregavel.pdf';
-        a.className = 'dl-btn dl-pdf';
-        a.textContent = '⬇ Baixar PDF';
-        btns.appendChild(a);
-      }
-      if (data.docx) {
-        const a = document.createElement('a');
-        a.href = 'data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,' + data.docx;
-        a.download = data.docxFilename || 'entregavel.docx';
-        a.className = 'dl-btn dl-docx';
-        a.textContent = '⬇ Baixar Word';
-        btns.appendChild(a);
-      }
+          if (data.done) {
+            es.close();
+            atualizarBarra(100, 'Pronto!');
 
+            const btns = document.getElementById('downloadBtns');
+            btns.innerHTML = '';
+            if (data.pdf) {
+              const a = document.createElement('a');
+              a.href = 'data:application/pdf;base64,' + data.pdf;
+              a.download = data.pdfFilename || 'entregavel.pdf';
+              a.className = 'dl-btn dl-pdf';
+              a.textContent = '⬇ Baixar PDF';
+              btns.appendChild(a);
+            }
+            if (data.docx) {
+              const a = document.createElement('a');
+              a.href = 'data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,' + data.docx;
+              a.download = data.docxFilename || 'entregavel.docx';
+              a.className = 'dl-btn dl-docx';
+              a.textContent = '⬇ Baixar Word';
+              btns.appendChild(a);
+            }
+
+            document.getElementById('successMsg').textContent = `"${data.titulo || payload.titulo}" gerado com sucesso!`;
+            resolve(data);
+          }
+        };
+
+        es.onerror = () => {
+          es.close();
+          reject(new Error('Conexão SSE perdida — tente novamente'));
+        };
+      });
+
+      progressEl.style.display = 'none';
       successBox.style.display = 'block';
+
     } catch (err) {
-      clearInterval(interval);
-      progress.style.display = 'none';
+      progressEl.style.display = 'none';
       form.style.display = 'block';
       btn.disabled = false;
       errorBox.style.display = 'block';

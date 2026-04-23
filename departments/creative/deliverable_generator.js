@@ -671,10 +671,12 @@ async function gerarDOCX(config, conteudo) {
 
 // ──────────────────────────────────────────
 // Função principal
+// config.onProgress(pct, msg) — callback opcional para progresso em tempo real
 // ──────────────────────────────────────────
 async function generate(config) {
   const temaKey = config.temaKey || "produtividade";
   const temaBase = THEMES[temaKey] || THEMES.produtividade;
+  const progress = typeof config.onProgress === "function" ? config.onProgress : () => {};
 
   // Imagem de capa: aceita Buffer (Telegram) ou base64 string (web)
   let imagemBuffer = null;
@@ -690,12 +692,16 @@ async function generate(config) {
 
   // Gera capa com Nano Banana (se não foi fornecida imagem manual)
   if (!imagemBuffer && config.capaGemini !== false) {
+    await progress(10, "Nano Banana criando a capa...");
     imagemBuffer = await gerarCapaComGemini(
       config.tipo || "ebook",
       config.titulo || "Entregável",
       config.descricao || config.titulo,
       temaKey,
     );
+    await progress(35, "Capa pronta! Extraindo paleta de cores...");
+  } else {
+    await progress(10, "Processando imagem da capa...");
   }
 
   // Extrai cores da imagem (manual ou gerada pelo Nano Banana)
@@ -736,6 +742,7 @@ async function generate(config) {
     capaImagemOpacidade: config.capaImagemOpacidade,
   };
 
+  await progress(45, "Gerando conteúdo rico com o Especialista...");
   const conteudo = await gerarConteudoRico({
     tipo: finalConfig.tipo,
     titulo: finalConfig.titulo,
@@ -746,6 +753,7 @@ async function generate(config) {
     numCapitulos: config.numCapitulos,
   });
 
+  await progress(75, "Montando o PDF...");
   const resultado = { titulo: finalConfig.titulo, conteudo, coverImageBuffer: imagemBuffer };
 
   if (finalConfig.formato === "pdf" || finalConfig.formato === "ambos") {
@@ -758,6 +766,7 @@ async function generate(config) {
     resultado.docxFilename = `${finalConfig.titulo.replace(/[^a-zA-Z0-9]/g, "_")}.docx`;
   }
 
+  await progress(100, "Pronto!");
   return resultado;
 }
 

@@ -229,8 +229,32 @@ module.exports = function registerHandlers(bot) {
     const titulo = tituloMatch[1];
     const temaKey = (temaMatch && temaMatch[1] !== tipo) ? temaMatch[1] : "impacto";
 
-    bot.sendMessage(msg.chat.id, `🍌 Nano Banana criando a capa...\n⚙️ Gerando *"${titulo}"* (${temaKey})\nAguarde ~30s.`, { parse_mode: "Markdown" });
-    bot.sendChatAction(msg.chat.id, "upload_document");
+    // ── Barra de progresso em tempo real ──
+    function barraProgresso(pct) {
+      const cheio = Math.round(pct / 10);
+      return "█".repeat(cheio) + "░".repeat(10 - cheio);
+    }
+    function textoProgresso(pct, etapa) {
+      return `⚙️ *Gerando "${titulo}"*\n\`[${barraProgresso(pct)}] ${pct}%\`\n_${etapa}_`;
+    }
+
+    const progressMsg = await bot.sendMessage(
+      msg.chat.id,
+      textoProgresso(0, "Iniciando..."),
+      { parse_mode: "Markdown" }
+    );
+    const editProgress = async (pct, etapa) => {
+      try {
+        await bot.editMessageText(textoProgresso(pct, etapa), {
+          chat_id: msg.chat.id, message_id: progressMsg.message_id, parse_mode: "Markdown",
+        });
+      } catch (_) {}
+    };
+
+    // Mantém o indicador "enviando arquivo" ativo a cada 4s
+    const actionInterval = setInterval(() => {
+      bot.sendChatAction(msg.chat.id, "upload_document").catch(() => {});
+    }, 4000);
 
     try {
       const { generate: gerarEntregavel } = require("../departments/creative/deliverable_generator");
@@ -238,12 +262,19 @@ module.exports = function registerHandlers(bot) {
 
       const resultado = await gerarEntregavel({
         tipo, titulo, temaKey, paginas: 10, descricao: titulo, formato: "pdf",
+        onProgress: editProgress,
       });
+
+      clearInterval(actionInterval);
+      await bot.deleteMessage(msg.chat.id, progressMsg.message_id).catch(() => {});
 
       await bot.sendDocument(
         msg.chat.id,
         resultado.pdf,
-        { caption: `✅ *${titulo}*\nTema: ${temaKey}`, parse_mode: "Markdown" },
+        {
+          caption: `✅ *${titulo}*\nTema: ${temaKey} | Seções: ${resultado.conteudo?.secoes?.length || "?"}`,
+          parse_mode: "Markdown",
+        },
         { filename: resultado.pdfFilename, contentType: "application/pdf" }
       );
 
@@ -251,7 +282,10 @@ module.exports = function registerHandlers(bot) {
         bot.sendMessage(msg.chat.id, formatarReview(review, titulo), { parse_mode: "Markdown" });
       }).catch(() => {});
     } catch (e) {
-      bot.sendMessage(msg.chat.id, `Erro ao gerar entregável: ${e.message}`);
+      clearInterval(actionInterval);
+      await bot.editMessageText(`❌ Erro ao gerar "${titulo}":\n${e.message}`, {
+        chat_id: msg.chat.id, message_id: progressMsg.message_id,
+      }).catch(() => bot.sendMessage(msg.chat.id, `❌ Erro: ${e.message}`));
     }
   });
 
@@ -286,8 +320,17 @@ module.exports = function registerHandlers(bot) {
           return;
         }
         const [, tipo, titulo, temaKey = "impacto"] = match;
-        bot.sendMessage(msg.chat.id, `🖼️ Imagem recebida! Gerando *"${titulo}"* com wallpaper personalizado...`, { parse_mode: "Markdown" });
-        bot.sendChatAction(msg.chat.id, "upload_document");
+
+        function barraFoto(pct) { return "█".repeat(Math.round(pct/10)) + "░".repeat(10-Math.round(pct/10)); }
+        const pMsgFoto = await bot.sendMessage(msg.chat.id,
+          `⚙️ *Gerando "${titulo}"*\n\`[${barraFoto(5)}] 5%\`\n_Processando imagem..._`,
+          { parse_mode: "Markdown" });
+        const editFoto = async (pct, etapa) => {
+          try { await bot.editMessageText(`⚙️ *Gerando "${titulo}"*\n\`[${barraFoto(pct)}] ${pct}%\`\n_${etapa}_`,
+            { chat_id: msg.chat.id, message_id: pMsgFoto.message_id, parse_mode: "Markdown" }); } catch(_) {}
+        };
+        const fotoInterval = setInterval(() => bot.sendChatAction(msg.chat.id, "upload_document").catch(()=>{}), 4000);
+
         try {
           const { generate: gerarEntregavel } = require("../departments/creative/deliverable_generator");
           const { revisarEntregavel, formatarReview } = require("../departments/creative/design_reviewer");
@@ -297,7 +340,11 @@ module.exports = function registerHandlers(bot) {
           const resultado = await gerarEntregavel({
             tipo, titulo, temaKey, paginas: 10, descricao: titulo,
             formato: "pdf", capaImagem: imageBuffer, extrairCores: true,
+            onProgress: editFoto,
           });
+
+          clearInterval(fotoInterval);
+          await bot.deleteMessage(msg.chat.id, pMsgFoto.message_id).catch(() => {});
 
           await bot.sendDocument(
             msg.chat.id,
@@ -310,7 +357,10 @@ module.exports = function registerHandlers(bot) {
             bot.sendMessage(msg.chat.id, formatarReview(review, titulo), { parse_mode: "Markdown" });
           }).catch(() => {});
         } catch (e) {
-          bot.sendMessage(msg.chat.id, `Erro ao gerar com imagem: ${e.message}`);
+          clearInterval(fotoInterval);
+          await bot.editMessageText(`❌ Erro ao gerar "${titulo}":\n${e.message}`, {
+            chat_id: msg.chat.id, message_id: pMsgFoto.message_id,
+          }).catch(() => bot.sendMessage(msg.chat.id, `❌ Erro: ${e.message}`));
         }
         return;
       }
