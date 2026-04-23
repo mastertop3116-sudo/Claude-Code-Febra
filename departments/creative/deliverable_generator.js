@@ -313,12 +313,9 @@ function gerarPDF(config, conteudo) {
     // ── Texto corrido ──
     function writeBody(text) {
       if (!text) return;
-      // Divide por ponto-e-vírgula (separador seguro do Gemini) ou por ponto seguido de espaço
-      const parts = String(text)
-        .replace(/([.!?])\s+/g, "$1|")
-        .split(/[;|]/)
-        .map(p => p.trim())
-        .filter(Boolean);
+      // Separa apenas por ponto-e-vírgula (separador que o Gemini usa para parágrafos).
+      // Períodos dentro das frases são preservados — o texto flui naturalmente.
+      const parts = String(text).split(";").map(p => p.trim()).filter(Boolean);
 
       for (const part of parts) {
         if (cy + 26 > CB) newPage();

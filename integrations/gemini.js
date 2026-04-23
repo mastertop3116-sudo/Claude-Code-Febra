@@ -11,7 +11,11 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const FLASH_MODEL = "gemini-2.5-flash";
 const PRO_MODEL   = "gemini-2.5-pro";
-const IMAGE_MODEL = "gemini-2.0-flash-preview-image-generation";
+// Nano Banana: imagem via responseModalities — tenta dois modelos em cascata
+const IMAGE_MODELS = [
+  "gemini-2.0-flash-preview-image-generation",
+  "gemini-2.0-flash-exp",
+];
 
 // Timeout universal — evita travamentos infinitos
 function withTimeout(promise, ms, label) {
@@ -59,25 +63,39 @@ async function geminiJson(prompt, usePro = false) {
 }
 
 // Nano Banana — geração de imagens
-// Retorna { buffer: Buffer, mimeType: string }
+// Tenta cada modelo da lista até um funcionar. Retorna { buffer, mimeType }.
 async function geminiImage(prompt) {
-  const model = genAI.getGenerativeModel({
-    model: IMAGE_MODEL,
-    generationConfig: { responseModalities: ["IMAGE", "TEXT"] },
-  });
+  let ultimoErro = null;
 
-  const result = await withTimeout(model.generateContent(prompt), 60_000, "geminiImage");
-  const parts = result.response.candidates?.[0]?.content?.parts || [];
+  for (const modelName of IMAGE_MODELS) {
+    try {
+      const model = genAI.getGenerativeModel({
+        model: modelName,
+        generationConfig: { responseModalities: ["IMAGE", "TEXT"] },
+      });
 
-  for (const part of parts) {
-    if (part.inlineData?.mimeType?.startsWith("image/")) {
-      return {
-        buffer: Buffer.from(part.inlineData.data, "base64"),
-        mimeType: part.inlineData.mimeType,
-      };
+      const result = await withTimeout(
+        model.generateContent(prompt), 60_000, `geminiImage(${modelName})`
+      );
+      const parts = result.response.candidates?.[0]?.content?.parts || [];
+
+      for (const part of parts) {
+        if (part.inlineData?.mimeType?.startsWith("image/")) {
+          console.log(`[Nano Banana] Modelo OK: ${modelName}`);
+          return {
+            buffer: Buffer.from(part.inlineData.data, "base64"),
+            mimeType: part.inlineData.mimeType,
+          };
+        }
+      }
+      ultimoErro = new Error(`${modelName}: resposta sem imagem`);
+    } catch (e) {
+      console.warn(`[Nano Banana] ${modelName} falhou: ${e.message}`);
+      ultimoErro = e;
     }
   }
-  throw new Error("Nano Banana não retornou imagem");
+
+  throw ultimoErro || new Error("Nano Banana: todos os modelos falharam");
 }
 
 module.exports = { geminiFlash, geminiPro, geminiChat, geminiJson, geminiImage };
