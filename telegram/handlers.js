@@ -247,8 +247,8 @@ module.exports = function registerHandlers(bot) {
         { filename: resultado.pdfFilename, contentType: "application/pdf" }
       );
 
-      // Revisor de design — roda em background, envia como segunda mensagem
-      revisarEntregavel(tipo, titulo, resultado.conteudo).then(review => {
+      // Revisor de design — conteúdo + visual — roda em background
+      revisarEntregavel(tipo, titulo, resultado.conteudo, resultado.coverImageBuffer).then(review => {
         bot.sendMessage(msg.chat.id, formatarReview(review, titulo), { parse_mode: "Markdown" });
       }).catch(() => {});
     } catch (e) {
@@ -305,8 +305,8 @@ module.exports = function registerHandlers(bot) {
             { filename: resultado.pdfFilename, contentType: "application/pdf" }
           );
 
-          // Revisor de design em background
-          revisarEntregavel(tipo, titulo, resultado.conteudo).then(review => {
+          // Revisor de design (conteúdo + visual) em background
+          revisarEntregavel(tipo, titulo, resultado.conteudo, resultado.coverImageBuffer).then(review => {
             bot.sendMessage(msg.chat.id, formatarReview(review, titulo), { parse_mode: "Markdown" });
           }).catch(() => {});
         } catch (e) {

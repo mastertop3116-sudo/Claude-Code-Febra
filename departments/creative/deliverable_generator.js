@@ -372,7 +372,8 @@ function gerarPDF(config, conteudo) {
     if (config.capaImagem) {
       // ── CAPA COM IMAGEM: overlay + texto limpo, zero caixas de cor ──
       try {
-        doc.image(config.capaImagem, 0, 0, { width: W, height: H });
+        // cover: preenche TODA a página sem bordas, crop centralizado
+        doc.image(config.capaImagem, 0, 0, { cover: [W, H], align: "center", valign: "center" });
       } catch (_) {
         doc.rect(0, 0, W, H).fill("#1A1A1A");
       }
@@ -698,7 +699,7 @@ async function generate(config) {
     finalConfig.paginas,
   );
 
-  const resultado = { titulo: finalConfig.titulo, conteudo };
+  const resultado = { titulo: finalConfig.titulo, conteudo, coverImageBuffer: imagemBuffer };
 
   if (finalConfig.formato === "pdf" || finalConfig.formato === "ambos") {
     resultado.pdf = await gerarPDF(finalConfig, conteudo);
