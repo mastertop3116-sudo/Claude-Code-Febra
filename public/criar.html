@@ -83,17 +83,25 @@
     input:checked + .slider { background: var(--primary); }
     input:checked + .slider:before { transform: translateX(20px); }
 
-    /* Color pickers */
-    .color-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
-    .color-field { display: flex; flex-direction: column; gap: 6px; align-items: center; }
-    .color-field label { font-size: 11px; color: var(--muted); text-align: center; }
-    input[type=color] { width: 48px; height: 36px; border: none; background: none; cursor: pointer; border-radius: 6px; }
+    /* Color pickers — 3 cores livres */
+    .color-pickers-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    @media(max-width:600px) { .color-pickers-row { grid-template-columns: 1fr; } }
+    .color-picker-item { display: flex; flex-direction: column; gap: 6px; }
+    .color-picker-item > label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 0; }
+    .color-picker-item small { font-size: 11px; color: var(--muted); }
+    .color-picker-control {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 6px 10px; transition: border-color 0.2s;
+    }
+    .color-picker-control:focus-within { border-color: var(--primary); }
+    .color-picker-control input[type=color] { width: 32px; height: 26px; border: none; background: none; cursor: pointer; border-radius: 4px; padding: 0; flex-shrink: 0; }
+    .color-picker-control .hex-input { flex: 1; background: none; border: none; color: var(--text); font-size: 13px; font-family: monospace; padding: 0; outline: none; min-width: 0; }
 
-    /* Custom section toggle */
+    /* Custom toggle (upload) */
     .custom-toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 16px; }
     .custom-toggle input { accent-color: var(--primary); }
     .custom-toggle span { font-size: 13px; color: var(--muted); }
-    #customColors { display: none; }
 
     /* Image upload */
     #capaImagemSection { display: none; margin-bottom: 16px; }
@@ -283,6 +291,37 @@
         </label>
       </div>
 
+      <!-- 3 Cores personalizáveis — sempre visíveis -->
+      <div style="margin-top: 18px; border-top: 1px solid var(--border); padding-top: 16px;">
+        <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); margin-bottom: 14px;">Personalizar Cores</div>
+        <div class="color-pickers-row">
+          <div class="color-picker-item">
+            <label>Cor Primária</label>
+            <div class="color-picker-control">
+              <input type="color" id="cPrimary" value="#E63946" />
+              <input type="text" class="hex-input" id="cPrimaryHex" value="#E63946" maxlength="7" />
+            </div>
+            <small>Títulos, bordas e destaques</small>
+          </div>
+          <div class="color-picker-item">
+            <label>Cor Secundária</label>
+            <div class="color-picker-control">
+              <input type="color" id="cSecondary" value="#1D1D1D" />
+              <input type="text" class="hex-input" id="cSecondaryHex" value="#1D1D1D" maxlength="7" />
+            </div>
+            <small>Fundo da capa</small>
+          </div>
+          <div class="color-picker-item">
+            <label>Cor Terciária</label>
+            <div class="color-picker-control">
+              <input type="color" id="cAccent" value="#FF6B35" />
+              <input type="text" class="hex-input" id="cAccentHex" value="#FF6B35" maxlength="7" />
+            </div>
+            <small>Marcadores e callouts</small>
+          </div>
+        </div>
+      </div>
+
       <!-- Capa com IA (Nano Banana) -->
       <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 18px;">
 
@@ -329,35 +368,6 @@
         </div>
       </div>
 
-      <!-- Cores customizadas -->
-      <label class="custom-toggle" style="margin-top: 18px;">
-        <input type="checkbox" id="useCustomColors" />
-        <span>Personalizar cores manualmente</span>
-      </label>
-      <div id="customColors">
-        <div class="color-grid">
-          <div class="color-field">
-            <label>Cor principal</label>
-            <input type="color" id="cPrimary" value="#E63946" />
-          </div>
-          <div class="color-field">
-            <label>Cor secundária</label>
-            <input type="color" id="cSecondary" value="#1D1D1D" />
-          </div>
-          <div class="color-field">
-            <label>Cor de destaque</label>
-            <input type="color" id="cAccent" value="#FF6B35" />
-          </div>
-          <div class="color-field">
-            <label>Cor do fundo</label>
-            <input type="color" id="cBackground" value="#FFFFFF" />
-          </div>
-          <div class="color-field">
-            <label>Cor do texto</label>
-            <input type="color" id="cText" value="#1D1D1D" />
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- CABEÇALHO E RODAPÉ -->
@@ -446,13 +456,47 @@
 </main>
 
 <script>
+  // Cores padrão por tema
+  const THEME_COLORS = {
+    impacto:      { primary: '#E63946', secondary: '#1D1D1D', accent: '#FF6B35' },
+    elegancia:    { primary: '#C2798A', secondary: '#7B5EA7', accent: '#C9A84C' },
+    sabedoria:    { primary: '#8B4513', secondary: '#556B2F', accent: '#DAA520' },
+    produtividade:{ primary: '#1565C0', secondary: '#00897B', accent: '#FF8F00' },
+    bemestar:     { primary: '#558B2F', secondary: '#1976D2', accent: '#F06292' },
+    criatividade: { primary: '#7C4DFF', secondary: '#00BCD4', accent: '#FF4081' },
+  };
+  function applyThemeColors(key) {
+    const c = THEME_COLORS[key]; if (!c) return;
+    [['Primary','primary'],['Secondary','secondary'],['Accent','accent']].forEach(([cap,k]) => {
+      document.getElementById('c'+cap).value = c[k];
+      document.getElementById('c'+cap+'Hex').value = c[k].toUpperCase();
+    });
+  }
   // Tema cards
   document.querySelectorAll('.theme-card').forEach(card => {
     card.addEventListener('click', () => {
       document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
+      const radio = card.querySelector('input[type=radio]');
+      if (radio) applyThemeColors(radio.value);
     });
   });
+  // Sync HEX ↔ color picker
+  function setupColorSync(colorId, hexId) {
+    const colorEl = document.getElementById(colorId);
+    const hexEl   = document.getElementById(hexId);
+    colorEl.addEventListener('input', () => { hexEl.value = colorEl.value.toUpperCase(); });
+    hexEl.addEventListener('input', () => {
+      if (/^#[0-9A-Fa-f]{6}$/.test(hexEl.value)) colorEl.value = hexEl.value;
+    });
+    hexEl.addEventListener('blur', () => {
+      const v = hexEl.value.replace(/^#?/, '#');
+      hexEl.value = /^#[0-9A-Fa-f]{6}$/i.test(v) ? v.toUpperCase() : colorEl.value.toUpperCase();
+    });
+  }
+  setupColorSync('cPrimary',   'cPrimaryHex');
+  setupColorSync('cSecondary', 'cSecondaryHex');
+  setupColorSync('cAccent',    'cAccentHex');
 
   // ── Nano Banana + Imagem de capa ──
   let capaImagemBase64 = null;
@@ -528,11 +572,6 @@
   const opVal = document.getElementById('opacityVal');
   opSlider.addEventListener('input', () => { opVal.textContent = opSlider.value + '%'; });
 
-  // Custom colors toggle
-  document.getElementById('useCustomColors').addEventListener('change', function() {
-    document.getElementById('customColors').style.display = this.checked ? 'block' : 'none';
-  });
-
   // Header/Footer toggles
   document.getElementById('cabActive').addEventListener('change', function() {
     document.getElementById('cabTextoField').style.display = this.checked ? 'block' : 'none';
@@ -565,14 +604,13 @@
     const successBox = document.getElementById('successBox');
     const errorBox = document.getElementById('errorBox');
 
-    const useCustom = document.getElementById('useCustomColors').checked;
-    const cores = useCustom ? {
-      primary: document.getElementById('cPrimary').value,
-      secondary: document.getElementById('cSecondary').value,
-      accent: document.getElementById('cAccent').value,
-      background: document.getElementById('cBackground').value,
-      text: document.getElementById('cText').value,
-    } : null;
+    const cores = {
+      primary:    document.getElementById('cPrimary').value,
+      secondary:  document.getElementById('cSecondary').value,
+      accent:     document.getElementById('cAccent').value,
+      background: '#FFFFFF',
+      text:       '#1A1A1A',
+    };
 
     const useManualImg = document.getElementById('useCapaImagem').checked && capaImagemBase64;
     const useNanoBanana = document.getElementById('capaGeminiAtivo').checked;

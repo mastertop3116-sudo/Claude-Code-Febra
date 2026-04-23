@@ -722,10 +722,13 @@ async function generate(config) {
     tema: temaBase,
     temaKey,
     // Prioridade: tema base → cores da imagem → cores customizadas pelo user
+    // secondary e accent do user também definem o visual da capa
     cores: {
       ...temaBase.colors,
       ...(coresExtraidas || {}),
       ...(config.cores || {}),
+      ...(config.cores?.secondary && { coverBg: config.cores.secondary }),
+      ...(config.cores?.accent    && { coverAccent: config.cores.accent }),
     },
     fontes: config.fontes ? { ...temaBase.fonts, ...config.fontes } : temaBase.fonts,
     cabecalho: config.cabecalho !== undefined ? config.cabecalho : {
