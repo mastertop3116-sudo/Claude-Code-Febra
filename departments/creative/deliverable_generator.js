@@ -8,6 +8,7 @@ const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = re
 const { geminiJson, geminiFlash, geminiImage } = require("../../integrations/gemini");
 const { gerarConteudoRico } = require("./content_specialist");
 const THEMES = require("./themes");
+const { revisarCapaVisual, revisarConteudo } = require("./design_reviewer");
 
 const MAX_TENTATIVAS = 3;
 
@@ -75,7 +76,7 @@ const TEMA_VISUAL_PROMPTS = {
   criatividade: "vibrant creative digital, deep purple and electric cyan, abstract geometric shapes, innovative modern design",
 };
 
-async function gerarCapaComGemini(tipo, titulo, descricao, temaKey) {
+async function gerarCapaComGemini(tipo, titulo, descricao, temaKey, melhoriaHint = null) {
   const temaDesc = TEMA_VISUAL_PROMPTS[temaKey] || TEMA_VISUAL_PROMPTS.produtividade;
   const tipoLabel = { ebook: "ebook", checklist: "checklist guide", workbook: "workbook",
     planner: "planner", script_vsl: "video script guide", cheat_sheet: "quick reference card",
@@ -90,7 +91,7 @@ Requirements:
 - NO text, numbers, or letters anywhere in the image
 - Professional quality suitable for a Brazilian digital product market
 - Rich, deep colors with strong contrast
-- Cinematic lighting and depth`;
+- Cinematic lighting and depth${melhoriaHint ? `\nIMPROVEMENT REQUIRED: ${melhoriaHint}` : ""}`;
 
   try {
     const { buffer } = await geminiImage(prompt);
@@ -699,10 +700,29 @@ async function generate(config) {
       config.descricao || config.titulo,
       temaKey,
     );
-    await progress(35, "Capa pronta! Extraindo paleta de cores...");
   } else {
     await progress(10, "Processando imagem da capa...");
   }
+
+  // Revisão e refinamento da capa pelo Designer (1 retry se reprovada)
+  if (imagemBuffer && config.revisaoDesigner !== false) {
+    await progress(28, "Designer revisando a capa...");
+    const reviewCapa = await revisarCapaVisual(imagemBuffer, config.titulo || "Entregável", temaKey);
+    if (reviewCapa && !reviewCapa.aprovado && reviewCapa.melhoria_prompt) {
+      await progress(32, `Capa ${reviewCapa.score}/10 — refazendo com feedback do designer...`);
+      const novaImagem = await gerarCapaComGemini(
+        config.tipo || "ebook",
+        config.titulo || "Entregável",
+        config.descricao || config.titulo,
+        temaKey,
+        reviewCapa.melhoria_prompt,
+      );
+      if (novaImagem) imagemBuffer = novaImagem;
+    } else if (reviewCapa) {
+      console.log(`[Creative] Capa aprovada pelo designer: ${reviewCapa.score}/10`);
+    }
+  }
+  await progress(38, "Extraindo paleta de cores...");
 
   // Extrai cores da imagem (manual ou gerada pelo Nano Banana)
   if (imagemBuffer && config.extrairCores !== false) {
@@ -746,7 +766,7 @@ async function generate(config) {
   };
 
   await progress(45, "Gerando conteúdo rico com o Especialista...");
-  const conteudo = await gerarConteudoRico({
+  let conteudo = await gerarConteudoRico({
     tipo: finalConfig.tipo,
     titulo: finalConfig.titulo,
     descricao: finalConfig.descricao,
@@ -755,6 +775,27 @@ async function generate(config) {
     avatar: config.avatar || "",
     numCapitulos: config.numCapitulos,
   });
+
+  // Revisão e refinamento do conteúdo pelo Designer (1 retry se reprovado)
+  if (config.revisaoDesigner !== false) {
+    await progress(65, "Designer revisando o conteúdo...");
+    const reviewConteudo = await revisarConteudo(finalConfig.tipo, finalConfig.titulo, conteudo);
+    if (!reviewConteudo.aprovado && reviewConteudo.instrucao_regeneracao) {
+      await progress(70, `Conteúdo ${reviewConteudo.score}/10 — refinando com feedback do designer...`);
+      conteudo = await gerarConteudoRico({
+        tipo: finalConfig.tipo,
+        titulo: finalConfig.titulo,
+        descricao: finalConfig.descricao,
+        temaKey,
+        paginas: finalConfig.paginas,
+        avatar: config.avatar || "",
+        numCapitulos: config.numCapitulos,
+        instrucaoMelhoria: reviewConteudo.instrucao_regeneracao,
+      });
+    } else if (reviewConteudo) {
+      console.log(`[Creative] Conteúdo aprovado pelo designer: ${reviewConteudo.score}/10`);
+    }
+  }
 
   await progress(75, "Montando o PDF...");
   const resultado = { titulo: finalConfig.titulo, conteudo, coverImageBuffer: imagemBuffer };

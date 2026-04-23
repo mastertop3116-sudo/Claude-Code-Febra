@@ -209,15 +209,19 @@ async function gerarConteudoRico(config) {
     paginas = 15,
     avatar = "",
     numCapitulos,
+    instrucaoMelhoria = "",
   } = config;
 
   const style = NICHE_STYLES[temaKey] || NICHE_STYLES.produtividade;
   const totalCaps = numCapitulos || Math.min(10, Math.max(5, Math.round(paginas / 2)));
 
   const isDegrau = style.formato === "degrau";
-  const prompt = isDegrau
+  const basePrompt = isDegrau
     ? buildPromptDegrau(titulo, descricao, avatar, totalCaps)
     : buildPromptCapitulo(titulo, descricao, avatar, totalCaps, tipo, style);
+  const prompt = instrucaoMelhoria
+    ? `${basePrompt}\n\nINSTRUÇÃO DE MELHORIA (aplique obrigatoriamente nesta regeneração):\n${instrucaoMelhoria}`
+    : basePrompt;
 
   const MAX_TENTATIVAS = 3;
   let ultimoErro = null;

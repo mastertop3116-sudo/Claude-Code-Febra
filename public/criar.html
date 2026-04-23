@@ -1,734 +1,1053 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nexus — Gerador de Entregáveis</title>
-  <style>
-    :root {
-      --bg: #0d0d0d;
-      --surface: #161616;
-      --surface2: #1e1e1e;
-      --border: #2a2a2a;
-      --primary: #e63946;
-      --accent: #ff6b35;
-      --text: #f0f0f0;
-      --muted: #888;
-      --radius: 10px;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+<meta charset="utf-8">
+<title>Nexus Max — Criar Entregável</title>
+<meta name="viewport" content="width=1280">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#070711;
+    --bg-1:#0c0d1a;
+    --bg-2:#111324;
+    --card:rgba(20,22,40,.55);
+    --card-hi:rgba(28,30,54,.7);
+    --border:rgba(255,255,255,.08);
+    --border-hi:rgba(255,255,255,.16);
+    --text:#ececf1;
+    --text-2:#a9abc2;
+    --text-3:#6b6e86;
+    --accent:#6366f1;
+    --accent-2:#8b5cf6;
+    --accent-3:#22d3ee;
+    --brand:#ff3b30;
+    --ok:#10b981;
+    --warn:#f59e0b;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    min-height:100vh;background:var(--bg-0);color:var(--text);
+    font-family:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-feature-settings:"ss01","cv11";
+    -webkit-font-smoothing:antialiased;
+    letter-spacing:-.01em;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--accent);color:#fff}
 
-    header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 18px 32px;
-      display: flex; align-items: center; gap: 14px;
-    }
-    header .logo { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
-    header .logo span { color: var(--primary); }
-    header p { font-size: 13px; color: var(--muted); margin-left: auto; }
+  .bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+  .bg::before{
+    content:"";position:absolute;inset:-20%;
+    background:
+      radial-gradient(50% 40% at 20% 10%, rgba(99,102,241,.22), transparent 70%),
+      radial-gradient(60% 50% at 85% 0%, rgba(139,92,246,.18), transparent 70%),
+      radial-gradient(50% 50% at 50% 100%, rgba(34,211,238,.10), transparent 70%);
+    filter:blur(20px);
+  }
+  .bg::after{
+    content:"";position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size:56px 56px;
+    mask-image:radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 80%);
+  }
+  .noise{
+    position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.5;mix-blend-mode:overlay;
+    background-image:radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
+    background-size:3px 3px;
+  }
 
-    main { max-width: 860px; margin: 40px auto; padding: 0 20px 60px; }
+  nav.top{
+    position:relative;z-index:10;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:22px 40px;max-width:1440px;margin:0 auto;
+  }
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;letter-spacing:-.02em}
+  .logo .mark{
+    width:28px;height:28px;border-radius:8px;
+    background:radial-gradient(circle at 30% 30%, #fff, transparent 40%),
+      linear-gradient(135deg, var(--accent), var(--accent-2) 60%, var(--accent-3));
+    box-shadow:0 0 0 1px rgba(255,255,255,.14), 0 8px 24px -6px rgba(99,102,241,.6);
+  }
+  .logo small{font-family:"JetBrains Mono",monospace;font-weight:500;font-size:11px;color:var(--text-3);margin-left:2px;letter-spacing:0}
+  .nav-mid{display:flex;gap:28px}
+  .nav-mid a{color:var(--text-2);text-decoration:none;font-size:14px;font-weight:500;transition:color .15s}
+  .nav-mid a:hover{color:var(--text)}
+  .nav-end{display:flex;align-items:center;gap:14px}
+  .nav-end a{color:var(--text-2);text-decoration:none;font-size:14px;font-weight:500}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:10px 18px;border-radius:10px;border:1px solid var(--border-hi);
+    font-size:14px;font-weight:600;color:var(--text);background:rgba(255,255,255,.04);
+    cursor:pointer;text-decoration:none;letter-spacing:-.01em;
+    transition:background .15s,border-color .15s,transform .1s;
+  }
+  .btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.22)}
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{
+    background:linear-gradient(180deg,#7579ff,var(--accent) 60%,#4f52d1);
+    border-color:rgba(255,255,255,.2);
+    box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 -1px 0 rgba(0,0,0,.3) inset,0 10px 30px -10px rgba(99,102,241,.7);
+    color:#fff;
+  }
+  .btn.primary:hover{filter:brightness(1.06)}
 
-    h2 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
-    .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+  main{position:relative;z-index:2;max-width:1280px;margin:0 auto;padding:10px 40px 60px}
+  .head{display:flex;align-items:end;justify-content:space-between;gap:32px;margin:20px 0 34px}
+  .head-left .pill{
+    display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;
+    background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.28);
+    font-size:12px;color:#c7c9ff;font-weight:500;margin-bottom:18px;
+  }
+  .head-left .pill .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent)}
+  .head h1{font-size:56px;line-height:1.02;letter-spacing:-.035em;font-weight:700;margin:0;max-width:780px}
+  .head h1 .grad{
+    background:linear-gradient(90deg, #a5a8ff 0%, var(--accent) 40%, var(--accent-2) 75%, #e0b0ff 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .head p{margin:18px 0 0;color:var(--text-2);font-size:16px;line-height:1.55;max-width:620px}
+  .head-right{
+    display:flex;flex-direction:column;align-items:flex-end;gap:10px;
+    font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--text-3);padding-bottom:4px;
+  }
+  .head-right .row{display:flex;align-items:center;gap:8px}
+  .head-right .led{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
 
-    .section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; }
-    .section-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--primary); margin-bottom: 18px; }
+  .grid{display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start}
+  .col{display:flex;flex-direction:column;gap:22px}
 
-    .field { margin-bottom: 18px; }
-    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
-    input[type=text], input[type=number], select, textarea {
-      width: 100%; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 8px; color: var(--text); font-size: 14px; outline: none;
-      transition: border-color 0.2s;
-    }
-    input:focus, select:focus, textarea:focus { border-color: var(--primary); }
-    textarea { resize: vertical; min-height: 80px; }
-    select option { background: var(--surface2); }
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0) 40%), var(--card);
+    border:1px solid var(--border);border-radius:var(--radius);padding:26px;position:relative;
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    transition:border-color .2s,transform .2s;
+  }
+  .card::before{
+    content:"";position:absolute;inset:0;border-radius:var(--radius);padding:1px;
+    background:linear-gradient(180deg, rgba(255,255,255,.14), transparent 40%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;
+  }
+  .card h2{
+    display:flex;align-items:center;gap:10px;margin:0 0 18px;font-size:12px;font-weight:600;
+    text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);
+    font-family:"JetBrains Mono",monospace;
+  }
+  .card h2 .n{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:22px;height:22px;border-radius:6px;
+    background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.35);
+    color:#c7c9ff;font-size:11px;font-weight:700;letter-spacing:0;
+  }
+  .card h2 .hint{margin-left:auto;color:var(--text-3);font-weight:400;text-transform:none;letter-spacing:0;font-family:"Inter",sans-serif;font-size:12px}
 
-    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .row2{display:grid;grid-template-columns:1.4fr .6fr;gap:14px}
+  .row2.eq{grid-template-columns:1fr 1fr}
+  label.lbl{display:block;font-size:13px;color:var(--text);font-weight:500;margin-bottom:8px}
+  label.lbl .opt{color:var(--text-3);font-weight:400;margin-left:6px}
+  .input,.textarea{
+    width:100%;padding:13px 14px;border-radius:10px;
+    background:rgba(10,11,22,.6);border:1px solid var(--border);
+    color:var(--text);font-size:14px;font-family:inherit;
+    transition:border-color .15s,background .15s,box-shadow .15s;outline:none;
+  }
+  .input::placeholder,.textarea::placeholder{color:var(--text-3)}
+  .input:hover,.textarea:hover{border-color:var(--border-hi)}
+  .input:focus,.textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.18);background:rgba(14,15,28,.75)}
+  .stack{display:flex;flex-direction:column;gap:16px}
 
-    /* Temas */
-    .themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    @media(max-width: 600px) { .themes { grid-template-columns: 1fr 1fr; } .grid2, .grid3 { grid-template-columns: 1fr; } }
-    .theme-card {
-      border: 2px solid var(--border); border-radius: 8px; padding: 14px 12px; cursor: pointer;
-      transition: all 0.2s; position: relative;
-    }
-    .theme-card:hover { border-color: var(--muted); }
-    .theme-card.selected { border-color: var(--primary); background: var(--primary)12; }
-    .theme-card input[type=radio] { position: absolute; opacity: 0; }
-    .theme-swatch { display: flex; gap: 5px; margin-bottom: 10px; }
-    .swatch { width: 18px; height: 18px; border-radius: 50%; }
-    .theme-name { font-size: 13px; font-weight: 600; }
-    .theme-niche { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .type-select{position:relative}
+  .type-select .trigger{
+    display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:10px;
+    background:rgba(10,11,22,.6);border:1px solid var(--border-hi);cursor:pointer;font-size:14px;
+  }
+  .type-select .trigger .ico{
+    width:24px;height:24px;border-radius:6px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:flex;align-items:center;justify-content:center;font-size:13px;
+    box-shadow:0 0 0 1px rgba(255,255,255,.12) inset;
+  }
+  .type-select .trigger .chev{margin-left:auto;color:var(--text-3);font-size:11px}
+  .type-menu{
+    margin-top:10px;border:1px solid var(--border);border-radius:12px;
+    background:rgba(10,11,22,.95);backdrop-filter:blur(12px);overflow:hidden;
+  }
+  .type-menu .opt{
+    display:flex;align-items:center;gap:12px;padding:12px 14px;font-size:14px;color:var(--text);
+    border-top:1px solid var(--border);cursor:pointer;transition:background .12s;
+  }
+  .type-menu .opt:first-child{border-top:none}
+  .type-menu .opt:hover{background:rgba(99,102,241,.08)}
+  .type-menu .opt.active{background:rgba(99,102,241,.15);color:#fff}
+  .type-menu .opt .ico{
+    width:22px;height:22px;border-radius:6px;
+    background:rgba(255,255,255,.06);border:1px solid var(--border-hi);
+    display:flex;align-items:center;justify-content:center;font-size:12px;
+  }
+  .type-menu .opt.active .ico{background:linear-gradient(135deg,var(--accent),var(--accent-2));border-color:transparent}
+  .type-menu .opt .meta{margin-left:auto;color:var(--text-3);font-size:11px;font-family:"JetBrains Mono",monospace}
 
-    /* Toggle switches */
-    .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-    .toggle-label { font-size: 14px; }
-    .toggle-label small { display: block; font-size: 12px; color: var(--muted); }
-    .toggle { position: relative; width: 44px; height: 24px; }
-    .toggle input { opacity: 0; width: 0; height: 0; }
-    .slider {
-      position: absolute; cursor: pointer; inset: 0; background: var(--border); border-radius: 24px;
-      transition: 0.2s;
-    }
-    .slider:before {
-      content: ''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px;
-      background: white; border-radius: 50%; transition: 0.2s;
-    }
-    input:checked + .slider { background: var(--primary); }
-    input:checked + .slider:before { transform: translateX(20px); }
+  .themes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .theme{
+    background:rgba(10,11,22,.55);border:1px solid var(--border);border-radius:12px;
+    padding:16px;cursor:pointer;position:relative;transition:border-color .15s,transform .1s,background .2s;
+  }
+  .theme:hover{border-color:var(--border-hi);background:rgba(14,15,28,.7)}
+  .theme.active{
+    border-color:var(--accent);
+    background:linear-gradient(180deg,rgba(99,102,241,.1),rgba(99,102,241,.02));
+    box-shadow:0 0 0 3px rgba(99,102,241,.18),0 10px 30px -10px rgba(99,102,241,.4);
+  }
+  .theme .dots{display:flex;gap:6px;margin-bottom:12px}
+  .theme .dots i{width:14px;height:14px;border-radius:50%;display:inline-block;box-shadow:0 0 0 1px rgba(255,255,255,.14) inset}
+  .theme .t{font-size:14px;font-weight:600;letter-spacing:-.01em}
+  .theme .d{font-size:12px;color:var(--text-3);margin-top:3px;line-height:1.4}
+  .theme .check{
+    position:absolute;top:12px;right:12px;width:18px;height:18px;border-radius:50%;
+    border:1.5px solid var(--border-hi);display:flex;align-items:center;justify-content:center;
+    font-size:10px;color:transparent;
+  }
+  .theme.active .check{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 12px rgba(99,102,241,.6)}
 
-    /* Color pickers — 3 cores livres */
-    .color-pickers-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-    @media(max-width:600px) { .color-pickers-row { grid-template-columns: 1fr; } }
-    .color-picker-item { display: flex; flex-direction: column; gap: 6px; }
-    .color-picker-item > label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 0; }
-    .color-picker-item small { font-size: 11px; color: var(--muted); }
-    .color-picker-control {
-      display: flex; align-items: center; gap: 8px;
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 8px; padding: 6px 10px; transition: border-color 0.2s;
-    }
-    .color-picker-control:focus-within { border-color: var(--primary); }
-    .color-picker-control input[type=color] { width: 32px; height: 26px; border: none; background: none; cursor: pointer; border-radius: 4px; padding: 0; flex-shrink: 0; }
-    .color-picker-control .hex-input { flex: 1; background: none; border: none; color: var(--text); font-size: 13px; font-family: monospace; padding: 0; outline: none; min-width: 0; }
+  .toggle-row{
+    display:flex;align-items:center;gap:14px;padding:14px;
+    border:1px solid var(--border);border-radius:12px;background:rgba(10,11,22,.4);
+  }
+  .toggle-row .tag{
+    width:34px;height:34px;border-radius:9px;
+    background:linear-gradient(135deg,rgba(245,158,11,.25),rgba(245,158,11,.05));
+    border:1px solid rgba(245,158,11,.3);
+    display:flex;align-items:center;justify-content:center;font-size:16px;
+  }
+  .toggle-row .txt{flex:1;min-width:0}
+  .toggle-row .txt b{font-size:14px;font-weight:600;display:block}
+  .toggle-row .txt span{font-size:12px;color:var(--text-3);display:block;margin-top:2px;line-height:1.4}
+  .switch{
+    position:relative;width:44px;height:24px;border-radius:999px;
+    background:rgba(255,255,255,.1);border:1px solid var(--border-hi);
+    cursor:pointer;transition:background .2s;flex-shrink:0;
+  }
+  .switch::after{
+    content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+    background:#fff;transition:left .2s,background .2s;box-shadow:0 2px 6px rgba(0,0,0,.4);
+  }
+  .switch.on{background:var(--accent);border-color:var(--accent)}
+  .switch.on::after{left:22px}
 
-    /* Custom toggle (upload) */
-    .custom-toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 16px; }
-    .custom-toggle input { accent-color: var(--primary); }
-    .custom-toggle span { font-size: 13px; color: var(--muted); }
+  .slider-wrap{padding:0 4px;margin-top:8px}
+  .slider-wrap .top{display:flex;justify-content:space-between;font-size:12px;color:var(--text-3);margin-bottom:10px;font-family:"JetBrains Mono",monospace}
+  .slider-wrap .top b{color:var(--text);font-weight:600}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;background:transparent;outline:none}
+  input[type=range]::-webkit-slider-runnable-track{
+    height:6px;border-radius:999px;
+    background:linear-gradient(90deg,var(--accent) 0%,var(--accent) var(--val,25%),rgba(255,255,255,.08) var(--val,25%),rgba(255,255,255,.08) 100%);
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;margin-top:-6px;
+    box-shadow:0 0 0 3px rgba(99,102,241,.3),0 2px 8px rgba(0,0,0,.4);cursor:pointer;
+  }
+  input[type=range]::-moz-range-track{height:6px;border-radius:999px;background:rgba(255,255,255,.08)}
+  input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:none;box-shadow:0 0 0 3px rgba(99,102,241,.3)}
 
-    /* Image upload */
-    #capaImagemSection { display: none; margin-bottom: 16px; }
-    #imageDropZone {
-      border: 2px dashed var(--border); border-radius: 8px; padding: 20px;
-      text-align: center; cursor: pointer; transition: border-color 0.2s; position: relative;
-    }
-    #imageDropZone:hover, #imageDropZone.dragover { border-color: var(--primary); }
-    #imageDropZone.has-image { border-color: var(--primary); border-style: solid; padding: 0; overflow: hidden; }
-    #imagePrompt { color: var(--muted); font-size: 13px; }
-    #imagePrompt small { display: block; font-size: 11px; margin-top: 4px; color: #555; }
-    #imagePreview { display: none; }
-    #previewImg { width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; display: block; }
-    #changeImgBtn {
-      position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6);
-      color: white; border: none; border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer;
-    }
-    .opacity-row { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
-    .opacity-row label { font-size: 12px; color: var(--muted); white-space: nowrap; min-width: 160px; }
-    .opacity-row input[type=range] { flex: 1; accent-color: var(--primary); }
-    #opacityVal { font-size: 12px; color: var(--text); min-width: 36px; text-align: right; }
+  .check-row{
+    display:flex;align-items:center;gap:10px;padding:11px 14px;
+    border:1px solid var(--border);border-radius:10px;background:rgba(10,11,22,.35);
+    cursor:pointer;font-size:13px;transition:border-color .15s;
+  }
+  .check-row:hover{border-color:var(--border-hi)}
+  .check-row .chk{
+    width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border-hi);
+    display:flex;align-items:center;justify-content:center;font-size:10px;color:transparent;
+  }
+  .check-row.on .chk{background:var(--accent);border-color:var(--accent);color:#fff}
+  .check-row .meta{margin-left:auto;color:var(--text-3);font-size:11px;font-family:"JetBrains Mono",monospace}
 
-    /* Formato */
-    .format-row { display: flex; gap: 10px; }
-    .format-btn {
-      flex: 1; padding: 10px; border: 2px solid var(--border); border-radius: 8px; cursor: pointer;
-      background: var(--surface2); color: var(--text); font-size: 13px; font-weight: 600; transition: all 0.2s;
-      text-align: center;
-    }
-    .format-btn:hover { border-color: var(--muted); }
-    .format-btn.active { border-color: var(--primary); color: var(--primary); background: var(--primary)12; }
+  .formats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .fmt{
+    display:flex;align-items:center;gap:10px;padding:14px 16px;
+    border:1px solid var(--border);border-radius:12px;background:rgba(10,11,22,.45);
+    cursor:pointer;transition:all .15s;
+  }
+  .fmt:hover{border-color:var(--border-hi);background:rgba(14,15,28,.7)}
+  .fmt.active{border-color:var(--accent);background:linear-gradient(180deg,rgba(99,102,241,.12),rgba(99,102,241,.02));box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+  .fmt .ico{
+    width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,.05);
+    border:1px solid var(--border-hi);display:flex;align-items:center;justify-content:center;font-size:14px;
+  }
+  .fmt.active .ico{background:linear-gradient(135deg,var(--accent),var(--accent-2));border-color:transparent}
+  .fmt b{font-size:14px;font-weight:600}
+  .fmt span{font-size:11px;color:var(--text-3);display:block;font-family:"JetBrains Mono",monospace;margin-top:1px}
 
-    /* Gerar button */
-    #btnGerar {
-      width: 100%; padding: 16px; background: var(--primary); border: none; border-radius: var(--radius);
-      color: white; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity 0.2s;
-      margin-top: 8px;
-    }
-    #btnGerar:hover { opacity: 0.9; }
-    #btnGerar:disabled { opacity: 0.5; cursor: not-allowed; }
+  .sticky{position:sticky;top:24px}
+  .preview{
+    aspect-ratio:3/4;border-radius:12px;overflow:hidden;position:relative;
+    background:radial-gradient(80% 50% at 50% 20%,rgba(139,92,246,.35),transparent 70%),
+      linear-gradient(180deg,#1a1340,#0a0720);
+    border:1px solid var(--border-hi);
+    display:flex;flex-direction:column;justify-content:space-between;padding:18px;
+  }
+  .preview .brand{font-family:"JetBrains Mono",monospace;font-size:10px;color:rgba(255,255,255,.7);letter-spacing:.14em;text-transform:uppercase}
+  .preview .ttl{font-size:26px;font-weight:800;line-height:1;letter-spacing:-.02em;background:linear-gradient(180deg,#fff,#c7c9ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .preview .sub{font-size:12px;color:rgba(255,255,255,.65);margin-top:6px}
+  .preview .foot{display:flex;justify-content:space-between;font-family:"JetBrains Mono",monospace;font-size:9px;color:rgba(255,255,255,.5);letter-spacing:.12em;text-transform:uppercase}
 
-    /* Progress */
-    #progress { display: none; padding: 32px 16px; }
-    .progress-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
-    .spinner { display: inline-block; width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .progress-title { font-size: 16px; font-weight: 700; }
-    .progress-title small { display: block; font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 2px; }
-    .progress-bar-wrap { background: var(--border); border-radius: 99px; height: 10px; overflow: hidden; margin-bottom: 10px; }
-    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); border-radius: 99px; transition: width 0.5s ease; width: 0%; }
-    .progress-meta { display: flex; justify-content: space-between; align-items: center; }
-    #progressPct { font-size: 22px; font-weight: 800; color: var(--primary); }
-    #progressText { color: var(--muted); font-size: 13px; font-style: italic; }
+  .summary-list{display:flex;flex-direction:column;gap:1px;border-top:1px solid var(--border);margin-top:18px}
+  .summary-list .r{display:flex;justify-content:space-between;align-items:center;padding:11px 0;font-size:13px;border-bottom:1px solid var(--border)}
+  .summary-list .r .k{color:var(--text-3)}
+  .summary-list .r .v{color:var(--text);font-weight:500;max-width:55%;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-    /* Success */
-    #successBox { display: none; background: var(--surface); border: 1px solid #2d6a2d; border-radius: var(--radius); padding: 24px; text-align: center; margin-top: 20px; }
-    #successBox h3 { color: #4caf50; margin-bottom: 12px; }
-    .dl-btn {
-      display: inline-block; margin: 6px; padding: 12px 24px; border-radius: 8px; font-weight: 600;
-      font-size: 14px; text-decoration: none; cursor: pointer; border: none;
-    }
-    .dl-pdf { background: var(--primary); color: white; }
-    .dl-docx { background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
-    .dl-btn:hover { opacity: 0.85; }
+  .generate{
+    margin-top:18px;width:100%;padding:16px;font-size:15px;font-weight:700;border-radius:12px;
+    background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,0) 50%),
+      linear-gradient(90deg,var(--accent),var(--accent-2));
+    border:1px solid rgba(255,255,255,.2);color:#fff;cursor:pointer;letter-spacing:-.01em;
+    box-shadow:0 1px 0 rgba(255,255,255,.3) inset,0 20px 40px -10px rgba(99,102,241,.5);
+    transition:transform .1s,filter .15s;
+  }
+  .generate:hover{filter:brightness(1.08)}
+  .generate:active{transform:translateY(1px)}
+  .generate:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none}
+  .small-note{margin-top:10px;font-size:11px;color:var(--text-3);text-align:center;font-family:"JetBrains Mono",monospace}
 
-    /* Error */
-    #errorBox { display: none; background: #1a0a0a; border: 1px solid #6a2d2d; border-radius: var(--radius); padding: 16px; margin-top: 12px; color: #f48989; font-size: 13px; }
-  </style>
+  /* ---- color picker panel ---- */
+  .expand-panel{
+    overflow:hidden;max-height:0;transition:max-height .3s ease,opacity .2s;opacity:0;
+  }
+  .expand-panel.open{max-height:200px;opacity:1}
+  .color-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;padding-top:14px}
+  .color-item{display:flex;flex-direction:column;gap:6px}
+  .color-item label{font-size:12px;color:var(--text-2);font-weight:500}
+  .color-item small{font-size:11px;color:var(--text-3)}
+  .color-ctrl{
+    display:flex;align-items:center;gap:8px;
+    background:rgba(10,11,22,.6);border:1px solid var(--border);border-radius:10px;padding:7px 10px;
+    transition:border-color .15s;
+  }
+  .color-ctrl:focus-within{border-color:var(--accent)}
+  .color-ctrl input[type=color]{width:28px;height:22px;border:none;background:none;cursor:pointer;border-radius:4px;padding:0;flex-shrink:0}
+  .color-ctrl .hex{flex:1;background:none;border:none;color:var(--text);font-size:13px;font-family:"JetBrains Mono",monospace;padding:0;outline:none;min-width:0}
+
+  /* ---- image upload panel ---- */
+  .drop-zone{
+    border:2px dashed var(--border);border-radius:12px;padding:22px;text-align:center;cursor:pointer;
+    transition:border-color .2s;position:relative;margin-top:14px;
+  }
+  .drop-zone:hover,.drop-zone.over{border-color:var(--accent)}
+  .drop-zone.has-img{border-color:var(--accent);border-style:solid;padding:0;overflow:hidden}
+  .drop-zone .prompt{color:var(--text-3);font-size:13px}
+  .drop-zone .prompt small{display:block;font-size:11px;margin-top:4px;color:var(--text-3)}
+  #preview-img{width:100%;max-height:180px;object-fit:cover;border-radius:10px;display:block}
+  #change-img{
+    position:absolute;top:8px;right:8px;background:rgba(0,0,0,.65);
+    color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:12px;cursor:pointer;
+  }
+
+  /* ---- progress overlay ---- */
+  .overlay{
+    display:none;position:fixed;inset:0;z-index:100;
+    background:rgba(7,7,17,.92);backdrop-filter:blur(16px);
+    align-items:center;justify-content:center;
+  }
+  .overlay.show{display:flex}
+  .overlay-box{
+    width:480px;max-width:calc(100vw - 40px);
+    background:var(--card);border:1px solid var(--border);border-radius:18px;
+    padding:36px;
+  }
+  .ov-spinner{
+    width:44px;height:44px;border:3px solid rgba(255,255,255,.08);
+    border-top-color:var(--accent);border-radius:50%;
+    animation:spin .8s linear infinite;margin:0 auto 22px;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .ov-title{font-size:18px;font-weight:700;text-align:center;margin-bottom:6px}
+  .ov-sub{font-size:13px;color:var(--text-3);text-align:center;margin-bottom:24px}
+  .prog-bar{background:rgba(255,255,255,.08);border-radius:999px;height:8px;overflow:hidden;margin-bottom:12px}
+  .prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:999px;transition:width .5s ease;width:0%}
+  .prog-meta{display:flex;justify-content:space-between;align-items:center}
+  .prog-pct{font-size:24px;font-weight:800;color:var(--accent)}
+  .prog-msg{font-size:12px;color:var(--text-3);font-style:italic;max-width:300px;text-align:right}
+
+  /* ---- success overlay ---- */
+  .ov-check{
+    width:54px;height:54px;border-radius:50%;
+    background:linear-gradient(135deg,#10b981,#059669);
+    display:flex;align-items:center;justify-content:center;
+    font-size:26px;margin:0 auto 20px;
+    box-shadow:0 0 30px rgba(16,185,129,.4);
+  }
+  .dl-row{display:flex;gap:12px;justify-content:center;margin-top:22px}
+  .dl-btn{
+    display:inline-flex;align-items:center;gap:8px;padding:13px 22px;border-radius:12px;
+    font-size:14px;font-weight:600;text-decoration:none;cursor:pointer;border:none;
+    transition:filter .15s,transform .1s;
+  }
+  .dl-btn:active{transform:translateY(1px)}
+  .dl-btn.pdf{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;box-shadow:0 8px 24px -6px rgba(99,102,241,.5)}
+  .dl-btn.pdf:hover{filter:brightness(1.08)}
+  .dl-btn.docx{background:rgba(255,255,255,.07);border:1px solid var(--border-hi);color:var(--text)}
+  .dl-btn.docx:hover{background:rgba(255,255,255,.12)}
+  .dl-btn.reset{background:transparent;border:1px solid var(--border);color:var(--text-2);font-size:13px;padding:10px 18px;margin-top:8px}
+  .dl-btn.reset:hover{border-color:var(--border-hi);color:var(--text)}
+
+  /* ---- error ---- */
+  #err-box{
+    display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:200;
+    background:#2a1215;color:#ff8a80;border:1px solid #5c2b2e;border-radius:12px;
+    padding:14px 20px;font-size:13px;max-width:520px;width:calc(100vw - 40px);
+    box-shadow:0 8px 32px rgba(0,0,0,.5);
+  }
+
+  @media(max-width:900px){
+    .grid{grid-template-columns:1fr}
+    .head h1{font-size:38px}
+    nav.top{padding:18px 20px}
+    main{padding:10px 20px 60px}
+  }
+  @media(max-width:640px){
+    .themes{grid-template-columns:1fr 1fr}
+    .formats{grid-template-columns:1fr}
+    .color-row{grid-template-columns:1fr}
+    .row2,.row2.eq{grid-template-columns:1fr}
+  }
+</style>
 </head>
 <body>
 
-<header>
-  <div class="logo">NEXUS <span>MAX</span></div>
-  <p>Gerador de Entregáveis Digitais</p>
-</header>
+<div class="bg"></div>
+<div class="noise"></div>
+
+<nav class="top">
+  <div class="logo">
+    <span class="mark"></span>
+    Nexus Max <small>1.0</small>
+  </div>
+  <div class="nav-mid">
+    <a href="#">Meus entregáveis</a>
+    <a href="#">Modelos</a>
+    <a href="#">Histórico</a>
+  </div>
+  <div class="nav-end">
+    <a href="#">Docs</a>
+    <a class="btn primary" href="#">Criar novo</a>
+  </div>
+</nav>
 
 <main>
-  <h2>Criar Entregável</h2>
-  <p class="subtitle">Conteúdo gerado por IA + layout profissional automático</p>
-
-  <form id="form">
-
-    <!-- BÁSICO -->
-    <div class="section">
-      <div class="section-title">01 — Informações Básicas</div>
-      <div class="grid2">
-        <div class="field">
-          <label>Tipo de entregável</label>
-          <select name="tipo" id="tipo">
-            <option value="ebook">📚 Ebook / Guia Completo</option>
-            <option value="workbook">✍️ Workbook / Caderno de Exercícios</option>
-            <option value="checklist">✅ Checklist</option>
-            <option value="planner">📅 Planner / Organizador</option>
-            <option value="script_vsl">🎥 Script VSL / Vídeo de Vendas</option>
-            <option value="cheat_sheet">⚡ Guia de Consulta Rápida</option>
-            <option value="certificado">🏆 Certificado de Conclusão</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Número de páginas</label>
-          <input type="number" name="paginas" value="10" min="3" max="50" />
-        </div>
-      </div>
-      <div class="field">
-        <label>Título do entregável</label>
-        <input type="text" name="titulo" placeholder="Ex: 10 Fundamentos do Jiu-Jitsu para Iniciantes" required />
-      </div>
-      <div class="field">
-        <label>Subtítulo (opcional)</label>
-        <input type="text" name="subtitulo" placeholder="Ex: O guia definitivo para quem está começando" />
-      </div>
-      <div class="grid2">
-        <div class="field">
-          <label>Nome do autor / marca</label>
-          <input type="text" name="autor" placeholder="Ex: João Silva | Academia XYZ" />
-        </div>
-        <div class="field">
-          <label>Nicho / descrição do público</label>
-          <input type="text" name="descricao" placeholder="Ex: Iniciantes no Jiu-Jitsu adultos 25-45 anos" />
-        </div>
-      </div>
+  <header class="head">
+    <div class="head-left">
+      <span class="pill"><span class="dot"></span>Nexus Max · editor</span>
+      <h1>Transforme qualquer ideia em um <span class="grad">entregável completo</span></h1>
+      <p>Ebooks, workbooks, checklists, planners, scripts de VSL, guias e certificados — gerados por IA com layout profissional automático. Preencha, clique, exporte.</p>
     </div>
-
-    <!-- TEMA VISUAL -->
-    <div class="section">
-      <div class="section-title">02 — Tema Visual</div>
-      <div class="themes" id="themes">
-        <label class="theme-card selected">
-          <input type="radio" name="temaKey" value="impacto" checked />
-          <div class="theme-swatch">
-            <div class="swatch" style="background:#E63946"></div>
-            <div class="swatch" style="background:#1D1D1D"></div>
-            <div class="swatch" style="background:#FF6B35"></div>
-          </div>
-          <div class="theme-name">⚡ Impacto & Ação</div>
-          <div class="theme-niche">Jiu-Jitsu, Fitness, Empreend.</div>
-        </label>
-        <label class="theme-card">
-          <input type="radio" name="temaKey" value="elegancia" />
-          <div class="theme-swatch">
-            <div class="swatch" style="background:#C2798A"></div>
-            <div class="swatch" style="background:#7B5EA7"></div>
-            <div class="swatch" style="background:#C9A84C"></div>
-          </div>
-          <div class="theme-name">🌸 Elegância & Harmonia</div>
-          <div class="theme-niche">Ballet, Bem-estar Feminino</div>
-        </label>
-        <label class="theme-card">
-          <input type="radio" name="temaKey" value="sabedoria" />
-          <div class="theme-swatch">
-            <div class="swatch" style="background:#8B4513"></div>
-            <div class="swatch" style="background:#556B2F"></div>
-            <div class="swatch" style="background:#DAA520"></div>
-          </div>
-          <div class="theme-name">📖 Sabedoria & Tradição</div>
-          <div class="theme-niche">Bíblico, Espiritualidade</div>
-        </label>
-        <label class="theme-card">
-          <input type="radio" name="temaKey" value="produtividade" />
-          <div class="theme-swatch">
-            <div class="swatch" style="background:#1565C0"></div>
-            <div class="swatch" style="background:#00897B"></div>
-            <div class="swatch" style="background:#FF8F00"></div>
-          </div>
-          <div class="theme-name">🎯 Produtividade & Foco</div>
-          <div class="theme-niche">Gestão, Finanças, Carreira</div>
-        </label>
-        <label class="theme-card">
-          <input type="radio" name="temaKey" value="bemestar" />
-          <div class="theme-swatch">
-            <div class="swatch" style="background:#558B2F"></div>
-            <div class="swatch" style="background:#1976D2"></div>
-            <div class="swatch" style="background:#F06292"></div>
-          </div>
-          <div class="theme-name">🌿 Bem-estar & Leveza</div>
-          <div class="theme-niche">Yoga, Saúde, Maternidade</div>
-        </label>
-        <label class="theme-card">
-          <input type="radio" name="temaKey" value="criatividade" />
-          <div class="theme-swatch">
-            <div class="swatch" style="background:#7C4DFF"></div>
-            <div class="swatch" style="background:#00BCD4"></div>
-            <div class="swatch" style="background:#FF4081"></div>
-          </div>
-          <div class="theme-name">🚀 Criatividade & Inovação</div>
-          <div class="theme-niche">Design, Marketing, Criativo</div>
-        </label>
-      </div>
-
-      <!-- 3 Cores personalizáveis — sempre visíveis -->
-      <div style="margin-top: 18px; border-top: 1px solid var(--border); padding-top: 16px;">
-        <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); margin-bottom: 14px;">Personalizar Cores</div>
-        <div class="color-pickers-row">
-          <div class="color-picker-item">
-            <label>Cor Primária</label>
-            <div class="color-picker-control">
-              <input type="color" id="cPrimary" value="#E63946" />
-              <input type="text" class="hex-input" id="cPrimaryHex" value="#E63946" maxlength="7" />
-            </div>
-            <small>Títulos, bordas e destaques</small>
-          </div>
-          <div class="color-picker-item">
-            <label>Cor Secundária</label>
-            <div class="color-picker-control">
-              <input type="color" id="cSecondary" value="#1D1D1D" />
-              <input type="text" class="hex-input" id="cSecondaryHex" value="#1D1D1D" maxlength="7" />
-            </div>
-            <small>Fundo da capa</small>
-          </div>
-          <div class="color-picker-item">
-            <label>Cor Terciária</label>
-            <div class="color-picker-control">
-              <input type="color" id="cAccent" value="#FF6B35" />
-              <input type="text" class="hex-input" id="cAccentHex" value="#FF6B35" maxlength="7" />
-            </div>
-            <small>Marcadores e callouts</small>
-          </div>
-        </div>
-      </div>
-
-      <!-- Capa com IA (Nano Banana) -->
-      <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 18px;">
-
-        <!-- Status Nano Banana (padrão ON) -->
-        <div id="nanoBananaStatus" style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;">
-          <span style="font-size:18px;">🍌</span>
-          <div style="flex:1">
-            <div style="font-size:13px;font-weight:600;color:var(--text)">Nano Banana ativo — capa gerada por IA</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:2px">Gemini cria uma capa exclusiva baseada no tema e título escolhidos</div>
-          </div>
-          <label class="toggle" title="Desativar Nano Banana"><input type="checkbox" id="capaGeminiAtivo" checked /><span class="slider"></span></label>
-        </div>
-
-        <!-- Overlay slider (para imagem do Nano Banana ou upload manual) -->
-        <div id="overlaySliderSection">
-          <div class="opacity-row">
-            <label>Escurecimento sobre a capa:</label>
-            <input type="range" id="capaOpacidade" min="10" max="75" value="40" step="1" />
-            <span id="opacityVal">40%</span>
-          </div>
-        </div>
-
-        <!-- Upload manual (substitui Nano Banana) -->
-        <label class="custom-toggle" style="margin-top: 14px;">
-          <input type="checkbox" id="useCapaImagem" />
-          <span>Usar minha própria imagem (substitui Nano Banana)</span>
-        </label>
-        <div id="capaImagemSection">
-          <div id="imageDropZone">
-            <input type="file" id="capaImagemFile" accept="image/jpeg,image/png,image/webp" style="display:none" />
-            <div id="imagePrompt">
-              Clique ou arraste uma imagem aqui
-              <small>JPEG / PNG — será redimensionada automaticamente para A4</small>
-            </div>
-            <div id="imagePreview">
-              <img id="previewImg" alt="Preview da capa" />
-              <button type="button" id="changeImgBtn">trocar</button>
-            </div>
-          </div>
-          <label class="custom-toggle" style="margin-top: 12px;">
-            <input type="checkbox" id="extrairCores" checked />
-            <span>Extrair cores da imagem automaticamente</span>
-          </label>
-        </div>
-      </div>
-
+    <div class="head-right">
+      <div class="row"><span class="led"></span><span>motor pronto · nano banana online</span></div>
+      <div class="row"><span>Nexus Digital Holding · 2026</span></div>
     </div>
+  </header>
 
-    <!-- CABEÇALHO E RODAPÉ -->
-    <div class="section">
-      <div class="section-title">03 — Cabeçalho & Rodapé</div>
+  <div class="grid">
 
-      <div class="toggle-row">
-        <div class="toggle-label">
-          Cabeçalho
-          <small>Barra superior com nome da marca em cada página</small>
-        </div>
-        <label class="toggle"><input type="checkbox" id="cabActive" checked /><span class="slider"></span></label>
-      </div>
-      <div class="field" id="cabTextoField">
-        <label>Texto do cabeçalho</label>
-        <input type="text" id="cabTexto" placeholder="Deixe vazio para usar o nome do autor" />
-      </div>
+    <!-- ===== FORM COLUMN ===== -->
+    <div class="col">
 
-      <div class="toggle-row" style="margin-top:16px">
-        <div class="toggle-label">
-          Rodapé
-          <small>Linha inferior com texto e número de páginas</small>
-        </div>
-        <label class="toggle"><input type="checkbox" id="rodActive" checked /><span class="slider"></span></label>
-      </div>
-      <div id="rodapeFields">
-        <div class="grid2">
-          <div class="field">
-            <label>Texto do rodapé</label>
-            <input type="text" id="rodTexto" placeholder="Ex: www.seusite.com.br | @suainstagram" />
+      <!-- 01 informações básicas -->
+      <section class="card">
+        <h2><span class="n">01</span>Informações básicas<span class="hint">o essencial pra IA montar o conteúdo</span></h2>
+        <div class="stack">
+          <div class="row2">
+            <div>
+              <label class="lbl">Tipo de entregável</label>
+              <div class="type-select">
+                <div class="trigger" id="type-trigger">
+                  <span class="ico" id="type-ico">📕</span>
+                  <span id="type-label">Ebook / Guia Completo</span>
+                  <span class="chev">▾</span>
+                </div>
+                <div class="type-menu" id="type-menu" style="display:none">
+                  <div class="opt active" data-v="ebook" data-ico="📕"><span class="ico">📕</span>Ebook / Guia Completo<span class="meta">50–200 pg</span></div>
+                  <div class="opt" data-v="workbook" data-ico="🖍️"><span class="ico">🖍️</span>Workbook / Caderno de Exercícios<span class="meta">30–80 pg</span></div>
+                  <div class="opt" data-v="checklist" data-ico="✅"><span class="ico">✅</span>Checklist<span class="meta">5–20 pg</span></div>
+                  <div class="opt" data-v="planner" data-ico="📒"><span class="ico">📒</span>Planner / Organizador<span class="meta">30–120 pg</span></div>
+                  <div class="opt" data-v="script_vsl" data-ico="🎬"><span class="ico">🎬</span>Script VSL / Vídeo de Vendas<span class="meta">roteiro</span></div>
+                  <div class="opt" data-v="cheat_sheet" data-ico="⚡"><span class="ico">⚡</span>Guia de Consulta Rápida<span class="meta">5–15 pg</span></div>
+                  <div class="opt" data-v="certificado" data-ico="🏅"><span class="ico">🏅</span>Certificado de Conclusão<span class="meta">1 pg</span></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <label class="lbl">Nº de páginas</label>
+              <input class="input" type="number" id="inp-paginas" value="15" min="1" max="80">
+            </div>
           </div>
-          <div class="field" style="display:flex;align-items:flex-end;gap:10px;padding-bottom:2px">
-            <div class="toggle-row" style="margin:0;flex:1">
-              <div class="toggle-label">Número de páginas</div>
-              <label class="toggle"><input type="checkbox" id="rodNumPag" checked /><span class="slider"></span></label>
+
+          <div>
+            <label class="lbl">Título do entregável</label>
+            <input class="input" id="inp-titulo" placeholder="Ex: 10 Fundamentos do Jiu-Jitsu para Iniciantes">
+          </div>
+
+          <div>
+            <label class="lbl">Subtítulo <span class="opt">opcional</span></label>
+            <input class="input" id="inp-subtitulo" placeholder="Ex: O guia definitivo para quem está começando">
+          </div>
+
+          <div class="row2 eq">
+            <div>
+              <label class="lbl">Nome do autor / marca</label>
+              <input class="input" id="inp-autor" placeholder="Ex: João Silva | Academia XYZ">
+            </div>
+            <div>
+              <label class="lbl">Nicho / descrição do público</label>
+              <input class="input" id="inp-descricao" placeholder="Ex: Iniciantes no Jiu-Jitsu adultos 25–45 anos">
             </div>
           </div>
         </div>
-        <div class="field">
-          <label>Texto de copyright (opcional)</label>
-          <input type="text" id="rodCopyright" placeholder="Ex: © 2025 Academia XYZ. Todos os direitos reservados." />
+      </section>
+
+      <!-- 02 tema visual -->
+      <section class="card">
+        <h2><span class="n">02</span>Tema visual<span class="hint">paleta e estética da capa + miolo</span></h2>
+
+        <div class="themes" id="themes">
+          <div class="theme" data-v="impacto">
+            <span class="check">✓</span>
+            <div class="dots"><i style="background:#ef4444"></i><i style="background:#f97316"></i></div>
+            <div class="t">⚡ Impacto &amp; Ação</div>
+            <div class="d">Jiu-Jitsu, fitness, empreend.</div>
+          </div>
+          <div class="theme" data-v="elegancia">
+            <span class="check">✓</span>
+            <div class="dots"><i style="background:#c084fc"></i><i style="background:#bef264"></i><i style="background:#fde047"></i></div>
+            <div class="t">🌸 Elegância &amp; Harmonia</div>
+            <div class="d">Ballet, bem-estar feminino</div>
+          </div>
+          <div class="theme" data-v="sabedoria">
+            <span class="check">✓</span>
+            <div class="dots"><i style="background:#d97706"></i><i style="background:#a16207"></i><i style="background:#78350f"></i></div>
+            <div class="t">📖 Sabedoria &amp; Tradição</div>
+            <div class="d">Bíblico, espiritualidade</div>
+          </div>
+          <div class="theme" data-v="produtividade">
+            <span class="check">✓</span>
+            <div class="dots"><i style="background:#3b82f6"></i><i style="background:#14b8a6"></i><i style="background:#fbbf24"></i></div>
+            <div class="t">🎯 Produtividade &amp; Foco</div>
+            <div class="d">Gestão, finanças, carreira</div>
+          </div>
+          <div class="theme active" data-v="bemestar">
+            <span class="check">✓</span>
+            <div class="dots"><i style="background:#4ade80"></i><i style="background:#86efac"></i><i style="background:#f9a8d4"></i></div>
+            <div class="t">🌿 Bem-estar &amp; Leveza</div>
+            <div class="d">Yoga, saúde, maternidade</div>
+          </div>
+          <div class="theme" data-v="criatividade">
+            <span class="check">✓</span>
+            <div class="dots"><i style="background:#f472b6"></i><i style="background:#a78bfa"></i><i style="background:#22d3ee"></i></div>
+            <div class="t">✨ Criatividade &amp; Inovação</div>
+            <div class="d">Design, marketing, criativo</div>
+          </div>
         </div>
-      </div>
+
+        <div style="margin-top:18px" class="stack">
+          <div class="toggle-row">
+            <span class="tag">🍌</span>
+            <div class="txt">
+              <b>Nano Banana ativo — capa gerada por IA</b>
+              <span>Gemini cria uma capa exclusiva baseada no tema e título escolhidos.</span>
+            </div>
+            <div class="switch on" id="sw-nano"></div>
+          </div>
+
+          <div>
+            <div class="slider-wrap">
+              <div class="top"><span>Escurecimento sobre a capa</span><b id="dark-val">25%</b></div>
+              <input type="range" min="0" max="100" value="25" id="darken" style="--val:25%">
+            </div>
+          </div>
+
+          <div class="row2 eq">
+            <div class="check-row" id="ck-img"><span class="chk">✓</span><span>Usar minha própria imagem</span><span class="meta">substitui IA</span></div>
+            <div class="check-row" id="ck-cor"><span class="chk">✓</span><span>Personalizar cores manualmente</span><span class="meta">avançado</span></div>
+          </div>
+
+          <!-- Image upload panel -->
+          <div class="expand-panel" id="panel-img">
+            <div class="drop-zone" id="drop-zone">
+              <input type="file" id="file-img" accept="image/jpeg,image/png,image/webp" style="display:none">
+              <div class="prompt">
+                Clique ou arraste uma imagem aqui
+                <small>JPEG / PNG — redimensionada automaticamente para A4</small>
+              </div>
+              <img id="preview-img" style="display:none" alt="Preview">
+              <button type="button" id="change-img" style="display:none">trocar</button>
+            </div>
+            <div class="check-row on" id="ck-extract" style="margin-top:10px">
+              <span class="chk">✓</span><span>Extrair cores da imagem automaticamente</span>
+            </div>
+          </div>
+
+          <!-- Color picker panel -->
+          <div class="expand-panel" id="panel-cor">
+            <div class="color-row">
+              <div class="color-item">
+                <label>Cor Primária</label>
+                <div class="color-ctrl">
+                  <input type="color" id="c-primary" value="#6366f1">
+                  <input type="text" class="hex" id="c-primary-hex" value="#6366F1" maxlength="7">
+                </div>
+                <small>Títulos, bordas, destaques</small>
+              </div>
+              <div class="color-item">
+                <label>Cor Secundária</label>
+                <div class="color-ctrl">
+                  <input type="color" id="c-secondary" value="#1D1D1D">
+                  <input type="text" class="hex" id="c-secondary-hex" value="#1D1D1D" maxlength="7">
+                </div>
+                <small>Fundo da capa</small>
+              </div>
+              <div class="color-item">
+                <label>Cor de Destaque</label>
+                <div class="color-ctrl">
+                  <input type="color" id="c-accent" value="#8b5cf6">
+                  <input type="text" class="hex" id="c-accent-hex" value="#8B5CF6" maxlength="7">
+                </div>
+                <small>Marcadores e callouts</small>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- 03 cabeçalho & rodapé -->
+      <section class="card">
+        <h2><span class="n">03</span>Cabeçalho &amp; rodapé<span class="hint">o que aparece em cada página</span></h2>
+        <div class="stack">
+          <div class="toggle-row">
+            <span class="tag" style="background:linear-gradient(135deg,rgba(99,102,241,.25),rgba(99,102,241,.05));border-color:rgba(99,102,241,.35)">⬆</span>
+            <div class="txt"><b>Cabeçalho</b><span>Barra superior com o nome da marca em cada página.</span></div>
+            <div class="switch on" id="sw-head"></div>
+          </div>
+          <input class="input" id="inp-cab" placeholder="Texto do cabeçalho (vazio = nome do autor)">
+
+          <div class="toggle-row">
+            <span class="tag" style="background:linear-gradient(135deg,rgba(34,211,238,.25),rgba(34,211,238,.05));border-color:rgba(34,211,238,.35)">⬇</span>
+            <div class="txt"><b>Rodapé</b><span>Linha inferior com texto e numeração de páginas.</span></div>
+            <div class="switch on" id="sw-foot"></div>
+          </div>
+
+          <div class="row2">
+            <input class="input" id="inp-rod" placeholder="Ex: www.seusite.com.br | @instagram">
+            <div class="check-row on" id="ck-numpag">
+              <span class="chk">✓</span><span>Nº de páginas</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="lbl">Texto de copyright <span class="opt">opcional</span></label>
+            <input class="input" id="inp-copyright" placeholder="Ex: © 2026 Academia XYZ. Todos os direitos reservados.">
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 formato -->
+      <section class="card">
+        <h2><span class="n">04</span>Formato de saída<span class="hint">como você recebe o arquivo</span></h2>
+        <div class="formats" id="formats">
+          <div class="fmt active" data-v="pdf"><span class="ico">📄</span><div><b>PDF</b><span>distribuir / vender</span></div></div>
+          <div class="fmt" data-v="docx"><span class="ico">📝</span><div><b>Word (.docx)</b><span>editável</span></div></div>
+          <div class="fmt" data-v="ambos"><span class="ico">🎁</span><div><b>Ambos</b><span>bundle completo</span></div></div>
+        </div>
+      </section>
+
     </div>
 
-    <!-- FORMATO DE SAÍDA -->
-    <div class="section">
-      <div class="section-title">04 — Formato de Saída</div>
-      <div class="format-row">
-        <div class="format-btn active" data-fmt="pdf" onclick="selectFmt(this,'pdf')">📄 PDF</div>
-        <div class="format-btn" data-fmt="docx" onclick="selectFmt(this,'docx')">📝 Word (.docx)</div>
-        <div class="format-btn" data-fmt="ambos" onclick="selectFmt(this,'ambos')">📦 Ambos</div>
-      </div>
-      <input type="hidden" id="formato" value="pdf" />
-    </div>
+    <!-- ===== RIGHT RAIL ===== -->
+    <aside class="col">
+      <div class="sticky">
+        <section class="card" style="padding:22px">
+          <h2 style="margin-bottom:16px"><span class="n">→</span>Pré-visualização</h2>
 
-    <button type="submit" id="btnGerar">✨ Gerar Entregável</button>
-  </form>
+          <div class="preview">
+            <div>
+              <div class="brand" id="pv-brand">Nexus Max · Ebook</div>
+            </div>
+            <div>
+              <div class="ttl" id="pv-title">Meu Entregável</div>
+              <div class="sub" id="pv-sub"></div>
+            </div>
+            <div class="foot">
+              <span id="pv-autor">Nexus Digital</span>
+              <span id="pv-meta">Bem-estar · 15 pg</span>
+            </div>
+          </div>
 
-  <div id="progress">
-    <div class="progress-header">
-      <div class="spinner"></div>
-      <div class="progress-title">
-        Gerando entregável...
-        <small>Não feche esta aba</small>
+          <div class="summary-list">
+            <div class="r"><span class="k">Tipo</span><span class="v" id="s-type">Ebook / Guia Completo</span></div>
+            <div class="r"><span class="k">Páginas</span><span class="v" id="s-pages">15</span></div>
+            <div class="r"><span class="k">Tema</span><span class="v" id="s-theme">🌿 Bem-estar &amp; Leveza</span></div>
+            <div class="r"><span class="k">Capa</span><span class="v" id="s-capa">Nano Banana · 25%</span></div>
+            <div class="r"><span class="k">Formato</span><span class="v" id="s-fmt">PDF</span></div>
+          </div>
+
+          <button class="generate" id="btn-gerar">✨ Gerar entregável</button>
+          <div class="small-note">~ 90s · gerado no servidor · sem marca d'água</div>
+        </section>
+
+        <section class="card" style="margin-top:22px;padding:18px">
+          <div style="display:flex;gap:10px;align-items:center">
+            <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-size:16px">💡</div>
+            <div>
+              <div style="font-size:13px;font-weight:600">Dica do MAX</div>
+              <div style="font-size:12px;color:var(--text-3);margin-top:2px;line-height:1.5">Descrições de público mais específicas melhoram muito a qualidade do conteúdo gerado.</div>
+            </div>
+          </div>
+        </section>
       </div>
-    </div>
-    <div class="progress-bar-wrap">
-      <div class="progress-bar-fill" id="progressFill"></div>
-    </div>
-    <div class="progress-meta">
-      <div id="progressText">Iniciando...</div>
-      <div id="progressPct">0%</div>
-    </div>
+    </aside>
+
   </div>
 
-  <div id="successBox">
-    <h3>✅ Entregável criado com sucesso!</h3>
-    <p id="successMsg" style="color:var(--muted);font-size:13px;margin-bottom:16px"></p>
-    <div id="downloadBtns"></div>
-    <br/>
-    <button class="dl-btn dl-docx" onclick="resetForm()">← Criar outro</button>
-  </div>
-
-  <div id="errorBox"></div>
+  <footer style="margin-top:60px;display:flex;justify-content:space-between;align-items:center;color:var(--text-3);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em">
+    <span>© Nexus Max · 2026</span>
+    <span style="display:flex;gap:18px"><a href="#" style="color:inherit;text-decoration:none">Docs</a><a href="#" style="color:inherit;text-decoration:none">Changelog</a><a href="#" style="color:inherit;text-decoration:none">Status</a></span>
+    <span>Nexus Digital Holding</span>
+  </footer>
 </main>
 
+<!-- PROGRESS OVERLAY -->
+<div class="overlay" id="overlay-prog">
+  <div class="overlay-box">
+    <div class="ov-spinner"></div>
+    <div class="ov-title">Gerando seu entregável…</div>
+    <div class="ov-sub">Não feche esta aba. O processo leva ~90 segundos.</div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+    <div class="prog-meta">
+      <div class="prog-pct" id="prog-pct">0%</div>
+      <div class="prog-msg" id="prog-msg">Iniciando…</div>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS OVERLAY -->
+<div class="overlay" id="overlay-ok">
+  <div class="overlay-box" style="text-align:center">
+    <div class="ov-check">✓</div>
+    <div class="ov-title">Entregável criado!</div>
+    <div class="ov-sub" id="ok-msg">Pronto para download.</div>
+    <div class="dl-row" id="dl-row"></div>
+    <div style="margin-top:16px">
+      <button class="dl-btn reset" onclick="resetForm()">← Criar outro</button>
+    </div>
+  </div>
+</div>
+
+<!-- ERROR TOAST -->
+<div id="err-box"></div>
+
 <script>
-  // Cores padrão por tema
-  const THEME_COLORS = {
-    impacto:      { primary: '#E63946', secondary: '#1D1D1D', accent: '#FF6B35' },
-    elegancia:    { primary: '#C2798A', secondary: '#7B5EA7', accent: '#C9A84C' },
-    sabedoria:    { primary: '#8B4513', secondary: '#556B2F', accent: '#DAA520' },
-    produtividade:{ primary: '#1565C0', secondary: '#00897B', accent: '#FF8F00' },
-    bemestar:     { primary: '#558B2F', secondary: '#1976D2', accent: '#F06292' },
-    criatividade: { primary: '#7C4DFF', secondary: '#00BCD4', accent: '#FF4081' },
-  };
-  function applyThemeColors(key) {
-    const c = THEME_COLORS[key]; if (!c) return;
-    [['Primary','primary'],['Secondary','secondary'],['Accent','accent']].forEach(([cap,k]) => {
-      document.getElementById('c'+cap).value = c[k];
-      document.getElementById('c'+cap+'Hex').value = c[k].toUpperCase();
-    });
-  }
-  // Tema cards
-  document.querySelectorAll('.theme-card').forEach(card => {
-    card.addEventListener('click', () => {
-      document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
-      const radio = card.querySelector('input[type=radio]');
-      if (radio) applyThemeColors(radio.value);
+  // ---- type dropdown ----
+  const typeTrigger = document.getElementById('type-trigger');
+  const typeMenu    = document.getElementById('type-menu');
+  const typeLabel   = document.getElementById('type-label');
+  const typeIco     = document.getElementById('type-ico');
+  let selectedType  = 'ebook';
+
+  typeTrigger.addEventListener('click', () => {
+    typeMenu.style.display = typeMenu.style.display === 'none' ? 'block' : 'none';
+  });
+  typeMenu.querySelectorAll('.opt').forEach(o => {
+    o.addEventListener('click', () => {
+      typeMenu.querySelectorAll('.opt').forEach(x => x.classList.remove('active'));
+      o.classList.add('active');
+      selectedType = o.dataset.v;
+      typeLabel.textContent = o.textContent.replace(/\d+[–-]\d+ pg|roteiro|1 pg/g, '').trim();
+      typeIco.textContent = o.dataset.ico;
+      document.getElementById('s-type').textContent = typeLabel.textContent;
+      document.getElementById('pv-brand').textContent = 'Nexus Max · ' + typeLabel.textContent.split('/')[0].trim();
+      typeMenu.style.display = 'none';
     });
   });
-  // Sync HEX ↔ color picker
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.type-select')) typeMenu.style.display = 'none';
+  });
+
+  // ---- themes ----
+  let selectedTheme = 'bemestar';
+  document.querySelectorAll('.theme').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.theme').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      selectedTheme = t.dataset.v;
+      document.getElementById('s-theme').innerHTML = t.querySelector('.t').innerHTML;
+      updateMeta();
+    });
+  });
+
+  // ---- formats ----
+  let selectedFmt = 'pdf';
+  document.querySelectorAll('.fmt').forEach(f => {
+    f.addEventListener('click', () => {
+      document.querySelectorAll('.fmt').forEach(x => x.classList.remove('active'));
+      f.classList.add('active');
+      selectedFmt = f.dataset.v;
+      document.getElementById('s-fmt').textContent = f.querySelector('b').textContent;
+    });
+  });
+
+  // ---- switches ----
+  document.querySelectorAll('.switch').forEach(s => {
+    s.addEventListener('click', () => s.classList.toggle('on'));
+  });
+
+  // ---- check rows ----
+  ['ck-numpag', 'ck-extract'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', () => el.classList.toggle('on'));
+  });
+
+  // ck-img expand
+  document.getElementById('ck-img').addEventListener('click', function() {
+    this.classList.toggle('on');
+    document.getElementById('panel-img').classList.toggle('open', this.classList.contains('on'));
+    updateCapaStatus();
+  });
+
+  // ck-cor expand
+  document.getElementById('ck-cor').addEventListener('click', function() {
+    this.classList.toggle('on');
+    document.getElementById('panel-cor').classList.toggle('open', this.classList.contains('on'));
+  });
+
+  // ---- slider ----
+  const darken = document.getElementById('darken');
+  const dval   = document.getElementById('dark-val');
+  darken.addEventListener('input', () => {
+    darken.style.setProperty('--val', darken.value + '%');
+    dval.textContent = darken.value + '%';
+    updateCapaStatus();
+  });
+
+  function updateCapaStatus() {
+    const nano = document.getElementById('sw-nano').classList.contains('on');
+    const img  = document.getElementById('ck-img').classList.contains('on');
+    document.getElementById('s-capa').textContent =
+      img ? 'Imagem própria · ' + darken.value + '%'
+          : nano ? 'Nano Banana · ' + darken.value + '%'
+          : 'Sem capa gerada';
+  }
+
+  // ---- color pickers ----
   function setupColorSync(colorId, hexId) {
-    const colorEl = document.getElementById(colorId);
-    const hexEl   = document.getElementById(hexId);
-    colorEl.addEventListener('input', () => { hexEl.value = colorEl.value.toUpperCase(); });
-    hexEl.addEventListener('input', () => {
-      if (/^#[0-9A-Fa-f]{6}$/.test(hexEl.value)) colorEl.value = hexEl.value;
-    });
-    hexEl.addEventListener('blur', () => {
-      const v = hexEl.value.replace(/^#?/, '#');
-      hexEl.value = /^#[0-9A-Fa-f]{6}$/i.test(v) ? v.toUpperCase() : colorEl.value.toUpperCase();
+    const c = document.getElementById(colorId);
+    const h = document.getElementById(hexId);
+    c.addEventListener('input', () => { h.value = c.value.toUpperCase(); });
+    h.addEventListener('input', () => { if (/^#[0-9A-Fa-f]{6}$/.test(h.value)) c.value = h.value; });
+    h.addEventListener('blur', () => {
+      const v = h.value.replace(/^#?/, '#');
+      h.value = /^#[0-9A-Fa-f]{6}$/i.test(v) ? v.toUpperCase() : c.value.toUpperCase();
     });
   }
-  setupColorSync('cPrimary',   'cPrimaryHex');
-  setupColorSync('cSecondary', 'cSecondaryHex');
-  setupColorSync('cAccent',    'cAccentHex');
+  setupColorSync('c-primary',   'c-primary-hex');
+  setupColorSync('c-secondary', 'c-secondary-hex');
+  setupColorSync('c-accent',    'c-accent-hex');
 
-  // ── Nano Banana + Imagem de capa ──
-  let capaImagemBase64 = null;
+  // ---- image upload ----
+  let capaBase64 = null;
+  const dropZone  = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('file-img');
+  const previewImg = document.getElementById('preview-img');
 
-  // Toggle Nano Banana
-  document.getElementById('capaGeminiAtivo').addEventListener('change', function() {
-    document.getElementById('nanoBananaStatus').style.opacity = this.checked ? '1' : '0.45';
-    document.getElementById('overlaySliderSection').style.display = this.checked || document.getElementById('useCapaImagem').checked ? 'block' : 'none';
+  dropZone.addEventListener('click', () => { if (!capaBase64) fileInput.click(); });
+  document.getElementById('change-img').addEventListener('click', e => {
+    e.stopPropagation(); capaBase64 = null; fileInput.click();
   });
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault(); dropZone.classList.remove('over');
+    if (e.dataTransfer.files[0]) handleImg(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', e => { if (e.target.files[0]) handleImg(e.target.files[0]); });
 
-  document.getElementById('useCapaImagem').addEventListener('change', function() {
-    document.getElementById('capaImagemSection').style.display = this.checked ? 'block' : 'none';
-    document.getElementById('overlaySliderSection').style.display =
-      (this.checked || document.getElementById('capaGeminiAtivo').checked) ? 'block' : 'none';
-  });
-
-  const dropZone = document.getElementById('imageDropZone');
-  const fileInput = document.getElementById('capaImagemFile');
-
-  dropZone.addEventListener('click', () => { if (!capaImagemBase64) fileInput.click(); });
-  document.getElementById('changeImgBtn').addEventListener('click', (e) => {
-    e.stopPropagation(); capaImagemBase64 = null;
-    fileInput.click();
-  });
-  dropZone.addEventListener('dragover', (e) => {
-    e.preventDefault(); dropZone.classList.add('dragover');
-  });
-  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-  dropZone.addEventListener('drop', (e) => {
-    e.preventDefault(); dropZone.classList.remove('dragover');
-    const file = e.dataTransfer.files[0];
-    if (file) handleImageFile(file);
-  });
-  fileInput.addEventListener('change', (e) => {
-    if (e.target.files[0]) handleImageFile(e.target.files[0]);
-  });
-
-  async function handleImageFile(file) {
+  async function handleImg(file) {
     if (!file.type.startsWith('image/')) return;
-    capaImagemBase64 = await resizeForUpload(file);
-    const img = document.getElementById('previewImg');
-    img.src = 'data:image/jpeg;base64,' + capaImagemBase64;
-    document.getElementById('imagePreview').style.display = 'block';
-    document.getElementById('imagePrompt').style.display = 'none';
-    dropZone.classList.add('has-image');
+    capaBase64 = await resizeImg(file);
+    previewImg.src = 'data:image/jpeg;base64,' + capaBase64;
+    previewImg.style.display = 'block';
+    dropZone.querySelector('.prompt').style.display = 'none';
+    document.getElementById('change-img').style.display = 'block';
+    dropZone.classList.add('has-img');
   }
 
-  function resizeForUpload(file) {
-    return new Promise((resolve) => {
+  function resizeImg(file) {
+    return new Promise(res => {
       const img = new Image();
       img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const maxW = 794, maxH = 1123; // A4 @ 96dpi
+        const c = document.createElement('canvas');
+        const maxW = 794, maxH = 1123;
         let w = img.width, h = img.height;
-        if (w > maxW || h > maxH) {
-          const r = Math.min(maxW / w, maxH / h);
-          w = Math.round(w * r); h = Math.round(h * r);
-        }
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        canvas.toBlob(blob => {
-          const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target.result.split(',')[1]);
-          reader.readAsDataURL(blob);
+        if (w > maxW || h > maxH) { const r = Math.min(maxW/w, maxH/h); w = Math.round(w*r); h = Math.round(h*r); }
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        c.toBlob(b => {
+          const fr = new FileReader();
+          fr.onload = e => res(e.target.result.split(',')[1]);
+          fr.readAsDataURL(b);
         }, 'image/jpeg', 0.88);
       };
       img.src = URL.createObjectURL(file);
     });
   }
 
-  // Slider de opacidade
-  const opSlider = document.getElementById('capaOpacidade');
-  const opVal = document.getElementById('opacityVal');
-  opSlider.addEventListener('input', () => { opVal.textContent = opSlider.value + '%'; });
-
-  // Header/Footer toggles
-  document.getElementById('cabActive').addEventListener('change', function() {
-    document.getElementById('cabTextoField').style.display = this.checked ? 'block' : 'none';
-  });
-  document.getElementById('rodActive').addEventListener('change', function() {
-    document.getElementById('rodapeFields').style.display = this.checked ? 'block' : 'none';
-  });
-
-  // Format selection
-  function selectFmt(el, fmt) {
-    document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
-    document.getElementById('formato').value = fmt;
+  // ---- live mirrors ----
+  function updateMeta() {
+    const pages = document.getElementById('inp-paginas').value || '15';
+    const theme = document.querySelector('.theme.active')?.querySelector('.t')?.textContent || '';
+    document.getElementById('pv-meta').textContent = theme.replace(/[^\w\s&]/g,'').trim() + ' · ' + pages + ' pg';
+    document.getElementById('s-pages').textContent = pages;
   }
 
-  // Atualiza barra de progresso na tela
-  function atualizarBarra(pct, msg) {
-    document.getElementById('progressFill').style.width = pct + '%';
-    document.getElementById('progressPct').textContent = pct + '%';
-    document.getElementById('progressText').textContent = msg || '';
-  }
+  document.getElementById('inp-titulo').addEventListener('input', function() {
+    document.getElementById('pv-title').textContent = this.value || 'Meu Entregável';
+  });
+  document.getElementById('inp-subtitulo').addEventListener('input', function() {
+    document.getElementById('pv-sub').textContent = this.value;
+  });
+  document.getElementById('inp-autor').addEventListener('input', function() {
+    document.getElementById('pv-autor').textContent = this.value || 'Nexus Digital';
+  });
+  document.getElementById('inp-paginas').addEventListener('input', updateMeta);
 
-  // Form submit — usa SSE para progresso em tempo real
-  document.getElementById('form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const form = e.target;
+  // ---- generate ----
+  document.getElementById('btn-gerar').addEventListener('click', async () => {
+    const titulo = document.getElementById('inp-titulo').value.trim();
+    if (!titulo) { showErr('Informe o título do entregável antes de gerar.'); return; }
 
-    const btn = document.getElementById('btnGerar');
-    const progressEl = document.getElementById('progress');
-    const successBox = document.getElementById('successBox');
-    const errorBox = document.getElementById('errorBox');
-
-    const cores = {
-      primary:    document.getElementById('cPrimary').value,
-      secondary:  document.getElementById('cSecondary').value,
-      accent:     document.getElementById('cAccent').value,
-      background: '#FFFFFF',
-      text:       '#1A1A1A',
-    };
-
-    const useManualImg = document.getElementById('useCapaImagem').checked && capaImagemBase64;
-    const useNanoBanana = document.getElementById('capaGeminiAtivo').checked;
+    const useManual = document.getElementById('ck-img').classList.contains('on') && capaBase64;
+    const useNano   = document.getElementById('sw-nano').classList.contains('on');
+    const useCores  = document.getElementById('ck-cor').classList.contains('on');
 
     const payload = {
-      tipo: form.tipo.value,
-      titulo: form.titulo.value,
-      subtitulo: form.subtitulo.value,
-      autor: form.autor.value,
-      descricao: form.descricao.value,
-      paginas: parseInt(form.paginas.value),
-      temaKey: form.querySelector('input[name=temaKey]:checked').value,
-      cores,
+      tipo:      selectedType,
+      titulo,
+      subtitulo: document.getElementById('inp-subtitulo').value,
+      autor:     document.getElementById('inp-autor').value,
+      descricao: document.getElementById('inp-descricao').value,
+      paginas:   parseInt(document.getElementById('inp-paginas').value) || 15,
+      temaKey:   selectedTheme,
+      formato:   selectedFmt,
+      capaGemini: useNano && !useManual,
+      capaImagemOpacidade: parseInt(darken.value) / 100,
       cabecalho: {
-        ativo: document.getElementById('cabActive').checked,
-        texto: document.getElementById('cabTexto').value,
+        ativo: document.getElementById('sw-head').classList.contains('on'),
+        texto: document.getElementById('inp-cab').value,
       },
       rodape: {
-        ativo: document.getElementById('rodActive').checked,
-        texto: document.getElementById('rodTexto').value,
-        numeroPagina: document.getElementById('rodNumPag').checked,
-        copyright: document.getElementById('rodCopyright').value,
+        ativo: document.getElementById('sw-foot').classList.contains('on'),
+        texto: document.getElementById('inp-rod').value,
+        numeroPagina: document.getElementById('ck-numpag').classList.contains('on'),
+        copyright: document.getElementById('inp-copyright').value,
       },
-      formato: document.getElementById('formato').value,
-      capaGemini: useNanoBanana && !useManualImg,
-      capaImagemOpacidade: parseInt(opSlider.value) / 100,
-      ...(useManualImg && {
-        capaImagem: capaImagemBase64,
-        extrairCores: document.getElementById('extrairCores').checked,
+      ...(useCores && {
+        cores: {
+          primary:    document.getElementById('c-primary').value,
+          secondary:  document.getElementById('c-secondary').value,
+          accent:     document.getElementById('c-accent').value,
+          background: '#FFFFFF',
+          text:       '#1A1A1A',
+        }
+      }),
+      ...(useManual && {
+        capaImagem: capaBase64,
+        extrairCores: document.getElementById('ck-extract').classList.contains('on'),
         capaGemini: false,
       }),
     };
 
-    btn.disabled = true;
-    form.style.display = 'none';
-    progressEl.style.display = 'block';
-    successBox.style.display = 'none';
-    errorBox.style.display = 'none';
-    atualizarBarra(0, 'Conectando ao servidor...');
+    document.getElementById('btn-gerar').disabled = true;
+    setProgress(0, 'Conectando ao servidor…');
+    document.getElementById('overlay-prog').classList.add('show');
+    hideErr();
 
     try {
-      // 1) Inicia o job no servidor
       const initRes = await fetch('/api/criar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      if (!initRes.ok) throw new Error('Falha ao iniciar geração');
+      if (!initRes.ok) throw new Error('Falha ao iniciar geração (status ' + initRes.status + ')');
       const { jobId } = await initRes.json();
 
-      // 2) Escuta progresso via SSE
       await new Promise((resolve, reject) => {
-        const es = new EventSource(`/api/criar/progress/${jobId}`);
-
-        es.onmessage = (event) => {
-          const data = JSON.parse(event.data);
-
-          if (data.error) {
+        const es = new EventSource('/api/criar/progress/' + jobId);
+        es.onmessage = e => {
+          const d = JSON.parse(e.data);
+          if (d.error) { es.close(); reject(new Error(d.error)); return; }
+          if (d.progress !== undefined) setProgress(d.progress, d.message);
+          if (d.done) {
             es.close();
-            reject(new Error(data.error));
-            return;
-          }
-
-          if (data.progress !== undefined) {
-            atualizarBarra(data.progress, data.message);
-          }
-
-          if (data.done) {
-            es.close();
-            atualizarBarra(100, 'Pronto!');
-
-            const btns = document.getElementById('downloadBtns');
-            btns.innerHTML = '';
-            if (data.pdf) {
-              const a = document.createElement('a');
-              a.href = 'data:application/pdf;base64,' + data.pdf;
-              a.download = data.pdfFilename || 'entregavel.pdf';
-              a.className = 'dl-btn dl-pdf';
-              a.textContent = '⬇ Baixar PDF';
-              btns.appendChild(a);
-            }
-            if (data.docx) {
-              const a = document.createElement('a');
-              a.href = 'data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,' + data.docx;
-              a.download = data.docxFilename || 'entregavel.docx';
-              a.className = 'dl-btn dl-docx';
-              a.textContent = '⬇ Baixar Word';
-              btns.appendChild(a);
-            }
-
-            document.getElementById('successMsg').textContent = `"${data.titulo || payload.titulo}" gerado com sucesso!`;
-            resolve(data);
+            setProgress(100, 'Pronto!');
+            showSuccess(d, payload.titulo);
+            resolve(d);
           }
         };
-
-        es.onerror = () => {
-          es.close();
-          reject(new Error('Conexão SSE perdida — tente novamente'));
-        };
+        es.onerror = () => { es.close(); reject(new Error('Conexão perdida — tente novamente.')); };
       });
 
-      progressEl.style.display = 'none';
-      successBox.style.display = 'block';
-
     } catch (err) {
-      progressEl.style.display = 'none';
-      form.style.display = 'block';
-      btn.disabled = false;
-      errorBox.style.display = 'block';
-      errorBox.textContent = '⚠ ' + err.message;
+      document.getElementById('overlay-prog').classList.remove('show');
+      document.getElementById('btn-gerar').disabled = false;
+      showErr('⚠ ' + err.message);
     }
   });
 
+  function setProgress(pct, msg) {
+    document.getElementById('prog-fill').style.width = pct + '%';
+    document.getElementById('prog-pct').textContent = pct + '%';
+    document.getElementById('prog-msg').textContent = msg || '';
+  }
+
+  function showSuccess(data, titulo) {
+    document.getElementById('overlay-prog').classList.remove('show');
+    document.getElementById('ok-msg').textContent = '"' + (data.titulo || titulo) + '" gerado com sucesso!';
+    const row = document.getElementById('dl-row');
+    row.innerHTML = '';
+    if (data.pdf) {
+      const a = document.createElement('a');
+      a.href = 'data:application/pdf;base64,' + data.pdf;
+      a.download = data.pdfFilename || 'entregavel.pdf';
+      a.className = 'dl-btn pdf';
+      a.textContent = '⬇ Baixar PDF';
+      row.appendChild(a);
+    }
+    if (data.docx) {
+      const a = document.createElement('a');
+      a.href = 'data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,' + data.docx;
+      a.download = data.docxFilename || 'entregavel.docx';
+      a.className = 'dl-btn docx';
+      a.textContent = '⬇ Baixar Word';
+      row.appendChild(a);
+    }
+    document.getElementById('overlay-ok').classList.add('show');
+  }
+
+  function showErr(msg) {
+    const el = document.getElementById('err-box');
+    el.textContent = msg;
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, 7000);
+  }
+  function hideErr() { document.getElementById('err-box').style.display = 'none'; }
+
   function resetForm() {
-    document.getElementById('form').style.display = 'block';
-    document.getElementById('btnGerar').disabled = false;
-    document.getElementById('successBox').style.display = 'none';
-    document.getElementById('errorBox').style.display = 'none';
+    document.getElementById('overlay-ok').classList.remove('show');
+    document.getElementById('btn-gerar').disabled = false;
+    capaBase64 = null;
   }
 </script>
 </body>
