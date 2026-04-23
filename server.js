@@ -51,6 +51,7 @@ const path = require("path");
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/criar", (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
   res.sendFile(path.join(__dirname, "public", "criar.html"));
 });
 
@@ -70,6 +71,15 @@ app.post("/api/criar", (req, res) => {
   criarJobs.set(jobId, { status: "running", progress: 0, message: "Iniciando...", criadoEm: Date.now() });
   res.json({ jobId });
 
+  // Killer de segurança: 3 minutos máximo por job
+  const jobKiller = setTimeout(() => {
+    const job = criarJobs.get(jobId);
+    if (job && job.status === "running") {
+      criarJobs.set(jobId, { status: "error", message: "Timeout: geração demorou mais de 3 minutos.", criadoEm: Date.now() });
+      console.error(`[/api/criar] Job ${jobId} encerrado por timeout`);
+    }
+  }, 3 * 60 * 1000);
+
   const { generate } = require("./departments/creative/deliverable_generator");
   generate({
     ...req.body,
@@ -78,6 +88,7 @@ app.post("/api/criar", (req, res) => {
       if (job) { job.progress = pct; job.message = msg; }
     },
   }).then(resultado => {
+    clearTimeout(jobKiller);
     criarJobs.set(jobId, {
       status: "done", progress: 100, message: "Pronto!", criadoEm: Date.now(),
       titulo: resultado.titulo,
@@ -87,6 +98,7 @@ app.post("/api/criar", (req, res) => {
       docxFilename: resultado.docxFilename,
     });
   }).catch(e => {
+    clearTimeout(jobKiller);
     console.error("[/api/criar]", e.message);
     criarJobs.set(jobId, { status: "error", message: e.message, criadoEm: Date.now() });
   });
