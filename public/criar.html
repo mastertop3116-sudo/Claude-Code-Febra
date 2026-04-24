@@ -991,8 +991,16 @@
   };
 
   function updatePreviewFonts() {
-    const titleEl = document.getElementById('pv-title');
-    if (titleEl) titleEl.style.fontFamily = selectedFontTitle ? FONT_FAMILY_MAP[selectedFontTitle] : '';
+    const tf = selectedFontTitle ? FONT_FAMILY_MAP[selectedFontTitle] : '';
+    const bf = selectedFontBody  ? FONT_FAMILY_MAP[selectedFontBody]  : '';
+    ['pv-title', 'pv-brand'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.fontFamily = tf;
+    });
+    ['pv-sub', 'pv-autor', 'pv-meta'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.fontFamily = bf;
+    });
   }
 
   document.querySelectorAll('#fp-titulo .fpick-card').forEach(c => {
@@ -1009,6 +1017,7 @@
       document.querySelectorAll('#fp-corpo .fpick-card').forEach(x => x.classList.remove('active'));
       c.classList.add('active');
       selectedFontBody = c.dataset.f;
+      updatePreviewFonts();
     });
   });
 
