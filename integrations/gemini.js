@@ -11,9 +11,9 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const FLASH_MODEL = "gemini-2.5-flash";
 const PRO_MODEL   = "gemini-2.5-pro";
-// Nano Banana: imagem via responseModalities — tenta dois modelos em cascata
+// Nano Banana: imagem via responseModalities — tenta modelos em cascata
 const IMAGE_MODELS = [
-  "gemini-2.0-flash-preview-image-generation",
+  "gemini-2.0-flash",
   "gemini-2.0-flash-exp",
 ];
 

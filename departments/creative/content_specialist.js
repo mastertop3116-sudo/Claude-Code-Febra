@@ -438,10 +438,10 @@ async function gerarConteudoRico(config) {
     try {
       let raw;
       if (tentativa === MAX_TENTATIVAS) {
-        console.log("[Content Specialist] Última tentativa — usando Gemini Pro");
+        console.log("[Content Specialist] Última tentativa — texto puro com Gemini Pro");
         raw = await geminiPro(prompt);
       } else {
-        raw = await geminiJson(prompt, tentativa === 2);
+        raw = await geminiJson(prompt, true); // sempre Pro para qualidade máxima
       }
 
       let text = raw.trim()
