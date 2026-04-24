@@ -957,11 +957,13 @@
       cover: document.getElementById('c-secondary')?.value || '#1D1D1D',
       accent: document.getElementById('c-accent')?.value || '#8b5cf6',
     } : (THEME_PREVIEW[selectedTheme] || THEME_PREVIEW.bemestar);
+    const dk = ((document.getElementById('darken')?.value ?? 25) / 100).toFixed(2);
     const pv = document.querySelector('.preview');
     pv.style.background = [
       `radial-gradient(ellipse 70% 22% at 22% 7%, rgba(255,255,255,.10), transparent 55%)`,
       `radial-gradient(ellipse 80% 55% at 50% 10%, ${t.accent}50, transparent 65%)`,
       `radial-gradient(ellipse 55% 38% at 95% 95%, ${t.accent}22, transparent 60%)`,
+      `linear-gradient(rgba(0,0,0,${dk}), rgba(0,0,0,${dk}))`,
       `linear-gradient(170deg, ${t.cover}f5 0%, ${t.cover} 50%, ${t.cover}dd 100%)`
     ].join(', ');
     pv.style.borderColor = `${t.accent}70`;
@@ -1099,6 +1101,7 @@
     darken.style.setProperty('--val', darken.value + '%');
     dval.textContent = darken.value + '%';
     updateCapaStatus();
+    updatePreviewColors();
   });
 
   function updateCapaStatus() {
