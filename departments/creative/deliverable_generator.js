@@ -9,8 +9,22 @@ const { geminiJson, geminiFlash, geminiImage } = require("../../integrations/gem
 const { gerarConteudoRico } = require("./content_specialist");
 const THEMES = require("./themes");
 const { revisarCapaVisual, revisarConteudo } = require("./design_reviewer");
+const path = require("path");
+const fs   = require("fs");
 
 const MAX_TENTATIVAS = 3;
+
+const FONTS_DIR = path.join(__dirname, "../../assets/fonts");
+const FONT_FILES = {
+  Anton:            { reg: "Anton-Regular.ttf",             bold: "Anton-Regular.ttf" },
+  Oswald:           { reg: "Oswald-variable.ttf",           bold: "Oswald-variable.ttf" },
+  BreeSerif:        { reg: "BreeSerif-Regular.ttf",         bold: "BreeSerif-Regular.ttf" },
+  Poppins:          { reg: "Poppins-Regular.ttf",           bold: "Poppins-SemiBold.ttf" },
+  Montserrat:       { reg: "Montserrat-variable.ttf",       bold: "Montserrat-variable.ttf" },
+  PlayfairDisplay:  { reg: "PlayfairDisplay-variable.ttf",  bold: "PlayfairDisplay-variable.ttf" },
+  LibreBaskerville: { reg: "LibreBaskerville-variable.ttf", bold: "LibreBaskerville-variable.ttf" },
+  GreatVibes:       { reg: "GreatVibes-Regular.ttf",        bold: "GreatVibes-Regular.ttf" },
+};
 
 // ──────────────────────────────────────────
 // Extrai paleta de cores dominantes da imagem
@@ -220,6 +234,16 @@ function gerarPDF(config, conteudo) {
     doc.on("data", c => chunks.push(c));
     doc.on("end", () => resolve(Buffer.concat(chunks)));
     doc.on("error", reject);
+
+    // ── Fontes customizadas ──
+    if (config.fonteTitulo && FONT_FILES[config.fonteTitulo]) {
+      const boldPath = path.join(FONTS_DIR, FONT_FILES[config.fonteTitulo].bold);
+      if (fs.existsSync(boldPath)) { doc.registerFont("f-title", boldPath); F.title = "f-title"; }
+    }
+    if (config.fonteCorpo && FONT_FILES[config.fonteCorpo]) {
+      const regPath = path.join(FONTS_DIR, FONT_FILES[config.fonteCorpo].reg);
+      if (fs.existsSync(regPath)) { doc.registerFont("f-body", regPath); F.body = "f-body"; }
+    }
 
     // ── Dimensões ──
     const W = 595.28, H = 841.89;
@@ -801,6 +825,8 @@ async function generate(config) {
     formato: config.formato || "pdf",
     capaImagem: imagemBuffer,
     capaImagemOpacidade: config.capaImagemOpacidade,
+    fonteTitulo: config.fonteTitulo || null,
+    fonteCorpo:  config.fonteCorpo  || null,
   };
 
   await progress(45, "Gerando conteúdo rico com o Especialista...");

@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Anton&family=Oswald:wght@300;400;600&family=Bree+Serif&family=Libre+Baskerville:wght@400;700&family=Montserrat:wght@400;600;700&family=Poppins:wght@400;600;700&family=Playfair+Display:wght@400;700&family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg-0:#070711;
@@ -364,6 +364,19 @@
     text-transform:uppercase;
   }
 
+  /* ---- font picker ---- */
+  .fpick-section{padding-top:14px;display:flex;flex-direction:column;gap:16px}
+  .fpick-group-label{font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:block}
+  .fpick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .fpick-card{
+    border-radius:10px;border:1.5px solid var(--border);background:var(--bg-2);cursor:pointer;
+    padding:10px 10px 8px;transition:border-color .15s,background .15s,transform .1s;text-align:center;
+  }
+  .fpick-card:hover{border-color:var(--border-hi);background:var(--card-hi);transform:translateY(-1px)}
+  .fpick-card.active{border-color:var(--accent);background:rgba(99,102,241,.12)}
+  .fpick-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.2;margin-bottom:3px}
+  .fpick-sample{font-size:9px;color:var(--text-3);letter-spacing:.02em}
+
   /* ---- image upload panel ---- */
   .drop-zone{
     border:2px dashed var(--border);border-radius:12px;padding:22px;text-align:center;cursor:pointer;
@@ -696,6 +709,37 @@
             </div>
           </div>
 
+          <div class="check-row" id="ck-fonte"><span class="chk">✓</span><span>Personalizar fontes do documento</span><span class="meta">tipografia</span></div>
+
+          <!-- Font picker panel -->
+          <div class="expand-panel" id="panel-fonte">
+            <div class="fpick-section">
+              <div class="fpick-group">
+                <span class="fpick-group-label">Fonte dos Títulos</span>
+                <div class="fpick-grid" id="fp-titulo">
+                  <div class="fpick-card" data-f="Anton"><div class="fpick-name" style="font-family:'Anton'">Anton</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="Oswald"><div class="fpick-name" style="font-family:'Oswald';font-weight:600">Oswald</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="Montserrat"><div class="fpick-name" style="font-family:'Montserrat';font-weight:700">Montserrat</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="Poppins"><div class="fpick-name" style="font-family:'Poppins';font-weight:700">Poppins</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="PlayfairDisplay"><div class="fpick-name" style="font-family:'Playfair Display';font-weight:700">Playfair</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="BreeSerif"><div class="fpick-name" style="font-family:'Bree Serif'">Bree Serif</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="LibreBaskerville"><div class="fpick-name" style="font-family:'Libre Baskerville';font-weight:700">Baskerville</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="GreatVibes"><div class="fpick-name" style="font-family:'Great Vibes';font-size:15px">Great Vibes</div><div class="fpick-sample">AaBbCc</div></div>
+                </div>
+              </div>
+              <div class="fpick-group">
+                <span class="fpick-group-label">Fonte do Corpo</span>
+                <div class="fpick-grid" id="fp-corpo">
+                  <div class="fpick-card" data-f="Poppins"><div class="fpick-name" style="font-family:'Poppins'">Poppins</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="Montserrat"><div class="fpick-name" style="font-family:'Montserrat'">Montserrat</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="LibreBaskerville"><div class="fpick-name" style="font-family:'Libre Baskerville'">Baskerville</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="BreeSerif"><div class="fpick-name" style="font-family:'Bree Serif'">Bree Serif</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="PlayfairDisplay"><div class="fpick-name" style="font-family:'Playfair Display'">Playfair</div><div class="fpick-sample">AaBbCc</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Color picker panel -->
           <div class="expand-panel" id="panel-cor">
             <div class="cpick-list">
@@ -931,7 +975,47 @@
     document.querySelector('.preview .brand').style.color = t.accent;
   }
 
-  let selectedTheme = 'bemestar';
+  let selectedTheme     = 'bemestar';
+  let selectedFontTitle = null;
+  let selectedFontBody  = null;
+
+  const FONT_FAMILY_MAP = {
+    Anton:            "'Anton', sans-serif",
+    Oswald:           "'Oswald', sans-serif",
+    Montserrat:       "'Montserrat', sans-serif",
+    Poppins:          "'Poppins', sans-serif",
+    PlayfairDisplay:  "'Playfair Display', serif",
+    BreeSerif:        "'Bree Serif', serif",
+    LibreBaskerville: "'Libre Baskerville', serif",
+    GreatVibes:       "'Great Vibes', cursive",
+  };
+
+  function updatePreviewFonts() {
+    const titleEl = document.getElementById('pv-title');
+    if (titleEl) titleEl.style.fontFamily = selectedFontTitle ? FONT_FAMILY_MAP[selectedFontTitle] : '';
+  }
+
+  document.querySelectorAll('#fp-titulo .fpick-card').forEach(c => {
+    c.addEventListener('click', () => {
+      document.querySelectorAll('#fp-titulo .fpick-card').forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+      selectedFontTitle = c.dataset.f;
+      updatePreviewFonts();
+    });
+  });
+
+  document.querySelectorAll('#fp-corpo .fpick-card').forEach(c => {
+    c.addEventListener('click', () => {
+      document.querySelectorAll('#fp-corpo .fpick-card').forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+      selectedFontBody = c.dataset.f;
+    });
+  });
+
+  document.getElementById('ck-fonte').addEventListener('click', function() {
+    this.classList.toggle('on');
+    document.getElementById('panel-fonte').classList.toggle('open', this.classList.contains('on'));
+  });
   document.querySelectorAll('.theme').forEach(t => {
     t.addEventListener('click', () => {
       document.querySelectorAll('.theme').forEach(x => x.classList.remove('active'));
@@ -1199,6 +1283,8 @@
         extrairCores: document.getElementById('ck-extract').classList.contains('on'),
         capaGemini: false,
       }),
+      ...(selectedFontTitle && { fonteTitulo: selectedFontTitle }),
+      ...(selectedFontBody  && { fonteCorpo:  selectedFontBody }),
     };
 
     document.getElementById('btn-gerar').disabled = true;
