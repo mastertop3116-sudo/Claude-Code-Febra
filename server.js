@@ -138,6 +138,107 @@ app.get("/api/criar/progress/:jobId", (req, res) => {
 });
 
 // ──────────────────────────────────────────
+// Gerador de Carrosseis (SSE igual ao /api/criar)
+// ──────────────────────────────────────────
+const carouselJobs = new Map();
+function limparCarouselJobs() {
+  const limite = Date.now() - 10 * 60 * 1000;
+  for (const [id, job] of carouselJobs.entries()) {
+    if (job.criadoEm < limite) carouselJobs.delete(id);
+  }
+}
+
+// POST /api/carousel → inicia job, retorna jobId
+app.post("/api/carousel", (req, res) => {
+  limparCarouselJobs();
+  const jobId = Math.random().toString(36).slice(2, 10);
+  carouselJobs.set(jobId, { status: "running", progress: 0, message: "Iniciando carrossel...", criadoEm: Date.now() });
+  res.json({ jobId });
+
+  const jobKiller = setTimeout(() => {
+    const job = carouselJobs.get(jobId);
+    if (job && job.status === "running") {
+      carouselJobs.set(jobId, { status: "error", message: "Timeout: carrossel demorou mais de 3 minutos.", criadoEm: Date.now() });
+    }
+  }, 3 * 60 * 1000);
+
+  const { gerarCarrossel } = require("./departments/creative/carousel_generator");
+  const { gerarConteudoRico } = require("./departments/creative/content_specialist");
+
+  (async () => {
+    try {
+      const setJob = (p, m) => { const j = carouselJobs.get(jobId); if (j) { j.progress = p; j.message = m; } };
+
+      setJob(10, "Gerando conteúdo com Gemini Pro...");
+      const conteudo = await gerarConteudoRico({
+        tipo:       req.body.tipo       || "ebook",
+        titulo:     req.body.titulo     || "Entregável",
+        descricao:  req.body.descricao  || req.body.titulo,
+        temaKey:    req.body.temaKey    || "produtividade",
+        paginas:    parseInt(req.body.paginas) || 10,
+        avatar:     req.body.avatar     || "",
+        numCapitulos: req.body.numCapitulos,
+      });
+
+      setJob(60, "Renderizando slides...");
+      const resultado = await gerarCarrossel({
+        titulo:    req.body.titulo    || "Entregável",
+        subtitulo: req.body.subtitulo || "",
+        autor:     req.body.autor     || "Nexus Digital",
+        temaKey:   req.body.temaKey   || "produtividade",
+        formato:   req.body.formato   || "instagram_feed",
+        maxSlides: parseInt(req.body.maxSlides) || 6,
+      }, conteudo);
+
+      clearTimeout(jobKiller);
+      carouselJobs.set(jobId, {
+        status: "done", progress: 100, message: "Carrossel pronto!", criadoEm: Date.now(),
+        slides: resultado.buffers.map(b => b.toString("base64")),
+        count:  resultado.count,
+        formato: resultado.formato,
+        titulo: req.body.titulo || "carrossel",
+      });
+    } catch (e) {
+      clearTimeout(jobKiller);
+      console.error("[/api/carousel]", e.message);
+      carouselJobs.set(jobId, { status: "error", message: e.message, criadoEm: Date.now() });
+    }
+  })();
+});
+
+// GET /api/carousel/progress/:jobId → SSE stream
+app.get("/api/carousel/progress/:jobId", (req, res) => {
+  const { jobId } = req.params;
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.flushHeaders();
+
+  const enviar = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
+
+  const tick = setInterval(() => {
+    const job = carouselJobs.get(jobId);
+    if (!job) { enviar({ error: "Job não encontrado" }); clearInterval(tick); res.end(); return; }
+
+    enviar({ progress: job.progress, message: job.message, status: job.status });
+
+    if (job.status === "done") {
+      enviar({ done: true, slides: job.slides, count: job.count, formato: job.formato, titulo: job.titulo });
+      clearInterval(tick);
+      carouselJobs.delete(jobId);
+      res.end();
+    } else if (job.status === "error") {
+      enviar({ error: job.message });
+      clearInterval(tick);
+      carouselJobs.delete(jobId);
+      res.end();
+    }
+  }, 600);
+
+  req.on("close", () => clearInterval(tick));
+});
+
+// ──────────────────────────────────────────
 // Webhook GitHub → salva commits no Supabase
 // ──────────────────────────────────────────
 const crypto = require("crypto");

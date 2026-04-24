@@ -464,6 +464,26 @@
   .toast.show{transform:translateY(0);opacity:1}
   .toast .ti{font-size:16px}
 
+  /* ---- carousel section ---- */
+  .cformats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .carousel-slides-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+  .slide-thumb-wrap{position:relative;cursor:pointer;border-radius:10px;overflow:hidden;border:1.5px solid var(--border);transition:border-color .15s,transform .12s;aspect-ratio:1}
+  .slide-thumb-wrap:hover{border-color:var(--accent);transform:scale(1.02)}
+  .slide-thumb-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+  .slide-thumb-dl{position:absolute;inset:0;background:rgba(0,0,0,.55);border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;opacity:0;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+  .slide-thumb-wrap:hover .slide-thumb-dl{opacity:1}
+  .slide-num{position:absolute;top:6px;left:8px;font-size:11px;font-weight:700;color:rgba(255,255,255,.7);font-family:"JetBrains Mono",monospace;pointer-events:none}
+  .btn-carousel{
+    margin-top:4px;width:100%;padding:15px;font-size:14px;font-weight:700;border-radius:12px;
+    background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,0) 50%),linear-gradient(90deg,#0ea5e9,#6366f1);
+    border:1px solid rgba(255,255,255,.18);color:#fff;cursor:pointer;letter-spacing:-.01em;
+    box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 16px 32px -10px rgba(14,165,233,.4);
+    transition:transform .1s,filter .15s;
+  }
+  .btn-carousel:hover{filter:brightness(1.08)}
+  .btn-carousel:active{transform:translateY(1px)}
+  .btn-carousel:disabled{opacity:.4;cursor:not-allowed;filter:none;transform:none}
+
   @media(max-width:900px){
     .grid{grid-template-columns:1fr}
     .head h1{font-size:38px}
@@ -829,6 +849,39 @@
         </div>
       </section>
 
+      <!-- 05 carrossel para redes sociais -->
+      <section class="card">
+        <h2><span class="n">05</span>Carrossel para redes sociais<span class="hint">slides PNG prontos para postar</span></h2>
+        <div class="stack">
+
+          <div class="toggle-row">
+            <span class="tag" style="background:linear-gradient(135deg,rgba(14,165,233,.25),rgba(14,165,233,.05));border-color:rgba(14,165,233,.35);font-size:18px">📱</span>
+            <div class="txt"><b>Gerar carrossel de slides</b><span>Slides PNG com layout profissional — mesmo conteúdo, formato social.</span></div>
+            <div class="switch" id="sw-carousel"></div>
+          </div>
+
+          <div id="carousel-opts" class="field-disabled">
+            <label class="lbl" style="margin-bottom:10px">Formato dos slides</label>
+            <div class="cformats" id="carousel-formats">
+              <div class="fmt active" data-v="instagram_feed"><span class="ico">📸</span><div><b>Feed 1:1</b><span>1080×1080</span></div></div>
+              <div class="fmt" data-v="instagram_feed_4x5"><span class="ico">📱</span><div><b>Feed 4:5</b><span>1080×1350</span></div></div>
+              <div class="fmt" data-v="instagram_story"><span class="ico">⬆</span><div><b>Story</b><span>1080×1920</span></div></div>
+              <div class="fmt" data-v="linkedin"><span class="ico">💼</span><div><b>LinkedIn</b><span>1200×627</span></div></div>
+              <div class="fmt" data-v="youtube_thumb"><span class="ico">▶</span><div><b>YouTube</b><span>1280×720</span></div></div>
+            </div>
+
+            <div class="slider-wrap" style="margin-top:16px">
+              <div class="top"><span>Slides de conteúdo</span><span><b id="max-slides-val">6</b> slides</span></div>
+              <input type="range" id="inp-max-slides" min="3" max="8" value="6" style="--val:60%">
+            </div>
+          </div>
+
+          <button class="btn-carousel" id="btn-carousel" disabled>📱 Gerar carrossel</button>
+          <div class="small-note" id="carousel-note">Ative a opção acima para gerar os slides</div>
+
+        </div>
+      </section>
+
     </div>
 
     <!-- ===== RIGHT RAIL ===== -->
@@ -907,6 +960,34 @@
     <div class="dl-row" id="dl-row"></div>
     <div style="margin-top:16px">
       <button class="dl-btn reset" onclick="resetForm()">← Criar outro</button>
+    </div>
+  </div>
+</div>
+
+<!-- CAROUSEL PROGRESS OVERLAY -->
+<div class="overlay" id="overlay-carousel-prog">
+  <div class="overlay-box">
+    <div class="ov-spinner"></div>
+    <div class="ov-title">Gerando carrossel…</div>
+    <div class="ov-sub">Gemini Pro criando o conteúdo · Satori renderizando os slides.</div>
+    <div class="prog-bar"><div class="prog-fill" id="carousel-prog-fill"></div></div>
+    <div class="prog-meta">
+      <div class="prog-pct" id="carousel-prog-pct">0%</div>
+      <div class="prog-msg" id="carousel-prog-msg">Iniciando…</div>
+    </div>
+  </div>
+</div>
+
+<!-- CAROUSEL SUCCESS OVERLAY -->
+<div class="overlay" id="overlay-carousel-ok">
+  <div class="overlay-box" style="width:660px;max-width:calc(100vw - 24px);text-align:center;max-height:90vh;overflow-y:auto">
+    <div class="ov-check" style="background:linear-gradient(135deg,#0ea5e9,#6366f1);box-shadow:0 0 30px rgba(14,165,233,.4)">📱</div>
+    <div class="ov-title">Carrossel criado!</div>
+    <div class="ov-sub" id="carousel-ok-msg">Clique em qualquer slide para baixar.</div>
+    <div class="carousel-slides-grid" id="carousel-slides-grid"></div>
+    <div style="margin-top:20px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button class="dl-btn pdf" id="btn-dl-all-slides">⬇ Baixar todos os slides</button>
+      <button class="dl-btn reset" onclick="closeCarouselOk()">← Fechar</button>
     </div>
   </div>
 </div>
@@ -1378,6 +1459,143 @@
     document.getElementById('overlay-ok').classList.remove('show');
     document.getElementById('btn-gerar').disabled = false;
     capaBase64 = null;
+  }
+
+  // ──────────────────────────────────────────
+  // CARROSSEL — toggle, formato, geração, download
+  // ──────────────────────────────────────────
+  let carouselFmt = 'instagram_feed';
+
+  document.querySelectorAll('#carousel-formats .fmt').forEach(f => {
+    f.addEventListener('click', () => {
+      document.querySelectorAll('#carousel-formats .fmt').forEach(x => x.classList.remove('active'));
+      f.classList.add('active');
+      carouselFmt = f.dataset.v;
+    });
+  });
+
+  const maxSliderEl  = document.getElementById('inp-max-slides');
+  const maxSliderVal = document.getElementById('max-slides-val');
+  maxSliderEl.addEventListener('input', () => {
+    maxSliderVal.textContent = maxSliderEl.value;
+    const pct = ((maxSliderEl.value - 3) / 5 * 100).toFixed(0);
+    maxSliderEl.style.setProperty('--val', pct + '%');
+  });
+
+  document.getElementById('sw-carousel').addEventListener('click', function() {
+    this.classList.toggle('on');
+    const on = this.classList.contains('on');
+    document.getElementById('carousel-opts').classList.toggle('field-disabled', !on);
+    document.getElementById('btn-carousel').disabled = !on;
+    document.getElementById('carousel-note').textContent =
+      on ? '~60s · renderizado no servidor · PNG puro, sem marca d\'água'
+         : 'Ative a opção acima para gerar os slides';
+  });
+
+  document.getElementById('btn-carousel').addEventListener('click', async () => {
+    const titulo = document.getElementById('inp-titulo').value.trim();
+    if (!titulo) { showErr('Informe o título antes de gerar o carrossel.'); return; }
+
+    const payload = {
+      tipo:      selectedType,
+      titulo,
+      subtitulo: document.getElementById('inp-subtitulo').value,
+      autor:     document.getElementById('inp-autor').value || 'Nexus Digital',
+      descricao: document.getElementById('inp-descricao').value || titulo,
+      paginas:   parseInt(document.getElementById('inp-paginas').value) || 15,
+      temaKey:   selectedTheme,
+      formato:   carouselFmt,
+      maxSlides: parseInt(maxSliderEl.value) || 6,
+    };
+
+    document.getElementById('btn-carousel').disabled = true;
+    setCarouselProgress(0, 'Conectando ao servidor…');
+    document.getElementById('overlay-carousel-prog').classList.add('show');
+    hideErr();
+
+    try {
+      const initRes = await fetch('/api/carousel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!initRes.ok) throw new Error('Falha ao iniciar carrossel (HTTP ' + initRes.status + ')');
+      const { jobId } = await initRes.json();
+
+      await new Promise((resolve, reject) => {
+        const es = new EventSource('/api/carousel/progress/' + jobId);
+        es.onmessage = e => {
+          const d = JSON.parse(e.data);
+          if (d.error) { es.close(); reject(new Error(d.error)); return; }
+          if (d.progress !== undefined) setCarouselProgress(d.progress, d.message);
+          if (d.done) { es.close(); showCarouselSuccess(d); resolve(d); }
+        };
+        es.onerror = () => { es.close(); reject(new Error('Conexão perdida — tente novamente.')); };
+      });
+
+    } catch (err) {
+      document.getElementById('overlay-carousel-prog').classList.remove('show');
+      document.getElementById('btn-carousel').disabled = false;
+      showErr('⚠ ' + err.message);
+    }
+  });
+
+  function setCarouselProgress(pct, msg) {
+    document.getElementById('carousel-prog-fill').style.width = pct + '%';
+    document.getElementById('carousel-prog-pct').textContent = pct + '%';
+    document.getElementById('carousel-prog-msg').textContent = msg || '';
+  }
+
+  let carouselSlideData = [];
+  function showCarouselSuccess(data) {
+    document.getElementById('overlay-carousel-prog').classList.remove('show');
+    carouselSlideData = data.slides || [];
+    const tit = data.titulo || document.getElementById('inp-titulo').value;
+    document.getElementById('carousel-ok-msg').textContent =
+      carouselSlideData.length + ' slides gerados · clique para baixar individualmente';
+
+    const grid = document.getElementById('carousel-slides-grid');
+    grid.innerHTML = '';
+    carouselSlideData.forEach((b64, i) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'slide-thumb-wrap';
+      const img = document.createElement('img');
+      img.src  = 'data:image/png;base64,' + b64;
+      img.alt  = 'Slide ' + (i + 1);
+      const num = document.createElement('span');
+      num.className = 'slide-num';
+      num.textContent = String(i + 1).padStart(2, '0');
+      const dlBtn = document.createElement('div');
+      dlBtn.className = 'slide-thumb-dl';
+      dlBtn.innerHTML = '⬇ Baixar slide ' + (i + 1);
+      wrap.appendChild(img);
+      wrap.appendChild(num);
+      wrap.appendChild(dlBtn);
+      wrap.addEventListener('click', () => downloadSlide(b64, i + 1, tit));
+      grid.appendChild(wrap);
+    });
+
+    document.getElementById('overlay-carousel-ok').classList.add('show');
+    document.getElementById('btn-carousel').disabled = false;
+  }
+
+  function downloadSlide(b64, num, titulo) {
+    const a = document.createElement('a');
+    a.href = 'data:image/png;base64,' + b64;
+    a.download = (titulo || 'carrossel').replace(/[^a-zA-Z0-9]/g, '_') +
+                 '_slide_' + String(num).padStart(2, '0') + '.png';
+    a.click();
+  }
+
+  document.getElementById('btn-dl-all-slides').addEventListener('click', () => {
+    const tit = document.getElementById('inp-titulo').value;
+    carouselSlideData.forEach((b64, i) => {
+      setTimeout(() => downloadSlide(b64, i + 1, tit), i * 250);
+    });
+  });
+
+  function closeCarouselOk() {
+    document.getElementById('overlay-carousel-ok').classList.remove('show');
   }
 </script>
 </body>

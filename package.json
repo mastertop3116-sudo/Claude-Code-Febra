@@ -10,13 +10,17 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.36.3",
+    "@google/genai": "^1.50.1",
     "@google/generative-ai": "^0.21.0",
+    "@resvg/resvg-js": "^2.6.2",
     "@supabase/supabase-js": "^2.45.0",
     "docx": "^9.6.1",
     "dotenv": "^16.4.5",
     "express": "^5.2.1",
     "node-telegram-bot-api": "^0.66.0",
     "node-vibrant": "^3.1.6",
-    "pdfkit": "^0.18.0"
+    "pdfkit": "^0.18.0",
+    "satori": "^0.26.0",
+    "satori-html": "^0.3.2"
   }
 }
