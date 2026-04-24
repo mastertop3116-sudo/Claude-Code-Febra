@@ -327,8 +327,8 @@
   .small-note{margin-top:10px;font-size:11px;color:var(--text-3);text-align:center;font-family:"JetBrains Mono",monospace}
 
   /* ---- panels expand ---- */
-  .expand-panel{overflow:hidden;max-height:0;transition:max-height .4s ease,opacity .2s;opacity:0}
-  .expand-panel.open{max-height:600px;opacity:1}
+  .expand-panel{overflow:hidden;max-height:0;transition:max-height .45s ease,opacity .2s;opacity:0}
+  .expand-panel.open{max-height:1000px;opacity:1}
 
   /* ---- color picker ---- */
   .cpick-list{display:flex;flex-direction:column;gap:8px;padding-top:14px}
@@ -465,7 +465,7 @@
   .toast .ti{font-size:16px}
 
   /* ---- carousel section ---- */
-  .cformats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .cformats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
   .carousel-slides-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
   .slide-thumb-wrap{position:relative;cursor:pointer;border-radius:10px;overflow:hidden;border:1.5px solid var(--border);transition:border-color .15s,transform .12s;aspect-ratio:1}
   .slide-thumb-wrap:hover{border-color:var(--accent);transform:scale(1.02)}
@@ -606,8 +606,23 @@
               <input class="input" id="inp-autor" placeholder="Ex: João Silva | Academia XYZ">
             </div>
             <div>
-              <label class="lbl">Nicho / descrição do público</label>
-              <input class="input" id="inp-descricao" placeholder="Ex: Iniciantes no Jiu-Jitsu adultos 25–45 anos">
+              <label class="lbl">Nicho / assunto principal</label>
+              <input class="input" id="inp-descricao" placeholder="Ex: Jiu-Jitsu infantil, iniciantes">
+            </div>
+          </div>
+
+          <div>
+            <label class="lbl">Avatar do público-alvo <span class="opt">recomendado · melhora muito o conteúdo</span></label>
+            <input class="input" id="inp-avatar" placeholder="Ex: Pais de crianças 5–12 anos que buscam disciplina e autodefesa pelo jiu-jitsu">
+          </div>
+
+          <div class="row2 eq">
+            <div>
+              <label class="lbl">Nº de capítulos <span class="opt">opcional</span></label>
+              <input class="input" type="number" id="inp-caps" placeholder="automático" min="1" max="20">
+            </div>
+            <div style="display:flex;flex-direction:column;justify-content:flex-end">
+              <div style="font-size:12px;color:var(--text-3);line-height:1.5;padding-bottom:13px" id="caps-hint">Deixe vazio para o MAX calcular pelo nº de páginas</div>
             </div>
           </div>
         </div>
@@ -910,10 +925,11 @@
             <div class="r"><span class="k">Tema</span><span class="v" id="s-theme">🌿 Bem-estar &amp; Leveza</span></div>
             <div class="r"><span class="k">Capa</span><span class="v" id="s-capa">Nano Banana · 25%</span></div>
             <div class="r"><span class="k">Formato</span><span class="v" id="s-fmt">PDF</span></div>
+            <div class="r"><span class="k">Carrossel</span><span class="v" id="s-carousel" style="color:var(--text-3)">desativado</span></div>
           </div>
 
           <button class="generate" id="btn-gerar">✨ Gerar entregável</button>
-          <div class="small-note">~ 90s · gerado no servidor · sem marca d'água</div>
+          <div class="small-note" id="gen-time-note">~ 90s · gerado no servidor · sem marca d'água</div>
         </section>
 
         <section class="card" style="margin-top:22px;padding:18px">
@@ -942,11 +958,14 @@
   <div class="overlay-box">
     <div class="ov-spinner"></div>
     <div class="ov-title">Gerando seu entregável…</div>
-    <div class="ov-sub">Não feche esta aba. O processo leva ~90 segundos.</div>
+    <div class="ov-sub" id="gen-overlay-sub">Não feche esta aba. O processo leva ~90 segundos.</div>
     <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
     <div class="prog-meta">
       <div class="prog-pct" id="prog-pct">0%</div>
       <div class="prog-msg" id="prog-msg">Iniciando…</div>
+    </div>
+    <div style="text-align:center;margin-top:20px">
+      <button id="btn-cancelar" style="background:none;border:1px solid var(--border);color:var(--text-3);border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer;transition:border-color .15s,color .15s" onmouseover="this.style.borderColor='rgba(255,255,255,.3)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-3)'">Cancelar e tentar novamente</button>
     </div>
   </div>
 </div>
@@ -1003,6 +1022,33 @@
   const typeIco     = document.getElementById('type-ico');
   let selectedType  = 'ebook';
 
+  // Tempo estimado e dica por tipo
+  const TYPE_TIME = {
+    ebook: '~120s', workbook: '~100s', checklist: '~45s',
+    planner: '~60s', script_vsl: '~60s', cheat_sheet: '~40s', certificado: '~20s',
+  };
+  const TYPE_CAPS_HINT = {
+    ebook: 'Sugestão: 8–15 capítulos', workbook: 'Sugestão: 6–12 capítulos',
+    checklist: 'Sugestão: 5–8 categorias', planner: 'Sugestão: 4–8 módulos',
+    script_vsl: 'Fixo: 7 etapas', cheat_sheet: 'Sugestão: 4–8 tópicos',
+    certificado: 'Fixo: 1 seção',
+  };
+
+  function updateTypeUI(v) {
+    const time = TYPE_TIME[v] || '~90s';
+    document.getElementById('gen-time-note').textContent =
+      time + ' · gerado no servidor · sem marca d\'água';
+    document.getElementById('caps-hint').textContent =
+      TYPE_CAPS_HINT[v] || 'Deixe vazio para o MAX calcular pelo nº de páginas';
+    // Script VSL e certificado têm caps fixos — desabilita o campo
+    const capsInput = document.getElementById('inp-caps');
+    if (v === 'script_vsl' || v === 'certificado') {
+      capsInput.disabled = true; capsInput.placeholder = 'fixo pelo tipo';
+    } else {
+      capsInput.disabled = false; capsInput.placeholder = 'automático';
+    }
+  }
+
   typeTrigger.addEventListener('click', () => {
     typeMenu.style.display = typeMenu.style.display === 'none' ? 'block' : 'none';
   });
@@ -1016,6 +1062,7 @@
       document.getElementById('s-type').textContent = typeLabel.textContent;
       document.getElementById('pv-brand').textContent = 'Nexus Max · ' + typeLabel.textContent.split('/')[0].trim();
       typeMenu.style.display = 'none';
+      updateTypeUI(selectedType);
     });
   });
   document.addEventListener('click', e => {
@@ -1341,13 +1388,16 @@
     const useNano   = document.getElementById('sw-nano').classList.contains('on');
     const useCores  = document.getElementById('ck-cor').classList.contains('on');
 
+    const numCaps = parseInt(document.getElementById('inp-caps').value);
     const payload = {
       tipo:      selectedType,
       titulo,
       subtitulo: document.getElementById('inp-subtitulo').value,
       autor:     document.getElementById('inp-autor').value,
       descricao: document.getElementById('inp-descricao').value,
+      avatar:    document.getElementById('inp-avatar').value.trim(),
       paginas:   parseInt(document.getElementById('inp-paginas').value) || 15,
+      ...(numCaps && { numCapitulos: numCaps }),
       temaKey:   selectedTheme,
       formato:   selectedFmt,
       capaGemini: useNano && !useManual,
@@ -1382,6 +1432,8 @@
 
     document.getElementById('btn-gerar').disabled = true;
     setProgress(0, 'Conectando ao servidor…');
+    document.getElementById('gen-overlay-sub').textContent =
+      'Não feche esta aba. O processo leva ' + (TYPE_TIME[selectedType] || '~90s') + '.';
     document.getElementById('overlay-prog').classList.add('show');
     hideErr();
 
@@ -1461,6 +1513,11 @@
     capaBase64 = null;
   }
 
+  document.getElementById('btn-cancelar').addEventListener('click', () => {
+    document.getElementById('overlay-prog').classList.remove('show');
+    document.getElementById('btn-gerar').disabled = false;
+  });
+
   // ──────────────────────────────────────────
   // CARROSSEL — toggle, formato, geração, download
   // ──────────────────────────────────────────
@@ -1471,6 +1528,9 @@
       document.querySelectorAll('#carousel-formats .fmt').forEach(x => x.classList.remove('active'));
       f.classList.add('active');
       carouselFmt = f.dataset.v;
+      if (document.getElementById('sw-carousel').classList.contains('on')) {
+        document.getElementById('s-carousel').textContent = f.querySelector('b').textContent;
+      }
     });
   });
 
@@ -1490,19 +1550,31 @@
     document.getElementById('carousel-note').textContent =
       on ? '~60s · renderizado no servidor · PNG puro, sem marca d\'água'
          : 'Ative a opção acima para gerar os slides';
+    const sCarousel = document.getElementById('s-carousel');
+    if (on) {
+      const fmtEl = document.querySelector('#carousel-formats .fmt.active');
+      sCarousel.textContent = fmtEl ? fmtEl.querySelector('b').textContent : 'Feed 1:1';
+      sCarousel.style.color = 'var(--text)';
+    } else {
+      sCarousel.textContent = 'desativado';
+      sCarousel.style.color = 'var(--text-3)';
+    }
   });
 
   document.getElementById('btn-carousel').addEventListener('click', async () => {
     const titulo = document.getElementById('inp-titulo').value.trim();
     if (!titulo) { showErr('Informe o título antes de gerar o carrossel.'); return; }
 
+    const numCapsC = parseInt(document.getElementById('inp-caps').value);
     const payload = {
       tipo:      selectedType,
       titulo,
       subtitulo: document.getElementById('inp-subtitulo').value,
       autor:     document.getElementById('inp-autor').value || 'Nexus Digital',
       descricao: document.getElementById('inp-descricao').value || titulo,
+      avatar:    document.getElementById('inp-avatar').value.trim(),
       paginas:   parseInt(document.getElementById('inp-paginas').value) || 15,
+      ...(numCapsC && { numCapitulos: numCapsC }),
       temaKey:   selectedTheme,
       formato:   carouselFmt,
       maxSlides: parseInt(maxSliderEl.value) || 6,
