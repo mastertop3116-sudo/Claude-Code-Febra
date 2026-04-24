@@ -286,9 +286,16 @@
   .sticky{position:sticky;top:24px}
   .preview{
     aspect-ratio:3/4;border-radius:12px;overflow:hidden;position:relative;
-    background:radial-gradient(80% 50% at 50% 20%,rgba(139,92,246,.35),transparent 70%),
+    background:
+      radial-gradient(ellipse 70% 22% at 22% 7%, rgba(255,255,255,.10), transparent 55%),
+      radial-gradient(80% 50% at 50% 20%,rgba(139,92,246,.35),transparent 70%),
       linear-gradient(180deg,#1a1340,#0a0720);
-    border:1px solid var(--border-hi);
+    border:1px solid rgba(255,255,255,.14);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,.13) inset,
+      0 -1px 0 rgba(0,0,0,.5) inset,
+      0 0 0 1px rgba(255,255,255,.04) inset,
+      0 40px 100px -20px rgba(0,0,0,.9);
     display:flex;flex-direction:column;justify-content:space-between;padding:18px;
   }
   .preview .brand{font-family:"JetBrains Mono",monospace;font-size:10px;color:rgba(255,255,255,.7);letter-spacing:.14em;text-transform:uppercase}
@@ -829,8 +836,20 @@
   function updatePreviewColors() {
     const t = THEME_PREVIEW[selectedTheme] || THEME_PREVIEW.bemestar;
     const pv = document.querySelector('.preview');
-    pv.style.background = `radial-gradient(80% 50% at 50% 20%, ${t.accent}35, transparent 70%), linear-gradient(180deg, ${t.cover}f0, ${t.cover})`;
-    pv.style.borderColor = `${t.accent}55`;
+    pv.style.background = [
+      `radial-gradient(ellipse 70% 22% at 22% 7%, rgba(255,255,255,.10), transparent 55%)`,
+      `radial-gradient(ellipse 80% 55% at 50% 10%, ${t.accent}50, transparent 65%)`,
+      `radial-gradient(ellipse 55% 38% at 95% 95%, ${t.accent}22, transparent 60%)`,
+      `linear-gradient(170deg, ${t.cover}f5 0%, ${t.cover} 50%, ${t.cover}dd 100%)`
+    ].join(', ');
+    pv.style.borderColor = `${t.accent}70`;
+    pv.style.boxShadow = [
+      `0 1px 0 rgba(255,255,255,.13) inset`,
+      `0 -1px 0 rgba(0,0,0,.5) inset`,
+      `0 0 0 1px ${t.accent}18 inset`,
+      `0 40px 100px -20px rgba(0,0,0,.9)`,
+      `0 0 50px -15px ${t.accent}30`
+    ].join(', ');
     document.querySelector('.preview .brand').style.color = t.accent;
   }
 
