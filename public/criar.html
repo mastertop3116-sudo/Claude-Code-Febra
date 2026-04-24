@@ -908,7 +908,11 @@
   };
   function calcCaps(pages) { return Math.min(20, Math.max(8, pages - 3)); }
   function updatePreviewColors() {
-    const t = THEME_PREVIEW[selectedTheme] || THEME_PREVIEW.bemestar;
+    const useCustom = document.getElementById('ck-cor')?.classList.contains('on');
+    const t = useCustom ? {
+      cover: document.getElementById('c-secondary')?.value || '#1D1D1D',
+      accent: document.getElementById('c-accent')?.value || '#8b5cf6',
+    } : (THEME_PREVIEW[selectedTheme] || THEME_PREVIEW.bemestar);
     const pv = document.querySelector('.preview');
     pv.style.background = [
       `radial-gradient(ellipse 70% 22% at 22% 7%, rgba(255,255,255,.10), transparent 55%)`,
@@ -992,6 +996,7 @@
   document.getElementById('ck-cor').addEventListener('click', function() {
     this.classList.toggle('on');
     document.getElementById('panel-cor').classList.toggle('open', this.classList.contains('on'));
+    updatePreviewColors();
   });
 
   // ---- slider ----
@@ -1024,10 +1029,11 @@
     c.addEventListener('input', () => {
       h.value = c.value.slice(1).toUpperCase();
       s.style.background = c.value;
+      updatePreviewColors();
     });
     h.addEventListener('input', () => {
       const val = '#' + h.value;
-      if (/^#[0-9A-Fa-f]{6}$/.test(val)) { c.value = val; s.style.background = val; }
+      if (/^#[0-9A-Fa-f]{6}$/.test(val)) { c.value = val; s.style.background = val; updatePreviewColors(); }
     });
     h.addEventListener('blur', () => {
       const v = '#' + h.value.replace(/^#/, '');
