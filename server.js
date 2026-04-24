@@ -71,14 +71,14 @@ app.post("/api/criar", (req, res) => {
   criarJobs.set(jobId, { status: "running", progress: 0, message: "Iniciando...", criadoEm: Date.now() });
   res.json({ jobId });
 
-  // Killer de segurança: 3 minutos máximo por job
+  // Killer de segurança: 5 minutos máximo por job (designer review + Nano Banana podem somar ~4 min)
   const jobKiller = setTimeout(() => {
     const job = criarJobs.get(jobId);
     if (job && job.status === "running") {
-      criarJobs.set(jobId, { status: "error", message: "Timeout: geração demorou mais de 3 minutos.", criadoEm: Date.now() });
+      criarJobs.set(jobId, { status: "error", message: "Timeout: geração demorou mais de 5 minutos.", criadoEm: Date.now() });
       console.error(`[/api/criar] Job ${jobId} encerrado por timeout`);
     }
-  }, 3 * 60 * 1000);
+  }, 5 * 60 * 1000);
 
   const { generate } = require("./departments/creative/deliverable_generator");
   generate({

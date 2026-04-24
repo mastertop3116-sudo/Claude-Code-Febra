@@ -866,8 +866,6 @@
     this.classList.toggle('on'); syncFoot();
   });
 
-  syncNano(); syncHead(); syncFoot();
-
   // ---- check rows ----
   ['ck-numpag', 'ck-extract'].forEach(id => {
     const el = document.getElementById(id);
@@ -902,6 +900,9 @@
           : nano ? 'Nano Banana · ' + darken.value + '%'
           : 'Sem capa gerada';
   }
+
+  // inicializa estados dos switches (depois que darken está declarado)
+  syncNano(); syncHead(); syncFoot();
 
   // ---- color pickers ----
   function setupColorSync(colorId, hexId) {
