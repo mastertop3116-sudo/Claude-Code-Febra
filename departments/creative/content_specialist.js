@@ -128,6 +128,190 @@ Idioma: PORTUGUÊS BRASILEIRO. Crie EXATAMENTE ${totalDegraus} seções. CADA se
 }
 
 // ──────────────────────────────────────────
+// Prompt formato VSL SCRIPT
+// ──────────────────────────────────────────
+function buildPromptVSL(titulo, descricao, avatar) {
+  return `Você é o melhor copywriter de vídeos de vendas do Brasil — especialista em VSL (Video Sales Letter).
+Crie um script de VSL COMPLETO e PERSUASIVO para o produto "${titulo}".
+Nicho/produto: ${descricao}
+Público-alvo: ${avatar || "adultos brasileiros interessados no tema"}
+
+REGRAS DE JSON — OBRIGATÓRIO:
+- Retorne APENAS JSON puro, sem markdown
+- NUNCA aspas duplas dentro de strings — use aspas simples
+- NUNCA quebras de linha — use ponto e vírgula
+
+ESTRUTURA JSON:
+{
+  "capa": {
+    "titulo": "${titulo}",
+    "subtitulo": "Script VSL Completo — Pronto para Gravar",
+    "tagline": "Hook • Prova • Conversão"
+  },
+  "introducao": "Visão geral do script: duração estimada, estrutura das etapas e instrução de uso para o produtor",
+  "secoes": [
+    { "titulo": "ETAPA 1 — HOOK (0:00–0:45)", "conteudo": "FUNDAMENTO: o que o espectador sente ao ver este gancho; APLICAÇÃO: frase exata de abertura + as 3 primeiras perguntas retóricas; PROGRESSÃO: como esta abertura cria tensão e mantém o espectador assistindo", "destaques": ["Hook principal: [frase de abertura impactante — começa com uma promessa ou dor visceral]", "Promessa da transformação: [o que o espectador vai descobrir nos próximos minutos]", "Quebra de padrão: [elemento surpresa ou declaração controversa que prende atenção]", "Prova de credibilidade inicial: [resultado de aluno ou dado numérico que valida o que vem a seguir]", "Transição para a história: [frase de ponte natural para o próximo bloco]"] },
+    { "titulo": "ETAPA 2 — HISTÓRIA E IDENTIFICAÇÃO (0:45–2:00)", "conteudo": "FUNDAMENTO: por que a história pessoal cria conexão e confiança; APLICAÇÃO: estrutura exata da história (situação antes → evento de virada → descoberta); PROGRESSÃO: como a história posiciona o apresentador como guia, não herói", "destaques": ["Situação antes (o problema): [dor específica que o apresentador ou aluno vivia — detalhes emocionais reais]", "O momento de virada: [o evento, descoberta ou decisão que mudou tudo — com data ou contexto]", "A jornada da transformação: [os obstáculos enfrentados e como foram superados — 3 marcos]", "O resultado concreto: [números reais ou prova visual da transformação obtida]", "Identificação com o avatar: [frase que conecta a história à dor do espectador]"] },
+    { "titulo": "ETAPA 3 — PROBLEMA E AGITAÇÃO (2:00–3:30)", "conteudo": "FUNDAMENTO: aprofundar a dor antes de apresentar a solução aumenta o valor percebido; APLICAÇÃO: listar os 3 maiores problemas do avatar com linguagem visceral; PROGRESSÃO: cada problema leva naturalmente ao próximo, criando urgência crescente", "destaques": ["Problema 1 — a dor visível: [o problema que o avatar reconhece conscientemente — com exemplos do dia a dia]", "Problema 2 — a causa raiz: [o motivo real por trás do problema superficial — que ele ainda não percebeu]", "Problema 3 — o custo de não resolver: [o que continua acontecendo se ele não agir agora — consequências reais]", "Agitação emocional: [pergunta retórica ou cena mental que amplifica a dor e cria desconforto]", "Ponte para a solução: [frase que apresenta que existe uma saída — sem revelar ainda]"] },
+    { "titulo": "ETAPA 4 — SOLUÇÃO E APRESENTAÇÃO DO PRODUTO (3:30–5:30)", "conteudo": "FUNDAMENTO: apresentar a solução como descoberta, não como venda; APLICAÇÃO: revelar o método ou produto de forma estruturada (nome + pilares + diferenciais); PROGRESSÃO: cada pilar resolve um dos problemas levantados na etapa anterior", "destaques": ["Revelação da solução: [como o produto/método foi criado e por que é diferente de tudo que existe]", "Pilar 1 do método: [nome do pilar + o que ele resolve + resultado esperado]", "Pilar 2 do método: [nome do pilar + benefício específico + prova ou dado]", "Pilar 3 do método: [nome do pilar + transformação que ele provoca]", "O diferencial único: [por que este produto funciona quando outros falharam — mecanismo exclusivo]"] },
+    { "titulo": "ETAPA 5 — PROVA SOCIAL E RESULTADOS (5:30–7:00)", "conteudo": "FUNDAMENTO: depoimentos e números reduzem objeções e criam prova social; APLICAÇÃO: apresentar 3 tipos de prova (resultado rápido, resultado profundo, perfil diferente); PROGRESSÃO: cada prova ataca uma objeção comum do avatar", "destaques": ["Depoimento 1 — resultado rápido: [aluno que viu resultado em menos de 30 dias — com números e contexto]", "Depoimento 2 — transformação profunda: [aluno com mudança de vida — antes e depois emocionalmente rico]", "Depoimento 3 — perfil diferente: [aluno que duvidava ou tinha o mesmo ceticismo do espectador]", "Dado/estatística de resultados: [número de alunos, percentual de sucesso ou métrica de impacto]", "Posicionamento de autoridade: [credenciais, mídia, certificações ou reconhecimentos do apresentador]"] },
+    { "titulo": "ETAPA 6 — OFERTA E GARANTIA (7:00–9:00)", "conteudo": "FUNDAMENTO: empilhar valor antes de revelar preço torna a oferta irresistível; APLICAÇÃO: listar todos os bônus, calcular valor total e revelar preço com ancoragem; PROGRESSÃO: cada elemento da oferta remove uma objeção específica", "destaques": ["Produto principal: [nome + o que inclui + valor percebido em R$]", "Bônus 1: [nome + benefício direto + valor em R$]", "Bônus 2: [nome + por que ele acelera o resultado + valor em R$]", "Ancoragem de preço: [valor total de tudo + preço real com desconto justificado]", "Garantia: [prazo + o que cobre + como solicitar — linguagem que elimina o risco do comprador]"] },
+    { "titulo": "ETAPA 7 — CTA E URGÊNCIA (9:00–10:30)", "conteudo": "FUNDAMENTO: o CTA precisa criar urgência real e eliminar a última hesitação; APLICAÇÃO: frase exata de chamada para ação + 2 elementos de escassez/urgência; PROGRESSÃO: recapitular a transformação prometida e encerrar com comando direto", "destaques": ["Frase de CTA principal: [comando direto, ação específica, onde clicar — ex: 'Clique no botão abaixo agora e garanta seu acesso imediato']", "Urgência 1 — escassez real: [vagas limitadas, bônus por tempo ou preço promocional com prazo]", "Urgência 2 — custo da inação: [o que ele perde se não agir hoje — coloca em perspectiva o investimento]", "Recapitulação da transformação: [3 resultados principais em uma frase poderosa]", "Encerramento: [frase final motivacional + repetição do CTA]"] }
+  ],
+  "conclusao": "Notas de produção: ritmo de fala recomendado, pausas dramáticas sugeridas, elementos visuais que reforçam cada etapa e dicas de tonalidade para cada bloco",
+  "sobre_autor": "Roteiro criado por Nexus MAX — IA especializada em copywriting de alta conversão para o mercado digital brasileiro"
+}
+
+Crie EXATAMENTE o JSON acima com conteúdo real, específico e poderoso para "${titulo}" no nicho "${descricao}". Idioma: PORTUGUÊS BRASILEIRO.`;
+}
+
+// ──────────────────────────────────────────
+// Prompt formato CHEAT SHEET (guia rápido)
+// ──────────────────────────────────────────
+function buildPromptCheatSheet(titulo, descricao, avatar, totalCaps) {
+  return `Você é especialista em criar materiais de referência rápida de alta qualidade.
+Crie um Cheat Sheet COMPLETO e DENSO chamado "${titulo}".
+Nicho: ${descricao}
+Público: ${avatar || "profissionais e estudantes do tema"}
+Número de seções (tópicos): ${totalCaps}
+
+REGRAS DE JSON — OBRIGATÓRIO: JSON puro sem markdown; aspas simples dentro de strings; sem quebras de linha.
+
+ESTRUTURA — cada seção é um bloco de referência rápida com informações densas:
+{
+  "capa": { "titulo": "${titulo}", "subtitulo": "Guia de Referência Rápida — ${descricao}", "tagline": "Consulta Rápida • Alta Densidade • Pronto para Usar" },
+  "introducao": "Como usar este cheat sheet: estrutura, símbolos utilizados e dica de uso no dia a dia",
+  "secoes": [
+    {
+      "titulo": "[TÓPICO EM MAIÚSCULAS — ex: POSIÇÕES FUNDAMENTAIS, REGRAS ESSENCIAIS, ERROS COMUNS]",
+      "conteudo": "CONCEITO: [definição direta e objetiva do tópico em 1-2 frases]; QUANDO USAR: [contexto de aplicação imediata]; ATENÇÃO: [armadilha ou erro mais comum neste tópico]",
+      "destaques": [
+        "▸ [item de referência 1 — formato ultra-conciso: nome → definição ou regra em até 20 palavras]",
+        "▸ [item de referência 2]",
+        "▸ [item de referência 3]",
+        "▸ [item de referência 4]",
+        "▸ [item de referência 5]",
+        "⚡ Dica rápida: [insight prático que diferencia iniciante de especialista neste tópico]"
+      ]
+    }
+  ],
+  "conclusao": "Próximos passos: onde aprofundar cada tópico e como usar este guia como base para prática diária",
+  "sobre_autor": "Guia criado com curadoria especializada no nicho ${descricao}"
+}
+
+Crie ${totalCaps} seções com conteúdo REAL e ESPECÍFICO para "${titulo}". Idioma: PORTUGUÊS BRASILEIRO.`;
+}
+
+// ──────────────────────────────────────────
+// Prompt formato CHECKLIST
+// ──────────────────────────────────────────
+function buildPromptChecklist(titulo, descricao, avatar, totalCaps) {
+  return `Você é especialista em criar checklists profissionais de alta qualidade.
+Crie um Checklist COMPLETO e ACIONÁVEL chamado "${titulo}".
+Nicho: ${descricao}
+Público: ${avatar || "profissionais e praticantes do tema"}
+Número de categorias/seções: ${totalCaps}
+
+REGRAS DE JSON: JSON puro sem markdown; aspas simples; sem quebras de linha.
+
+{
+  "capa": { "titulo": "${titulo}", "subtitulo": "Lista Completa de Verificação — ${descricao}", "tagline": "Verificação • Consistência • Resultados" },
+  "introducao": "Como usar este checklist: frequência recomendada, como marcar os itens, dica de implementação gradual e o que esperar ao completar todos os pontos",
+  "secoes": [
+    {
+      "titulo": "[CATEGORIA — ex: PRÉ-TREINO, EQUIPAMENTOS, SEGURANÇA, PROGRESSÃO]",
+      "conteudo": "OBJETIVO: [o que esta categoria garante quando concluída]; FREQUÊNCIA: [quando verificar estes itens — diário/semanal/por sessão]; PRIORIDADE: [crítico/importante/recomendado]",
+      "destaques": [
+        "☐ [item de checklist 1 — ação específica e verificável, não vaga]",
+        "☐ [item de checklist 2]",
+        "☐ [item de checklist 3]",
+        "☐ [item de checklist 4]",
+        "☐ [item de checklist 5]",
+        "☐ [item de checklist 6 — o mais frequentemente esquecido nesta categoria]"
+      ]
+    }
+  ],
+  "conclusao": "Revisão semanal: como usar o checklist para avaliar progresso, identificar gaps e ajustar rotina",
+  "sobre_autor": "Checklist desenvolvido com base nas melhores práticas de ${descricao}"
+}
+
+Crie ${totalCaps} categorias com itens REAIS e VERIFICÁVEIS para "${titulo}". Idioma: PORTUGUÊS BRASILEIRO.`;
+}
+
+// ──────────────────────────────────────────
+// Prompt formato PLANNER
+// ──────────────────────────────────────────
+function buildPromptPlanner(titulo, descricao, avatar, totalCaps) {
+  return `Você é especialista em criar planners e organizadores de alta performance.
+Crie um Planner COMPLETO chamado "${titulo}".
+Nicho: ${descricao}
+Público: ${avatar || "praticantes e profissionais do tema"}
+Número de módulos de planejamento: ${totalCaps}
+
+REGRAS DE JSON: JSON puro sem markdown; aspas simples; sem quebras de linha.
+
+{
+  "capa": { "titulo": "${titulo}", "subtitulo": "Planner de Alta Performance — ${descricao}", "tagline": "Planejamento • Execução • Resultados" },
+  "introducao": "Metodologia do planner: filosofia de organização, como preencher cada seção, ritmo recomendado (diário/semanal/mensal) e como transformar intenção em hábito",
+  "secoes": [
+    {
+      "titulo": "[MÓDULO — ex: PLANEJAMENTO SEMANAL, METAS DO MÊS, REVISÃO DE PROGRESSO, ROTINA DIÁRIA]",
+      "conteudo": "OBJETIVO: [o que este módulo organiza e por que é importante]; QUANDO PREENCHER: [horário e frequência recomendados]; COMO USAR: [instrução prática de preenchimento — passo a passo simples]",
+      "destaques": [
+        "📌 Meta principal do período: [espaço e instrução para definir o objetivo central]",
+        "✅ Ações prioritárias: [lista das 3 ações de maior impacto para este período]",
+        "⏰ Blocos de tempo: [como distribuir as horas disponíveis nas tarefas principais]",
+        "📊 Indicadores de progresso: [métricas específicas do nicho para acompanhar evolução]",
+        "⚡ Hábito-âncora do período: [o único hábito que, se feito, garante os demais]",
+        "🔄 Revisão e ajuste: [perguntas de reflexão para avaliar o que funcionou e o que precisa melhorar]"
+      ]
+    }
+  ],
+  "conclusao": "Sistema de revisão: como fazer a revisão mensal, analisar padrões e recalibrar objetivos para o próximo ciclo",
+  "sobre_autor": "Planner desenvolvido com metodologia comprovada para o nicho ${descricao}"
+}
+
+Crie ${totalCaps} módulos com conteúdo REAL e PRÁTICO para "${titulo}". Idioma: PORTUGUÊS BRASILEIRO.`;
+}
+
+// ──────────────────────────────────────────
+// Prompt formato CERTIFICADO
+// ──────────────────────────────────────────
+function buildPromptCertificado(titulo, descricao) {
+  return `Crie o conteúdo para um certificado digital profissional chamado "${titulo}".
+Contexto do curso/programa: ${descricao}
+
+REGRAS DE JSON: JSON puro sem markdown; aspas simples; sem quebras de linha.
+
+{
+  "capa": {
+    "titulo": "${titulo}",
+    "subtitulo": "Certificado de Conclusão",
+    "tagline": "Excelência • Dedicação • Conquista"
+  },
+  "introducao": "Este certificado atesta a conclusão com êxito do programa '${titulo}'. O portador demonstrou dedicação, comprometimento e domínio das competências desenvolvidas ao longo do programa.",
+  "secoes": [
+    {
+      "titulo": "Competências Desenvolvidas",
+      "conteudo": "ÁREA: ${descricao}; RECONHECIMENTO: conclusão com aproveitamento total do programa; VALIDADE: este certificado é válido como comprovante de formação complementar",
+      "destaques": [
+        "Competência 1: [habilidade técnica específica desenvolvida no programa]",
+        "Competência 2: [habilidade prática ou metodológica desenvolvida]",
+        "Competência 3: [habilidade comportamental ou de mentalidade desenvolvida]",
+        "Carga horária estimada: [X horas de conteúdo e prática]",
+        "Metodologia: [abordagem pedagógica utilizada no programa]",
+        "Próximos passos recomendados: [como aplicar e aprofundar o que foi aprendido]"
+      ]
+    }
+  ],
+  "conclusao": "Parabéns pela conquista. O conhecimento adquirido é seu para sempre. Aplique, ensine e transforme.",
+  "sobre_autor": "Emitido por ${descricao} — comprometidos com excelência e transformação real"
+}
+
+Retorne APENAS o JSON. Idioma: PORTUGUÊS BRASILEIRO.`;
+}
+
+// ──────────────────────────────────────────
 // Prompt formato CAPÍTULO (demais nichos)
 // ──────────────────────────────────────────
 function buildPromptCapitulo(titulo, descricao, avatar, totalCaps, tipo, style) {
@@ -216,12 +400,33 @@ async function gerarConteudoRico(config) {
   } = config;
 
   const style = NICHE_STYLES[temaKey] || NICHE_STYLES.produtividade;
-  const totalCaps = numCapitulos || Math.min(20, Math.max(8, paginas - 3));
+
+  // Caps máximos por tipo — tipos concisos têm menos seções
+  const capsMax = { script_vsl: 7, cheat_sheet: 8, checklist: 8, certificado: 1, planner: 8 };
+  const capsMin = { script_vsl: 7, cheat_sheet: 4, checklist: 5, certificado: 1, planner: 4 };
+  const defaultCaps = Math.min(20, Math.max(8, paginas - 3));
+  const totalCaps = numCapitulos || Math.min(
+    capsMax[tipo] ?? 20,
+    Math.max(capsMin[tipo] ?? 8, tipo === "script_vsl" ? 7 : defaultCaps)
+  );
 
   const isDegrau = style.formato === "degrau";
-  const basePrompt = isDegrau
-    ? buildPromptDegrau(titulo, descricao, avatar, totalCaps)
-    : buildPromptCapitulo(titulo, descricao, avatar, totalCaps, tipo, style);
+  let basePrompt;
+  if (isDegrau) {
+    basePrompt = buildPromptDegrau(titulo, descricao, avatar, totalCaps);
+  } else if (tipo === "script_vsl") {
+    basePrompt = buildPromptVSL(titulo, descricao, avatar);
+  } else if (tipo === "cheat_sheet") {
+    basePrompt = buildPromptCheatSheet(titulo, descricao, avatar, totalCaps);
+  } else if (tipo === "checklist") {
+    basePrompt = buildPromptChecklist(titulo, descricao, avatar, totalCaps);
+  } else if (tipo === "planner") {
+    basePrompt = buildPromptPlanner(titulo, descricao, avatar, totalCaps);
+  } else if (tipo === "certificado") {
+    basePrompt = buildPromptCertificado(titulo, descricao);
+  } else {
+    basePrompt = buildPromptCapitulo(titulo, descricao, avatar, totalCaps, tipo, style);
+  }
   const prompt = instrucaoMelhoria
     ? `${basePrompt}\n\nINSTRUÇÃO DE MELHORIA (aplique obrigatoriamente nesta regeneração):\n${instrucaoMelhoria}`
     : basePrompt;
