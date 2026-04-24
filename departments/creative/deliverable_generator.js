@@ -312,17 +312,32 @@ function gerarPDF(config, conteudo) {
     }
 
     // ── Texto corrido ──
+    // Detecta parágrafos rotulados "LABEL: conteúdo" e renderiza o rótulo como mini-heading
     function writeBody(text) {
       if (!text) return;
-      // Separa apenas por ponto-e-vírgula (separador que o Gemini usa para parágrafos).
-      // Períodos dentro das frases são preservados — o texto flui naturalmente.
       const parts = String(text).split(";").map(p => p.trim()).filter(Boolean);
 
       for (const part of parts) {
-        if (cy + 26 > CB) newPage();
-        doc.fillColor(TEXT_DARK).font(F.body).fontSize(11)
-          .text(part, ML, cy, { width: CW, lineGap: 4, paragraphGap: 0 });
-        cy = doc.y + 8;
+        if (cy + 28 > CB) newPage();
+
+        // Detecta "LABEL: conteúdo" — rótulo em maiúsculas (até 60 chars) seguido de ": "
+        const labelMatch = part.match(/^([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇÀÜ\/\s]{3,60}):\s*(.+)$/s);
+        if (labelMatch && labelMatch[1].trim().split(/\s+/).length <= 6) {
+          const label = labelMatch[1].trim();
+          const content = labelMatch[2].trim();
+          // Mini-heading colorido
+          doc.fillColor(C.primary).font(F.title).fontSize(8)
+            .text(label.toUpperCase(), ML, cy, { width: CW, characterSpacing: 0.8 });
+          cy = doc.y + 4;
+          if (cy + 18 > CB) newPage();
+          doc.fillColor(TEXT_DARK).font(F.body).fontSize(11)
+            .text(content, ML, cy, { width: CW, lineGap: 5 });
+          cy = doc.y + 12;
+        } else {
+          doc.fillColor(TEXT_DARK).font(F.body).fontSize(11)
+            .text(part, ML, cy, { width: CW, lineGap: 5, paragraphGap: 0 });
+          cy = doc.y + 10;
+        }
       }
     }
 
@@ -349,6 +364,29 @@ function gerarPDF(config, conteudo) {
       doc.fillColor(TEXT_DARK).font(F.body).fontSize(10)
         .text(text.trim(), ML + 30, cy + 12, { width: CW - 42, lineGap: 3 });
       cy = doc.y + 12;
+    }
+
+    // ── Caixa de Fato/Dado científico (visual diferenciado) ──
+    function writeFactBox(text) {
+      if (!text) return;
+      const cleanText = text.replace(/^(FATO\/DADO|FATO|DADO|Fato\/Dado)\s*:\s*/i, "").trim();
+      const est = doc.heightOfString(cleanText, { width: CW - 62, fontSize: 10.5 });
+      const boxH = Math.max(58, est + 30);
+      if (cy + boxH + 8 > CB) newPage();
+
+      // Fundo azul suave
+      doc.rect(ML, cy, CW, boxH).fill("#EEF4FF");
+      doc.rect(ML, cy, CW, boxH).lineWidth(0.5).strokeColor("#C0D4F8").stroke();
+      // Barra esquerda azul
+      doc.rect(ML, cy, 5, boxH).fill("#3B7BF0");
+      // Badge "DADO"
+      doc.rect(ML + 12, cy + 10, 38, 15).fill("#3B7BF0");
+      doc.fillColor("#FFFFFF").font(F.title).fontSize(7)
+        .text("DADO", ML + 12, cy + 13, { width: 38, align: "center", characterSpacing: 0.5 });
+      // Texto
+      doc.fillColor("#1A2B4A").font(F.body).fontSize(10.5)
+        .text(cleanText, ML + 58, cy + 12, { width: CW - 68, lineGap: 3.5 });
+      cy = doc.y + 16;
     }
 
     // ── Divisor leve ──
@@ -554,23 +592,23 @@ function gerarPDF(config, conteudo) {
     // ════════════════════════════════════════
     for (let i = 0; i < (conteudo.secoes || []).length; i++) {
       const secao = conteudo.secoes[i];
-      // Só nova página se restar menos de 200pt de espaço
-      if (cy + 200 > CB) newPage();
-      else cy += 20; // espaço entre seções na mesma página
+      newPage(); // cada seção sempre começa em página nova
       sectionTitle(secao.titulo, String(i + 1).padStart(2, "0"));
       writeBody(secao.conteudo);
       if (secao.destaques?.length) {
-        cy += 6;
+        cy += 8;
         writeDivider();
-        for (const d of secao.destaques) writeCallout(d);
+        for (const d of secao.destaques) {
+          if (/^(FATO\/DADO|FATO|DADO|Fato\/Dado)\s*:/i.test(d)) writeFactBox(d);
+          else writeCallout(d);
+        }
       }
     }
 
     // ════════════════════════════════════════
     // CONCLUSÃO
     // ════════════════════════════════════════
-    if (cy + 200 > CB) newPage();
-    else cy += 20;
+    newPage(); // conclusão sempre em página própria
     sectionTitle("Conclusão & Próximos Passos", null);
     writeBody(conteudo.conclusao);
 

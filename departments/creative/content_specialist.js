@@ -86,7 +86,7 @@ MISSÃO: Replicar e SUPERAR a qualidade do "Pack Mentoria 80 Tópicos Cristãos"
 ESTRUTURA OBRIGATÓRIA POR DEGRAU (seção):
 - titulo: "DEGRAU [numero] — [TÍTULO DRAMÁTICO EM CAIXA ALTA: descrição do tema]"
   Exemplo: "DEGRAU 01 — A CHAVE MESTRA DA IDENTIDADE: ROMPENDO RÓTULOS E ASSUMINDO O GOVERNO COMO NOVA CRIATURA"
-- conteudo: "[EIXO X: NOME DO EIXO] | A VISÃO DO MENTOR: [2-3 parágrafos de ensino profundo; com exegese do grego/hebraico se relevante; referências bíblicas contextuais; aplicação à vida moderna do cristão brasileiro]. Progressão: inicia do princípio teológico, passa pela realidade do leitor, chega à transformação prática"
+- conteudo: "[EIXO X: NOME DO EIXO] | A VISÃO DO MENTOR: [5 parágrafos profundos separados por ponto e vírgula — total 600-800 chars. Estrutura: (1) fundamento bíblico com exegese do grego/hebraico quando relevante; (2) contexto histórico ou teológico que dá peso à verdade; (3) realidade do cristão brasileiro de hoje — onde a maioria erra ou sofre neste ponto; (4) o caminho de transformação — o que Deus diz e como é vivido na prática; (5) o resultado de quem aplica — transformação concreta e já experimentada por outros]"
 - destaques: exatamente 5 itens:
   [0] "VERSÍCULO: '[texto literal do versículo]' — [Livro Cap:Verso]"
   [1] "CHAVE DE ATIVAÇÃO: [declaração de fé em 1ª pessoa, presente, que o leitor vai declarar em voz alta. Ex: Hoje, eu escolho viver a partir da minha identidade em Cristo, não dos rótulos que o mundo tentou me impor.]"
@@ -106,7 +106,7 @@ REGRAS DE JSON — OBRIGATÓRIO:
 - Retorne APENAS JSON puro, sem markdown
 - NUNCA use aspas duplas dentro de strings — use aspas simples
 - NUNCA coloque quebras de linha dentro de valores — use ponto e vírgula
-- Máximo 480 caracteres por destaque
+- Máximo 600 caracteres por destaque
 
 ESTRUTURA JSON:
 {
@@ -153,17 +153,19 @@ MISSÃO PRINCIPAL: Criar conteúdo NO NÍVEL de "Manual de Dinâmicas de Kung Fu
 
 REGRAS DE EXCELÊNCIA:
 1. Títulos = temáticos e marcantes usando o estilo "${style.prefix}"
-2. Cada capítulo: 5 destaques = 3 atividades/exercícios + 1 dica do especialista + 1 competências
-3. Cada atividade: nome criativo; objetivo; duração; materiais; como executar em 2-3 passos
-4. Progressão lógica: do básico ao avançado, do individual ao coletivo, do físico ao mental
-5. Tom: envolvente, prático, vocabulário específico do nicho. Termos técnicos reais
-6. NUNCA use conteúdo genérico ou placeholder
+2. Cada capítulo: 6 destaques = 3 atividades/exercícios detalhados + 1 dica do especialista + 1 fato/dado científico + 1 habilidades formadas
+3. Cada atividade: 3-4 passos detalhados; objetivo mensurável; duração; materiais; variação avançada
+4. conteudo: OBRIGATÓRIO 3 parágrafos rotulados separados por ponto e vírgula (FUNDAMENTO / APLICAÇÃO / PROGRESSÃO), total 500-700 chars
+5. Progressão lógica: do básico ao avançado, do individual ao coletivo, do físico ao mental
+6. Tom: envolvente, prático, vocabulário específico do nicho. Termos técnicos reais
+7. NUNCA use conteúdo genérico ou placeholder
+8. Cada destaque: mínimo 80 palavras, máximo 600 caracteres
 
 REGRAS DE JSON — OBRIGATÓRIO:
 - Retorne APENAS JSON puro, sem markdown
 - NUNCA aspas duplas dentro de strings — use aspas simples
 - NUNCA quebras de linha dentro de valores — use ponto e vírgula
-- Máximo 450 caracteres por destaque
+- Máximo 600 caracteres por destaque
 
 ESTRUTURA JSON:
 {
@@ -179,13 +181,14 @@ ESTRUTURA JSON:
   "secoes": [
     {
       "titulo": "título temático usando o estilo ${style.prefix}",
-      "conteudo": "parágrafo rico: foco do capítulo; o que o aluno aprende; progressão; conexão com desenvolvimento geral",
+      "conteudo": "FUNDAMENTO: [contexto, importância e base teórica do capítulo em 2-3 frases ricas]; APLICAÇÃO: [como funciona na prática com exemplos reais e terminologia específica do nicho em 2-3 frases]; PROGRESSÃO: [como este capítulo se conecta com os anteriores e prepara para os próximos — cria sensação de jornada em 2 frases]",
       "destaques": [
-        "${style.atividade_label} 1: [nome criativo] — [como fazer em 2-3 passos]. Objetivo: [resultado]. Duração: [X-Y min]",
-        "${style.atividade_label} 2: [nome criativo] — [descrição + execução]. Variação: [versão avançada]",
-        "${style.atividade_label} 3: [nome criativo] — [descrição]. Materiais: [lista]. Como aplicar: [instruções]",
-        "${style.especialista_label}: [dica específica que transforma a qualidade da execução]",
-        "Competências desenvolvidas: [comp 1] • [comp 2] • [comp 3] • [comp 4]"
+        "${style.atividade_label} 1: [NOME CRIATIVO] — Objetivo: [resultado mensurável]. Duração: [X min]. Execução: [passo 1 com detalhe técnico]; [passo 2 — o que observar e ajustar]; [passo 3 — como finalizar e avaliar]. Variação avançada: [como aumentar dificuldade ou profundidade]",
+        "${style.atividade_label} 2: [NOME CRIATIVO] — Objetivo: [resultado]. Materiais: [lista do que precisa]. Como executar: [passo 1]; [passo 2 com técnica correta]; [passo 3]. Adaptação em grupo: [como escalar para mais pessoas ou turma inteira]",
+        "${style.atividade_label} 3: [NOME CRIATIVO] — Objetivo: [resultado]. Duração: [X-Y min]. Passo a passo: [1 — ação específica e detalhada]; [2 — ação com variações]; [3 — como finalizar e registrar o resultado obtido]",
+        "${style.especialista_label}: [insight técnico ou científico — explica O QUÊ fazer, COMO fazer corretamente e POR QUÊ funciona (base fisiológica, psicológica ou técnica do nicho). Inclui o erro mais comum neste ponto e como identificá-lo e corrigi-lo]",
+        "FATO/DADO: [estatística, estudo científico ou dado histórico relevante ao tema do capítulo. Contextualize a pesquisa ou fonte, o que ela revelou e por que isso importa para o praticante — mínimo 80 palavras de explicação]",
+        "Habilidades formadas: [habilidade 1 — como se manifesta na prática diária] • [habilidade 2 — benefício observável em semanas] • [habilidade 3 — resultado de longo prazo no desenvolvimento] • [habilidade 4 — aplicação fora do contexto de treino/aula]"
       ]
     }
   ],
@@ -193,7 +196,7 @@ ESTRUTURA JSON:
   "sobre_autor": "texto profissional de 2-3 frases sobre o autor, credibilidade e missão"
 }
 
-Idioma: PORTUGUÊS BRASILEIRO. Crie exatamente ${totalCaps} seções com exatamente 5 destaques cada.`;
+Idioma: PORTUGUÊS BRASILEIRO. Crie exatamente ${totalCaps} seções com exatamente 6 destaques cada. Máximo 600 caracteres por destaque.`;
 }
 
 // ──────────────────────────────────────────
@@ -213,7 +216,7 @@ async function gerarConteudoRico(config) {
   } = config;
 
   const style = NICHE_STYLES[temaKey] || NICHE_STYLES.produtividade;
-  const totalCaps = numCapitulos || Math.min(10, Math.max(5, Math.round(paginas / 2)));
+  const totalCaps = numCapitulos || Math.min(20, Math.max(8, paginas - 3));
 
   const isDegrau = style.formato === "degrau";
   const basePrompt = isDegrau

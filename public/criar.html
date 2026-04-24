@@ -817,6 +817,23 @@
   });
 
   // ---- themes ----
+  const THEME_PREVIEW = {
+    impacto:       { cover: '#1D1D1D', accent: '#E63946' },
+    elegancia:     { cover: '#7B5EA7', accent: '#C9A84C' },
+    sabedoria:     { cover: '#3E2723', accent: '#DAA520' },
+    produtividade: { cover: '#1565C0', accent: '#FF8F00' },
+    bemestar:      { cover: '#558B2F', accent: '#F06292' },
+    criatividade:  { cover: '#212121', accent: '#7C4DFF' },
+  };
+  function calcCaps(pages) { return Math.min(20, Math.max(8, pages - 3)); }
+  function updatePreviewColors() {
+    const t = THEME_PREVIEW[selectedTheme] || THEME_PREVIEW.bemestar;
+    const pv = document.querySelector('.preview');
+    pv.style.background = `radial-gradient(80% 50% at 50% 20%, ${t.accent}35, transparent 70%), linear-gradient(180deg, ${t.cover}f0, ${t.cover})`;
+    pv.style.borderColor = `${t.accent}55`;
+    document.querySelector('.preview .brand').style.color = t.accent;
+  }
+
   let selectedTheme = 'bemestar';
   document.querySelectorAll('.theme').forEach(t => {
     t.addEventListener('click', () => {
@@ -824,6 +841,7 @@
       t.classList.add('active');
       selectedTheme = t.dataset.v;
       document.getElementById('s-theme').innerHTML = t.querySelector('.t').innerHTML;
+      updatePreviewColors();
       updateMeta();
     });
   });
@@ -903,6 +921,7 @@
 
   // inicializa estados dos switches (depois que darken está declarado)
   syncNano(); syncHead(); syncFoot();
+  updatePreviewColors(); updateMeta();
 
   // ---- color pickers ----
   function setupColorSync(colorId, hexId) {
@@ -945,6 +964,11 @@
     dropZone.querySelector('.prompt').style.display = 'none';
     document.getElementById('change-img').style.display = 'block';
     dropZone.classList.add('has-img');
+    // Mostrar imagem no card de preview
+    const pv = document.querySelector('.preview');
+    pv.style.background = `linear-gradient(180deg, rgba(0,0,0,.5) 0%, rgba(0,0,0,.75) 100%), url('data:image/jpeg;base64,${capaBase64}') center/cover`;
+    pv.style.borderColor = 'rgba(255,255,255,.2)';
+    document.querySelector('.preview .brand').style.color = '#fff';
   }
 
   function resizeImg(file) {
@@ -969,10 +993,12 @@
 
   // ---- live mirrors ----
   function updateMeta() {
-    const pages = document.getElementById('inp-paginas').value || '15';
+    const pages = parseInt(document.getElementById('inp-paginas').value) || 15;
+    const caps  = calcCaps(pages);
     const theme = document.querySelector('.theme.active')?.querySelector('.t')?.textContent || '';
-    document.getElementById('pv-meta').textContent = theme.replace(/[^\w\s&]/g,'').trim() + ' · ' + pages + ' pg';
-    document.getElementById('s-pages').textContent = pages;
+    const themeClean = theme.replace(/[^\w\s&À-ɏ]/g,'').trim();
+    document.getElementById('pv-meta').textContent = themeClean + ' · ' + pages + 'pg';
+    document.getElementById('s-pages').textContent = pages + ' pg · ~' + caps + ' capítulos';
   }
 
   document.getElementById('inp-titulo').addEventListener('input', function() {
