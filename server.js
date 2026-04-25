@@ -81,13 +81,27 @@ app.post("/api/criar", (req, res) => {
   }, 5 * 60 * 1000);
 
   const { generate } = require("./departments/creative/deliverable_generator");
-  generate({
-    ...req.body,
-    onProgress: async (pct, msg) => {
-      const job = criarJobs.get(jobId);
-      if (job) { job.progress = pct; job.message = msg; }
-    },
-  }).then(resultado => {
+  const { createClient } = require("@supabase/supabase-js");
+  const _supa = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+
+  const telegramId = req.body.telegram_id || "web";
+  _supa.from("expert_dna").select("*").eq("telegram_id", telegramId).single()
+    .then(({ data: dna }) => {
+      const body = { ...req.body };
+      if (dna) {
+        body.autor  = body.autor  || dna.marca;
+        body.nicho  = body.nicho  || dna.nicho;
+        body.avatar_publico = body.avatar_publico || dna.avatar_publico;
+      }
+      return generate({
+        ...body,
+        onProgress: async (pct, msg) => {
+          const job = criarJobs.get(jobId);
+          if (job) { job.progress = pct; job.message = msg; }
+        },
+      });
+    })
+    .then(resultado => {
     clearTimeout(jobKiller);
     criarJobs.set(jobId, {
       status: "done", progress: 100, message: "Pronto!", criadoEm: Date.now(),

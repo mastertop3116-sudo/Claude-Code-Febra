@@ -37,7 +37,7 @@ module.exports = function registerHandlers(bot) {
   bot.onText(/\/start/, (msg) => {
     if (!isAuthorized(msg.chat.id)) return deny(bot, msg.chat.id);
     bot.sendMessage(msg.chat.id,
-      `*NEXUS DIGITAL HOLDING — ONLINE*\n\n` +
+      `${process.env.BRAND_NAME ? '*' + process.env.BRAND_NAME + ' — ONLINE*' : '*MAX — ONLINE*'}\n\n` +
       `Sou o *MAX*, seu COO digital.\n\n` +
       `*Comandos:*\n` +
       `/metas — Caderno Preto\n` +
@@ -46,7 +46,7 @@ module.exports = function registerHandlers(bot) {
       `/financeiro — Métricas UTMify em tempo real\n` +
       `/criar — Gerar entregável PDF/Word\n` +
       `/conselho [decisão] — Convocar os Titãs\n` +
-      `/paulo [contexto] — Análise DISC\n` +
+      `/mentor [contexto] — Análise DISC\n` +
       `/claude [pergunta] — Falar com Claude\n` +
       `/yt [url] — Analisar vídeo YouTube\n` +
       `/pesquisa [tema] — Pesquisa de mercado\n` +
@@ -150,11 +150,11 @@ module.exports = function registerHandlers(bot) {
     } catch (e) { bot.sendMessage(msg.chat.id, `Erro ao consultar Claude: ${e.message}`); }
   });
 
-  bot.onText(/\/paulo (.+)/, async (msg, match) => {
+  bot.onText(/\/mentor (.+)/, async (msg, match) => {
     if (!isAuthorized(msg.chat.id)) return deny(bot, msg.chat.id);
-    bot.sendMessage(msg.chat.id, `Paulo Vieira analisando...`);
+    bot.sendMessage(msg.chat.id, `Analisando perfil comportamental...`);
     try {
-      const resultado = await geminiPro(`Você é Paulo Vieira, especialista DISC.\nAnalise: ${match[1]}\n\n1. Perfil DISC do público\n2. Gatilhos emocionais\n3. Tom de comunicação\n4. Objeções e como quebrar`);
+      const resultado = await geminiPro(`Você é um especialista em psicologia comportamental e perfil DISC.\nAnalise: ${match[1]}\n\n1. Perfil DISC do público\n2. Gatilhos emocionais\n3. Tom de comunicação\n4. Objeções e como quebrar`);
       bot.sendMessage(msg.chat.id, resultado, { parse_mode: "Markdown" });
     } catch (e) { bot.sendMessage(msg.chat.id, `Erro: ${e.message}`); }
   });

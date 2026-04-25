@@ -32,14 +32,14 @@ bot.onText(/\/start/, (msg) => {
 
   bot.sendMessage(
     msg.chat.id,
-    `*NEXUS DIGITAL HOLDING — ONLINE*\n\n` +
+    `${process.env.BRAND_NAME ? '*' + process.env.BRAND_NAME + ' — ONLINE*' : '*MAX — ONLINE*'}\n\n` +
     `Olá. Sou o *MAX*, seu COO digital.\n\n` +
     `*Comandos disponíveis:*\n` +
     `/metas — Ver Caderno Preto\n` +
     `/tarefas — Status dos departamentos\n` +
     `/report — Stark Report\n` +
     `/conselho [decisão] — Convocar os Titãs\n` +
-    `/paulo [contexto] — Análise DISC\n` +
+    `/mentor [contexto] — Análise DISC\n` +
     `/yt [url] — Analisar vídeo YouTube\n` +
     `/pesquisa [tema] — Pesquisa de mercado\n` +
     `/copy [texto] — Analisar copy/VSL\n` +
@@ -182,16 +182,16 @@ Responda em português brasileiro, de forma direta e objetiva.`,
 });
 
 // ──────────────────────────────────────────
-// /paulo — Análise DISC
+// /mentor — Análise DISC
 // ──────────────────────────────────────────
-bot.onText(/\/paulo (.+)/, async (msg, match) => {
+bot.onText(/\/mentor (.+)/, async (msg, match) => {
   if (!isAuthorized(msg.chat.id)) return deny(msg.chat.id);
 
   const contexto = match[1];
-  bot.sendMessage(msg.chat.id, `Paulo Vieira analisando...`, { parse_mode: "Markdown" });
+  bot.sendMessage(msg.chat.id, `Analisando perfil comportamental...`, { parse_mode: "Markdown" });
 
   const prompt = `
-Você é Paulo Vieira, especialista em psicologia comportamental e perfil DISC.
+Você é um especialista em psicologia comportamental e perfil DISC.
 Analise o seguinte contexto e forneça:
 1. Perfil DISC provável do público/cliente
 2. Gatilhos emocionais mais efetivos

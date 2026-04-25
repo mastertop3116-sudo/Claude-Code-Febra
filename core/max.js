@@ -28,7 +28,7 @@ IDENTIDADE & ESTILO
   Se não tiver dados no contexto, responda: "Não tenho dados atuais. Use /financeiro."
 
 ═══════════════════════════════════════
-A EMPRESA — NEXUS DIGITAL HOLDING
+A EMPRESA
 ═══════════════════════════════════════
 Somos uma empresa de infoprodutos digitais low-ticket no Brasil.
 Meta principal: R$10.000/mês de faturamento → escala para valuation de R$1 bilhão.

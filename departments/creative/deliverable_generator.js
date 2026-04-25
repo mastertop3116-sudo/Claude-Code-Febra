@@ -12,6 +12,12 @@ const { revisarCapaVisual, revisarConteudo } = require("./design_reviewer");
 const path = require("path");
 const fs   = require("fs");
 
+const estrategista = require("../../agents/estrategista");
+const arquiteto    = require("../../agents/arquiteto");
+const copywriter   = require("../../agents/copywriter");
+const capaAgent    = require("../../agents/capa");
+const carrosselAgent = require("../../agents/carrossel");
+
 const MAX_TENTATIVAS = 3;
 
 const FONTS_DIR = path.join(__dirname, "../../assets/fonts");
@@ -736,133 +742,86 @@ async function gerarDOCX(config, conteudo) {
 // Função principal
 // config.onProgress(pct, msg) — callback opcional para progresso em tempo real
 // ──────────────────────────────────────────
-async function generate(config) {
-  const temaKey = config.temaKey || "produtividade";
+async function generate(params) {
+  const {
+    titulo, subtitulo, autor, nicho, avatar_publico, tipo,
+    num_paginas, num_capitulos, tema, gerar_carrossel, formato_carrossel, onProgress,
+    capaImagem, capaImagemOpacidade, formato, cores, fontes,
+    fonteTitulo, fonteCorpo, cabecalho, rodape,
+    temaKey: temaKeyParam, descricao, paginas, avatar,
+  } = params;
+
+  const progress = typeof onProgress === "function" ? onProgress : () => {};
+  const temaKey  = temaKeyParam || tema || "produtividade";
   const temaBase = THEMES[temaKey] || THEMES.produtividade;
-  const progress = typeof config.onProgress === "function" ? config.onProgress : () => {};
+  const nichoFinal = nicho || descricao || titulo;
 
-  // Imagem de capa: aceita Buffer (Telegram) ou base64 string (web)
-  let imagemBuffer = null;
-  let coresExtraidas = null;
+  await progress(5, "Mapeando mercado...");
+  const estrategia = await estrategista.run({ titulo, subtitulo, nicho: nichoFinal, avatar_publico: avatar_publico || avatar, tipo });
 
-  if (config.capaImagem) {
-    if (typeof config.capaImagem === "string") {
-      imagemBuffer = Buffer.from(config.capaImagem, "base64");
-    } else if (Buffer.isBuffer(config.capaImagem)) {
-      imagemBuffer = config.capaImagem;
-    }
-  }
+  await progress(20, "Estruturando conteúdo...");
+  const estrutura = await arquiteto.run({ estrategia, tipo, num_paginas: num_paginas || paginas, num_capitulos });
 
-  // Gera capa com Nano Banana (se não foi fornecida imagem manual)
-  if (!imagemBuffer && config.capaGemini !== false) {
-    await progress(10, "Nano Banana criando a capa...");
-    imagemBuffer = await gerarCapaComGemini(
-      config.tipo || "ebook",
-      config.titulo || "Entregável",
-      config.descricao || config.titulo,
-      temaKey,
-    );
+  await progress(45, "Escrevendo copy...");
+  const copy = await copywriter.run({ estrategia, estrutura, autor: autor || "", tipo });
+
+  await progress(70, "Gerando capa...");
+  let capaBuffer = null;
+  if (capaImagem) {
+    capaBuffer = typeof capaImagem === "string" ? Buffer.from(capaImagem, "base64") : capaImagem;
   } else {
-    await progress(10, "Processando imagem da capa...");
+    capaBuffer = await capaAgent.run({ titulo, nicho: nichoFinal, tema: temaKey });
   }
 
-  // Revisão e refinamento da capa pelo Designer (1 retry se reprovada)
-  if (imagemBuffer && config.revisaoDesigner !== false) {
-    await progress(28, "Designer revisando a capa...");
-    const reviewCapa = await revisarCapaVisual(imagemBuffer, config.titulo || "Entregável", temaKey);
-    if (reviewCapa && !reviewCapa.aprovado && reviewCapa.melhoria_prompt) {
-      await progress(32, `Capa ${reviewCapa.score}/10 — refazendo com feedback do designer...`);
-      const novaImagem = await gerarCapaComGemini(
-        config.tipo || "ebook",
-        config.titulo || "Entregável",
-        config.descricao || config.titulo,
-        temaKey,
-        reviewCapa.melhoria_prompt,
-      );
-      if (novaImagem) imagemBuffer = novaImagem;
-    } else if (reviewCapa) {
-      console.log(`[Creative] Capa aprovada pelo designer: ${reviewCapa.score}/10`);
-    }
-  }
-  await progress(38, "Extraindo paleta de cores...");
-
-  // Extrai cores da imagem (manual ou gerada pelo Nano Banana)
-  if (imagemBuffer && config.extrairCores !== false) {
-    coresExtraidas = await extrairCoresDaImagem(imagemBuffer);
-    if (coresExtraidas) {
-      console.log("[Creative] Cores extraídas:", coresExtraidas.primary, coresExtraidas.accent);
-    }
+  let slides = null;
+  if (gerar_carrossel) {
+    await progress(82, "Gerando carrossel...");
+    slides = await carrosselAgent.run({ copy, estrategia, autor: autor || "", formato: formato_carrossel });
   }
 
-  const finalConfig = {
-    tipo: config.tipo || "ebook",
-    titulo: config.titulo || "Meu Entregável",
-    subtitulo: config.subtitulo || "",
-    autor: config.autor || "Nexus Digital Holding",
-    paginas: parseInt(config.paginas) || 10,
-    descricao: config.descricao || config.titulo,
-    tema: temaBase,
-    temaKey,
-    // Prioridade: tema base → cores da imagem → cores customizadas pelo user
-    // secondary e accent do user também definem o visual da capa
-    cores: {
-      ...temaBase.colors,
-      ...(coresExtraidas || {}),
-      ...(config.cores || {}),
-      ...(config.cores?.secondary && { coverBg: config.cores.secondary }),
-      ...(config.cores?.accent    && { coverAccent: config.cores.accent }),
+  const conteudo = {
+    capa: {
+      titulo: titulo || "Entregável",
+      subtitulo: subtitulo || estrategia.promessa_central || "",
+      tagline: copy.copy_capa || "",
     },
-    fontes: config.fontes ? { ...temaBase.fonts, ...config.fontes } : temaBase.fonts,
-    cabecalho: config.cabecalho !== undefined ? config.cabecalho : {
-      ativo: true,
-      texto: config.autor || "Nexus Digital",
-    },
-    rodape: config.rodape !== undefined ? config.rodape : {
-      ativo: true,
-      texto: "",
-      numeroPagina: true,
-    },
-    formato: config.formato || "pdf",
-    capaImagem: imagemBuffer,
-    capaImagemOpacidade: config.capaImagemOpacidade,
-    fonteTitulo: config.fonteTitulo || null,
-    fonteCorpo:  config.fonteCorpo  || null,
+    introducao: estrategia.promessa_central || "",
+    secoes: (copy.secoes || []).map(s => ({
+      titulo: s.titulo,
+      conteudo: s.conteudo,
+      destaques: s.ponto_de_acao ? [s.ponto_de_acao] : [],
+    })),
+    conclusao: copy.copy_contracapa || "",
+    sobre_autor: autor || "",
   };
 
-  await progress(45, "Gerando conteúdo rico com o Especialista...");
-  let conteudo = await gerarConteudoRico({
-    tipo: finalConfig.tipo,
-    titulo: finalConfig.titulo,
-    descricao: finalConfig.descricao,
+  const finalConfig = {
+    tipo: tipo || "ebook",
+    titulo: titulo || "Meu Entregável",
+    subtitulo: subtitulo || "",
+    autor: autor || "",
+    paginas: parseInt(num_paginas || paginas) || 10,
+    descricao: nichoFinal,
+    tema: temaBase,
     temaKey,
-    paginas: finalConfig.paginas,
-    avatar: config.avatar || "",
-    numCapitulos: config.numCapitulos,
-  });
+    cores: {
+      ...temaBase.colors,
+      ...(cores || {}),
+      ...(cores?.secondary && { coverBg: cores.secondary }),
+      ...(cores?.accent    && { coverAccent: cores.accent }),
+    },
+    fontes: fontes ? { ...temaBase.fonts, ...fontes } : temaBase.fonts,
+    cabecalho: cabecalho !== undefined ? cabecalho : { ativo: true, texto: autor || "" },
+    rodape:    rodape    !== undefined ? rodape    : { ativo: true, texto: "", numeroPagina: true },
+    formato:   formato || "pdf",
+    capaImagem: capaBuffer,
+    capaImagemOpacidade,
+    fonteTitulo: fonteTitulo || null,
+    fonteCorpo:  fonteCorpo  || null,
+  };
 
-  // Revisão e refinamento do conteúdo pelo Designer (1 retry se reprovado)
-  if (config.revisaoDesigner !== false) {
-    await progress(65, "Designer revisando o conteúdo...");
-    const reviewConteudo = await revisarConteudo(finalConfig.tipo, finalConfig.titulo, conteudo);
-    if (!reviewConteudo.aprovado && reviewConteudo.instrucao_regeneracao) {
-      await progress(70, `Conteúdo ${reviewConteudo.score}/10 — refinando com feedback do designer...`);
-      conteudo = await gerarConteudoRico({
-        tipo: finalConfig.tipo,
-        titulo: finalConfig.titulo,
-        descricao: finalConfig.descricao,
-        temaKey,
-        paginas: finalConfig.paginas,
-        avatar: config.avatar || "",
-        numCapitulos: config.numCapitulos,
-        instrucaoMelhoria: reviewConteudo.instrucao_regeneracao,
-      });
-    } else if (reviewConteudo) {
-      console.log(`[Creative] Conteúdo aprovado pelo designer: ${reviewConteudo.score}/10`);
-    }
-  }
-
-  await progress(75, "Montando o PDF...");
-  const resultado = { titulo: finalConfig.titulo, conteudo, coverImageBuffer: imagemBuffer };
+  await progress(90, "Montando PDF...");
+  const resultado = { titulo: finalConfig.titulo, conteudo, coverImageBuffer: capaBuffer };
 
   if (finalConfig.formato === "pdf" || finalConfig.formato === "ambos") {
     resultado.pdf = await gerarPDF(finalConfig, conteudo);
@@ -874,8 +833,8 @@ async function generate(config) {
     resultado.docxFilename = `${finalConfig.titulo.replace(/[^a-zA-Z0-9]/g, "_")}.docx`;
   }
 
-  await progress(100, "Pronto!");
-  return resultado;
+  await progress(100, "Pronto.");
+  return { ...resultado, slides };
 }
 
 module.exports = { generate, gerarConteudo, gerarPDF, gerarDOCX, extrairCoresDaImagem, THEMES };
