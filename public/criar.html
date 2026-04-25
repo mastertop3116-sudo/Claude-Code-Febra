@@ -392,15 +392,30 @@
   }
 
   /* ---- font picker ---- */
-  .fpick-section{padding-top:14px;display:flex;flex-direction:column;gap:16px}
-  .fpick-group-label{font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:block}
+  .fpick-section{padding-top:14px;display:flex;flex-direction:column;gap:20px}
+  .fpick-group{display:flex;flex-direction:column;gap:0}
+  .fpick-group-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .fpick-group-label{font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;display:block}
+  .fpick-clear{background:none;border:none;color:var(--text-3);font-size:11px;cursor:pointer;padding:2px 6px;border-radius:4px;transition:color .12s,background .12s}
+  .fpick-clear:hover{color:var(--text);background:rgba(255,255,255,.06)}
+
+  /* live preview bar */
+  .fpick-live{
+    background:rgba(10,11,22,.55);border:1px solid var(--border);border-radius:10px;
+    padding:12px 16px;margin-bottom:14px;min-height:52px;
+    display:flex;align-items:center;gap:14px;transition:border-color .2s;
+  }
+  .fpick-live-name{font-size:10px;font-family:"JetBrains Mono",monospace;color:var(--text-3);white-space:nowrap;min-width:80px}
+  .fpick-live-text{font-size:20px;color:var(--text);flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;transition:font-family .15s}
+
   .fpick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
   .fpick-card{
     border-radius:10px;border:1.5px solid var(--border);background:var(--bg-2);cursor:pointer;
-    padding:10px 10px 8px;transition:border-color .15s,background .15s,transform .1s;text-align:center;
+    padding:10px 10px 8px;transition:border-color .15s,background .15s,transform .1s;text-align:center;position:relative;
   }
   .fpick-card:hover{border-color:var(--border-hi);background:var(--card-hi);transform:translateY(-1px)}
   .fpick-card.active{border-color:var(--accent);background:rgba(99,102,241,.12)}
+  .fpick-card.active::after{content:"✓";position:absolute;top:4px;right:5px;font-size:9px;color:var(--accent)}
   .fpick-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.2;margin-bottom:3px}
   .fpick-sample{font-size:9px;color:var(--text-3);letter-spacing:.02em}
 
@@ -884,36 +899,72 @@
           <div class="check-row" id="ck-fonte"><span class="chk">✓</span><span>Personalizar fontes</span><span class="meta">tipografia</span></div>
           <div class="expand-panel" id="panel-fonte">
             <div class="fpick-section">
+
+              <!-- live preview bar -->
+              <div class="fpick-live" id="fpick-live">
+                <span class="fpick-live-name" id="fpick-live-name">hover numa fonte</span>
+                <span class="fpick-live-text" id="fpick-live-text">Seu conteúdo exclusivo</span>
+              </div>
+
+              <!-- Título -->
               <div class="fpick-group">
-                <span class="fpick-group-label">Fonte dos Títulos</span>
+                <div class="fpick-group-header">
+                  <span class="fpick-group-label">Título</span>
+                  <button class="fpick-clear" data-group="titulo">limpar ×</button>
+                </div>
                 <div class="fpick-grid" id="fp-titulo">
-                  <div class="fpick-card" data-f="Gagalin"><div class="fpick-name" style="font-family:'Gagalin';letter-spacing:.04em">Gagalin</div><div class="fpick-sample">AABBCC</div></div>
-                  <div class="fpick-card" data-f="Anton"><div class="fpick-name" style="font-family:'Anton'">Anton</div><div class="fpick-sample">AaBbCc</div></div>
-                  <div class="fpick-card" data-f="BebasNeue"><div class="fpick-name" style="font-family:'Bebas Neue';letter-spacing:.06em">Bebas Neue</div><div class="fpick-sample">AABBCC</div></div>
-                  <div class="fpick-card" data-f="Oswald"><div class="fpick-name" style="font-family:'Oswald';font-weight:600">Oswald</div><div class="fpick-sample">AaBbCc</div></div>
-                  <div class="fpick-card" data-f="Raleway"><div class="fpick-name" style="font-family:'Raleway';font-weight:700">Raleway</div><div class="fpick-sample">AaBbCc</div></div>
-                  <div class="fpick-card" data-f="Montserrat"><div class="fpick-name" style="font-family:'Montserrat';font-weight:700">Montserrat</div><div class="fpick-sample">AaBbCc</div></div>
-                  <div class="fpick-card" data-f="Poppins"><div class="fpick-name" style="font-family:'Poppins';font-weight:700">Poppins</div><div class="fpick-sample">AaBbCc</div></div>
-                  <div class="fpick-card" data-f="PlayfairDisplay"><div class="fpick-name" style="font-family:'Playfair Display';font-weight:700">Playfair</div><div class="fpick-sample">AaBbCc</div></div>
-                  <div class="fpick-card" data-f="BreeSerif"><div class="fpick-name" style="font-family:'Bree Serif'">Bree Serif</div><div class="fpick-sample">AaBbCc</div></div>
-                  <div class="fpick-card" data-f="LibreBaskerville"><div class="fpick-name" style="font-family:'Libre Baskerville';font-weight:700">Baskerville</div><div class="fpick-sample">AaBbCc</div></div>
-                  <div class="fpick-card" data-f="GreatVibes"><div class="fpick-name" style="font-family:'Great Vibes';font-size:15px">Great Vibes</div><div class="fpick-sample">AaBbCc</div></div>
-                  <div class="fpick-card" data-f="DancingScript"><div class="fpick-name" style="font-family:'Dancing Script';font-size:15px">Dancing Script</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="Gagalin" data-group="titulo"><div class="fpick-name" style="font-family:'Gagalin';letter-spacing:.04em">Gagalin</div><div class="fpick-sample">AABBCC</div></div>
+                  <div class="fpick-card" data-f="Anton" data-group="titulo"><div class="fpick-name" style="font-family:'Anton'">Anton</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="BebasNeue" data-group="titulo"><div class="fpick-name" style="font-family:'Bebas Neue';letter-spacing:.06em">Bebas Neue</div><div class="fpick-sample">AABBCC</div></div>
+                  <div class="fpick-card" data-f="Oswald" data-group="titulo"><div class="fpick-name" style="font-family:'Oswald';font-weight:600">Oswald</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="Raleway" data-group="titulo"><div class="fpick-name" style="font-family:'Raleway';font-weight:700">Raleway</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="Montserrat" data-group="titulo"><div class="fpick-name" style="font-family:'Montserrat';font-weight:700">Montserrat</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="Poppins" data-group="titulo"><div class="fpick-name" style="font-family:'Poppins';font-weight:700">Poppins</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="PlayfairDisplay" data-group="titulo"><div class="fpick-name" style="font-family:'Playfair Display';font-weight:700">Playfair</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="BreeSerif" data-group="titulo"><div class="fpick-name" style="font-family:'Bree Serif'">Bree Serif</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="LibreBaskerville" data-group="titulo"><div class="fpick-name" style="font-family:'Libre Baskerville';font-weight:700">Baskerville</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="GreatVibes" data-group="titulo"><div class="fpick-name" style="font-family:'Great Vibes';font-size:15px">Great Vibes</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="DancingScript" data-group="titulo"><div class="fpick-name" style="font-family:'Dancing Script';font-size:15px">Dancing Script</div><div class="fpick-sample">AaBbCc</div></div>
                 </div>
               </div>
+
+              <!-- Subtítulo -->
               <div class="fpick-group">
-                <span class="fpick-group-label">Fonte do Corpo</span>
-                <div class="fpick-grid" id="fp-corpo">
-                  <div class="fpick-card" data-f="Poppins"><div class="fpick-name" style="font-family:'Poppins'">Poppins</div><div class="fpick-sample">AaBbCc</div></div>
-                  <div class="fpick-card" data-f="Nunito"><div class="fpick-name" style="font-family:'Nunito'">Nunito</div><div class="fpick-sample">AaBbCc</div></div>
-                  <div class="fpick-card" data-f="Raleway"><div class="fpick-name" style="font-family:'Raleway'">Raleway</div><div class="fpick-sample">AaBbCc</div></div>
-                  <div class="fpick-card" data-f="Montserrat"><div class="fpick-name" style="font-family:'Montserrat'">Montserrat</div><div class="fpick-sample">AaBbCc</div></div>
-                  <div class="fpick-card" data-f="Lora"><div class="fpick-name" style="font-family:'Lora'">Lora</div><div class="fpick-sample">AaBbCc</div></div>
-                  <div class="fpick-card" data-f="LibreBaskerville"><div class="fpick-name" style="font-family:'Libre Baskerville'">Baskerville</div><div class="fpick-sample">AaBbCc</div></div>
-                  <div class="fpick-card" data-f="BreeSerif"><div class="fpick-name" style="font-family:'Bree Serif'">Bree Serif</div><div class="fpick-sample">AaBbCc</div></div>
-                  <div class="fpick-card" data-f="PlayfairDisplay"><div class="fpick-name" style="font-family:'Playfair Display'">Playfair</div><div class="fpick-sample">AaBbCc</div></div>
+                <div class="fpick-group-header">
+                  <span class="fpick-group-label">Subtítulo</span>
+                  <button class="fpick-clear" data-group="subtitulo">limpar ×</button>
+                </div>
+                <div class="fpick-grid" id="fp-subtitulo">
+                  <div class="fpick-card" data-f="Poppins" data-group="subtitulo"><div class="fpick-name" style="font-family:'Poppins'">Poppins</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="Raleway" data-group="subtitulo"><div class="fpick-name" style="font-family:'Raleway'">Raleway</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="Nunito" data-group="subtitulo"><div class="fpick-name" style="font-family:'Nunito'">Nunito</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="Oswald" data-group="subtitulo"><div class="fpick-name" style="font-family:'Oswald'">Oswald</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="Montserrat" data-group="subtitulo"><div class="fpick-name" style="font-family:'Montserrat'">Montserrat</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="Lora" data-group="subtitulo"><div class="fpick-name" style="font-family:'Lora'">Lora</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="PlayfairDisplay" data-group="subtitulo"><div class="fpick-name" style="font-family:'Playfair Display'">Playfair</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="GreatVibes" data-group="subtitulo"><div class="fpick-name" style="font-family:'Great Vibes';font-size:15px">Great Vibes</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="DancingScript" data-group="subtitulo"><div class="fpick-name" style="font-family:'Dancing Script';font-size:15px">Dancing Script</div><div class="fpick-sample">AaBbCc</div></div>
                 </div>
               </div>
+
+              <!-- Corpo -->
+              <div class="fpick-group">
+                <div class="fpick-group-header">
+                  <span class="fpick-group-label">Corpo do texto</span>
+                  <button class="fpick-clear" data-group="corpo">limpar ×</button>
+                </div>
+                <div class="fpick-grid" id="fp-corpo">
+                  <div class="fpick-card" data-f="Poppins" data-group="corpo"><div class="fpick-name" style="font-family:'Poppins'">Poppins</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="Nunito" data-group="corpo"><div class="fpick-name" style="font-family:'Nunito'">Nunito</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="Raleway" data-group="corpo"><div class="fpick-name" style="font-family:'Raleway'">Raleway</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="Montserrat" data-group="corpo"><div class="fpick-name" style="font-family:'Montserrat'">Montserrat</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="Lora" data-group="corpo"><div class="fpick-name" style="font-family:'Lora'">Lora</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="LibreBaskerville" data-group="corpo"><div class="fpick-name" style="font-family:'Libre Baskerville'">Baskerville</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="BreeSerif" data-group="corpo"><div class="fpick-name" style="font-family:'Bree Serif'">Bree Serif</div><div class="fpick-sample">AaBbCc</div></div>
+                  <div class="fpick-card" data-f="PlayfairDisplay" data-group="corpo"><div class="fpick-name" style="font-family:'Playfair Display'">Playfair</div><div class="fpick-sample">AaBbCc</div></div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -1357,9 +1408,10 @@
     document.querySelector('.preview .brand').style.color = t.accent;
   }
 
-  let selectedTheme     = 'bemestar';
-  let selectedFontTitle = null;
-  let selectedFontBody  = null;
+  let selectedTheme        = 'bemestar';
+  let selectedFontTitle    = null;
+  let selectedFontSubtitle = null;
+  let selectedFontBody     = null;
 
   const FONT_FAMILY_MAP = {
     Gagalin:          "'Gagalin', sans-serif",
@@ -1379,18 +1431,39 @@
   };
 
   function updatePreviewFonts() {
-    const tf = selectedFontTitle ? FONT_FAMILY_MAP[selectedFontTitle] : '';
-    const bf = selectedFontBody  ? FONT_FAMILY_MAP[selectedFontBody]  : '';
+    const tf = selectedFontTitle    ? FONT_FAMILY_MAP[selectedFontTitle]    : '';
+    const sf = selectedFontSubtitle ? FONT_FAMILY_MAP[selectedFontSubtitle] : (selectedFontBody ? FONT_FAMILY_MAP[selectedFontBody] : '');
+    const bf = selectedFontBody     ? FONT_FAMILY_MAP[selectedFontBody]     : '';
     ['pv-title', 'pv-brand'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.style.fontFamily = tf;
+      const el = document.getElementById(id); if (el) el.style.fontFamily = tf;
     });
-    ['pv-sub', 'pv-autor', 'pv-meta'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.style.fontFamily = bf;
+    const sub = document.getElementById('pv-sub');
+    if (sub) sub.style.fontFamily = sf;
+    ['pv-autor', 'pv-meta'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.style.fontFamily = bf;
     });
   }
 
+  // live preview bar — atualiza no hover de qualquer fpick-card
+  const fpickLiveName = document.getElementById('fpick-live-name');
+  const fpickLiveText = document.getElementById('fpick-live-text');
+  document.querySelectorAll('.fpick-card').forEach(c => {
+    c.addEventListener('mouseenter', () => {
+      const ff = FONT_FAMILY_MAP[c.dataset.f] || '';
+      const label = c.querySelector('.fpick-name')?.textContent || c.dataset.f;
+      fpickLiveName.textContent = label;
+      fpickLiveText.style.fontFamily = ff;
+      const previewTxt = document.getElementById('inp-titulo')?.value || document.getElementById('inp-assunto')?.value || 'Seu conteúdo exclusivo';
+      fpickLiveText.textContent = previewTxt || 'Seu conteúdo exclusivo';
+    });
+    c.addEventListener('mouseleave', () => {
+      fpickLiveName.textContent = 'hover numa fonte';
+      fpickLiveText.style.fontFamily = '';
+      fpickLiveText.textContent = document.getElementById('inp-titulo')?.value || 'Seu conteúdo exclusivo';
+    });
+  });
+
+  // seleção por grupo
   document.querySelectorAll('#fp-titulo .fpick-card').forEach(c => {
     c.addEventListener('click', () => {
       document.querySelectorAll('#fp-titulo .fpick-card').forEach(x => x.classList.remove('active'));
@@ -1400,11 +1473,32 @@
     });
   });
 
+  document.querySelectorAll('#fp-subtitulo .fpick-card').forEach(c => {
+    c.addEventListener('click', () => {
+      document.querySelectorAll('#fp-subtitulo .fpick-card').forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+      selectedFontSubtitle = c.dataset.f;
+      updatePreviewFonts();
+    });
+  });
+
   document.querySelectorAll('#fp-corpo .fpick-card').forEach(c => {
     c.addEventListener('click', () => {
       document.querySelectorAll('#fp-corpo .fpick-card').forEach(x => x.classList.remove('active'));
       c.classList.add('active');
       selectedFontBody = c.dataset.f;
+      updatePreviewFonts();
+    });
+  });
+
+  // botões limpar por grupo
+  document.querySelectorAll('.fpick-clear').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const g = btn.dataset.group;
+      document.querySelectorAll(`#fp-${g} .fpick-card`).forEach(x => x.classList.remove('active'));
+      if (g === 'titulo')    selectedFontTitle    = null;
+      if (g === 'subtitulo') selectedFontSubtitle = null;
+      if (g === 'corpo')     selectedFontBody     = null;
       updatePreviewFonts();
     });
   });
@@ -1701,8 +1795,9 @@
         extrairCores: document.getElementById('ck-extract').classList.contains('on'),
         capaGemini: false,
       }),
-      ...(selectedFontTitle && { fonteTitulo: selectedFontTitle }),
-      ...(selectedFontBody  && { fonteCorpo:  selectedFontBody }),
+      ...(selectedFontTitle    && { fonteTitulo:    selectedFontTitle }),
+      ...(selectedFontSubtitle && { fonteSubtitulo: selectedFontSubtitle }),
+      ...(selectedFontBody     && { fonteCorpo:     selectedFontBody }),
       produto: {
         nome:          document.getElementById('dna-nome').value.trim() || titulo,
         nicho:         document.getElementById('dna-nicho').value.trim(),

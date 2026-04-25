@@ -256,6 +256,11 @@ function gerarPDF(config, conteudo) {
       const regPath = path.join(FONTS_DIR, FONT_FILES[config.fonteCorpo].reg);
       if (fs.existsSync(regPath)) { doc.registerFont("f-body", regPath); F.body = "f-body"; }
     }
+    if (config.fonteSubtitulo && FONT_FILES[config.fonteSubtitulo]) {
+      const subPath = path.join(FONTS_DIR, FONT_FILES[config.fonteSubtitulo].reg);
+      if (fs.existsSync(subPath)) { doc.registerFont("f-subtitle", subPath); F.subtitle = "f-subtitle"; }
+    }
+    if (!F.subtitle) F.subtitle = F.body;
 
     // ── Dimensões ──
     const W = 595.28, H = 841.89;
@@ -487,7 +492,7 @@ function gerarPDF(config, conteudo) {
       // Subtítulo (branco levemente opaco — sem concatenar hex)
       if (conteudo.capa.subtitulo) {
         doc.save();
-        doc.fillOpacity(0.82).fillColor("#FFFFFF").font(F.body).fontSize(13)
+        doc.fillOpacity(0.82).fillColor("#FFFFFF").font(F.subtitle).fontSize(13)
           .text(conteudo.capa.subtitulo, ML, aft + 14, { width: CW });
         doc.restore();
         doc.fillOpacity(1);
@@ -548,7 +553,7 @@ function gerarPDF(config, conteudo) {
       // Subtítulo
       if (conteudo.capa.subtitulo) {
         doc.save();
-        doc.fillOpacity(0.78).fillColor(COV_TEXT).font(F.body).fontSize(13)
+        doc.fillOpacity(0.78).fillColor(COV_TEXT).font(F.subtitle).fontSize(13)
           .text(conteudo.capa.subtitulo, ML, afterTitle + 14, { width: CW });
         doc.restore();
         doc.fillOpacity(1);
