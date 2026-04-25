@@ -565,6 +565,18 @@
     font-family:"JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;
   }
 
+  /* ---- draggable preview elements ---- */
+  .pv-elem{position:relative}
+  .drag-handle{
+    position:absolute;top:-9px;right:-9px;width:20px;height:20px;border-radius:50%;
+    background:rgba(99,102,241,.92);border:1.5px solid rgba(255,255,255,.5);
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;cursor:move;opacity:0;transition:opacity .15s;
+    user-select:none;z-index:20;color:#fff;
+  }
+  .pv-elem:hover .drag-handle{opacity:1}
+  .pv-elem.dragging{opacity:.75}
+
   /* ---- summary row mode visibility ---- */
   .r.car-row{display:none}
   body.mode-car .r.ent-row{display:none}
@@ -941,7 +953,7 @@
           </div>
         </div>
 
-        <div style="margin-top:18px" class="stack">
+        <div style="margin-top:18px" class="stack" data-showon="ent">
           <div class="toggle-row">
             <span class="tag">🍌</span>
             <div class="txt">
@@ -1108,23 +1120,31 @@
           <h2 style="margin-bottom:16px"><span class="n">→</span>Pré-visualização</h2>
 
           <div class="preview">
-            <div>
+            <div class="pv-elem" id="pve-brand">
               <div class="brand" id="pv-brand">Nexus Max · Ebook</div>
+              <div class="drag-handle" data-pve="pve-brand">⊕</div>
             </div>
-            <div>
+            <div class="pv-elem" id="pve-title">
               <div class="ttl" id="pv-title">Meu Entregável</div>
               <div class="sub" id="pv-sub"></div>
+              <div class="drag-handle" data-pve="pve-title">⊕</div>
             </div>
-            <div class="foot">
-              <span id="pv-autor"></span>
-              <span id="pv-meta">Bem-estar · 15 pg</span>
+            <div class="pv-elem" id="pve-foot" style="width:100%">
+              <div class="foot" style="width:100%">
+                <span id="pv-autor"></span>
+                <span id="pv-meta">Bem-estar · 15 pg</span>
+              </div>
+              <div class="drag-handle" data-pve="pve-foot">⊕</div>
             </div>
           </div>
 
           <!-- slide preview (carousel mode) -->
           <div class="preview-slide" id="preview-slide">
             <div class="slide-dots" id="slide-dots"></div>
-            <div class="slide-hook-pv" id="pv-hook" contenteditable="true" spellcheck="false" data-placeholder="Gancho do 1º slide..."></div>
+            <div class="pv-elem" id="pve-hook" style="max-width:90%">
+              <div class="slide-hook-pv" id="pv-hook" contenteditable="true" spellcheck="false" data-placeholder="Gancho do 1º slide..."></div>
+              <div class="drag-handle" data-pve="pve-hook">⊕</div>
+            </div>
             <div class="slide-brand-pv" id="pv-slide-brand">@marca</div>
           </div>
 
@@ -1828,15 +1848,17 @@
     document.getElementById('overlay-carousel-ok').classList.remove('show');
   }
 
-  // ---- preview inline editing ----
-  let pvTitleSize = 26;
+  // ---- preview inline editing + drag + scale ----
   const pvEditMap = { 'pv-title': 'inp-titulo', 'pv-sub': 'inp-subtitulo', 'pv-autor': 'inp-autor' };
+  const pvFontSizes = { 'pv-title': 26, 'pv-sub': 12, 'pv-autor': 10, 'pv-hook': 20, 'pv-brand': 10 };
+  let pvActiveElem = 'pv-title';
 
+  // contenteditable setup
   ['pv-title', 'pv-sub', 'pv-autor'].forEach(id => {
     const el = document.getElementById(id);
     el.contentEditable = 'true';
     el.spellcheck = false;
-    el.addEventListener('focus', () => { pvFocused = id; });
+    el.addEventListener('focus', () => { pvFocused = id; pvActiveElem = id; });
     el.addEventListener('blur', () => {
       pvFocused = null;
       const inputId = pvEditMap[id];
@@ -1845,14 +1867,47 @@
     el.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } });
   });
 
+  // pv-hook active tracking
+  const pvHookEl = document.getElementById('pv-hook');
+  if (pvHookEl) pvHookEl.addEventListener('focus', () => { pvFocused = 'pv-hook'; pvActiveElem = 'pv-hook'; });
+
+  // A+ / A- on active element
   document.getElementById('pv-font-up').addEventListener('click', () => {
-    pvTitleSize = Math.min(pvTitleSize + 2, 52);
-    document.getElementById('pv-title').style.fontSize = pvTitleSize + 'px';
+    pvFontSizes[pvActiveElem] = Math.min((pvFontSizes[pvActiveElem] || 16) + 2, 60);
+    const el = document.getElementById(pvActiveElem);
+    if (el) el.style.fontSize = pvFontSizes[pvActiveElem] + 'px';
   });
   document.getElementById('pv-font-down').addEventListener('click', () => {
-    pvTitleSize = Math.max(pvTitleSize - 2, 12);
-    document.getElementById('pv-title').style.fontSize = pvTitleSize + 'px';
+    pvFontSizes[pvActiveElem] = Math.max((pvFontSizes[pvActiveElem] || 16) - 2, 9);
+    const el = document.getElementById(pvActiveElem);
+    if (el) el.style.fontSize = pvFontSizes[pvActiveElem] + 'px';
   });
+
+  // drag handles
+  function makeDraggable(elemId) {
+    const container = document.getElementById(elemId);
+    if (!container) return;
+    const handle = container.querySelector('.drag-handle');
+    if (!handle) return;
+    let dragging = false, sx = 0, sy = 0, dx = 0, dy = 0;
+    handle.addEventListener('mousedown', e => {
+      dragging = true;
+      sx = e.clientX - dx;
+      sy = e.clientY - dy;
+      container.classList.add('dragging');
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      dx = e.clientX - sx;
+      dy = e.clientY - sy;
+      container.style.transform = `translate(${dx}px,${dy}px)`;
+    });
+    document.addEventListener('mouseup', () => {
+      if (dragging) { dragging = false; container.classList.remove('dragging'); }
+    });
+  }
+  ['pve-brand', 'pve-title', 'pve-foot', 'pve-hook'].forEach(makeDraggable);
 
   // ---- DNA do Produto ----
   function syncDNA() {
@@ -1996,13 +2051,21 @@
     });
   }
 
-  // ---- carousel platform → summary ----
+  // ---- carousel platform → summary + preview aspect-ratio ----
+  const PLATFORM_RATIO = {
+    instagram_feed:     '1 / 1',
+    instagram_feed_4x5: '4 / 5',
+    instagram_story:    '9 / 16',
+    linkedin:           '19 / 10',
+  };
   document.querySelectorAll('#carousel-formats .fmt').forEach(f => {
     f.addEventListener('click', () => {
       document.querySelectorAll('#carousel-formats .fmt').forEach(x => x.classList.remove('active'));
       f.classList.add('active');
       carouselFmt = f.dataset.v;
       document.getElementById('s-car-fmt').textContent = f.querySelector('b').textContent;
+      const ps = document.getElementById('preview-slide');
+      if (ps) ps.style.aspectRatio = PLATFORM_RATIO[carouselFmt] || '1 / 1';
     });
   });
 
