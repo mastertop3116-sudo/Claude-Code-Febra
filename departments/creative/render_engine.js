@@ -18,31 +18,65 @@ try {
 
 const FONTS_DIR = path.join(__dirname, "../../assets/fonts");
 
-// Fontes carregadas uma vez no escopo do módulo (não por request)
-let FONTS = null;
-function getFonts() {
-  if (FONTS) return FONTS;
-  FONTS = [
-    {
-      name: "Poppins",
-      data: fs.readFileSync(path.join(FONTS_DIR, "Poppins-Regular.ttf")),
-      weight: 400,
-      style: "normal",
-    },
-    {
-      name: "Poppins",
-      data: fs.readFileSync(path.join(FONTS_DIR, "Poppins-SemiBold.ttf")),
-      weight: 600,
-      style: "normal",
-    },
-    {
-      name: "Anton",
-      data: fs.readFileSync(path.join(FONTS_DIR, "Anton-Regular.ttf")),
-      weight: 400,
-      style: "normal",
-    },
-  ];
-  return FONTS;
+const FONT_FILES = {
+  Anton:            { reg: "Anton-Regular.ttf",              bold: "Anton-Regular.ttf" },
+  Gagalin:          { reg: "Gagalin-Regular.otf",            bold: "Gagalin-Regular.otf" },
+  BebasNeue:        { reg: "BebasNeue-Regular.ttf",          bold: "BebasNeue-Regular.ttf" },
+  Oswald:           { reg: "Oswald-variable.ttf",            bold: "Oswald-variable.ttf" },
+  Raleway:          { reg: "Raleway-Regular.ttf",            bold: "Raleway-Bold.ttf" },
+  Montserrat:       { reg: "Montserrat-variable.ttf",        bold: "Montserrat-variable.ttf" },
+  Poppins:          { reg: "Poppins-Regular.ttf",            bold: "Poppins-SemiBold.ttf" },
+  Nunito:           { reg: "Nunito-Regular.ttf",             bold: "Nunito-Bold.ttf" },
+  BreeSerif:        { reg: "BreeSerif-Regular.ttf",          bold: "BreeSerif-Regular.ttf" },
+  Lora:             { reg: "Lora-Regular.ttf",               bold: "Lora-Bold.ttf" },
+  PlayfairDisplay:  { reg: "PlayfairDisplay-variable.ttf",   bold: "PlayfairDisplay-variable.ttf" },
+  LibreBaskerville: { reg: "LibreBaskerville-variable.ttf",  bold: "LibreBaskerville-variable.ttf" },
+  GreatVibes:       { reg: "GreatVibes-Regular.ttf",         bold: "GreatVibes-Regular.ttf" },
+  DancingScript:    { reg: "DancingScript-Regular.ttf",      bold: "DancingScript-Bold.ttf" },
+};
+
+// Cache by "fonteTitulo|fonteCorpo" key
+const FONTS_CACHE = new Map();
+
+function loadFontEntries(name, files) {
+  const entries = [];
+  const regPath = path.join(FONTS_DIR, files.reg);
+  if (!fs.existsSync(regPath)) return entries;
+  const regData = fs.readFileSync(regPath);
+  entries.push({ name, data: regData, weight: 400, style: "normal" });
+  if (files.bold === files.reg) {
+    // Single-weight font: register as bold too so font-weight:600 resolves correctly
+    entries.push({ name, data: regData, weight: 600, style: "normal" });
+  } else {
+    const boldPath = path.join(FONTS_DIR, files.bold);
+    if (fs.existsSync(boldPath)) {
+      entries.push({ name, data: fs.readFileSync(boldPath), weight: 600, style: "normal" });
+    }
+  }
+  return entries;
+}
+
+function getFonts(fonteTitulo = "Anton", fonteCorpo = "Poppins") {
+  const key = `${fonteTitulo}|${fonteCorpo}`;
+  if (FONTS_CACHE.has(key)) return FONTS_CACHE.get(key);
+
+  const list = [];
+
+  // Poppins always loaded as UI fallback
+  list.push(...loadFontEntries("Poppins", FONT_FILES.Poppins));
+
+  // Title font (skip if it's Poppins, already loaded)
+  if (fonteTitulo && fonteTitulo !== "Poppins" && FONT_FILES[fonteTitulo]) {
+    list.push(...loadFontEntries(fonteTitulo, FONT_FILES[fonteTitulo]));
+  }
+
+  // Body font (skip if already loaded as Poppins or same as title)
+  if (fonteCorpo && fonteCorpo !== "Poppins" && fonteCorpo !== fonteTitulo && FONT_FILES[fonteCorpo]) {
+    list.push(...loadFontEntries(fonteCorpo, FONT_FILES[fonteCorpo]));
+  }
+
+  FONTS_CACHE.set(key, list);
+  return list;
 }
 
 // Formatos e dimensões suportados
@@ -55,17 +89,19 @@ const FORMATOS = {
 };
 
 // Renderiza uma string HTML → Buffer PNG
-async function renderSlide(htmlStr, w = 1080, h = 1080) {
+async function renderSlide(htmlStr, w = 1080, h = 1080, fonts = null) {
   const vdom = html(htmlStr);
-  const svg  = await satori(vdom, { width: w, height: h, fonts: getFonts() });
+  const svg  = await satori(vdom, { width: w, height: h, fonts: fonts || getFonts() });
   const resvg = new Resvg(svg, { fitTo: { mode: "width", value: w } });
   return resvg.render().asPng();
 }
 
 // Renderiza múltiplos slides em paralelo → array de Buffers PNG
-async function renderCarousel(slides, formato = "instagram_feed") {
+// fontes: { fonteTitulo, fonteCorpo }
+async function renderCarousel(slides, formato = "instagram_feed", fontes = {}) {
   const [w, h] = FORMATOS[formato] || [1080, 1080];
-  return Promise.all(slides.map(s => renderSlide(s, w, h)));
+  const fonts  = getFonts(fontes.fonteTitulo || "Anton", fontes.fonteCorpo || "Poppins");
+  return Promise.all(slides.map(s => renderSlide(s, w, h, fonts)));
 }
 
 module.exports = { renderSlide, renderCarousel, FORMATOS };

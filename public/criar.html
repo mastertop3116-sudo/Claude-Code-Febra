@@ -2231,6 +2231,8 @@
       maxSlides:        parseInt(maxSliderEl?.value) || 6,
       formato_conteudo: selectedCtype,
       gancho:           document.getElementById('inp-gancho').value.trim(),
+      ...(selectedFontTitle    && { fonteTitulo: selectedFontTitle }),
+      ...(selectedFontBody     && { fonteCorpo:  selectedFontBody }),
     };
     const btnGerar = document.getElementById('btn-gerar');
     btnGerar.disabled = true;

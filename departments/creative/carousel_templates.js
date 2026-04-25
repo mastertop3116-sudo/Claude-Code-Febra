@@ -67,7 +67,7 @@ function getPaleta(temaKey) {
 }
 
 // ── Slide 0: CAPA ──────────────────────────────────
-function slideCapa({ titulo, subtitulo, autor, temaKey, badge }) {
+function slideCapa({ titulo, subtitulo, autor, temaKey, badge, fontTitle = "Anton", fontBody = "Poppins" }) {
   const P = getPaleta(temaKey);
   const tituloLimpo = String(titulo || "").slice(0, 80);
   const subLimpo    = String(subtitulo || "").slice(0, 100);
@@ -81,28 +81,28 @@ function slideCapa({ titulo, subtitulo, autor, temaKey, badge }) {
   <!-- Topo: badge nicho -->
   <div style="display:flex;align-items:center;gap:12px;">
     <div style="width:32px;height:2px;background:${P.primary};display:flex;"></div>
-    <span style="font-family:Poppins;font-size:18px;font-weight:600;color:${P.primary};letter-spacing:2px;text-transform:uppercase;">${badgeLimpo || "Conteúdo Exclusivo"}</span>
+    <span style="font-family:${fontBody};font-size:18px;font-weight:600;color:${P.primary};letter-spacing:2px;text-transform:uppercase;">${badgeLimpo || "Conteúdo Exclusivo"}</span>
   </div>
 
   <!-- Centro: título principal -->
   <div style="display:flex;flex-direction:column;gap:24px;">
-    <h1 style="font-family:Anton;font-size:72px;font-weight:400;color:${P.text};line-height:1.1;margin:0;letter-spacing:1px;">${tituloLimpo}</h1>
+    <h1 style="font-family:${fontTitle};font-size:72px;font-weight:400;color:${P.text};line-height:1.1;margin:0;letter-spacing:1px;">${tituloLimpo}</h1>
     <div style="width:64px;height:4px;background:${P.accent};display:flex;"></div>
-    <p style="font-family:Poppins;font-size:26px;font-weight:400;color:${P.textSec};line-height:1.5;margin:0;">${subLimpo}</p>
+    <p style="font-family:${fontBody};font-size:26px;font-weight:400;color:${P.textSec};line-height:1.5;margin:0;">${subLimpo}</p>
   </div>
 
   <!-- Rodapé: autor + instrução -->
   <div style="display:flex;justify-content:space-between;align-items:flex-end;">
-    <span style="font-family:Poppins;font-size:20px;font-weight:600;color:${P.accent};letter-spacing:1.5px;">${autorLimpo}</span>
+    <span style="font-family:${fontBody};font-size:20px;font-weight:600;color:${P.accent};letter-spacing:1.5px;">${autorLimpo}</span>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-      <span style="font-family:Poppins;font-size:16px;color:${P.textSec};">Deslize para ver →</span>
+      <span style="font-family:${fontBody};font-size:16px;color:${P.textSec};">Deslize para ver →</span>
     </div>
   </div>
 </div>`;
 }
 
 // ── Slide de CONTEÚDO (seções numeradas) ──────────────
-function slideConteudo({ titulo, corpo, destaques, numero, total, temaKey }) {
+function slideConteudo({ titulo, corpo, destaques, numero, total, temaKey, fontTitle = "Anton", fontBody = "Poppins" }) {
   const P      = getPaleta(temaKey);
   const numStr = String(numero).padStart(2, "0");
   const titLimpo = String(titulo || "").slice(0, 60);
@@ -119,53 +119,53 @@ function slideConteudo({ titulo, corpo, destaques, numero, total, temaKey }) {
   <div style="position:absolute;top:0;left:0;right:0;height:5px;background:${P.primary};display:flex;"></div>
 
   <!-- Número grande decorativo -->
-  <span style="font-family:Anton;font-size:96px;font-weight:400;color:${P.num};opacity:0.18;line-height:1;margin-bottom:-16px;">${numStr}</span>
+  <span style="font-family:${fontTitle};font-size:96px;font-weight:400;color:${P.num};opacity:0.18;line-height:1;margin-bottom:-16px;">${numStr}</span>
 
   <!-- Título da seção -->
-  <h2 style="font-family:Anton;font-size:52px;font-weight:400;color:${P.text};line-height:1.15;margin:0 0 20px 0;">${titLimpo}</h2>
+  <h2 style="font-family:${fontTitle};font-size:52px;font-weight:400;color:${P.text};line-height:1.15;margin:0 0 20px 0;">${titLimpo}</h2>
 
   <!-- Linha separadora -->
   <div style="width:48px;height:3px;background:${P.accent};margin-bottom:28px;display:flex;"></div>
 
   <!-- Corpo resumido -->
-  ${corpoCurto ? `<p style="font-family:Poppins;font-size:22px;font-weight:400;color:${P.textSec};line-height:1.55;margin:0 0 32px 0;">${corpoCurto}</p>` : ""}
+  ${corpoCurto ? `<p style="font-family:${fontBody};font-size:22px;font-weight:400;color:${P.textSec};line-height:1.55;margin:0 0 32px 0;">${corpoCurto}</p>` : ""}
 
   <!-- Destaques como bullets -->
   <div style="display:flex;flex-direction:column;gap:16px;flex:1;">
     ${items.map(item => `
     <div style="display:flex;align-items:flex-start;gap:14px;">
       <div style="width:8px;height:8px;background:${P.primary};border-radius:50%;margin-top:8px;flex-shrink:0;display:flex;"></div>
-      <span style="font-family:Poppins;font-size:21px;font-weight:400;color:${P.text};line-height:1.45;">${item}</span>
+      <span style="font-family:${fontBody};font-size:21px;font-weight:400;color:${P.text};line-height:1.45;">${item}</span>
     </div>`).join("")}
   </div>
 
   <!-- Contador de slides -->
   <div style="display:flex;justify-content:flex-end;margin-top:24px;">
-    <span style="font-family:Poppins;font-size:16px;color:${P.textSec};">${numero}/${total}</span>
+    <span style="font-family:${fontBody};font-size:16px;color:${P.textSec};">${numero}/${total}</span>
   </div>
 </div>`;
 }
 
 // ── Slide de DESTAQUE (frase de impacto) ──────────────
-function slideDestaque({ frase, autor, temaKey }) {
+function slideDestaque({ frase, autor, temaKey, fontTitle = "Anton", fontBody = "Poppins" }) {
   const P = getPaleta(temaKey);
   const fraseLimpa = String(frase || "").slice(0, 200);
   const autorLimpo = String(autor || "").toUpperCase();
 
   return `<div style="width:100%;height:100%;background:${P.primary};display:flex;flex-direction:column;justify-content:center;align-items:center;padding:80px;position:relative;">
   <!-- Aspas decorativas -->
-  <span style="font-family:Anton;font-size:180px;font-weight:400;color:rgba(0,0,0,0.15);line-height:0.8;position:absolute;top:40px;left:48px;">"</span>
+  <span style="font-family:${fontTitle};font-size:180px;font-weight:400;color:rgba(0,0,0,0.15);line-height:0.8;position:absolute;top:40px;left:48px;">"</span>
 
   <div style="display:flex;flex-direction:column;align-items:center;gap:32px;z-index:1;">
-    <p style="font-family:Anton;font-size:54px;font-weight:400;color:#FFFFFF;text-align:center;line-height:1.25;margin:0;">${fraseLimpa}</p>
+    <p style="font-family:${fontTitle};font-size:54px;font-weight:400;color:#FFFFFF;text-align:center;line-height:1.25;margin:0;">${fraseLimpa}</p>
     <div style="width:64px;height:3px;background:rgba(255,255,255,0.5);display:flex;"></div>
-    <span style="font-family:Poppins;font-size:20px;font-weight:600;color:rgba(255,255,255,0.85);letter-spacing:2px;">${autorLimpo}</span>
+    <span style="font-family:${fontBody};font-size:20px;font-weight:600;color:rgba(255,255,255,0.85);letter-spacing:2px;">${autorLimpo}</span>
   </div>
 </div>`;
 }
 
 // ── Slide final: CTA ──────────────────────────────────
-function slideCTA({ titulo, instrucao, autor, temaKey }) {
+function slideCTA({ titulo, instrucao, autor, temaKey, fontTitle = "Anton", fontBody = "Poppins" }) {
   const P = getPaleta(temaKey);
   const titLimpo  = String(titulo || "Gostou do conteúdo?").slice(0, 80);
   const instrLimpo = String(instrucao || "Salve para não perder e compartilhe com quem precisa!").slice(0, 120);
@@ -179,24 +179,24 @@ function slideCTA({ titulo, instrucao, autor, temaKey }) {
 
   <!-- Ícone seta circular decorativo -->
   <div style="width:80px;height:80px;border-radius:50%;border:3px solid ${P.primary};display:flex;justify-content:center;align-items:center;margin-bottom:40px;">
-    <span style="font-family:Poppins;font-size:36px;color:${P.primary};">↑</span>
+    <span style="font-family:${fontBody};font-size:36px;color:${P.primary};">↑</span>
   </div>
 
-  <h2 style="font-family:Anton;font-size:58px;font-weight:400;color:${P.text};text-align:center;line-height:1.2;margin:0 0 24px 0;">${titLimpo}</h2>
+  <h2 style="font-family:${fontTitle};font-size:58px;font-weight:400;color:${P.text};text-align:center;line-height:1.2;margin:0 0 24px 0;">${titLimpo}</h2>
 
   <div style="width:56px;height:3px;background:${P.accent};margin-bottom:32px;display:flex;"></div>
 
-  <p style="font-family:Poppins;font-size:24px;font-weight:400;color:${P.textSec};text-align:center;line-height:1.5;margin:0 0 48px 0;">${instrLimpo}</p>
+  <p style="font-family:${fontBody};font-size:24px;font-weight:400;color:${P.textSec};text-align:center;line-height:1.5;margin:0 0 48px 0;">${instrLimpo}</p>
 
   <!-- Ações sugeridas -->
   <div style="display:flex;gap:32px;">
     ${["💾 Salvar", "🔁 Compartilhar", "👆 Seguir"].map(a => `
     <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
-      <span style="font-family:Poppins;font-size:22px;color:${P.text};">${a}</span>
+      <span style="font-family:${fontBody};font-size:22px;color:${P.text};">${a}</span>
     </div>`).join("")}
   </div>
 
-  <span style="font-family:Poppins;font-size:18px;font-weight:600;color:${P.accent};letter-spacing:2px;margin-top:48px;">${autorLimpo}</span>
+  <span style="font-family:${fontBody};font-size:18px;font-weight:600;color:${P.accent};letter-spacing:2px;margin-top:48px;">${autorLimpo}</span>
 </div>`;
 }
 

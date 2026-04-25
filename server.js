@@ -197,12 +197,14 @@ app.post("/api/carousel", (req, res) => {
 
       setJob(60, "Renderizando slides...");
       const resultado = await gerarCarrossel({
-        titulo:    req.body.titulo    || "Entregável",
-        subtitulo: req.body.subtitulo || "",
-        autor:     req.body.autor     || "Nexus Digital",
-        temaKey:   req.body.temaKey   || "produtividade",
-        formato:   req.body.formato   || "instagram_feed",
-        maxSlides: parseInt(req.body.maxSlides) || 6,
+        titulo:       req.body.titulo       || "Entregável",
+        subtitulo:    req.body.subtitulo    || "",
+        autor:        req.body.autor        || "Nexus Digital",
+        temaKey:      req.body.temaKey      || "produtividade",
+        formato:      req.body.formato      || "instagram_feed",
+        maxSlides:    parseInt(req.body.maxSlides) || 6,
+        fonteTitulo:  req.body.fonteTitulo  || "Anton",
+        fonteCorpo:   req.body.fonteCorpo   || "Poppins",
       }, conteudo);
 
       clearTimeout(jobKiller);

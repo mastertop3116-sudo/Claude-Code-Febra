@@ -29,19 +29,22 @@ function selecionarSecoes(secoes, maxSlides) {
   return sorted.slice(0, maxSlides);
 }
 
-// config: { tipo, titulo, subtitulo, autor, temaKey, formato, maxSlides }
+// config: { tipo, titulo, subtitulo, autor, temaKey, formato, maxSlides, fonteTitulo, fonteCorpo }
 // conteudo: objeto retornado por gerarConteudoRico
 // Retorna: array de Buffers PNG
 async function gerarCarrossel(config, conteudo) {
   const {
-    titulo     = "Entregável",
-    subtitulo  = "",
-    autor      = "Nexus Digital",
-    temaKey    = "produtividade",
-    formato    = "instagram_feed",
-    maxSlides  = 6,
+    titulo      = "Entregável",
+    subtitulo   = "",
+    autor       = "Nexus Digital",
+    temaKey     = "produtividade",
+    formato     = "instagram_feed",
+    maxSlides   = 6,
+    fonteTitulo = "Anton",
+    fonteCorpo  = "Poppins",
   } = config;
 
+  const fonteOpts = { fontTitle: fonteTitulo, fontBody: fonteCorpo };
   const slideHtmls = [];
 
   // 1. Slide capa
@@ -51,6 +54,7 @@ async function gerarCarrossel(config, conteudo) {
     autor,
     temaKey,
     badge: conteudo.capa?.tagline || "",
+    ...fonteOpts,
   }));
 
   // 2. Slides de conteúdo (seções selecionadas)
@@ -66,13 +70,14 @@ async function gerarCarrossel(config, conteudo) {
       numero:    i + 1,
       total,
       temaKey,
+      ...fonteOpts,
     }));
   }
 
   // 3. Slide de destaque (frase de impacto), se houver
   const frase = extrairFraseDestaque(conteudo);
   if (frase) {
-    slideHtmls.push(slideDestaque({ frase, autor, temaKey }));
+    slideHtmls.push(slideDestaque({ frase, autor, temaKey, ...fonteOpts }));
   }
 
   // 4. Slide CTA final
@@ -81,10 +86,11 @@ async function gerarCarrossel(config, conteudo) {
     instrucao: "Salve este carrossel e compartilhe com quem precisa deste conteúdo!",
     autor,
     temaKey,
+    ...fonteOpts,
   }));
 
-  // Renderiza todos em paralelo
-  const buffers = await renderCarousel(slideHtmls, formato);
+  // Renderiza todos em paralelo com as fontes selecionadas
+  const buffers = await renderCarousel(slideHtmls, formato, { fonteTitulo, fonteCorpo });
 
   return {
     buffers,
