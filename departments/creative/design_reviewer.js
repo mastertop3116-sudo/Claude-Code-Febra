@@ -72,7 +72,7 @@ CRITÉRIOS GERAIS (peso 50%):
 1. Impacto visual imediato — em 3 segundos chama atenção e comunica o valor?
 2. Profissionalismo — parece produto pago de alto valor (R$47-R$97+)?
 3. Hierarquia visual — composição clara com foco bem definido?
-4. Qualidade técnica — sem artefatos, desfoque, ou erros de IA visíveis?
+4. Qualidade técnica — sem artefatos, desfoque, ou erros de geração visíveis?
 5. Ausência de texto na imagem — imagem pura, sem letras ou números?
 
 CRITÉRIOS ESPECÍFICOS DO NICHO "${temaKey}" (peso 50%):

@@ -159,7 +159,7 @@ ESTRUTURA JSON:
     { "titulo": "ETAPA 7 — CTA E URGÊNCIA (9:00–10:30)", "conteudo": "FUNDAMENTO: o CTA precisa criar urgência real e eliminar a última hesitação; APLICAÇÃO: frase exata de chamada para ação + 2 elementos de escassez/urgência; PROGRESSÃO: recapitular a transformação prometida e encerrar com comando direto", "destaques": ["Frase de CTA principal: [comando direto, ação específica, onde clicar — ex: 'Clique no botão abaixo agora e garanta seu acesso imediato']", "Urgência 1 — escassez real: [vagas limitadas, bônus por tempo ou preço promocional com prazo]", "Urgência 2 — custo da inação: [o que ele perde se não agir hoje — coloca em perspectiva o investimento]", "Recapitulação da transformação: [3 resultados principais em uma frase poderosa]", "Encerramento: [frase final motivacional + repetição do CTA]"] }
   ],
   "conclusao": "Notas de produção: ritmo de fala recomendado, pausas dramáticas sugeridas, elementos visuais que reforçam cada etapa e dicas de tonalidade para cada bloco",
-  "sobre_autor": "Roteiro criado por Nexus MAX — IA especializada em copywriting de alta conversão para o mercado digital brasileiro"
+  "sobre_autor": "Roteiro criado por Nexus MAX — Motor de criação especializado em copywriting de alta conversão para o mercado digital brasileiro"
 }
 
 Crie EXATAMENTE o JSON acima com conteúdo real, específico e poderoso para "${titulo}" no nicho "${descricao}". Idioma: PORTUGUÊS BRASILEIRO.`;
