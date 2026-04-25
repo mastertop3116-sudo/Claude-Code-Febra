@@ -482,6 +482,9 @@
   .dl-btn.reset{background:transparent;border:1px solid var(--border);color:var(--text-2);font-size:13px;padding:10px 18px;margin-top:8px}
   .dl-btn.reset:hover{border-color:var(--border-hi);color:var(--text)}
 
+  /* ---- pdf cover preview ---- */
+  #pdf-cover-canvas{display:none;max-width:260px;width:100%;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.45);margin:0 auto 20px}
+
   /* ---- error ---- */
   #err-box{
     display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:200;
@@ -667,6 +670,8 @@
     .toast{right:12px;left:12px;max-width:none;bottom:16px}
   }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>if(window.pdfjsLib)pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
 </head>
 <body>
 
@@ -1276,6 +1281,7 @@
     <div class="ov-check">✓</div>
     <div class="ov-title">Entregável criado!</div>
     <div class="ov-sub" id="ok-msg">Pronto para download.</div>
+    <canvas id="pdf-cover-canvas"></canvas>
     <div class="dl-row" id="dl-row"></div>
     <div style="margin-top:16px">
       <button class="dl-btn reset" onclick="resetForm()">← Criar outro</button>
@@ -1852,9 +1858,30 @@
     document.getElementById('prog-msg').textContent = msg || '';
   }
 
+  async function renderPDFPreview(base64pdf) {
+    const canvas = document.getElementById('pdf-cover-canvas');
+    if (!canvas || !window.pdfjsLib) return;
+    try {
+      const binaryStr = atob(base64pdf);
+      const bytes = new Uint8Array(binaryStr.length);
+      for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
+      const pdfDoc = await pdfjsLib.getDocument({ data: bytes }).promise;
+      const page   = await pdfDoc.getPage(1);
+      const vp0    = page.getViewport({ scale: 1 });
+      const scale  = 520 / vp0.width; // 260px × retina 2×
+      const vp     = page.getViewport({ scale });
+      canvas.width  = vp.width;
+      canvas.height = vp.height;
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+      canvas.style.display = 'block';
+    } catch(e) { console.warn('[PDF preview]', e.message); }
+  }
+
   function showSuccess(data, titulo) {
     document.getElementById('overlay-prog').classList.remove('show');
     document.getElementById('ok-msg').textContent = '"' + (data.titulo || titulo) + '" gerado com sucesso!';
+    const canvas = document.getElementById('pdf-cover-canvas');
+    if (canvas) canvas.style.display = 'none'; // reset antes de renderizar
     const row = document.getElementById('dl-row');
     row.innerHTML = '';
     if (data.pdf) {
@@ -1864,6 +1891,7 @@
       a.className = 'dl-btn pdf';
       a.textContent = '⬇ Baixar PDF';
       row.appendChild(a);
+      renderPDFPreview(data.pdf);
     }
     if (data.docx) {
       const a = document.createElement('a');
