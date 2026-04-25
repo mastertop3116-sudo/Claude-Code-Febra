@@ -253,6 +253,122 @@ app.get("/api/carousel/progress/:jobId", (req, res) => {
 });
 
 // ──────────────────────────────────────────
+// Gerador de Roteiros + Edição (SSE)
+// ──────────────────────────────────────────
+const roteiroJobs = new Map();
+function limparRoteiroJobs() {
+  const limite = Date.now() - 10 * 60 * 1000;
+  for (const [id, job] of roteiroJobs.entries()) {
+    if (job.criadoEm < limite) roteiroJobs.delete(id);
+  }
+}
+
+app.post("/api/roteiro", (req, res) => {
+  limparRoteiroJobs();
+  const jobId = Math.random().toString(36).slice(2, 10);
+  roteiroJobs.set(jobId, { status: "running", progress: 0, message: "Iniciando...", criadoEm: Date.now() });
+  res.json({ jobId });
+
+  const jobKiller = setTimeout(() => {
+    const job = roteiroJobs.get(jobId);
+    if (job && job.status === "running") {
+      roteiroJobs.set(jobId, { status: "error", message: "Timeout: roteiro demorou mais de 3 minutos.", criadoEm: Date.now() });
+    }
+  }, 3 * 60 * 1000);
+
+  const { run: runRoteirista } = require("./agents/roteirista");
+  const { run: runEditor } = require("./agents/editor");
+  const { createClient } = require("@supabase/supabase-js");
+  const _supR = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+
+  (async () => {
+    try {
+      const setJob = (p, m) => { const j = roteiroJobs.get(jobId); if (j) { j.progress = p; j.message = m; } };
+
+      let produto = req.body.produto;
+      if (!produto && req.body.produto_id) {
+        setJob(5, "Buscando produto...");
+        const { data } = await _supR.from("produtos").select("*").eq("id", req.body.produto_id).single();
+        produto = data;
+      }
+      if (!produto) throw new Error("Produto não informado");
+
+      let lancamento = null;
+      if (req.body.lancamento_id) {
+        const { data } = await _supR.from("lancamentos").select("*").eq("id", req.body.lancamento_id).single();
+        lancamento = data;
+      }
+
+      setJob(20, "Criando roteiro...");
+      const roteiro = await runRoteirista({
+        produto,
+        lancamento,
+        modo: req.body.modo || "venda",
+        plataforma: req.body.plataforma || "reels",
+        duracao: req.body.duracao || "curto",
+      });
+
+      setJob(70, "Gerando instruções de edição...");
+      const edicao = await runEditor({ roteiro, plataforma: req.body.plataforma || "reels" });
+
+      setJob(90, "Salvando resultado...");
+      await _supR.from("criativos").insert({
+        tipo: "roteiro",
+        produto_id: req.body.produto_id || null,
+        lancamento_id: req.body.lancamento_id || null,
+        telegram_id: req.body.telegram_id || null,
+        plataforma: req.body.plataforma || "reels",
+        modo: req.body.modo || "venda",
+        roteiro,
+        edicao,
+      }).catch(e => console.warn("[/api/roteiro] Aviso ao salvar criativo:", e.message));
+
+      clearTimeout(jobKiller);
+      roteiroJobs.set(jobId, {
+        status: "done", progress: 100, message: "Roteiro pronto!", criadoEm: Date.now(),
+        roteiro,
+        edicao,
+      });
+    } catch (e) {
+      clearTimeout(jobKiller);
+      console.error("[/api/roteiro]", e.message);
+      roteiroJobs.set(jobId, { status: "error", message: e.message, criadoEm: Date.now() });
+    }
+  })();
+});
+
+app.get("/api/roteiro/progress/:jobId", (req, res) => {
+  const { jobId } = req.params;
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.flushHeaders();
+
+  const enviar = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
+
+  const tick = setInterval(() => {
+    const job = roteiroJobs.get(jobId);
+    if (!job) { enviar({ error: "Job não encontrado" }); clearInterval(tick); res.end(); return; }
+
+    enviar({ progress: job.progress, message: job.message, status: job.status });
+
+    if (job.status === "done") {
+      enviar({ done: true, roteiro: job.roteiro, edicao: job.edicao });
+      clearInterval(tick);
+      roteiroJobs.delete(jobId);
+      res.end();
+    } else if (job.status === "error") {
+      enviar({ error: job.message });
+      clearInterval(tick);
+      roteiroJobs.delete(jobId);
+      res.end();
+    }
+  }, 600);
+
+  req.on("close", () => clearInterval(tick));
+});
+
+// ──────────────────────────────────────────
 // Webhook GitHub → salva commits no Supabase
 // ──────────────────────────────────────────
 const crypto = require("crypto");

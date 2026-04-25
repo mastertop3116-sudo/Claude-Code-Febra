@@ -45,6 +45,7 @@ module.exports = function registerHandlers(bot) {
       `/report — Stark Report\n` +
       `/financeiro — Métricas UTMify em tempo real\n` +
       `/criar — Gerar entregável PDF/Word\n` +
+      `/roteiro — Criar roteiro + edição para Reels/TikTok\n` +
       `/conselho [decisão] — Convocar os Titãs\n` +
       `/mentor [contexto] — Análise DISC\n` +
       `/claude [pergunta] — Falar com Claude\n` +
@@ -291,6 +292,83 @@ module.exports = function registerHandlers(bot) {
 
   // /criar com FOTO — envia foto com legenda: /criar ebook "Título" tema
   // A imagem vira o wallpaper da capa + cores extraídas automaticamente
+
+  // /roteiro [nome] | [nicho] | [modo] | [plataforma] | [duracao]
+  bot.onText(/\/roteiro(.*)/, async (msg, match) => {
+    if (!isAuthorized(msg.chat.id)) return deny(bot, msg.chat.id);
+    const args = (match[1] || "").trim();
+
+    if (!args) {
+      return bot.sendMessage(msg.chat.id,
+        `*GERADOR DE ROTEIRO*\n\n` +
+        `Uso: \`/roteiro [nome] | [nicho] | [modo] | [plataforma] | [duracao]\`\n\n` +
+        `*Modos:* venda, engajamento, autoridade, vsl\n` +
+        `*Plataformas:* reels, tiktok, shorts\n` +
+        `*Duração:* ultra_curto, curto, medio, vsl\n\n` +
+        `*Exemplo:*\n` +
+        `/roteiro Meditação em 7 Dias | bem-estar | venda | reels | curto`,
+        { parse_mode: "Markdown" }
+      );
+    }
+
+    const partes = args.split("|").map(p => p.trim());
+    const nome      = partes[0] || "Produto";
+    const nicho     = partes[1] || "desenvolvimento pessoal";
+    const modo      = partes[2] || "venda";
+    const plataforma = partes[3] || "reels";
+    const duracao   = partes[4] || "curto";
+
+    const produto = { nome, nicho, tipo: "entregavel digital", publico_alvo: nicho, beneficio_principal: nicho, preco: "link na bio" };
+
+    const barraFn = (pct) => "█".repeat(Math.round(pct / 10)) + "░".repeat(10 - Math.round(pct / 10));
+    const progressMsg = await bot.sendMessage(msg.chat.id,
+      `⚙️ *Gerando roteiro para "${nome}"*\n\`[${barraFn(0)}] 0%\`\n_Iniciando..._`,
+      { parse_mode: "Markdown" }
+    );
+    const editProgress = async (pct, etapa) => {
+      try {
+        await bot.editMessageText(
+          `⚙️ *Gerando roteiro para "${nome}"*\n\`[${barraFn(pct)}] ${pct}%\`\n_${etapa}_`,
+          { chat_id: msg.chat.id, message_id: progressMsg.message_id, parse_mode: "Markdown" }
+        );
+      } catch (_) {}
+    };
+
+    try {
+      const { run: runRoteirista } = require("../agents/roteirista");
+      const { run: runEditor }     = require("../agents/editor");
+
+      await editProgress(20, "Criando roteiro...");
+      const roteiro = await runRoteirista({ produto, modo, plataforma, duracao });
+
+      await editProgress(70, "Gerando instruções de edição...");
+      const edicao = await runEditor({ roteiro, plataforma });
+
+      await bot.deleteMessage(msg.chat.id, progressMsg.message_id).catch(() => {});
+
+      const blocos = (roteiro.blocos || []).map(b =>
+        `*[${b.id}] ${b.nome}* (${b.tempo})\n${b.fala || "_sem fala_"}`
+      ).join("\n\n");
+
+      const texto =
+        `✅ *ROTEIRO — ${roteiro.titulo || nome}*\n\n` +
+        `📱 ${(roteiro.plataforma || plataforma).toUpperCase()} | ${roteiro.formato || ""} | ${roteiro.duracao_estimada || ""}\n` +
+        `🎯 Modo: ${modo} | Framework: ${roteiro.framework || ""}\n\n` +
+        `${blocos}\n\n` +
+        `*Palavra-gatilho:* ${roteiro.palavra_gatilho ? `"${roteiro.palavra_gatilho}"` : "N/A"}\n\n` +
+        `*Edição — Prioridades:*\n${(edicao.prioridades || []).map((p, i) => `${i + 1}. ${p}`).join("\n")}`;
+
+      await bot.sendMessage(msg.chat.id, texto.slice(0, 4096), { parse_mode: "Markdown" });
+
+      if (roteiro.legenda) {
+        await bot.sendMessage(msg.chat.id, `📝 *LEGENDA PRONTA:*\n\n${roteiro.legenda}`.slice(0, 4096), { parse_mode: "Markdown" });
+      }
+    } catch (e) {
+      await bot.editMessageText(`❌ Erro ao gerar roteiro:\n${e.message}`, {
+        chat_id: msg.chat.id, message_id: progressMsg.message_id,
+      }).catch(() => bot.sendMessage(msg.chat.id, `❌ Erro: ${e.message}`));
+    }
+  });
 
   bot.onText(/\/status/, (msg) => {
     if (!isAuthorized(msg.chat.id)) return deny(bot, msg.chat.id);
