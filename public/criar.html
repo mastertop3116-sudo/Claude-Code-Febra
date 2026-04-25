@@ -505,6 +505,71 @@
   .dna-file-btn:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.22)}
   .dna-chars{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--text-3);margin-left:auto}
 
+  /* ---- carousel content type ---- */
+  .ctype-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .ctype-card{
+    display:flex;align-items:center;gap:12px;padding:14px 16px;
+    border:1px solid var(--border);border-radius:12px;background:rgba(10,11,22,.45);
+    cursor:pointer;transition:all .15s;
+  }
+  .ctype-card:hover{border-color:var(--border-hi);background:rgba(14,15,28,.7)}
+  .ctype-card.active{
+    border-color:var(--accent);
+    background:linear-gradient(180deg,rgba(99,102,241,.12),rgba(99,102,241,.02));
+    box-shadow:0 0 0 3px rgba(99,102,241,.15);
+  }
+  .ctype-card .ctc-ico{
+    width:34px;height:34px;border-radius:9px;flex-shrink:0;
+    background:rgba(255,255,255,.05);border:1px solid var(--border-hi);
+    display:flex;align-items:center;justify-content:center;font-size:17px;
+  }
+  .ctype-card.active .ctc-ico{background:linear-gradient(135deg,var(--accent),var(--accent-2));border-color:transparent}
+  .ctype-card b{font-size:13px;font-weight:600;display:block;line-height:1.2}
+  .ctype-card small{font-size:11px;color:var(--text-3);font-family:"JetBrains Mono",monospace;margin-top:2px;display:block}
+
+  /* ---- gancho input + suggest ---- */
+  .gancho-wrap{position:relative}
+  .gancho-wrap .textarea{padding-right:90px;min-height:72px;resize:none}
+  .btn-sugerir{
+    position:absolute;bottom:10px;right:10px;
+    background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);color:#c7c9ff;
+    border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;
+    transition:background .15s;white-space:nowrap;
+  }
+  .btn-sugerir:hover{background:rgba(99,102,241,.28)}
+
+  /* ---- slide preview (carousel mode) ---- */
+  .preview-slide{
+    display:none;aspect-ratio:1;border-radius:12px;overflow:hidden;position:relative;
+    background:linear-gradient(160deg,#1a1340,#0a0720);
+    border:1px solid rgba(255,255,255,.14);
+    box-shadow:0 1px 0 rgba(255,255,255,.13) inset,0 40px 100px -20px rgba(0,0,0,.9);
+    flex-direction:column;align-items:center;justify-content:center;
+    padding:24px 20px;text-align:center;
+  }
+  body.mode-car .preview{display:none}
+  body.mode-car .preview-slide{display:flex}
+  .slide-dots{display:flex;gap:6px;margin-bottom:22px}
+  .slide-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.25);transition:all .2s}
+  .slide-dot.active{width:20px;border-radius:3px;background:#fff}
+  .slide-hook-pv{
+    font-size:20px;font-weight:800;color:#fff;line-height:1.25;letter-spacing:-.025em;
+    outline:none;cursor:text;border-radius:6px;padding:4px 6px;transition:background .15s;
+    min-height:1em;
+  }
+  .slide-hook-pv:hover{background:rgba(255,255,255,.07)}
+  .slide-hook-pv:focus{background:rgba(255,255,255,.1);box-shadow:0 0 0 1px rgba(255,255,255,.18)}
+  .slide-hook-pv:empty::before{content:attr(data-placeholder);color:rgba(255,255,255,.3);font-style:italic;pointer-events:none}
+  .slide-brand-pv{
+    margin-top:22px;font-size:10px;color:rgba(255,255,255,.4);
+    font-family:"JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;
+  }
+
+  /* ---- summary row mode visibility ---- */
+  .r.car-row{display:none}
+  body.mode-car .r.ent-row{display:none}
+  body.mode-car .r.car-row{display:flex}
+
   /* ---- toast notification ---- */
   .toast{
     position:fixed;bottom:24px;right:24px;z-index:300;
@@ -671,7 +736,7 @@
       </section>
 
       <!-- 01 informações básicas -->
-      <section class="card">
+      <section class="card" data-showon="ent">
         <h2><span class="n">01</span>Informações básicas<span class="hint">o essencial para montar o conteúdo</span></h2>
         <div class="stack">
           <div class="row2">
@@ -738,40 +803,63 @@
         </div>
       </section>
 
-      <!-- CARROSSEL / POST (visível quando modo=carrossel ou ambos) -->
+      <!-- CARROSSEL — campos exclusivos -->
       <section class="card" data-showon="car">
-        <h2><span class="n">📱</span>Tipo de conteúdo social<span class="hint">formato do post para redes</span></h2>
+        <h2><span class="n">📋</span>Conteúdo do carrossel<span class="hint">o que vai dentro dos slides</span></h2>
         <div class="stack">
+
           <div>
-            <label class="lbl">Formato do post</label>
-            <div class="post-types" id="post-types">
-              <div class="fmt" data-pt="post_unico"><span class="ico">🖼️</span><div><b>Post único</b><span>1 imagem</span></div></div>
-              <div class="fmt active" data-pt="carrossel"><span class="ico">🎠</span><div><b>Carrossel</b><span>múltiplos slides</span></div></div>
-              <div class="fmt" data-pt="story_unico"><span class="ico">📸</span><div><b>Story único</b><span>1 story 9:16</span></div></div>
-              <div class="fmt" data-pt="stories_multiplos"><span class="ico">📱</span><div><b>Stories múltiplos</b><span>sequência 9:16</span></div></div>
+            <label class="lbl">Assunto do carrossel</label>
+            <input class="input" id="inp-assunto" placeholder="Ex: 5 erros que impedem de emagrecer de vez">
+          </div>
+
+          <div>
+            <label class="lbl">Formato do conteúdo</label>
+            <div class="ctype-grid" id="ctype-grid">
+              <div class="ctype-card active" data-ctype="lista_dicas">
+                <span class="ctc-ico">📋</span>
+                <div><b>Lista de dicas</b><small>tips · erros · segredos</small></div>
+              </div>
+              <div class="ctype-card" data-ctype="antes_depois">
+                <span class="ctc-ico">↔️</span>
+                <div><b>Antes / Depois</b><small>transformação · contraste</small></div>
+              </div>
+              <div class="ctype-card" data-ctype="passo_passo">
+                <span class="ctc-ico">🔢</span>
+                <div><b>Passo a passo</b><small>tutorial · processo</small></div>
+              </div>
+              <div class="ctype-card" data-ctype="storytelling">
+                <span class="ctc-ico">📖</span>
+                <div><b>Storytelling</b><small>história · jornada</small></div>
+              </div>
             </div>
           </div>
 
-          <div id="carousel-platform-wrap">
-            <label class="lbl">Plataforma / Dimensões</label>
+          <div>
+            <label class="lbl">Gancho — 1º slide <span class="opt">você decide · sugestão disponível</span></label>
+            <div class="gancho-wrap">
+              <textarea class="textarea" id="inp-gancho" rows="2" placeholder="Ex: A maioria erra isso e nem percebe..."></textarea>
+              <button type="button" class="btn-sugerir" id="btn-sugerir-gancho">✦ Sugerir</button>
+            </div>
+          </div>
+
+          <div>
+            <div class="slider-wrap">
+              <div class="top"><span>Slides de conteúdo</span><span><b id="max-slides-val">6</b> slides</span></div>
+              <input type="range" id="inp-max-slides" min="3" max="10" value="6" style="--val:50%">
+            </div>
+          </div>
+
+          <div>
+            <label class="lbl">Plataforma</label>
             <div class="cformats" id="carousel-formats">
               <div class="fmt active" data-v="instagram_feed"><span class="ico">📸</span><div><b>Feed 1:1</b><span>1080×1080</span></div></div>
               <div class="fmt" data-v="instagram_feed_4x5"><span class="ico">📱</span><div><b>Feed 4:5</b><span>1080×1350</span></div></div>
               <div class="fmt" data-v="instagram_story"><span class="ico">⬆</span><div><b>Story</b><span>1080×1920</span></div></div>
               <div class="fmt" data-v="linkedin"><span class="ico">💼</span><div><b>LinkedIn</b><span>1200×627</span></div></div>
-              <div class="fmt" data-v="youtube_thumb"><span class="ico">▶</span><div><b>YouTube</b><span>1280×720</span></div></div>
             </div>
           </div>
 
-          <div id="carousel-slides-count-wrap">
-            <div class="slider-wrap">
-              <div class="top"><span>Slides de conteúdo</span><span><b id="max-slides-val">6</b> slides</span></div>
-              <input type="range" id="inp-max-slides" min="3" max="8" value="6" style="--val:60%">
-            </div>
-          </div>
-
-          <button class="btn-carousel" id="btn-carousel-top">📱 Gerar carrossel</button>
-          <div class="small-note">~60s · renderizado no servidor · PNG puro, sem marca d'água</div>
         </div>
       </section>
 
@@ -1033,19 +1121,32 @@
             </div>
           </div>
 
+          <!-- slide preview (carousel mode) -->
+          <div class="preview-slide" id="preview-slide">
+            <div class="slide-dots" id="slide-dots"></div>
+            <div class="slide-hook-pv" id="pv-hook" contenteditable="true" spellcheck="false" data-placeholder="Gancho do 1º slide..."></div>
+            <div class="slide-brand-pv" id="pv-slide-brand">@marca</div>
+          </div>
+
           <div class="pv-edit-bar">
-            <span class="pv-hint">✏️ Clique no título ou subtítulo para editar</span>
+            <span class="pv-hint" id="pv-hint-text">✏️ Clique no título ou subtítulo para editar</span>
             <button class="pv-btn" id="pv-font-down" title="Diminuir fonte">A−</button>
             <button class="pv-btn" id="pv-font-up" title="Aumentar fonte">A+</button>
           </div>
 
           <div class="summary-list">
-            <div class="r"><span class="k">Tipo</span><span class="v" id="s-type">Ebook / Guia Completo</span></div>
-            <div class="r"><span class="k">Páginas</span><span class="v" id="s-pages">15</span></div>
+            <!-- infoproduto rows -->
+            <div class="r ent-row"><span class="k">Tipo</span><span class="v" id="s-type">Ebook / Guia Completo</span></div>
+            <div class="r ent-row"><span class="k">Páginas</span><span class="v" id="s-pages">15</span></div>
+            <div class="r ent-row"><span class="k">Capa</span><span class="v" id="s-capa">Nano Banana · 25%</span></div>
+            <div class="r ent-row"><span class="k">Formato</span><span class="v" id="s-fmt">PDF</span></div>
+            <!-- carrossel rows -->
+            <div class="r car-row"><span class="k">Assunto</span><span class="v" id="s-car-assunto">—</span></div>
+            <div class="r car-row"><span class="k">Formato</span><span class="v" id="s-car-tipo">Lista de dicas</span></div>
+            <div class="r car-row"><span class="k">Slides</span><span class="v" id="s-car-slides">6</span></div>
+            <div class="r car-row"><span class="k">Plataforma</span><span class="v" id="s-car-fmt">Feed 1:1</span></div>
+            <!-- shared row -->
             <div class="r"><span class="k">Tema</span><span class="v" id="s-theme">🌿 Bem-estar &amp; Leveza</span></div>
-            <div class="r"><span class="k">Capa</span><span class="v" id="s-capa">Nano Banana · 25%</span></div>
-            <div class="r"><span class="k">Formato</span><span class="v" id="s-fmt">PDF</span></div>
-            <div class="r"><span class="k">Carrossel</span><span class="v" id="s-carousel" style="color:var(--text-3)">desativado</span></div>
           </div>
 
           <button class="generate" id="btn-gerar">🚀 Gerar Infoproduto</button>
@@ -1285,6 +1386,7 @@
       selectedTheme = t.dataset.v;
       document.getElementById('s-theme').innerHTML = t.querySelector('.t').innerHTML;
       updatePreviewColors();
+      updateSlidePreviewColors();
       updateMeta();
     });
   });
@@ -1310,13 +1412,6 @@
     });
   });
 
-  // ---- post type ----
-  document.querySelectorAll('#post-types .fmt').forEach(f => {
-    f.addEventListener('click', () => {
-      document.querySelectorAll('#post-types .fmt').forEach(x => x.classList.remove('active'));
-      f.classList.add('active');
-    });
-  });
 
   // ---- switches com comportamento específico ----
   function syncNano() {
@@ -1525,6 +1620,8 @@
 
   // ---- generate ----
   document.getElementById('btn-gerar').addEventListener('click', async () => {
+    if (currentMode === 'car') { await gerarCarrossel(); return; }
+
     const titulo = document.getElementById('inp-titulo').value.trim();
     if (!titulo) { showErr('Informe o título do entregável antes de gerar.'); return; }
 
@@ -1682,58 +1779,6 @@
     });
   }
 
-  document.getElementById('btn-carousel-top').addEventListener('click', async () => {
-    const titulo = document.getElementById('inp-titulo').value.trim();
-    if (!titulo) { showErr('Informe o título antes de gerar o carrossel.'); return; }
-
-    const numCapsC = parseInt(document.getElementById('inp-caps').value);
-    const payload = {
-      tipo:      selectedType,
-      titulo,
-      subtitulo: document.getElementById('inp-subtitulo').value,
-      autor:     document.getElementById('inp-autor').value || 'Nexus Digital',
-      descricao: document.getElementById('inp-descricao').value || titulo,
-      avatar:    document.getElementById('inp-avatar').value.trim(),
-      paginas:   parseInt(document.getElementById('inp-paginas').value) || 15,
-      ...(numCapsC && { numCapitulos: numCapsC }),
-      temaKey:   selectedTheme,
-      formato:   carouselFmt,
-      maxSlides: parseInt(maxSliderEl?.value) || 6,
-    };
-
-    const btnTop = document.getElementById('btn-carousel-top');
-    btnTop.disabled = true;
-    setCarouselProgress(0, 'Conectando ao servidor…');
-    document.getElementById('overlay-carousel-prog').classList.add('show');
-    hideErr();
-
-    try {
-      const initRes = await fetch('/api/carousel', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      if (!initRes.ok) throw new Error('Falha ao iniciar carrossel (HTTP ' + initRes.status + ')');
-      const { jobId } = await initRes.json();
-
-      await new Promise((resolve, reject) => {
-        const es = new EventSource('/api/carousel/progress/' + jobId);
-        es.onmessage = e => {
-          const d = JSON.parse(e.data);
-          if (d.error) { es.close(); reject(new Error(d.error)); return; }
-          if (d.progress !== undefined) setCarouselProgress(d.progress, d.message);
-          if (d.done) { es.close(); showCarouselSuccess(d); resolve(d); }
-        };
-        es.onerror = () => { es.close(); reject(new Error('Conexão perdida — tente novamente.')); };
-      });
-
-    } catch (err) {
-      document.getElementById('overlay-carousel-prog').classList.remove('show');
-      btnTop.disabled = false;
-      showErr('⚠ ' + err.message);
-    }
-  });
-
   function setCarouselProgress(pct, msg) {
     document.getElementById('carousel-prog-fill').style.width = pct + '%';
     document.getElementById('carousel-prog-pct').textContent = pct + '%';
@@ -1770,7 +1815,7 @@
     });
 
     document.getElementById('overlay-carousel-ok').classList.add('show');
-    document.getElementById('btn-carousel-top').disabled = false;
+    document.getElementById('btn-gerar').disabled = false;
   }
 
   function downloadSlide(b64, num, titulo) {
@@ -1864,6 +1909,124 @@
     dnaChars.textContent = this.value.length ? this.value.length.toLocaleString('pt-BR') + ' chars' : '';
   });
 
+  // ---- ctype (carousel content format) ----
+  let selectedCtype = 'lista_dicas';
+  const CTYPE_LABELS = {
+    lista_dicas: 'Lista de dicas',
+    antes_depois: 'Antes / Depois',
+    passo_passo: 'Passo a passo',
+    storytelling: 'Storytelling',
+  };
+  document.querySelectorAll('.ctype-card').forEach(c => {
+    c.addEventListener('click', () => {
+      document.querySelectorAll('.ctype-card').forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+      selectedCtype = c.dataset.ctype;
+      document.getElementById('s-car-tipo').textContent = CTYPE_LABELS[selectedCtype] || selectedCtype;
+    });
+  });
+
+  // ---- gancho field → slide preview ----
+  document.getElementById('inp-gancho').addEventListener('input', function() {
+    const hook = document.getElementById('pv-hook');
+    hook.textContent = this.value || '';
+    if (!this.value) hook.removeAttribute('style');
+  });
+
+  // pv-hook (preview slide) → gancho input sync
+  document.getElementById('pv-hook').addEventListener('blur', function() {
+    document.getElementById('inp-gancho').value = this.textContent.trim();
+  });
+  document.getElementById('pv-hook').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); }
+  });
+
+  // ---- suggest gancho ----
+  const GANCHO_TEMPLATES = {
+    lista_dicas:  [
+      'A maioria erra isso e nem percebe...',
+      'Ninguém te conta isso sobre [assunto]',
+      'Pare de fazer isso se quiser resultado',
+    ],
+    antes_depois: [
+      'Antes: travado. Depois: tudo mudou.',
+      'A virada que eu não esperava.',
+      'O que aconteceu quando eu parei de [erro]',
+    ],
+    passo_passo:  [
+      'O processo que mudou meu resultado em 7 dias',
+      'Siga esses passos — na ordem certa',
+      'A sequência que a maioria ignora',
+    ],
+    storytelling: [
+      'A história que me ensinou tudo',
+      'Quando percebi que estava errado sobre isso...',
+      'Um erro que me custou caro — e o que aprendi',
+    ],
+  };
+  document.getElementById('btn-sugerir-gancho').addEventListener('click', () => {
+    const assunto  = document.getElementById('inp-assunto').value.trim();
+    const list     = GANCHO_TEMPLATES[selectedCtype] || GANCHO_TEMPLATES.lista_dicas;
+    let sugestao   = list[Math.floor(Math.random() * list.length)];
+    if (assunto) sugestao = sugestao.replace('[assunto]', assunto).replace('[erro]', assunto);
+    document.getElementById('inp-gancho').value = sugestao;
+    document.getElementById('pv-hook').textContent = sugestao;
+  });
+
+  // ---- assunto → summary ----
+  document.getElementById('inp-assunto').addEventListener('input', function() {
+    const v = this.value.trim();
+    document.getElementById('s-car-assunto').textContent = v.slice(0, 28) + (v.length > 28 ? '…' : '') || '—';
+  });
+
+  // ---- slide dots generator ----
+  function updateSlideDots(count) {
+    const container = document.getElementById('slide-dots');
+    container.innerHTML = '';
+    for (let i = 0; i < Math.min(count, 8); i++) {
+      const dot = document.createElement('div');
+      dot.className = 'slide-dot' + (i === 0 ? ' active' : '');
+      container.appendChild(dot);
+    }
+  }
+  updateSlideDots(6);
+
+  // ---- slides slider → dots + summary ----
+  const maxSliderEl  = document.getElementById('inp-max-slides');
+  const maxSliderVal = document.getElementById('max-slides-val');
+  if (maxSliderEl) {
+    maxSliderEl.addEventListener('input', () => {
+      const v = maxSliderEl.value;
+      maxSliderVal.textContent = v;
+      const pct = ((v - 3) / 7 * 100).toFixed(0);
+      maxSliderEl.style.setProperty('--val', pct + '%');
+      document.getElementById('s-car-slides').textContent = v;
+      updateSlideDots(parseInt(v));
+    });
+  }
+
+  // ---- carousel platform → summary ----
+  document.querySelectorAll('#carousel-formats .fmt').forEach(f => {
+    f.addEventListener('click', () => {
+      document.querySelectorAll('#carousel-formats .fmt').forEach(x => x.classList.remove('active'));
+      f.classList.add('active');
+      carouselFmt = f.dataset.v;
+      document.getElementById('s-car-fmt').textContent = f.querySelector('b').textContent;
+    });
+  });
+
+  // ---- slide preview colors follow theme ----
+  function updateSlidePreviewColors() {
+    const t = THEME_PREVIEW[selectedTheme] || THEME_PREVIEW.bemestar;
+    const ps = document.getElementById('preview-slide');
+    if (!ps) return;
+    ps.style.background = [
+      `radial-gradient(ellipse 80% 55% at 50% 10%, ${t.accent}50, transparent 70%)`,
+      `linear-gradient(160deg, ${t.cover}f5, ${t.cover})`,
+    ].join(', ');
+    ps.style.borderColor = `${t.accent}70`;
+  }
+
   // ---- mode tabs switching ----
   let currentMode = 'ent';
   document.querySelectorAll('.mode-tab').forEach(tab => {
@@ -1872,17 +2035,69 @@
       tab.classList.add('active');
       currentMode = tab.dataset.mode;
       document.body.className = 'mode-' + currentMode;
-      const btnGerar = document.getElementById('btn-gerar');
-      const genNote  = document.getElementById('gen-time-note');
+      const btnGerar  = document.getElementById('btn-gerar');
+      const genNote   = document.getElementById('gen-time-note');
+      const hintText  = document.getElementById('pv-hint-text');
       if (currentMode === 'car') {
-        btnGerar.style.display = 'none';
-        genNote.style.display  = 'none';
+        btnGerar.textContent = '📱 Gerar Carrossel';
+        genNote.textContent  = '~60s · slides PNG · sem marca d\'água';
+        hintText.textContent = '✏️ Clique no gancho para editar';
+        updateSlidePreviewColors();
       } else {
-        btnGerar.style.display = '';
-        genNote.style.display  = '';
+        btnGerar.textContent = '🚀 Gerar Infoproduto';
+        genNote.textContent  = (TYPE_TIME[selectedType] || '~90s') + ' · gerado no servidor · sem marca d\'água';
+        hintText.textContent = '✏️ Clique no título ou subtítulo para editar';
+        updatePreviewColors();
       }
     });
   });
+
+  // ---- btn-gerar handles both modes ----
+  async function gerarCarrossel() {
+    const assunto = document.getElementById('inp-assunto').value.trim();
+    if (!assunto) { showErr('Informe o assunto do carrossel antes de gerar.'); return; }
+    const payload = {
+      tipo:             'carrossel',
+      titulo:           assunto,
+      subtitulo:        document.getElementById('inp-gancho').value.trim(),
+      descricao:        document.getElementById('dna-nicho').value.trim() || assunto,
+      autor:            document.getElementById('dna-nome').value.trim() || 'Nexus Digital',
+      avatar:           document.getElementById('dna-publico').value.trim(),
+      temaKey:          selectedTheme,
+      formato:          carouselFmt,
+      maxSlides:        parseInt(maxSliderEl?.value) || 6,
+      formato_conteudo: selectedCtype,
+      gancho:           document.getElementById('inp-gancho').value.trim(),
+    };
+    const btnGerar = document.getElementById('btn-gerar');
+    btnGerar.disabled = true;
+    setCarouselProgress(0, 'Conectando ao servidor…');
+    document.getElementById('overlay-carousel-prog').classList.add('show');
+    hideErr();
+    try {
+      const initRes = await fetch('/api/carousel', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!initRes.ok) throw new Error('Falha ao iniciar (HTTP ' + initRes.status + ')');
+      const { jobId } = await initRes.json();
+      await new Promise((resolve, reject) => {
+        const es = new EventSource('/api/carousel/progress/' + jobId);
+        es.onmessage = e => {
+          const d = JSON.parse(e.data);
+          if (d.error) { es.close(); reject(new Error(d.error)); return; }
+          if (d.progress !== undefined) setCarouselProgress(d.progress, d.message);
+          if (d.done) { es.close(); showCarouselSuccess(d); resolve(d); }
+        };
+        es.onerror = () => { es.close(); reject(new Error('Conexão perdida — tente novamente.')); };
+      });
+    } catch (err) {
+      document.getElementById('overlay-carousel-prog').classList.remove('show');
+      showErr('⚠ ' + err.message);
+    } finally {
+      btnGerar.disabled = false;
+    }
+  }
 </script>
 </body>
 </html>
