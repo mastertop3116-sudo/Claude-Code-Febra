@@ -23,13 +23,19 @@ const MAX_TENTATIVAS = 3;
 const FONTS_DIR = path.join(__dirname, "../../assets/fonts");
 const FONT_FILES = {
   Anton:            { reg: "Anton-Regular.ttf",             bold: "Anton-Regular.ttf" },
+  Gagalin:          { reg: "Gagalin-Regular.otf",           bold: "Gagalin-Regular.otf" },
+  BebasNeue:        { reg: "BebasNeue-Regular.ttf",         bold: "BebasNeue-Regular.ttf" },
   Oswald:           { reg: "Oswald-variable.ttf",           bold: "Oswald-variable.ttf" },
-  BreeSerif:        { reg: "BreeSerif-Regular.ttf",         bold: "BreeSerif-Regular.ttf" },
-  Poppins:          { reg: "Poppins-Regular.ttf",           bold: "Poppins-SemiBold.ttf" },
+  Raleway:          { reg: "Raleway-variable.ttf",          bold: "Raleway-variable.ttf" },
   Montserrat:       { reg: "Montserrat-variable.ttf",       bold: "Montserrat-variable.ttf" },
+  Poppins:          { reg: "Poppins-Regular.ttf",           bold: "Poppins-SemiBold.ttf" },
+  Nunito:           { reg: "Nunito-variable.ttf",           bold: "Nunito-variable.ttf" },
+  BreeSerif:        { reg: "BreeSerif-Regular.ttf",         bold: "BreeSerif-Regular.ttf" },
+  Lora:             { reg: "Lora-variable.ttf",             bold: "Lora-variable.ttf" },
   PlayfairDisplay:  { reg: "PlayfairDisplay-variable.ttf",  bold: "PlayfairDisplay-variable.ttf" },
   LibreBaskerville: { reg: "LibreBaskerville-variable.ttf", bold: "LibreBaskerville-variable.ttf" },
   GreatVibes:       { reg: "GreatVibes-Regular.ttf",        bold: "GreatVibes-Regular.ttf" },
+  DancingScript:    { reg: "DancingScript-variable.ttf",    bold: "DancingScript-variable.ttf" },
 };
 
 // ──────────────────────────────────────────

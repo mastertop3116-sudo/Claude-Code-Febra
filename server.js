@@ -49,6 +49,7 @@ app.use("/webhook", ggCheckout);
 // ──────────────────────────────────────────
 const path = require("path");
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/fonts", express.static(path.join(__dirname, "assets/fonts")));
 
 app.get("/criar", (req, res) => {
   res.setHeader("Cache-Control", "no-store");
