@@ -328,7 +328,7 @@
   .small-note{margin-top:10px;font-size:11px;color:var(--text-3);text-align:center;font-family:"JetBrains Mono",monospace}
 
   /* ---- mode tabs ---- */
-  .mode-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px}
+  .mode-tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:4px}
   .mode-tab{
     display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px 10px;
     border:2px solid var(--border);border-radius:12px;cursor:pointer;
@@ -351,7 +351,6 @@
   [data-showon="car"]{display:none}
   body.mode-car [data-showon="ent"]{display:none}
   body.mode-car [data-showon="car"]{display:block}
-  body.mode-both [data-showon="car"]{display:block}
 
   /* ---- panels expand ---- */
   .expand-panel{overflow:hidden;max-height:0;transition:max-height .45s ease,opacity .2s;opacity:0}
@@ -574,7 +573,7 @@
     <div class="head-left">
       <span class="pill"><span class="dot"></span>Nexus Max · editor</span>
       <h1>Transforme qualquer ideia em um <span class="grad">entregável completo</span></h1>
-      <p>Ebooks, workbooks, checklists, planners, scripts de VSL, guias e certificados — gerados por IA com layout profissional automático. Preencha, clique, exporte.</p>
+      <p>Ebooks, workbooks, checklists, planners, scripts de VSL, guias e certificados — com layout profissional automático. Preencha, clique, exporte.</p>
     </div>
     <div class="head-right">
       <div class="row"><span class="led"></span><span>motor pronto · nano banana online</span></div>
@@ -592,8 +591,8 @@
         <h2><span class="n">⚡</span>O que você quer criar?</h2>
         <div class="mode-tabs" id="mode-tabs">
           <div class="mode-tab active" data-mode="ent">
-            <span class="mico">📄</span>
-            <b>Entregável</b>
+            <span class="mico">🚀</span>
+            <b>Infoproduto</b>
             <small>PDF · Word</small>
           </div>
           <div class="mode-tab" data-mode="car">
@@ -601,17 +600,12 @@
             <b>Carrossel / Post</b>
             <small>Instagram · LinkedIn</small>
           </div>
-          <div class="mode-tab" data-mode="both">
-            <span class="mico">🎁</span>
-            <b>Ambos</b>
-            <small>Entregável + Post</small>
-          </div>
         </div>
       </section>
 
       <!-- 01 informações básicas -->
       <section class="card">
-        <h2><span class="n">01</span>Informações básicas<span class="hint">o essencial pra IA montar o conteúdo</span></h2>
+        <h2><span class="n">01</span>Informações básicas<span class="hint">o essencial para montar o conteúdo</span></h2>
         <div class="stack">
           <div class="row2">
             <div>
@@ -796,7 +790,7 @@
           <div class="toggle-row">
             <span class="tag">🍌</span>
             <div class="txt">
-              <b>Nano Banana ativo — capa gerada por IA</b>
+              <b>Nano Banana ativo — capa gerada automaticamente</b>
               <span>Gemini cria uma capa exclusiva baseada no tema e título escolhidos.</span>
             </div>
             <div class="switch on" id="sw-nano"></div>
@@ -910,7 +904,7 @@
       </section>
 
       <!-- 03 cabeçalho & rodapé -->
-      <section class="card">
+      <section class="card" data-showon="ent">
         <h2><span class="n">03</span>Cabeçalho &amp; rodapé<span class="hint">o que aparece em cada página</span></h2>
         <div class="stack">
           <div class="toggle-row">
@@ -941,45 +935,12 @@
       </section>
 
       <!-- 04 formato -->
-      <section class="card">
+      <section class="card" data-showon="ent">
         <h2><span class="n">04</span>Formato de saída<span class="hint">como você recebe o arquivo</span></h2>
         <div class="formats" id="formats">
           <div class="fmt active" data-v="pdf"><span class="ico">📄</span><div><b>PDF</b><span>distribuir / vender</span></div></div>
           <div class="fmt" data-v="docx"><span class="ico">📝</span><div><b>Word (.docx)</b><span>editável</span></div></div>
           <div class="fmt" data-v="ambos"><span class="ico">🎁</span><div><b>Ambos</b><span>bundle completo</span></div></div>
-        </div>
-      </section>
-
-      <!-- 05 carrossel para redes sociais -->
-      <section class="card">
-        <h2><span class="n">05</span>Carrossel para redes sociais<span class="hint">slides PNG prontos para postar</span></h2>
-        <div class="stack">
-
-          <div class="toggle-row">
-            <span class="tag" style="background:linear-gradient(135deg,rgba(14,165,233,.25),rgba(14,165,233,.05));border-color:rgba(14,165,233,.35);font-size:18px">📱</span>
-            <div class="txt"><b>Gerar carrossel de slides</b><span>Slides PNG com layout profissional — mesmo conteúdo, formato social.</span></div>
-            <div class="switch" id="sw-carousel"></div>
-          </div>
-
-          <div id="carousel-opts" class="field-disabled">
-            <label class="lbl" style="margin-bottom:10px">Formato dos slides</label>
-            <div class="cformats" id="carousel-formats">
-              <div class="fmt active" data-v="instagram_feed"><span class="ico">📸</span><div><b>Feed 1:1</b><span>1080×1080</span></div></div>
-              <div class="fmt" data-v="instagram_feed_4x5"><span class="ico">📱</span><div><b>Feed 4:5</b><span>1080×1350</span></div></div>
-              <div class="fmt" data-v="instagram_story"><span class="ico">⬆</span><div><b>Story</b><span>1080×1920</span></div></div>
-              <div class="fmt" data-v="linkedin"><span class="ico">💼</span><div><b>LinkedIn</b><span>1200×627</span></div></div>
-              <div class="fmt" data-v="youtube_thumb"><span class="ico">▶</span><div><b>YouTube</b><span>1280×720</span></div></div>
-            </div>
-
-            <div class="slider-wrap" style="margin-top:16px">
-              <div class="top"><span>Slides de conteúdo</span><span><b id="max-slides-val">6</b> slides</span></div>
-              <input type="range" id="inp-max-slides" min="3" max="8" value="6" style="--val:60%">
-            </div>
-          </div>
-
-          <button class="btn-carousel" id="btn-carousel" disabled>📱 Gerar carrossel</button>
-          <div class="small-note" id="carousel-note">Ative a opção acima para gerar os slides</div>
-
         </div>
       </section>
 
@@ -1014,7 +975,7 @@
             <div class="r"><span class="k">Carrossel</span><span class="v" id="s-carousel" style="color:var(--text-3)">desativado</span></div>
           </div>
 
-          <button class="generate" id="btn-gerar">✨ Gerar entregável</button>
+          <button class="generate" id="btn-gerar">🚀 Gerar Infoproduto</button>
           <div class="small-note" id="gen-time-note">~ 90s · gerado no servidor · sem marca d'água</div>
         </section>
 
@@ -1252,14 +1213,32 @@
     });
   });
 
-  // ---- formats ----
+  // ---- formats (output: PDF/DOCX/Ambos) ----
   let selectedFmt = 'pdf';
-  document.querySelectorAll('.fmt').forEach(f => {
+  document.querySelectorAll('#formats .fmt').forEach(f => {
     f.addEventListener('click', () => {
-      document.querySelectorAll('.fmt').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('#formats .fmt').forEach(x => x.classList.remove('active'));
       f.classList.add('active');
       selectedFmt = f.dataset.v;
       document.getElementById('s-fmt').textContent = f.querySelector('b').textContent;
+    });
+  });
+
+  // ---- carousel platform format ----
+  let carouselFmt = 'instagram_feed';
+  document.querySelectorAll('#carousel-formats .fmt').forEach(f => {
+    f.addEventListener('click', () => {
+      document.querySelectorAll('#carousel-formats .fmt').forEach(x => x.classList.remove('active'));
+      f.classList.add('active');
+      carouselFmt = f.dataset.v;
+    });
+  });
+
+  // ---- post type ----
+  document.querySelectorAll('#post-types .fmt').forEach(f => {
+    f.addEventListener('click', () => {
+      document.querySelectorAll('#post-types .fmt').forEach(x => x.classList.remove('active'));
+      f.classList.add('active');
     });
   });
 
@@ -1608,49 +1587,19 @@
   });
 
   // ──────────────────────────────────────────
-  // CARROSSEL — toggle, formato, geração, download
+  // CARROSSEL — geração e download
   // ──────────────────────────────────────────
-  let carouselFmt = 'instagram_feed';
-
-  document.querySelectorAll('#carousel-formats .fmt').forEach(f => {
-    f.addEventListener('click', () => {
-      document.querySelectorAll('#carousel-formats .fmt').forEach(x => x.classList.remove('active'));
-      f.classList.add('active');
-      carouselFmt = f.dataset.v;
-      if (document.getElementById('sw-carousel').classList.contains('on')) {
-        document.getElementById('s-carousel').textContent = f.querySelector('b').textContent;
-      }
-    });
-  });
-
   const maxSliderEl  = document.getElementById('inp-max-slides');
   const maxSliderVal = document.getElementById('max-slides-val');
-  maxSliderEl.addEventListener('input', () => {
-    maxSliderVal.textContent = maxSliderEl.value;
-    const pct = ((maxSliderEl.value - 3) / 5 * 100).toFixed(0);
-    maxSliderEl.style.setProperty('--val', pct + '%');
-  });
+  if (maxSliderEl) {
+    maxSliderEl.addEventListener('input', () => {
+      maxSliderVal.textContent = maxSliderEl.value;
+      const pct = ((maxSliderEl.value - 3) / 5 * 100).toFixed(0);
+      maxSliderEl.style.setProperty('--val', pct + '%');
+    });
+  }
 
-  document.getElementById('sw-carousel').addEventListener('click', function() {
-    this.classList.toggle('on');
-    const on = this.classList.contains('on');
-    document.getElementById('carousel-opts').classList.toggle('field-disabled', !on);
-    document.getElementById('btn-carousel').disabled = !on;
-    document.getElementById('carousel-note').textContent =
-      on ? '~60s · renderizado no servidor · PNG puro, sem marca d\'água'
-         : 'Ative a opção acima para gerar os slides';
-    const sCarousel = document.getElementById('s-carousel');
-    if (on) {
-      const fmtEl = document.querySelector('#carousel-formats .fmt.active');
-      sCarousel.textContent = fmtEl ? fmtEl.querySelector('b').textContent : 'Feed 1:1';
-      sCarousel.style.color = 'var(--text)';
-    } else {
-      sCarousel.textContent = 'desativado';
-      sCarousel.style.color = 'var(--text-3)';
-    }
-  });
-
-  document.getElementById('btn-carousel').addEventListener('click', async () => {
+  document.getElementById('btn-carousel-top').addEventListener('click', async () => {
     const titulo = document.getElementById('inp-titulo').value.trim();
     if (!titulo) { showErr('Informe o título antes de gerar o carrossel.'); return; }
 
@@ -1666,10 +1615,11 @@
       ...(numCapsC && { numCapitulos: numCapsC }),
       temaKey:   selectedTheme,
       formato:   carouselFmt,
-      maxSlides: parseInt(maxSliderEl.value) || 6,
+      maxSlides: parseInt(maxSliderEl?.value) || 6,
     };
 
-    document.getElementById('btn-carousel').disabled = true;
+    const btnTop = document.getElementById('btn-carousel-top');
+    btnTop.disabled = true;
     setCarouselProgress(0, 'Conectando ao servidor…');
     document.getElementById('overlay-carousel-prog').classList.add('show');
     hideErr();
@@ -1696,7 +1646,7 @@
 
     } catch (err) {
       document.getElementById('overlay-carousel-prog').classList.remove('show');
-      document.getElementById('btn-carousel').disabled = false;
+      btnTop.disabled = false;
       showErr('⚠ ' + err.message);
     }
   });
@@ -1737,7 +1687,7 @@
     });
 
     document.getElementById('overlay-carousel-ok').classList.add('show');
-    document.getElementById('btn-carousel').disabled = false;
+    document.getElementById('btn-carousel-top').disabled = false;
   }
 
   function downloadSlide(b64, num, titulo) {
@@ -1758,6 +1708,26 @@
   function closeCarouselOk() {
     document.getElementById('overlay-carousel-ok').classList.remove('show');
   }
+
+  // ---- mode tabs switching ----
+  let currentMode = 'ent';
+  document.querySelectorAll('.mode-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentMode = tab.dataset.mode;
+      document.body.className = 'mode-' + currentMode;
+      const btnGerar = document.getElementById('btn-gerar');
+      const genNote  = document.getElementById('gen-time-note');
+      if (currentMode === 'car') {
+        btnGerar.style.display = 'none';
+        genNote.style.display  = 'none';
+      } else {
+        btnGerar.style.display = '';
+        genNote.style.display  = '';
+      }
+    });
+  });
 </script>
 </body>
 </html>
