@@ -20,39 +20,43 @@ O arquivo SQL já está no repositório em `supabase/schema.sql`.
 
 ---
 
-## 🟡 UX / Frontend (aprovado, aguardando implementação)
+## ✅ Concluído
 
 ### 2. Finalizar redesign de `public/criar.html`
-O commit `28df6c0` tem o início do redesign mas está incompleto:
-- [ ] Adicionar `data-showon="ent"` nas seções 03 e 04 (entregável)
-- [ ] Remover seção antiga de carrossel (substituída pelo novo modo)
-- [ ] Adicionar JS de troca de modo (Entregável / Carrossel / Ambos)
-- [ ] Preview sticky: testar após as alterações acima
+Implementado nos commits do Carlinhos (`6e039d8`, `a03f38b`):
+- ✅ `data-showon="ent"` nas seções 03 e 04
+- ✅ Seção antiga de carrossel removida (substituída pelo novo modo)
+- ✅ JS de troca de modo (Entregável / Carrossel) + atualização do botão/preview
+- ✅ Preview sticky no CSS
+
+### 5. Varredura de linguagem proibida (`687be2f`)
+- ✅ `public/criar.html` — "substitui IA" → "substitui geração"
+- ✅ `departments/creative/content_specialist.js` — "IA especializada" → "Motor de criação especializado"
+- ✅ `departments/creative/design_reviewer.js` — "erros de IA visíveis" → "erros de geração visíveis"
 
 ---
 
 ## 🟢 Melhorias futuras (próximas sessões)
 
 ### 3. DNA de Lançamento — Upload de relatório de mercado
+⚠️ Depende do item 1 (SQL no Supabase)
 - Campo de upload de PDF/texto na página `/criar`
 - Parser que extrai insights do relatório e salva em `lancamentos.relatorio_texto`
 - Alimenta automaticamente os agentes roteirista/editor com contexto do lançamento
 
 ### 4. Wizard de produto (para usuários sem relatório)
+⚠️ Depende do item 1 (SQL no Supabase)
 - Fluxo guiado: nome do produto → nicho → público → benefício → preço
 - O próprio sistema pesquisa mercado (agente `pesquisarMercado` já existe)
 - Salva resultado em `produtos` e `lancamentos` no Supabase
 
-### 5. Varredura de linguagem proibida
-- Substituir todas as ocorrências de "IA / Inteligência Artificial" nos textos de interface
-- Termos aprovados: "Motor de criação", "Sistema", "Processo", "Engenheiro de criação"
-- Verificar: `public/criar.html`, `telegram/handlers.js`, `README` (se houver)
-
 ### 6. Comando `/roteiro` com produto do Supabase
+⚠️ Depende do item 1 (SQL no Supabase)
 - Atualmente o `/roteiro` no Telegram recebe dados inline (nome|nicho|modo...)
 - Após tabela `produtos` existir: permitir `/roteiro [produto_id]` para buscar dados salvos
 
 ### 7. Dashboard/Studio (sessão dedicada)
+⚠️ Depende do item 1 (SQL no Supabase)
 - Seletor de produto cadastrado
 - Histórico de criativos gerados por produto
 - Visualizador de roteiro + instruções de edição lado a lado
