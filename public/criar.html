@@ -118,8 +118,9 @@
   .head-right .row{display:flex;align-items:center;gap:8px}
   .head-right .led{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
 
-  .grid{display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start}
+  .grid{display:grid;grid-template-columns:1fr 380px;gap:24px}
   .col{display:flex;flex-direction:column;gap:22px}
+  .col:first-child{align-self:start}
 
   .card{
     background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0) 40%), var(--card);
@@ -288,7 +289,7 @@
   .fmt b{font-size:14px;font-weight:600}
   .fmt span{font-size:11px;color:var(--text-3);display:block;font-family:"JetBrains Mono",monospace;margin-top:1px}
 
-  .sticky{position:sticky;top:24px;max-height:calc(100vh - 48px);overflow-y:auto;align-self:flex-start}
+  .sticky{position:sticky;top:24px}
   .preview{
     aspect-ratio:3/4;border-radius:12px;overflow:hidden;position:relative;
     background:
@@ -325,6 +326,32 @@
   .generate:active{transform:translateY(1px)}
   .generate:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none}
   .small-note{margin-top:10px;font-size:11px;color:var(--text-3);text-align:center;font-family:"JetBrains Mono",monospace}
+
+  /* ---- mode tabs ---- */
+  .mode-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px}
+  .mode-tab{
+    display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px 10px;
+    border:2px solid var(--border);border-radius:12px;cursor:pointer;
+    background:rgba(10,11,22,.4);transition:all .15s;text-align:center;
+  }
+  .mode-tab:hover{border-color:var(--border-hi);background:rgba(14,15,28,.7)}
+  .mode-tab.active{
+    border-color:var(--accent);
+    background:linear-gradient(180deg,rgba(99,102,241,.12),rgba(99,102,241,.02));
+    box-shadow:0 0 0 3px rgba(99,102,241,.15);
+  }
+  .mode-tab .mico{font-size:24px;line-height:1}
+  .mode-tab b{font-size:13px;font-weight:600;color:var(--text);display:block;margin-top:4px}
+  .mode-tab small{font-size:11px;color:var(--text-3);font-family:"JetBrains Mono",monospace;display:block;margin-top:2px}
+
+  /* ---- post type ---- */
+  .post-types{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+  /* ---- mode visibility ---- */
+  [data-showon="car"]{display:none}
+  body.mode-car [data-showon="ent"]{display:none}
+  body.mode-car [data-showon="car"]{display:block}
+  body.mode-both [data-showon="car"]{display:block}
 
   /* ---- panels expand ---- */
   .expand-panel{overflow:hidden;max-height:0;transition:max-height .45s ease,opacity .2s;opacity:0}
@@ -560,6 +587,28 @@
     <!-- ===== FORM COLUMN ===== -->
     <div class="col">
 
+      <!-- 00 modo de criação -->
+      <section class="card">
+        <h2><span class="n">⚡</span>O que você quer criar?</h2>
+        <div class="mode-tabs" id="mode-tabs">
+          <div class="mode-tab active" data-mode="ent">
+            <span class="mico">📄</span>
+            <b>Entregável</b>
+            <small>PDF · Word</small>
+          </div>
+          <div class="mode-tab" data-mode="car">
+            <span class="mico">📱</span>
+            <b>Carrossel / Post</b>
+            <small>Instagram · LinkedIn</small>
+          </div>
+          <div class="mode-tab" data-mode="both">
+            <span class="mico">🎁</span>
+            <b>Ambos</b>
+            <small>Entregável + Post</small>
+          </div>
+        </div>
+      </section>
+
       <!-- 01 informações básicas -->
       <section class="card">
         <h2><span class="n">01</span>Informações básicas<span class="hint">o essencial pra IA montar o conteúdo</span></h2>
@@ -625,6 +674,43 @@
               <div style="font-size:12px;color:var(--text-3);line-height:1.5;padding-bottom:13px" id="caps-hint">Deixe vazio para o MAX calcular pelo nº de páginas</div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <!-- CARROSSEL / POST (visível quando modo=carrossel ou ambos) -->
+      <section class="card" data-showon="car">
+        <h2><span class="n">📱</span>Tipo de conteúdo social<span class="hint">formato do post para redes</span></h2>
+        <div class="stack">
+          <div>
+            <label class="lbl">Formato do post</label>
+            <div class="post-types" id="post-types">
+              <div class="fmt" data-pt="post_unico"><span class="ico">🖼️</span><div><b>Post único</b><span>1 imagem</span></div></div>
+              <div class="fmt active" data-pt="carrossel"><span class="ico">🎠</span><div><b>Carrossel</b><span>múltiplos slides</span></div></div>
+              <div class="fmt" data-pt="story_unico"><span class="ico">📸</span><div><b>Story único</b><span>1 story 9:16</span></div></div>
+              <div class="fmt" data-pt="stories_multiplos"><span class="ico">📱</span><div><b>Stories múltiplos</b><span>sequência 9:16</span></div></div>
+            </div>
+          </div>
+
+          <div id="carousel-platform-wrap">
+            <label class="lbl">Plataforma / Dimensões</label>
+            <div class="cformats" id="carousel-formats">
+              <div class="fmt active" data-v="instagram_feed"><span class="ico">📸</span><div><b>Feed 1:1</b><span>1080×1080</span></div></div>
+              <div class="fmt" data-v="instagram_feed_4x5"><span class="ico">📱</span><div><b>Feed 4:5</b><span>1080×1350</span></div></div>
+              <div class="fmt" data-v="instagram_story"><span class="ico">⬆</span><div><b>Story</b><span>1080×1920</span></div></div>
+              <div class="fmt" data-v="linkedin"><span class="ico">💼</span><div><b>LinkedIn</b><span>1200×627</span></div></div>
+              <div class="fmt" data-v="youtube_thumb"><span class="ico">▶</span><div><b>YouTube</b><span>1280×720</span></div></div>
+            </div>
+          </div>
+
+          <div id="carousel-slides-count-wrap">
+            <div class="slider-wrap">
+              <div class="top"><span>Slides de conteúdo</span><span><b id="max-slides-val">6</b> slides</span></div>
+              <input type="range" id="inp-max-slides" min="3" max="8" value="6" style="--val:60%">
+            </div>
+          </div>
+
+          <button class="btn-carousel" id="btn-carousel-top">📱 Gerar carrossel</button>
+          <div class="small-note">~60s · renderizado no servidor · PNG puro, sem marca d'água</div>
         </div>
       </section>
 
