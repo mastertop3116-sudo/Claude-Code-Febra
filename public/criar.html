@@ -1769,15 +1769,6 @@
   // ──────────────────────────────────────────
   // CARROSSEL — geração e download
   // ──────────────────────────────────────────
-  const maxSliderEl  = document.getElementById('inp-max-slides');
-  const maxSliderVal = document.getElementById('max-slides-val');
-  if (maxSliderEl) {
-    maxSliderEl.addEventListener('input', () => {
-      maxSliderVal.textContent = maxSliderEl.value;
-      const pct = ((maxSliderEl.value - 3) / 5 * 100).toFixed(0);
-      maxSliderEl.style.setProperty('--val', pct + '%');
-    });
-  }
 
   function setCarouselProgress(pct, msg) {
     document.getElementById('carousel-prog-fill').style.width = pct + '%';
