@@ -477,6 +477,34 @@
   /* ---- field disabled state ---- */
   .field-disabled{opacity:.35;pointer-events:none;transition:opacity .2s}
 
+  /* ---- preview inline edit ---- */
+  .preview [contenteditable]{outline:none;cursor:text;border-radius:4px;transition:background .15s}
+  .preview [contenteditable]:hover{background:rgba(255,255,255,.07)}
+  .preview [contenteditable]:focus{background:rgba(255,255,255,.1);box-shadow:0 0 0 1px rgba(255,255,255,.2)}
+  .pv-edit-bar{
+    display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px 14px;
+    background:rgba(10,11,22,.5);border:1px solid var(--border);border-radius:10px;
+    font-size:12px;color:var(--text-3);flex-wrap:wrap;
+  }
+  .pv-edit-bar .pv-hint{flex:1;min-width:0}
+  .pv-btn{
+    background:rgba(255,255,255,.07);border:1px solid var(--border-hi);
+    color:var(--text);border-radius:6px;padding:4px 10px;cursor:pointer;
+    font-size:13px;font-weight:700;transition:background .12s;line-height:1.4;
+  }
+  .pv-btn:hover{background:rgba(255,255,255,.14)}
+
+  /* ---- dna do produto ---- */
+  .dna-upload-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .dna-file-btn{
+    display:inline-flex;align-items:center;gap:7px;padding:10px 16px;border-radius:10px;
+    border:1px solid var(--border-hi);background:rgba(255,255,255,.04);
+    color:var(--text);font-size:13px;font-weight:500;cursor:pointer;
+    transition:background .15s,border-color .15s;white-space:nowrap;
+  }
+  .dna-file-btn:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.22)}
+  .dna-chars{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--text-3);margin-left:auto}
+
   /* ---- toast notification ---- */
   .toast{
     position:fixed;bottom:24px;right:24px;z-index:300;
@@ -599,6 +627,45 @@
             <span class="mico">📱</span>
             <b>Carrossel / Post</b>
             <small>Instagram · LinkedIn</small>
+          </div>
+        </div>
+      </section>
+
+      <!-- DNA do Produto -->
+      <section class="card" id="sec-dna">
+        <h2><span class="n">🧬</span>DNA do Produto<span class="hint">pré-preenche os campos e alimenta os agentes</span></h2>
+        <div class="stack">
+          <div class="row2 eq">
+            <div>
+              <label class="lbl">Nome do produto</label>
+              <input class="input" id="dna-nome" placeholder="Ex: Método Ballet em Casa">
+            </div>
+            <div>
+              <label class="lbl">Nicho / categoria</label>
+              <input class="input" id="dna-nicho" placeholder="Ex: Dança, bem-estar">
+            </div>
+          </div>
+          <div class="row2 eq">
+            <div>
+              <label class="lbl">Público-alvo</label>
+              <input class="input" id="dna-publico" placeholder="Ex: Mulheres 25–45 que querem leveza">
+            </div>
+            <div>
+              <label class="lbl">Preço <span class="opt">opcional</span></label>
+              <input class="input" id="dna-preco" placeholder="Ex: R$ 97 ou gratuito">
+            </div>
+          </div>
+          <div>
+            <label class="lbl">Relatório de pesquisa de mercado <span class="opt">opcional · alimenta o processo criativo</span></label>
+            <textarea class="textarea" id="dna-relatorio" rows="4" placeholder="Cole aqui o conteúdo do seu relatório de pesquisa de mercado. Quanto mais contexto, mais preciso e alinhado ao seu público será o resultado."></textarea>
+            <div class="dna-upload-row" style="margin-top:10px">
+              <label class="dna-file-btn" id="dna-file-label">
+                📎 Carregar arquivo
+                <input type="file" id="dna-file-input" accept=".txt,.md,.csv" style="display:none">
+              </label>
+              <span style="font-size:12px;color:var(--text-3)">.txt · .md · .csv aceitos</span>
+              <span class="dna-chars" id="dna-chars"></span>
+            </div>
           </div>
         </div>
       </section>
@@ -966,6 +1033,12 @@
             </div>
           </div>
 
+          <div class="pv-edit-bar">
+            <span class="pv-hint">✏️ Clique no título ou subtítulo para editar</span>
+            <button class="pv-btn" id="pv-font-down" title="Diminuir fonte">A−</button>
+            <button class="pv-btn" id="pv-font-up" title="Aumentar fonte">A+</button>
+          </div>
+
           <div class="summary-list">
             <div class="r"><span class="k">Tipo</span><span class="v" id="s-type">Ebook / Guia Completo</span></div>
             <div class="r"><span class="k">Páginas</span><span class="v" id="s-pages">15</span></div>
@@ -1062,6 +1135,9 @@
 <div id="err-box"></div>
 
 <script>
+  // pvFocused: tracks which preview element is being edited inline
+  let pvFocused = null;
+
   // ---- type dropdown ----
   const typeTrigger = document.getElementById('type-trigger');
   const typeMenu    = document.getElementById('type-menu');
@@ -1399,13 +1475,13 @@
   }
 
   document.getElementById('inp-titulo').addEventListener('input', function() {
-    document.getElementById('pv-title').textContent = this.value || 'Meu Entregável';
+    if (pvFocused !== 'pv-title') document.getElementById('pv-title').textContent = this.value || 'Meu Entregável';
   });
   document.getElementById('inp-subtitulo').addEventListener('input', function() {
-    document.getElementById('pv-sub').textContent = this.value;
+    if (pvFocused !== 'pv-sub') document.getElementById('pv-sub').textContent = this.value;
   });
   document.getElementById('inp-autor').addEventListener('input', function() {
-    document.getElementById('pv-autor').textContent = this.value || '';
+    if (pvFocused !== 'pv-autor') document.getElementById('pv-autor').textContent = this.value || '';
   });
   document.getElementById('inp-descricao').addEventListener('input', updateMeta);
   document.getElementById('inp-paginas').addEventListener('input', updateMeta);
@@ -1496,6 +1572,13 @@
       }),
       ...(selectedFontTitle && { fonteTitulo: selectedFontTitle }),
       ...(selectedFontBody  && { fonteCorpo:  selectedFontBody }),
+      produto: {
+        nome:          document.getElementById('dna-nome').value.trim() || titulo,
+        nicho:         document.getElementById('dna-nicho').value.trim(),
+        publico_alvo:  document.getElementById('dna-publico').value.trim(),
+        preco:         document.getElementById('dna-preco').value.trim(),
+        relatorio:     document.getElementById('dna-relatorio').value.trim().slice(0, 8000),
+      },
     };
 
     document.getElementById('btn-gerar').disabled = true;
@@ -1708,6 +1791,78 @@
   function closeCarouselOk() {
     document.getElementById('overlay-carousel-ok').classList.remove('show');
   }
+
+  // ---- preview inline editing ----
+  let pvTitleSize = 26;
+  const pvEditMap = { 'pv-title': 'inp-titulo', 'pv-sub': 'inp-subtitulo', 'pv-autor': 'inp-autor' };
+
+  ['pv-title', 'pv-sub', 'pv-autor'].forEach(id => {
+    const el = document.getElementById(id);
+    el.contentEditable = 'true';
+    el.spellcheck = false;
+    el.addEventListener('focus', () => { pvFocused = id; });
+    el.addEventListener('blur', () => {
+      pvFocused = null;
+      const inputId = pvEditMap[id];
+      if (inputId) document.getElementById(inputId).value = el.textContent.trim();
+    });
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } });
+  });
+
+  document.getElementById('pv-font-up').addEventListener('click', () => {
+    pvTitleSize = Math.min(pvTitleSize + 2, 52);
+    document.getElementById('pv-title').style.fontSize = pvTitleSize + 'px';
+  });
+  document.getElementById('pv-font-down').addEventListener('click', () => {
+    pvTitleSize = Math.max(pvTitleSize - 2, 12);
+    document.getElementById('pv-title').style.fontSize = pvTitleSize + 'px';
+  });
+
+  // ---- DNA do Produto ----
+  function syncDNA() {
+    const nome    = document.getElementById('dna-nome').value.trim();
+    const nicho   = document.getElementById('dna-nicho').value.trim();
+    const publico = document.getElementById('dna-publico').value.trim();
+
+    const tituloInp  = document.getElementById('inp-titulo');
+    const nichoInp   = document.getElementById('inp-descricao');
+    const publicoInp = document.getElementById('inp-avatar');
+
+    if (nome && !tituloInp.value) {
+      tituloInp.value = nome;
+      if (pvFocused !== 'pv-title') document.getElementById('pv-title').textContent = nome;
+    }
+    if (nicho && !nichoInp.value) {
+      nichoInp.value = nicho;
+      updateMeta();
+    }
+    if (publico && !publicoInp.value) {
+      publicoInp.value = publico;
+    }
+  }
+
+  ['dna-nome', 'dna-nicho', 'dna-publico'].forEach(id => {
+    document.getElementById(id).addEventListener('input', syncDNA);
+  });
+
+  // File upload → textarea
+  const dnaFileInput = document.getElementById('dna-file-input');
+  const dnaChars     = document.getElementById('dna-chars');
+  dnaFileInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const txt = ev.target.result;
+      document.getElementById('dna-relatorio').value = txt;
+      dnaChars.textContent = txt.length.toLocaleString('pt-BR') + ' chars carregados';
+    };
+    reader.readAsText(file, 'UTF-8');
+    e.target.value = '';
+  });
+  document.getElementById('dna-relatorio').addEventListener('input', function() {
+    dnaChars.textContent = this.value.length ? this.value.length.toLocaleString('pt-BR') + ' chars' : '';
+  });
 
   // ---- mode tabs switching ----
   let currentMode = 'ent';
