@@ -45,12 +45,9 @@ Implementado nos commits do Carlinhos (`6e039d8`, `a03f38b`):
 - Atualmente o `/roteiro` no Telegram recebe dados inline (nome|nicho|modo...)
 - Permitir `/roteiro [produto_id]` para buscar dados salvos na tabela `produtos`
 
-### 8. Preview fiel à capa do entregável (sessão dedicada)
-- O preview atual (HTML/CSS no browser) é apenas uma aproximação de fonte + cor
-- O PDF real é gerado pelo PDFKit com coordenadas x/y fixas — layouts divergem
-- **Solução A (recomendada):** renderizar o 1º slide do PDF no servidor (`pdfjs-dist` ou `pdf2pic`) e exibir como thumbnail no preview
-- **Solução B:** refatorar o PDFKit para replicar fielmente o layout do preview HTML
-- Inclui: imagem de capa personalizada (upload) aparecendo corretamente no PDF gerado
+### 8. ✅ Preview fiel à capa do entregável (`b06e570`)
+- `pdfjs-dist` 3.11 via CDN renderiza a página 1 do PDF gerado num `<canvas>` no overlay de sucesso
+- Zero mudança no servidor — usa o base64 que já chega no browser
 
 ### 7. Dashboard/Studio (sessão dedicada)
 - Seletor de produto cadastrado
