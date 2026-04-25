@@ -1285,12 +1285,13 @@
   <div class="overlay-box">
     <div class="ov-spinner"></div>
     <div class="ov-title">Gerando seu entregável…</div>
-    <div class="ov-sub" id="gen-overlay-sub">Não feche esta aba. O processo leva ~90 segundos.</div>
+    <div class="ov-sub" id="gen-overlay-sub">Criando seu material personalizado…</div>
     <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
     <div class="prog-meta">
       <div class="prog-pct" id="prog-pct">0%</div>
       <div class="prog-msg" id="prog-msg">Iniciando…</div>
     </div>
+    <div id="gen-tip" style="margin-top:16px;padding:12px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;font-size:12px;color:var(--text-3);line-height:1.55;text-align:left;min-height:48px;transition:opacity .4s"></div>
     <div style="text-align:center;margin-top:20px">
       <button id="btn-cancelar" style="background:none;border:1px solid var(--border);color:var(--text-3);border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer;transition:border-color .15s,color .15s" onmouseover="this.style.borderColor='rgba(255,255,255,.3)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-3)'">Cancelar e tentar novamente</button>
     </div>
@@ -1848,8 +1849,31 @@
     document.getElementById('btn-gerar').disabled = true;
     setProgress(0, 'Conectando ao servidor…');
     document.getElementById('gen-overlay-sub').textContent =
-      'Não feche esta aba. O processo leva ' + (TYPE_TIME[selectedType] || '~90s') + '.';
+      'Criando seu material personalizado · ' + (TYPE_TIME[selectedType] || '~90s');
     document.getElementById('overlay-prog').classList.add('show');
+
+    // Dicas cíclicas durante a espera
+    const _DICAS = [
+      '💡 Títulos com números ímpares (3, 7, 9) convertem até 36% mais — o MAX já considera isso na estrutura.',
+      '✏️ O conteúdo gerado é seu ponto de partida. Edite, personalize e injete sua voz antes de publicar.',
+      '🎨 A capa usa as cores e fontes que você escolheu — fiel à sua identidade visual.',
+      '📐 Cada seção é dimensionada para leitura em tela e impressão A4 sem cortes.',
+      '🚀 Entregáveis bem estruturados aumentam o valor percebido do seu produto até 3×.',
+      '🔁 Você pode gerar versões diferentes do mesmo produto variando o tema ou as fontes.',
+    ];
+    let _dicaIdx = 0;
+    const _tipEl = document.getElementById('gen-tip');
+    if (_tipEl) _tipEl.textContent = _DICAS[0];
+    const _dicaTimer = setInterval(() => {
+      if (!_tipEl) return;
+      _tipEl.style.opacity = '0';
+      setTimeout(() => {
+        _dicaIdx = (_dicaIdx + 1) % _DICAS.length;
+        _tipEl.textContent = _DICAS[_dicaIdx];
+        _tipEl.style.opacity = '1';
+      }, 400);
+    }, 12000);
+    const _stopDicas = () => { clearInterval(_dicaTimer); if (_tipEl) _tipEl.style.opacity = '0'; };
     hideErr();
 
     try {
@@ -1869,15 +1893,17 @@
           if (d.progress !== undefined) setProgress(d.progress, d.message);
           if (d.done) {
             es.close();
+            _stopDicas();
             setProgress(100, 'Pronto!');
             showSuccess(d, payload.titulo);
             resolve(d);
           }
         };
-        es.onerror = () => { es.close(); reject(new Error('Conexão perdida — tente novamente.')); };
+        es.onerror = () => { es.close(); _stopDicas(); reject(new Error('Conexão perdida — tente novamente.')); };
       });
 
     } catch (err) {
+      _stopDicas();
       document.getElementById('overlay-prog').classList.remove('show');
       document.getElementById('btn-gerar').disabled = false;
       showErr('⚠ ' + err.message);

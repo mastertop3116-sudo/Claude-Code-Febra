@@ -515,64 +515,68 @@ function gerarPDF(config, conteudo) {
       doc.fillOpacity(1);
 
     } else {
-      // ── CAPA SEM IMAGEM: design geométrico sólido ──
+      // ── CAPA SEM IMAGEM: design editorial limpo ──
+      const COV_TEXT = C.coverText || "#FFFFFF";
+      const bandH = Math.round(H * 0.17); // faixa inferior 17%
+
+      // Fundo escuro completo
       doc.rect(0, 0, W, H).fill(COV);
 
-      // Retângulo accent no topo
-      doc.rect(0, 0, W * 0.45, 8).fill(COV_ACC);
+      // Faixa accent inferior
+      doc.rect(0, H - bandH, W, bandH).fill(COV_ACC);
 
-      // Bloco de cor inferior (28%)
-      doc.rect(0, H * 0.72, W, H * 0.28).fill(COV_ACC);
+      // Barra accent fina no topo (seis pontos)
+      doc.rect(0, 0, W, 6).fill(COV_ACC);
 
-      // Círculo decorativo — fillOpacity em vez de hex+"22"
+      // Círculo atmosférico — textura, não elemento dominante
       doc.save();
-      doc.fillOpacity(0.13).fillColor(COV_ACC).circle(W + 30, H * 0.38, 210).fill();
+      doc.fillOpacity(0.09).fillColor(COV_ACC).circle(W * 0.78, H * 0.33, 240).fill();
       doc.restore();
       doc.fillOpacity(1);
 
-      // Fundo do bloco de título — fillOpacity em vez de hex+"CC"
+      // Segundo anel concentrico mais sutil
       doc.save();
-      doc.fillOpacity(0.72).fillColor(COV).rect(ML - 10, H * 0.28, CW + 20, 200).fill();
+      doc.fillOpacity(0.05).fillColor(COV_ACC).circle(W * 0.78, H * 0.33, 170).fill();
       doc.restore();
       doc.fillOpacity(1);
 
-      // Linha accent antes do título
-      doc.rect(ML, H * 0.29, 48, 4).fill(COV_ACC);
+      // Linha accent que ancora o título
+      doc.rect(ML, H * 0.22, 52, 4).fill(COV_ACC);
 
-      // Título
-      const COV_TEXT = C.coverText || "#FFFFFF";
-      doc.fillColor(COV_TEXT).font(F.title).fontSize(34)
-        .text(conteudo.capa.titulo || config.titulo, ML, H * 0.31,
-          { width: CW, lineGap: 6 });
+      // Título — posicionado no terço superior, sem caixa
+      doc.fillColor(COV_TEXT).font(F.title).fontSize(38)
+        .text(conteudo.capa.titulo || config.titulo, ML, H * 0.245,
+          { width: CW * 0.72, lineGap: 7 });
 
-      const afterTitle = doc.y + 16;
+      const afterTitle = doc.y + 18;
 
-      // Linha separadora
-      doc.rect(ML, afterTitle, CW * 0.28, 2).fill(COV_ACC);
+      // Linha separadora fina
+      doc.rect(ML, afterTitle, CW * 0.25, 2).fill(COV_ACC);
 
       // Subtítulo
       if (conteudo.capa.subtitulo) {
         doc.save();
-        doc.fillOpacity(0.78).fillColor(COV_TEXT).font(F.subtitle).fontSize(13)
-          .text(conteudo.capa.subtitulo, ML, afterTitle + 14, { width: CW });
+        doc.fillOpacity(0.72).fillColor(COV_TEXT).font(F.subtitle).fontSize(13)
+          .text(conteudo.capa.subtitulo, ML, afterTitle + 14, { width: CW * 0.70 });
         doc.restore();
         doc.fillOpacity(1);
       }
 
-      // Tagline na faixa inferior
+      // Tagline na faixa inferior — texto escuro sobre accent
       if (conteudo.capa.tagline) {
-        doc.fillColor(COV).font(F.body).fontSize(11)
-          .text(conteudo.capa.tagline, ML, H * 0.745, { width: CW, align: "center" });
+        doc.fillColor(COV).font(F.body).fontSize(10)
+          .text(conteudo.capa.tagline.toUpperCase(), ML, H - bandH + Math.round(bandH * 0.18),
+            { width: CW, align: "center", characterSpacing: 1.8 });
       }
 
       if (config.autor) {
-        doc.fillColor(COV).font(F.title).fontSize(10)
-          .text(config.autor.toUpperCase(), ML, H * 0.81,
-            { width: CW, align: "center", characterSpacing: 1 });
+        doc.fillColor(COV).font(F.title).fontSize(11)
+          .text(config.autor.toUpperCase(), ML, H - bandH + Math.round(bandH * 0.45),
+            { width: CW, align: "center", characterSpacing: 2 });
       }
       doc.save();
       doc.fillOpacity(0.55).fillColor(COV).font(F.body).fontSize(8)
-        .text(String(new Date().getFullYear()), ML, H * 0.84,
+        .text(String(new Date().getFullYear()), ML, H - bandH + Math.round(bandH * 0.72),
           { width: CW, align: "center" });
       doc.restore();
       doc.fillOpacity(1);
