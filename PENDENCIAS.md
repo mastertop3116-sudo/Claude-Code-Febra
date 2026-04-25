@@ -5,18 +5,11 @@
 
 ---
 
-## 🔴 Bloqueantes (fazer antes de usar em produção)
+## ✅ Bloqueantes resolvidos
 
-### 1. Rodar SQL das tabelas no Supabase
-As tabelas `produtos`, `lancamentos` e `criativos` ainda não existem no banco.
-O arquivo SQL já está no repositório em `supabase/schema.sql`.
-
-**Opção A (recomendada):**
-- Supabase → SQL Editor → cole o conteúdo de `supabase/schema.sql` → Run
-
-**Opção B (automatizar futuro):**
-- Me forneça a `service_role` key (Supabase → Settings → API) ou a Connection String (Settings → Database → URI)
-- Com isso consigo rodar SQL diretamente sem copiar e colar
+### 1. ✅ Tabelas criadas no Supabase (2026-04-25)
+Tabelas `produtos`, `lancamentos` e `criativos` criadas via Management API.
+PAT e service_role key salvas no `.env` local.
 
 ---
 
@@ -39,24 +32,20 @@ Implementado nos commits do Carlinhos (`6e039d8`, `a03f38b`):
 ## 🟢 Melhorias futuras (próximas sessões)
 
 ### 3. DNA de Lançamento — Upload de relatório de mercado
-⚠️ Depende do item 1 (SQL no Supabase)
 - Campo de upload de PDF/texto na página `/criar`
 - Parser que extrai insights do relatório e salva em `lancamentos.relatorio_texto`
 - Alimenta automaticamente os agentes roteirista/editor com contexto do lançamento
 
 ### 4. Wizard de produto (para usuários sem relatório)
-⚠️ Depende do item 1 (SQL no Supabase)
 - Fluxo guiado: nome do produto → nicho → público → benefício → preço
 - O próprio sistema pesquisa mercado (agente `pesquisarMercado` já existe)
 - Salva resultado em `produtos` e `lancamentos` no Supabase
 
 ### 6. Comando `/roteiro` com produto do Supabase
-⚠️ Depende do item 1 (SQL no Supabase)
 - Atualmente o `/roteiro` no Telegram recebe dados inline (nome|nicho|modo...)
-- Após tabela `produtos` existir: permitir `/roteiro [produto_id]` para buscar dados salvos
+- Permitir `/roteiro [produto_id]` para buscar dados salvos na tabela `produtos`
 
 ### 7. Dashboard/Studio (sessão dedicada)
-⚠️ Depende do item 1 (SQL no Supabase)
 - Seletor de produto cadastrado
 - Histórico de criativos gerados por produto
 - Visualizador de roteiro + instruções de edição lado a lado
