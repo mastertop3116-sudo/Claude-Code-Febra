@@ -1,5 +1,5 @@
-const Anthropic = require('@anthropic-ai/sdk')
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+const { GoogleGenerativeAI } = require('@google/generative-ai')
+const genai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
 
 const SYSTEM = `Você é um especialista em edição de vídeo para Instagram Reels, TikTok e YouTube Shorts focado em conversão e retenção.
 
@@ -82,17 +82,13 @@ Retorne APENAS este JSON:
 }`
 
 async function run({ roteiro, plataforma }) {
-  const msg = await client.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 4000,
-    system: SYSTEM,
-    messages: [{
-      role: 'user',
-      content: `Plataforma: ${plataforma || roteiro.plataforma || 'reels'}\nDuracao estimada: ${roteiro.duracao_estimada || 'curto'}\n\nRoteiro:\n${JSON.stringify(roteiro, null, 2)}\n\nGere as instrucoes completas de edicao.`
-    }]
+  const model = genai.getGenerativeModel({
+    model: 'gemini-2.5-pro',
+    systemInstruction: SYSTEM,
+    generationConfig: { responseMimeType: 'application/json' },
   })
-
-  return JSON.parse(msg.content[0].text.replace(/```json\n?|\n?```/g, '').trim())
+  const r = await model.generateContent(`Plataforma: ${plataforma || roteiro.plataforma || 'reels'}\nDuracao estimada: ${roteiro.duracao_estimada || 'curto'}\n\nRoteiro:\n${JSON.stringify(roteiro, null, 2)}\n\nGere as instrucoes completas de edicao.`)
+  return JSON.parse(r.response.text().trim())
 }
 
 module.exports = { run }

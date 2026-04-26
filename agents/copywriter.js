@@ -1,5 +1,5 @@
-const Anthropic = require('@anthropic-ai/sdk')
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+const { GoogleGenerativeAI } = require('@google/generative-ai')
+const genai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
 
 const SYSTEM = `Copywriter especialista em infoprodutos brasileiros. Frameworks: AIDA, PAS, StoryBrand.
 Escreva na voz do autor. Parágrafos curtos. Linguagem direta. Zero jargão corporativo.
@@ -17,13 +17,13 @@ Responda APENAS em JSON válido:
 }`
 
 async function run({ estrategia, estrutura, autor, tipo }) {
-  const msg = await client.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 8000,
-    system: SYSTEM,
-    messages: [{ role: 'user', content: `Autor: ${autor}\nTipo: ${tipo}\nEstratégia: ${JSON.stringify(estrategia)}\nEstrutura: ${JSON.stringify(estrutura)}\nEscreva todas as seções.` }]
+  const model = genai.getGenerativeModel({
+    model: 'gemini-2.5-pro',
+    systemInstruction: SYSTEM,
+    generationConfig: { responseMimeType: 'application/json' },
   })
-  return JSON.parse(msg.content[0].text.replace(/```json\n?|\n?```/g, '').trim())
+  const r = await model.generateContent(`Autor: ${autor}\nTipo: ${tipo}\nEstratégia: ${JSON.stringify(estrategia)}\nEstrutura: ${JSON.stringify(estrutura)}\nEscreva todas as seções.`)
+  return JSON.parse(r.response.text().trim())
 }
 
 module.exports = { run }

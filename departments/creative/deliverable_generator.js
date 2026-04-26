@@ -730,7 +730,11 @@ async function generate(params) {
   if (capaImagem) {
     capaBuffer = typeof capaImagem === "string" ? Buffer.from(capaImagem, "base64") : capaImagem;
   } else {
-    capaBuffer = await capaAgent.run({ titulo, nicho: nichoFinal, tema: temaKey });
+    try {
+      capaBuffer = await capaAgent.run({ titulo, nicho: nichoFinal, tema: temaKey });
+    } catch (e) {
+      console.warn("[capa] Nano Banana falhou, usando capa satori:", e.message);
+    }
   }
 
   let slides = null;
