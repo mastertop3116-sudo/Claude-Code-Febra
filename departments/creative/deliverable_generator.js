@@ -226,10 +226,9 @@ Idioma: português brasileiro. Tom: direto e prático.`;
 }
 
 // ──────────────────────────────────────────
-// Gerar PDF — Design profissional v3
+// Gerar PDF — Design profissional v4
 // ──────────────────────────────────────────
 async function gerarPDF(config, conteudo) {
-  // Pré-gera capa via satori quando não há imagem de usuário
   let coverPng = null;
   if (!config.capaImagem) {
     try {
@@ -252,18 +251,19 @@ async function gerarPDF(config, conteudo) {
     const tema = config.tema || THEMES.produtividade;
     const C = config.cores ? { ...tema.colors, ...config.cores } : tema.colors;
     const F = config.fontes ? { ...tema.fonts, ...config.fontes } : tema.fonts;
-    const cabAtivo = config.cabecalho?.ativo !== false;
-    const rodAtivo = config.rodape?.ativo !== false;
-    const cabTexto = config.cabecalho?.texto || config.autor || "Nexus Digital";
-    const rodTexto = config.rodape?.texto || `© ${new Date().getFullYear()} ${config.autor || ""}`;
+    const cabAtivo  = config.cabecalho?.ativo !== false;
+    const rodAtivo  = config.rodape?.ativo !== false;
+    const cabTexto  = config.cabecalho?.texto || config.autor || "Nexus Digital";
+    const rodTexto  = config.rodape?.texto || `© ${new Date().getFullYear()} ${config.autor || ""}`;
     const showPagNum = config.rodape?.numeroPagina !== false;
 
-    const doc = new PDFDocument({ size: "A4", margin: 0, autoFirstPage: false,
+    const doc = new PDFDocument({
+      size: "A4", margin: 0, autoFirstPage: false,
       info: { Title: config.titulo, Author: config.autor || "Nexus Digital Holding", Creator: "Nexus MAX" },
     });
     const chunks = [];
     doc.on("data", c => chunks.push(c));
-    doc.on("end", () => resolve(Buffer.concat(chunks)));
+    doc.on("end",  () => resolve(Buffer.concat(chunks)));
     doc.on("error", reject);
 
     // ── Fontes customizadas ──
@@ -272,197 +272,269 @@ async function gerarPDF(config, conteudo) {
       if (fs.existsSync(boldPath)) { doc.registerFont("f-title", boldPath); F.title = "f-title"; }
     }
     if (config.fonteCorpo && FONT_FILES[config.fonteCorpo]) {
-      const regPath = path.join(FONTS_DIR, FONT_FILES[config.fonteCorpo].reg);
-      if (fs.existsSync(regPath)) { doc.registerFont("f-body", regPath); F.body = "f-body"; }
+      const regPath  = path.join(FONTS_DIR, FONT_FILES[config.fonteCorpo].reg);
+      const boldPath = path.join(FONTS_DIR, FONT_FILES[config.fonteCorpo].bold);
+      if (fs.existsSync(regPath))  { doc.registerFont("f-body",      regPath);  F.body     = "f-body"; }
+      if (fs.existsSync(boldPath)) { doc.registerFont("f-body-bold", boldPath); F.bodyBold = "f-body-bold"; }
     }
     if (config.fonteSubtitulo && FONT_FILES[config.fonteSubtitulo]) {
       const subPath = path.join(FONTS_DIR, FONT_FILES[config.fonteSubtitulo].reg);
       if (fs.existsSync(subPath)) { doc.registerFont("f-subtitle", subPath); F.subtitle = "f-subtitle"; }
     }
     if (!F.subtitle) F.subtitle = F.body;
+    if (!F.bodyBold) F.bodyBold = F.title;
 
     // ── Dimensões ──
-    const W = 595.28, H = 841.89;
-    const ML = 52, MR = 52, CW = W - ML - MR;
-    const STRIPE = 5;
-    const CAB_H  = cabAtivo ? 32 : 0;
-    const ROD_H  = rodAtivo ? 34 : 0;
-    const CT = STRIPE + CAB_H + 16;
-    const CB = H - ROD_H - 12;
+    const W  = 595.28, H = 841.89;
+    const ML = 56, MR = 56, CW = W - ML - MR;
+    const STRIPE_H = 6;
+    const CAB_H    = cabAtivo ? 36 : 0;
+    const ROD_H    = rodAtivo ? 36 : 0;
+    const CT = STRIPE_H + CAB_H + 22;
+    const CB = H - ROD_H - 14;
 
-    // Cor de fundo das páginas de conteúdo: usa o background do tema
-    const PAGE_BG = C.background || "#FFFFFF";
-    // Cor sólida para callout (branca com borda) — sempre legível
-    const CALLOUT_BG = "#FFFFFF";
+    const PAGE_BG    = C.background || "#FFFFFF";
     const TEXT_DARK  = "#1A1A1A";
-    const TEXT_MID   = "#555555";
+    const TEXT_LIGHT = "#888888";
 
-    let pageNum = 0;
-    let cy = CT;
+    let pageNum  = 0;
+    let cy       = CT;
+    let secAtual = "";
 
-    // ── Chrome de cada página de conteúdo ──
+    // ── Chrome: cabeçalho + rodapé ──
     function drawChrome() {
-      // Fundo completo da página
       doc.rect(0, 0, W, H).fill(PAGE_BG);
-      // Stripe topo
-      doc.rect(0, 0, W, STRIPE).fill(C.primary);
+      doc.rect(0, 0, W, STRIPE_H).fill(C.primary);
 
       if (cabAtivo) {
-        // Fundo cabeçalho branco
-        doc.rect(0, STRIPE, W, CAB_H).fill("#FFFFFF");
-        // Linha divisória leve
-        doc.rect(0, STRIPE + CAB_H - 1, W, 1).fill("#E8E8E8");
-        // Texto marca (cor primária)
-        doc.fillColor(C.primary).font(F.title).fontSize(8)
-          .text(cabTexto.toUpperCase(), ML, STRIPE + 10, { width: CW * 0.6, characterSpacing: 0.5 });
-        // Título doc (cinza, alinhado à direita)
-        if (pageNum > 1) {
-          doc.fillColor("#AAAAAA").font(F.body).fontSize(7.5)
-            .text(config.titulo, ML, STRIPE + 11, { width: CW, align: "right" });
+        doc.rect(0, STRIPE_H, W, CAB_H).fill("#F9F9F9");
+        doc.rect(0, STRIPE_H + CAB_H - 0.5, W, 0.5).fill("#E0E0E0");
+        doc.fillColor(C.primary).font(F.title).fontSize(7.5)
+          .text(cabTexto.toUpperCase(), ML, STRIPE_H + 13, { width: CW * 0.6, characterSpacing: 1.2 });
+        if (pageNum > 2 && secAtual) {
+          doc.fillColor(TEXT_LIGHT).font(F.body).fontSize(7)
+            .text(secAtual.toUpperCase(), ML, STRIPE_H + 14, { width: CW, align: "right", characterSpacing: 0.5 });
         }
       }
 
       if (rodAtivo) {
         const fy = H - ROD_H;
-        // Linha topo do rodapé
-        doc.rect(0, fy, W, 1).fill("#E8E8E8");
-        // Fundo rodapé branco
-        doc.rect(0, fy + 1, W, ROD_H).fill("#FFFFFF");
+        doc.rect(0, fy, W, ROD_H).fill("#F9F9F9");
+        doc.rect(0, fy, W, 0.5).fill("#E0E0E0");
+        doc.rect(0, H - 2, W, 2).fill(C.primary);
         if (rodTexto.trim()) {
-          doc.fillColor("#BBBBBB").font(F.body).fontSize(7.5)
-            .text(rodTexto, ML, fy + 12, { width: CW - 40 });
+          doc.fillColor(TEXT_LIGHT).font(F.body).fontSize(7)
+            .text(rodTexto, ML, fy + 14, { width: CW - 54 });
         }
         if (showPagNum) {
-          const pcx = W - ML - 13, pcy = fy + 17;
-          doc.circle(pcx, pcy, 13).fill(C.primary);
-          doc.fillColor("#FFFFFF").font(F.title).fontSize(8.5)
-            .text(String(pageNum), pcx - 13, pcy - 6, { width: 26, align: "center" });
+          const bw = 30, bh = 18;
+          const px = W - ML, py = fy + 9;
+          doc.rect(px - bw, py, bw, bh).fill(C.primary);
+          doc.fillColor("#FFFFFF").font(F.title).fontSize(9)
+            .text(String(pageNum), px - bw, py + 4, { width: bw, align: "center" });
         }
       }
     }
 
-    function newPage() {
+    function newPage(novaSecao = null) {
       pageNum++;
+      if (novaSecao !== null) secAtual = novaSecao;
       doc.addPage({ size: "A4", margin: 0 });
       drawChrome();
       cy = CT;
     }
 
-    // ── Título de seção (inline, sem forçar nova página) ──
+    // ── Título de seção ──
     function sectionTitle(titulo, numStr) {
-      // Se não tiver espaço suficiente para o título + algum conteúdo, nova página
-      if (cy + 80 > CB) newPage();
+      if (cy + 90 > CB) newPage(titulo);
 
-      // Barra lateral esquerda colorida
-      const barH = 38;
-      doc.rect(ML, cy, 5, barH).fill(C.primary);
+      doc.rect(ML, cy, 48, 3).fill(C.primary);
+      cy += 10;
 
-      // Número pequeno acima do título
       if (numStr) {
-        doc.fillColor(C.accent || C.primary).font(F.title).fontSize(9)
-          .text(numStr, ML + 14, cy + 2, { width: 30, characterSpacing: 1 });
+        doc.fillColor("#F0F0F0").font(F.title).fontSize(68)
+          .text(numStr, W - ML - 88, cy - 18, { width: 88, align: "right" });
       }
 
-      // Título principal
-      const titleY = numStr ? cy + 13 : cy + 8;
-      doc.fillColor(C.primary).font(F.title).fontSize(18)
-        .text(titulo, ML + 14, titleY, { width: CW - 18 });
+      doc.fillColor(C.primary).font(F.title).fontSize(20)
+        .text(titulo.toUpperCase(), ML, cy, { width: numStr ? CW - 88 : CW, characterSpacing: 0.5 });
+      cy = doc.y + 16;
 
+      doc.save();
+      doc.fillOpacity(0.12);
+      doc.rect(ML, cy - 4, CW, 0.5).fill(C.primary);
+      doc.restore();
+      cy += 4;
+    }
+
+    // ── Detecta tipo de linha ──
+    function getLineType(line) {
+      const l = line.trim();
+      if (/^\[\s*[xX✓]?\s*\]/.test(l))           return "checkbox";
+      if (/^[-*•]\s+/.test(l))                     return "bullet";
+      if (/^▸\s*/.test(l))                          return "action";
+      if (/^#{1,3}\s+/.test(l))                     return "heading";
+      if (/^(FATO\/DADO|FATO|DADO)\s*:/i.test(l)) return "fact";
+      return "paragraph";
+    }
+
+    // ── Checkbox visual ──
+    function writeChecklistItem(line) {
+      const checked   = /^\[\s*[xX✓]\s*\]/.test(line.trim());
+      const cleanText = line.replace(/^\[\s*[xX✓]?\s*\]\s*/, "").replace(/\*\*/g, "").trim();
+      if (!cleanText) return;
+      const est  = doc.heightOfString(cleanText, { width: CW - 30, fontSize: 11 });
+      const boxH = Math.max(20, est);
+      if (cy + boxH + 8 > CB) newPage();
+      const bx = ML + 2, by = cy + (boxH / 2) - 7;
+      doc.rect(bx, by, 13, 13).lineWidth(1).strokeColor(checked ? C.primary : "#AAAAAA").stroke();
+      if (checked) {
+        doc.moveTo(bx + 2, by + 6).lineTo(bx + 5, by + 9).lineTo(bx + 11, by + 3)
+          .lineWidth(1.5).strokeColor(C.primary).stroke();
+      }
+      doc.fillColor(TEXT_DARK).font(F.body).fontSize(11)
+        .text(cleanText, ML + 22, cy, { width: CW - 26, lineGap: 3 });
+      cy = doc.y + 8;
+    }
+
+    // ── Bullet point ──
+    function writeBulletItem(line) {
+      const cleanText = line.replace(/^[-*•]\s+/, "").replace(/\*\*/g, "").trim();
+      if (!cleanText) return;
+      if (cy + 18 > CB) newPage();
+      doc.circle(ML + 7, cy + 6, 2.5).fill(C.accent || C.primary);
+      doc.fillColor(TEXT_DARK).font(F.body).fontSize(11)
+        .text(cleanText, ML + 20, cy, { width: CW - 24, lineGap: 3 });
+      cy = doc.y + 7;
+    }
+
+    // ── Ponto de ação (▸) ──
+    function writeActionPoint(line) {
+      const cleanText = line.replace(/^▸\s*/, "").replace(/\*\*/g, "").trim();
+      if (!cleanText) return;
+      const est  = doc.heightOfString(cleanText, { width: CW - 46, fontSize: 10.5 });
+      const boxH = Math.max(38, est + 22);
+      if (cy + boxH + 8 > CB) newPage();
+      doc.save();
+      doc.fillOpacity(0.07);
+      doc.rect(ML, cy, CW, boxH).fill(C.primary);
+      doc.restore();
+      doc.rect(ML, cy, 4, boxH).fill(C.accent || C.primary);
+      doc.fillColor(C.accent || C.primary).font(F.title).fontSize(10)
+        .text("▸", ML + 12, cy + Math.floor(boxH / 2) - 6, { width: 16 });
+      doc.fillColor(TEXT_DARK).font(F.body).fontSize(10.5)
+        .text(cleanText, ML + 32, cy + 11, { width: CW - 46, lineGap: 3 });
       cy = doc.y + 14;
     }
 
-    // ── Texto corrido ──
-    // Detecta parágrafos rotulados "LABEL: conteúdo" e renderiza o rótulo como mini-heading
-    function writeBody(text) {
-      if (!text) return;
-      const parts = String(text).split(";").map(p => p.trim()).filter(Boolean);
+    // ── Heading inline (##) ──
+    function writeInlineHeading(line) {
+      const cleanText = line.replace(/^#{1,3}\s+/, "").trim();
+      if (!cleanText) return;
+      if (cy + 28 > CB) newPage();
+      cy += 6;
+      doc.fillColor(C.primary).font(F.title).fontSize(13)
+        .text(cleanText.toUpperCase(), ML, cy, { width: CW, characterSpacing: 0.5 });
+      cy = doc.y + 8;
+    }
 
-      for (const part of parts) {
-        if (cy + 28 > CB) newPage();
+    // ── Parágrafo normal ──
+    function writeParagraph(line) {
+      const cleanText = line.replace(/\*\*/g, "").trim();
+      if (!cleanText) return;
+      if (cy + 18 > CB) newPage();
+      doc.fillColor(TEXT_DARK).font(F.body).fontSize(11)
+        .text(cleanText, ML, cy, { width: CW, lineGap: 5 });
+      cy = doc.y + 10;
+    }
 
-        // Detecta "LABEL: conteúdo" — rótulo em maiúsculas (até 60 chars) seguido de ": "
-        const labelMatch = part.match(/^([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇÀÜ\/\s]{3,60}):\s*(.+)$/s);
-        if (labelMatch && labelMatch[1].trim().split(/\s+/).length <= 6) {
-          const label = labelMatch[1].trim();
-          const content = labelMatch[2].trim();
-          // Mini-heading colorido
-          doc.fillColor(C.primary).font(F.title).fontSize(8)
-            .text(label.toUpperCase(), ML, cy, { width: CW, characterSpacing: 0.8 });
-          cy = doc.y + 4;
-          if (cy + 18 > CB) newPage();
-          doc.fillColor(TEXT_DARK).font(F.body).fontSize(11)
-            .text(content, ML, cy, { width: CW, lineGap: 5 });
-          cy = doc.y + 12;
-        } else {
-          doc.fillColor(TEXT_DARK).font(F.body).fontSize(11)
-            .text(part, ML, cy, { width: CW, lineGap: 5, paragraphGap: 0 });
-          cy = doc.y + 10;
-        }
+    // ── Dispatcher de linha ──
+    function dispatchLine(line) {
+      const l = line.trim();
+      if (!l) return;
+      switch (getLineType(l)) {
+        case "checkbox": writeChecklistItem(l); break;
+        case "bullet":   writeBulletItem(l);   break;
+        case "action":   writeActionPoint(l);  break;
+        case "heading":  writeInlineHeading(l); break;
+        case "fact":     writeFactBox(l);       break;
+        default:         writeParagraph(l);     break;
       }
     }
 
-    // ── Callout box (branco + borda sólida = sempre legível) ──
-    function writeCallout(text) {
+    // ── Corpo principal ──
+    function writeBody(text) {
       if (!text) return;
-      const est = doc.heightOfString(text, { width: CW - 50, fontSize: 10 });
-      const boxH = Math.max(40, est + 24);
-      if (cy + boxH + 6 > CB) newPage();
-
-      // Fundo branco
-      doc.rect(ML, cy, CW, boxH).fill(CALLOUT_BG);
-      // Borda externa sutil
-      doc.rect(ML, cy, CW, boxH).lineWidth(0.5).strokeColor("#DDDDDD").stroke();
-      // Borda esquerda colorida sólida
-      doc.rect(ML, cy, 5, boxH).fill(C.accent || C.primary);
-      // Marcador — losango desenhado (sem depender de glifo da fonte)
-      const mx = ML + 17, my = cy + boxH / 2;
-      doc.save();
-      doc.fillColor(C.accent || C.primary)
-        .moveTo(mx, my - 5).lineTo(mx + 5, my).lineTo(mx, my + 5).lineTo(mx - 5, my).closePath().fill();
-      doc.restore();
-      // Texto sempre escuro
-      doc.fillColor(TEXT_DARK).font(F.body).fontSize(10)
-        .text(text.trim(), ML + 30, cy + 12, { width: CW - 42, lineGap: 3 });
-      cy = doc.y + 12;
+      const segments = String(text).split(";").map(p => p.trim()).filter(Boolean);
+      for (const seg of segments) {
+        const lines = seg.split(/\n/).map(l => l.trim()).filter(Boolean);
+        if (lines.length === 0) continue;
+        if (lines.length === 1) dispatchLine(lines[0]);
+        else for (const line of lines) dispatchLine(line);
+      }
     }
 
-    // ── Caixa de Fato/Dado científico (visual diferenciado) ──
+    // ── Callout box ──
+    function writeCallout(text) {
+      if (!text) return;
+      const t = text.trim();
+      if (/^▸/.test(t))                              { writeActionPoint(t); return; }
+      if (/^(FATO\/DADO|FATO|DADO)\s*:/i.test(t))   { writeFactBox(t);     return; }
+      const cleanText = t.replace(/\*\*/g, "");
+      const est  = doc.heightOfString(cleanText, { width: CW - 50, fontSize: 10.5 });
+      const boxH = Math.max(44, est + 28);
+      if (cy + boxH + 8 > CB) newPage();
+      doc.save();
+      doc.fillOpacity(0.06);
+      doc.rect(ML, cy, CW, boxH).fill(C.primary);
+      doc.restore();
+      doc.rect(ML, cy, CW, boxH).lineWidth(0.5).strokeColor("#DDDDDD").stroke();
+      doc.rect(ML, cy, 5, boxH).fill(C.accent || C.primary);
+      const mx = ML + 18, my = cy + Math.floor(boxH / 2);
+      doc.fillColor(C.accent || C.primary)
+        .moveTo(mx, my - 5).lineTo(mx + 5, my).lineTo(mx, my + 5).lineTo(mx - 5, my).closePath().fill();
+      doc.fillColor(TEXT_DARK).font(F.body).fontSize(10.5)
+        .text(cleanText, ML + 32, cy + 14, { width: CW - 44, lineGap: 3.5 });
+      cy = doc.y + 14;
+    }
+
+    // ── Fact box ──
     function writeFactBox(text) {
       if (!text) return;
-      const cleanText = text.replace(/^(FATO\/DADO|FATO|DADO|Fato\/Dado)\s*:\s*/i, "").trim();
-      const est = doc.heightOfString(cleanText, { width: CW - 62, fontSize: 10.5 });
-      const boxH = Math.max(58, est + 30);
+      const cleanText = text.replace(/^(FATO\/DADO|FATO|DADO|Fato\/Dado)\s*:\s*/i, "").replace(/\*\*/g, "").trim();
+      const est  = doc.heightOfString(cleanText, { width: CW - 70, fontSize: 10.5 });
+      const boxH = Math.max(58, est + 32);
       if (cy + boxH + 8 > CB) newPage();
-
-      // Fundo azul suave
       doc.rect(ML, cy, CW, boxH).fill("#EEF4FF");
       doc.rect(ML, cy, CW, boxH).lineWidth(0.5).strokeColor("#C0D4F8").stroke();
-      // Barra esquerda azul
       doc.rect(ML, cy, 5, boxH).fill("#3B7BF0");
-      // Badge "DADO"
-      doc.rect(ML + 12, cy + 10, 38, 15).fill("#3B7BF0");
-      doc.fillColor("#FFFFFF").font(F.title).fontSize(7)
-        .text("DADO", ML + 12, cy + 13, { width: 38, align: "center", characterSpacing: 0.5 });
-      // Texto
+      doc.rect(ML + 14, cy + 10, 40, 16).fill("#3B7BF0");
+      doc.fillColor("#FFFFFF").font(F.title).fontSize(7.5)
+        .text("DADO", ML + 14, cy + 14, { width: 40, align: "center", characterSpacing: 0.5 });
       doc.fillColor("#1A2B4A").font(F.body).fontSize(10.5)
-        .text(cleanText, ML + 58, cy + 12, { width: CW - 68, lineGap: 3.5 });
+        .text(cleanText, ML + 62, cy + 12, { width: CW - 74, lineGap: 3.5 });
       cy = doc.y + 16;
     }
 
-    // ── Divisor leve ──
+    // ── Divisor ──
     function writeDivider() {
-      if (cy + 14 > CB) return;
+      if (cy + 18 > CB) return;
+      cy += 6;
+      const dX = ML + CW * 0.25, dW = CW * 0.5;
       doc.save();
-      doc.fillOpacity(0.3).fillColor(C.primary)
-        .rect(ML + CW * 0.3, cy + 6, CW * 0.4, 1).fill();
+      doc.fillOpacity(0.12);
+      doc.rect(dX, cy + 7, dW, 1).fill(C.primary);
       doc.restore();
-      doc.fillOpacity(1);
-      doc.circle(W / 2, cy + 6, 3).fill(C.primary);
-      cy += 18;
+      const mx = W / 2, my = cy + 7;
+      doc.save();
+      doc.fillColor(C.primary).fillOpacity(0.45)
+        .moveTo(mx, my - 4).lineTo(mx + 4, my).lineTo(mx, my + 4).lineTo(mx - 4, my).closePath().fill();
+      doc.restore();
+      cy += 22;
     }
 
     // ════════════════════════════════════════
-    // CAPA — dois caminhos separados e limpos
+    // CAPA
     // ════════════════════════════════════════
     pageNum++;
     doc.addPage({ size: "A4", margin: 0 });
@@ -470,23 +542,18 @@ async function gerarPDF(config, conteudo) {
     const COV_ACC = C.coverAccent || C.accent || C.primary;
 
     if (coverPng) {
-      // ── CAPA SATORI: PNG gerado pelo cover_templates.js ──
       doc.image(coverPng, 0, 0, { width: W, height: H });
-
     } else if (config.capaImagem) {
-      // ── CAPA COM IMAGEM DO USUÁRIO: overlay + texto ──
       try {
         doc.image(config.capaImagem, 0, 0, { cover: [W, H], align: "center", valign: "center" });
-      } catch (_) {
-        doc.rect(0, 0, W, H).fill("#1A1A1A");
-      }
+      } catch (_) { doc.rect(0, 0, W, H).fill("#1A1A1A"); }
       const opacidade = config.capaImagemOpacidade !== undefined ? config.capaImagemOpacidade : 0.40;
       doc.save();
       doc.fillOpacity(opacidade).fillColor("#000000").rect(0, 0, W, H).fill();
       doc.restore();
+      doc.save();
       doc.fillOpacity(0.72).fillColor("#000000").rect(0, H * 0.65, W, H * 0.35).fill();
       doc.restore();
-      doc.fillOpacity(1);
       doc.rect(0, 0, W, 5).fill(COV_ACC);
       doc.rect(ML, H * 0.28, 44, 4).fill(COV_ACC);
       doc.fillColor("#FFFFFF").font(F.title).fontSize(34)
@@ -498,23 +565,18 @@ async function gerarPDF(config, conteudo) {
         doc.fillOpacity(0.82).fillColor("#FFFFFF").font(F.subtitle).fontSize(13)
           .text(conteudo.capa.subtitulo, ML, aft + 14, { width: CW });
         doc.restore();
-        doc.fillOpacity(1);
       }
       if (conteudo.capa.tagline)
         doc.fillColor("#FFFFFF").font(F.body).fontSize(11)
           .text(conteudo.capa.tagline, ML, H * 0.74, { width: CW, align: "center" });
       if (config.autor)
         doc.fillColor(COV_ACC).font(F.title).fontSize(10)
-          .text(config.autor.toUpperCase(), ML, H * 0.82,
-            { width: CW, align: "center", characterSpacing: 1.2 });
+          .text(config.autor.toUpperCase(), ML, H * 0.82, { width: CW, align: "center", characterSpacing: 1.2 });
       doc.save();
       doc.fillOpacity(0.5).fillColor("#FFFFFF").font(F.body).fontSize(8)
         .text(String(new Date().getFullYear()), ML, H * 0.855, { width: CW, align: "center" });
       doc.restore();
-      doc.fillOpacity(1);
-
     } else {
-      // ── FALLBACK: capa PDFKit simples (satori falhou) ──
       doc.rect(0, 0, W, H).fill(COV);
       doc.rect(0, 0, W, 6).fill(COV_ACC);
       doc.rect(0, H * 0.82, W, H * 0.18).fill(COV_ACC);
@@ -526,62 +588,55 @@ async function gerarPDF(config, conteudo) {
     }
 
     // ════════════════════════════════════════
-    // ÍNDICE
+    // SUMÁRIO
     // ════════════════════════════════════════
-    newPage();
+    newPage("Sumário");
+    doc.fillColor(C.primary).font(F.title).fontSize(24)
+      .text("SUMÁRIO", ML, cy, { width: CW, characterSpacing: 4 });
+    cy = doc.y + 6;
+    doc.rect(ML, cy, 60, 3).fill(C.primary);
+    cy += 22;
 
-    // Título "ÍNDICE" centralizado com barra accent
-    doc.rect(ML, cy, CW, 3).fill(C.primary);
-    cy += 14;
-    doc.fillColor(C.primary).font(F.title).fontSize(20)
-      .text("ÍNDICE", ML, cy, { width: CW, align: "center", characterSpacing: 3 });
-    cy = doc.y + 20;
-    doc.rect(ML + CW * 0.3, cy, CW * 0.4, 1).fill(C.primary);
-    cy += 16;
-
-    // Introdução
-    const indiceItens = [{ num: null, nome: "Introdução", sub: "" }];
-    for (let i = 0; i < (conteudo.secoes || []).length; i++) {
-      const s = conteudo.secoes[i];
-      indiceItens.push({ num: String(i + 1).padStart(2, "0"), nome: s.titulo, sub: "" });
-    }
-    indiceItens.push({ num: null, nome: "Conclusão & Próximos Passos", sub: "" });
+    const indiceItens = [{ num: null, nome: "Introdução" }];
+    for (let i = 0; i < (conteudo.secoes || []).length; i++)
+      indiceItens.push({ num: String(i + 1).padStart(2, "0"), nome: conteudo.secoes[i].titulo });
+    indiceItens.push({ num: null, nome: "Conclusão & Próximos Passos" });
 
     for (const item of indiceItens) {
-      if (cy + 26 > CB) newPage();
-      const numTxt = item.num ? `${item.num}.` : "  ";
-      const dotsFill = "·".repeat(60);
-      // Número
-      doc.fillColor(C.primary).font(F.title).fontSize(11)
-        .text(numTxt, ML, cy, { width: 28, lineBreak: false });
-      // Título do capítulo
-      doc.fillColor(TEXT_DARK).font(F.title).fontSize(11)
-        .text(item.nome, ML + 34, cy, { width: CW - 34, lineBreak: false });
-      cy = doc.y + 12;
-
-      // Linha pontilhada separadora leve
+      if (cy + 36 > CB) newPage("Sumário");
+      if (item.num) {
+        doc.rect(ML, cy + 2, 28, 22).fill(C.primary);
+        doc.fillColor("#FFFFFF").font(F.title).fontSize(10)
+          .text(item.num, ML, cy + 7, { width: 28, align: "center" });
+      } else {
+        doc.rect(ML, cy + 2, 28, 22).fill("#EEEEEE");
+        doc.fillColor("#999999").font(F.title).fontSize(10)
+          .text("—", ML, cy + 7, { width: 28, align: "center" });
+      }
+      doc.fillColor(TEXT_DARK).font(F.body).fontSize(12)
+        .text(item.nome, ML + 38, cy + 7, { width: CW - 38 });
+      cy = doc.y + 10;
       doc.save();
-      doc.fillOpacity(0.15).fillColor(C.primary)
-        .rect(ML + 34, cy - 4, CW - 34, 0.8).fill();
+      doc.fillOpacity(0.08);
+      doc.rect(ML + 38, cy - 4, CW - 38, 0.5).fill(C.primary);
       doc.restore();
-      doc.fillOpacity(1);
     }
-    cy += 10;
 
     // ════════════════════════════════════════
     // INTRODUÇÃO
     // ════════════════════════════════════════
-    newPage();
+    newPage("Introdução");
     sectionTitle("Introdução", null);
     writeBody(conteudo.introducao);
 
     // ════════════════════════════════════════
-    // SEÇÕES — fluem na mesma página se houver espaço
+    // SEÇÕES
     // ════════════════════════════════════════
     for (let i = 0; i < (conteudo.secoes || []).length; i++) {
-      const secao = conteudo.secoes[i];
-      newPage(); // cada seção sempre começa em página nova
-      sectionTitle(secao.titulo, String(i + 1).padStart(2, "0"));
+      const secao  = conteudo.secoes[i];
+      const numStr = String(i + 1).padStart(2, "0");
+      newPage(secao.titulo);
+      sectionTitle(secao.titulo, numStr);
       writeBody(secao.conteudo);
       if (secao.destaques?.length) {
         cy += 8;
@@ -596,7 +651,7 @@ async function gerarPDF(config, conteudo) {
     // ════════════════════════════════════════
     // CONCLUSÃO
     // ════════════════════════════════════════
-    newPage(); // conclusão sempre em página própria
+    newPage("Conclusão");
     sectionTitle("Conclusão & Próximos Passos", null);
     writeBody(conteudo.conclusao);
 
@@ -604,18 +659,18 @@ async function gerarPDF(config, conteudo) {
     // SOBRE O AUTOR
     // ════════════════════════════════════════
     if (conteudo.sobre_autor) {
-      if (cy + 110 > CB) newPage();
-      cy += 18;
+      if (cy + 120 > CB) newPage();
+      cy += 20;
       writeDivider();
-      // Box "Sobre o Autor" com fundo branco e borda primária
-      const sobreH = Math.max(76, doc.heightOfString(conteudo.sobre_autor, { width: CW - 32, fontSize: 10 }) + 36);
-      doc.rect(ML, cy, CW, sobreH).fill("#FFFFFF");
-      doc.rect(ML, cy, CW, sobreH).lineWidth(0.5).strokeColor("#DDDDDD").stroke();
+      const sobreText = String(conteudo.sobre_autor);
+      const sobreH    = Math.max(80, doc.heightOfString(sobreText, { width: CW - 36, fontSize: 10.5 }) + 44);
+      doc.rect(ML, cy, CW, sobreH).fill("#F8F8F8");
+      doc.rect(ML, cy, CW, sobreH).lineWidth(0.5).strokeColor("#E0E0E0").stroke();
       doc.rect(ML, cy, 5, sobreH).fill(C.primary);
-      doc.fillColor(C.primary).font(F.title).fontSize(11)
-        .text("Sobre o Autor", ML + 16, cy + 10, { width: CW - 26 });
-      doc.fillColor(TEXT_DARK).font(F.body).fontSize(10)
-        .text(conteudo.sobre_autor, ML + 16, cy + 30, { width: CW - 26, lineGap: 4 });
+      doc.fillColor(C.primary).font(F.title).fontSize(10)
+        .text("SOBRE O AUTOR", ML + 18, cy + 14, { width: CW - 28, characterSpacing: 1 });
+      doc.fillColor(TEXT_DARK).font(F.body).fontSize(10.5)
+        .text(sobreText, ML + 18, cy + 34, { width: CW - 28, lineGap: 4 });
       cy = doc.y + 16;
     }
 
@@ -780,8 +835,8 @@ async function generate(params) {
     formato:   formato || "pdf",
     capaImagem: capaBuffer,
     capaImagemOpacidade,
-    fonteTitulo: fonteTitulo || null,
-    fonteCorpo:  fonteCorpo  || null,
+    fonteTitulo: fonteTitulo || "Poppins",
+    fonteCorpo:  fonteCorpo  || "Poppins",
   };
 
   await progress(90, "Montando PDF...");
