@@ -88,12 +88,35 @@ const FORMATOS = {
   youtube_thumb:      [1280, 720],
 };
 
+// A4 @ 144dpi — qualidade de tela+impressão, embutido em PDFKit a 595×842pt
+const A4_W = 1190;
+const A4_H = 1684;
+
 // Renderiza uma string HTML → Buffer PNG
 async function renderSlide(htmlStr, w = 1080, h = 1080, fonts = null) {
   const vdom = html(htmlStr);
   const svg  = await satori(vdom, { width: w, height: h, fonts: fonts || getFonts() });
   const resvg = new Resvg(svg, { fitTo: { mode: "width", value: w } });
   return resvg.render().asPng();
+}
+
+// Renderiza capa A4 → Buffer PNG (1190×1684 @ 144dpi)
+// config: { temaKey, titulo, subtitulo, autor, tagline, fonteTitulo, fonteCorpo }
+async function renderCover(config = {}) {
+  const { getCoverHTML } = require("./cover_templates");
+  const fonteTitulo = config.fonteTitulo || "Anton";
+  const fonteCorpo  = config.fonteCorpo  || "Poppins";
+  const fonts = getFonts(fonteTitulo, fonteCorpo);
+  const htmlStr = getCoverHTML({
+    temaKey:   config.temaKey   || "produtividade",
+    titulo:    config.titulo    || "",
+    subtitulo: config.subtitulo || "",
+    autor:     config.autor     || "Nexus Digital",
+    tagline:   config.tagline   || "",
+    fontTitle: fonteTitulo,
+    fontBody:  fonteCorpo,
+  });
+  return renderSlide(htmlStr, A4_W, A4_H, fonts);
 }
 
 // Renderiza múltiplos slides em paralelo → array de Buffers PNG
@@ -104,4 +127,4 @@ async function renderCarousel(slides, formato = "instagram_feed", fontes = {}) {
   return Promise.all(slides.map(s => renderSlide(s, w, h, fonts)));
 }
 
-module.exports = { renderSlide, renderCarousel, FORMATOS };
+module.exports = { renderSlide, renderCarousel, renderCover, FORMATOS };

@@ -228,7 +228,26 @@ Idioma: português brasileiro. Tom: direto e prático.`;
 // ──────────────────────────────────────────
 // Gerar PDF — Design profissional v3
 // ──────────────────────────────────────────
-function gerarPDF(config, conteudo) {
+async function gerarPDF(config, conteudo) {
+  // Pré-gera capa via satori quando não há imagem de usuário
+  let coverPng = null;
+  if (!config.capaImagem) {
+    try {
+      const { renderCover } = require("./render_engine");
+      coverPng = await renderCover({
+        temaKey:     config.temaKey     || "produtividade",
+        titulo:      conteudo.capa?.titulo    || config.titulo    || "",
+        subtitulo:   conteudo.capa?.subtitulo || config.subtitulo || "",
+        autor:       config.autor       || "Nexus Digital",
+        tagline:     conteudo.capa?.tagline   || "",
+        fonteTitulo: config.fonteTitulo || "Anton",
+        fonteCorpo:  config.fonteCorpo  || "Poppins",
+      });
+    } catch (e) {
+      console.warn("[capa satori]", e.message);
+    }
+  }
+
   return new Promise((resolve, reject) => {
     const tema = config.tema || THEMES.produtividade;
     const C = config.cores ? { ...tema.colors, ...config.cores } : tema.colors;
@@ -450,46 +469,30 @@ function gerarPDF(config, conteudo) {
     const COV     = C.coverBg || C.secondary || "#1D1D1D";
     const COV_ACC = C.coverAccent || C.accent || C.primary;
 
-    if (config.capaImagem) {
-      // ── CAPA COM IMAGEM: overlay + texto limpo, zero caixas de cor ──
+    if (coverPng) {
+      // ── CAPA SATORI: PNG gerado pelo cover_templates.js ──
+      doc.image(coverPng, 0, 0, { width: W, height: H });
+
+    } else if (config.capaImagem) {
+      // ── CAPA COM IMAGEM DO USUÁRIO: overlay + texto ──
       try {
-        // cover: preenche TODA a página sem bordas, crop centralizado
         doc.image(config.capaImagem, 0, 0, { cover: [W, H], align: "center", valign: "center" });
       } catch (_) {
         doc.rect(0, 0, W, H).fill("#1A1A1A");
       }
-
-      // Overlay geral (escurece a imagem para o texto ficar legível)
-      const opacidade = config.capaImagemOpacidade !== undefined
-        ? config.capaImagemOpacidade : 0.40;
+      const opacidade = config.capaImagemOpacidade !== undefined ? config.capaImagemOpacidade : 0.40;
       doc.save();
       doc.fillOpacity(opacidade).fillColor("#000000").rect(0, 0, W, H).fill();
       doc.restore();
-      doc.fillOpacity(1);
-
-      // Zona inferior com degradê escuro (gradual, sem borda visível)
-      doc.save();
       doc.fillOpacity(0.72).fillColor("#000000").rect(0, H * 0.65, W, H * 0.35).fill();
       doc.restore();
       doc.fillOpacity(1);
-
-      // Barra accent fina no topo
       doc.rect(0, 0, W, 5).fill(COV_ACC);
-
-      // Linha accent antes do título
       doc.rect(ML, H * 0.28, 44, 4).fill(COV_ACC);
-
-      // Título (branco direto sobre imagem escurecida — sem caixa)
       doc.fillColor("#FFFFFF").font(F.title).fontSize(34)
-        .text(conteudo.capa.titulo || config.titulo, ML, H * 0.30,
-          { width: CW, lineGap: 5 });
-
+        .text(conteudo.capa.titulo || config.titulo, ML, H * 0.30, { width: CW, lineGap: 5 });
       const aft = doc.y + 14;
-
-      // Separador
       doc.rect(ML, aft, CW * 0.22, 2).fill(COV_ACC);
-
-      // Subtítulo (branco levemente opaco — sem concatenar hex)
       if (conteudo.capa.subtitulo) {
         doc.save();
         doc.fillOpacity(0.82).fillColor("#FFFFFF").font(F.subtitle).fontSize(13)
@@ -497,17 +500,13 @@ function gerarPDF(config, conteudo) {
         doc.restore();
         doc.fillOpacity(1);
       }
-
-      // Tagline e autor na zona escura inferior
-      if (conteudo.capa.tagline) {
+      if (conteudo.capa.tagline)
         doc.fillColor("#FFFFFF").font(F.body).fontSize(11)
           .text(conteudo.capa.tagline, ML, H * 0.74, { width: CW, align: "center" });
-      }
-      if (config.autor) {
+      if (config.autor)
         doc.fillColor(COV_ACC).font(F.title).fontSize(10)
           .text(config.autor.toUpperCase(), ML, H * 0.82,
             { width: CW, align: "center", characterSpacing: 1.2 });
-      }
       doc.save();
       doc.fillOpacity(0.5).fillColor("#FFFFFF").font(F.body).fontSize(8)
         .text(String(new Date().getFullYear()), ML, H * 0.855, { width: CW, align: "center" });
@@ -515,71 +514,15 @@ function gerarPDF(config, conteudo) {
       doc.fillOpacity(1);
 
     } else {
-      // ── CAPA SEM IMAGEM: design editorial limpo ──
-      const COV_TEXT = C.coverText || "#FFFFFF";
-      const bandH = Math.round(H * 0.17); // faixa inferior 17%
-
-      // Fundo escuro completo
+      // ── FALLBACK: capa PDFKit simples (satori falhou) ──
       doc.rect(0, 0, W, H).fill(COV);
-
-      // Faixa accent inferior
-      doc.rect(0, H - bandH, W, bandH).fill(COV_ACC);
-
-      // Barra accent fina no topo (seis pontos)
       doc.rect(0, 0, W, 6).fill(COV_ACC);
-
-      // Círculo atmosférico — textura, não elemento dominante
-      doc.save();
-      doc.fillOpacity(0.09).fillColor(COV_ACC).circle(W * 0.78, H * 0.33, 240).fill();
-      doc.restore();
-      doc.fillOpacity(1);
-
-      // Segundo anel concentrico mais sutil
-      doc.save();
-      doc.fillOpacity(0.05).fillColor(COV_ACC).circle(W * 0.78, H * 0.33, 170).fill();
-      doc.restore();
-      doc.fillOpacity(1);
-
-      // Linha accent que ancora o título
-      doc.rect(ML, H * 0.22, 52, 4).fill(COV_ACC);
-
-      // Título — posicionado no terço superior, sem caixa
-      doc.fillColor(COV_TEXT).font(F.title).fontSize(38)
-        .text(conteudo.capa.titulo || config.titulo, ML, H * 0.245,
-          { width: CW * 0.72, lineGap: 7 });
-
-      const afterTitle = doc.y + 18;
-
-      // Linha separadora fina
-      doc.rect(ML, afterTitle, CW * 0.25, 2).fill(COV_ACC);
-
-      // Subtítulo
-      if (conteudo.capa.subtitulo) {
-        doc.save();
-        doc.fillOpacity(0.72).fillColor(COV_TEXT).font(F.subtitle).fontSize(13)
-          .text(conteudo.capa.subtitulo, ML, afterTitle + 14, { width: CW * 0.70 });
-        doc.restore();
-        doc.fillOpacity(1);
-      }
-
-      // Tagline na faixa inferior — texto escuro sobre accent
-      if (conteudo.capa.tagline) {
-        doc.fillColor(COV).font(F.body).fontSize(10)
-          .text(conteudo.capa.tagline.toUpperCase(), ML, H - bandH + Math.round(bandH * 0.18),
-            { width: CW, align: "center", characterSpacing: 1.8 });
-      }
-
-      if (config.autor) {
+      doc.rect(0, H * 0.82, W, H * 0.18).fill(COV_ACC);
+      doc.fillColor(C.coverText || "#FFFFFF").font(F.title).fontSize(36)
+        .text(conteudo.capa.titulo || config.titulo, ML, H * 0.28, { width: CW * 0.72 });
+      if (config.autor)
         doc.fillColor(COV).font(F.title).fontSize(11)
-          .text(config.autor.toUpperCase(), ML, H - bandH + Math.round(bandH * 0.45),
-            { width: CW, align: "center", characterSpacing: 2 });
-      }
-      doc.save();
-      doc.fillOpacity(0.55).fillColor(COV).font(F.body).fontSize(8)
-        .text(String(new Date().getFullYear()), ML, H - bandH + Math.round(bandH * 0.72),
-          { width: CW, align: "center" });
-      doc.restore();
-      doc.fillOpacity(1);
+          .text(config.autor.toUpperCase(), ML, H * 0.855, { width: CW, align: "center" });
     }
 
     // ════════════════════════════════════════
