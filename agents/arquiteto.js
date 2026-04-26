@@ -10,7 +10,7 @@ Recebe estratégia e tipo. Responda APENAS em JSON válido:
 }`
 
 async function run({ estrategia, tipo, num_paginas, num_capitulos }) {
-  const model = genai.getGenerativeModel({ model: 'gemini-2.0-flash', systemInstruction: SYSTEM })
+  const model = genai.getGenerativeModel({ model: 'gemini-2.5-flash', systemInstruction: SYSTEM })
   const r = await model.generateContent(`Tipo: ${tipo}\nPáginas: ${num_paginas || 'auto'}\nCapítulos: ${num_capitulos || 'auto'}\nEstratégia: ${JSON.stringify(estrategia)}`)
   return JSON.parse(r.response.text().replace(/```json\n?|\n?```/g, '').trim())
 }

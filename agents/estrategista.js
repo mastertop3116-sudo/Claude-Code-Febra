@@ -17,7 +17,7 @@ Analise nicho, título e avatar. Responda APENAS em JSON válido:
 }`
 
 async function run({ titulo, subtitulo, nicho, avatar_publico, tipo, relatorio = "" }) {
-  const model = genai.getGenerativeModel({ model: 'gemini-2.0-flash', systemInstruction: SYSTEM })
+  const model = genai.getGenerativeModel({ model: 'gemini-2.5-flash', systemInstruction: SYSTEM })
   const contexto = relatorio
     ? `\nRelatório de mercado:\n${relatorio.slice(0, 3000)}`
     : "";

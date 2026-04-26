@@ -19,8 +19,7 @@ const IMAGEN_MODELS = [
   "imagen-3.0-generate-002",
 ];
 const IMAGE_MODELS_FALLBACK = [
-  "gemini-2.0-flash",
-  "gemini-2.0-flash-exp",
+  "gemini-2.0-flash-preview-image-generation",
 ];
 
 // Timeout universal — evita travamentos infinitos
@@ -70,7 +69,7 @@ async function geminiJson(prompt, usePro = false) {
 
 // Nano Banana — geração de imagens
 // Fase 1: tenta Imagen 4 / Imagen 3 via novo SDK @google/genai
-// Fase 2: fallback para gemini-2.0-flash via responseModalities
+// Fase 2: fallback via responseModalities (gemini-2.0-flash-preview-image-generation)
 // Retorna { buffer, mimeType }.
 async function geminiImage(prompt) {
   let ultimoErro = null;
