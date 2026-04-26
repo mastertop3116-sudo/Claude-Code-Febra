@@ -65,6 +65,38 @@ function limparJobsAntigos() {
   }
 }
 
+// POST /api/produto → salva produto + lançamento no Supabase
+app.post("/api/produto", async (req, res) => {
+  try {
+    const { createClient } = require("@supabase/supabase-js");
+    const _supa = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+    const { nome, nicho, publico_alvo, preco, relatorio, telegram_id } = req.body;
+    if (!nome) return res.status(400).json({ error: "nome obrigatório" });
+
+    const { data: produto, error: errP } = await _supa
+      .from("produtos")
+      .insert({ nome, nicho: nicho || null, publico_alvo: publico_alvo || null, preco: preco || null, telegram_id: telegram_id || "web" })
+      .select()
+      .single();
+    if (errP) return res.status(500).json({ error: errP.message });
+
+    let lancamento = null;
+    if (relatorio) {
+      const { data: lanc, error: errL } = await _supa
+        .from("lancamentos")
+        .insert({ produto_id: produto.id, telegram_id: telegram_id || "web", nome, relatorio_texto: relatorio.slice(0, 50000) })
+        .select()
+        .single();
+      if (!errL) lancamento = lanc;
+    }
+
+    res.json({ produto, lancamento });
+  } catch (e) {
+    console.error("[/api/produto]", e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // POST /api/criar → inicia job, retorna jobId imediatamente
 app.post("/api/criar", (req, res) => {
   limparJobsAntigos();

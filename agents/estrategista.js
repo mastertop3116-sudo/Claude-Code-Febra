@@ -16,9 +16,12 @@ Analise nicho, título e avatar. Responda APENAS em JSON válido:
   "tom_de_voz": "autoritativo|empático|educativo|inspirador"
 }`
 
-async function run({ titulo, subtitulo, nicho, avatar_publico, tipo }) {
+async function run({ titulo, subtitulo, nicho, avatar_publico, tipo, relatorio = "" }) {
   const model = genai.getGenerativeModel({ model: 'gemini-2.0-flash', systemInstruction: SYSTEM })
-  const r = await model.generateContent(`Tipo: ${tipo}\nTítulo: ${titulo}\nSubtítulo: ${subtitulo || ''}\nNicho: ${nicho}\nAvatar: ${avatar_publico || ''}`)
+  const contexto = relatorio
+    ? `\nRelatório de mercado:\n${relatorio.slice(0, 3000)}`
+    : "";
+  const r = await model.generateContent(`Tipo: ${tipo}\nTítulo: ${titulo}\nSubtítulo: ${subtitulo || ''}\nNicho: ${nicho}\nAvatar: ${avatar_publico || ''}${contexto}`)
   return JSON.parse(r.response.text().replace(/```json\n?|\n?```/g, '').trim())
 }
 

@@ -397,6 +397,7 @@ async function gerarConteudoRico(config) {
     avatar = "",
     numCapitulos,
     instrucaoMelhoria = "",
+    relatorio = "",
   } = config;
 
   const style = NICHE_STYLES[temaKey] || NICHE_STYLES.produtividade;
@@ -427,9 +428,12 @@ async function gerarConteudoRico(config) {
   } else {
     basePrompt = buildPromptCapitulo(titulo, descricao, avatar, totalCaps, tipo, style);
   }
+  const contextoMercado = relatorio
+    ? `\n\nCONTEXTO DE MERCADO (use para tornar o conteúdo mais preciso e alinhado ao público):\n${relatorio.slice(0, 3000)}`
+    : "";
   const prompt = instrucaoMelhoria
-    ? `${basePrompt}\n\nINSTRUÇÃO DE MELHORIA (aplique obrigatoriamente nesta regeneração):\n${instrucaoMelhoria}`
-    : basePrompt;
+    ? `${basePrompt}${contextoMercado}\n\nINSTRUÇÃO DE MELHORIA (aplique obrigatoriamente nesta regeneração):\n${instrucaoMelhoria}`
+    : `${basePrompt}${contextoMercado}`;
 
   const MAX_TENTATIVAS = 3;
   let ultimoErro = null;

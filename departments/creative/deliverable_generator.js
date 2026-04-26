@@ -707,7 +707,9 @@ async function generate(params) {
     capaImagem, capaImagemOpacidade, formato, cores, fontes,
     fonteTitulo, fonteCorpo, cabecalho, rodape,
     temaKey: temaKeyParam, descricao, paginas, avatar,
+    produto,
   } = params;
+  const relatorio = produto?.relatorio || "";
 
   const progress = typeof onProgress === "function" ? onProgress : () => {};
   const temaKey  = temaKeyParam || tema || "produtividade";
@@ -715,7 +717,7 @@ async function generate(params) {
   const nichoFinal = nicho || descricao || titulo;
 
   await progress(5, "Mapeando mercado...");
-  const estrategia = await estrategista.run({ titulo, subtitulo, nicho: nichoFinal, avatar_publico: avatar_publico || avatar, tipo });
+  const estrategia = await estrategista.run({ titulo, subtitulo, nicho: nichoFinal, avatar_publico: avatar_publico || avatar, tipo, relatorio });
 
   await progress(20, "Estruturando conteúdo...");
   const estrutura = await arquiteto.run({ estrategia, tipo, num_paginas: num_paginas || paginas, num_capitulos });

@@ -545,6 +545,10 @@
   }
   .dna-file-btn:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.22)}
   .dna-chars{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--text-3);margin-left:auto}
+  .dna-save-btn{padding:9px 18px;border-radius:10px;border:1px solid var(--border-hi);background:rgba(255,255,255,.05);color:var(--text);font-size:13px;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s}
+  .dna-save-btn:hover{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.28)}
+  .dna-save-btn:disabled{opacity:.45;cursor:default}
+  .dna-save-status{font-size:12px;color:var(--text-3);font-family:"JetBrains Mono",monospace}
 
   /* ---- carousel content type ---- */
   .ctype-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -781,11 +785,16 @@
             <div class="dna-upload-row" style="margin-top:10px">
               <label class="dna-file-btn" id="dna-file-label">
                 📎 Carregar arquivo
-                <input type="file" id="dna-file-input" accept=".txt,.md,.csv" style="display:none">
+                <input type="file" id="dna-file-input" accept=".txt,.md,.csv,.pdf" style="display:none">
               </label>
-              <span style="font-size:12px;color:var(--text-3)">.txt · .md · .csv aceitos</span>
+              <span style="font-size:12px;color:var(--text-3)">.txt · .md · .csv · .pdf</span>
               <span class="dna-chars" id="dna-chars"></span>
             </div>
+            <div class="dna-upload-row" style="margin-top:12px">
+              <button type="button" class="dna-save-btn" id="dna-save-btn">💾 Salvar produto</button>
+              <span class="dna-save-status" id="dna-save-status"></span>
+            </div>
+            <input type="hidden" id="dna-produto-id" value="">
           </div>
         </div>
       </section>
@@ -2162,23 +2171,80 @@
     document.getElementById(id).addEventListener('input', syncDNA);
   });
 
-  // File upload → textarea
+  // File upload → textarea (com suporte a PDF via pdfjs)
   const dnaFileInput = document.getElementById('dna-file-input');
   const dnaChars     = document.getElementById('dna-chars');
-  dnaFileInput.addEventListener('change', e => {
+
+  async function extractPDFText(file) {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let text = '';
+    const maxPages = Math.min(pdf.numPages, 40);
+    for (let i = 1; i <= maxPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      text += content.items.map(item => item.str).join(' ') + '\n';
+    }
+    return text.trim();
+  }
+
+  dnaFileInput.addEventListener('change', async e => {
     const file = e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const txt = ev.target.result;
+    dnaChars.textContent = 'lendo...';
+    try {
+      let txt;
+      if (file.name.toLowerCase().endsWith('.pdf')) {
+        txt = await extractPDFText(file);
+      } else {
+        txt = await new Promise((res, rej) => {
+          const reader = new FileReader();
+          reader.onload = ev => res(ev.target.result);
+          reader.onerror = rej;
+          reader.readAsText(file, 'UTF-8');
+        });
+      }
       document.getElementById('dna-relatorio').value = txt;
       dnaChars.textContent = txt.length.toLocaleString('pt-BR') + ' chars carregados';
-    };
-    reader.readAsText(file, 'UTF-8');
+    } catch (err) {
+      dnaChars.textContent = '❌ Erro ao ler arquivo';
+    }
     e.target.value = '';
   });
+
   document.getElementById('dna-relatorio').addEventListener('input', function() {
     dnaChars.textContent = this.value.length ? this.value.length.toLocaleString('pt-BR') + ' chars' : '';
+  });
+
+  // Salvar produto no Supabase
+  document.getElementById('dna-save-btn').addEventListener('click', async () => {
+    const nome     = document.getElementById('dna-nome').value.trim();
+    const nicho    = document.getElementById('dna-nicho').value.trim();
+    const publico  = document.getElementById('dna-publico').value.trim();
+    const preco    = document.getElementById('dna-preco').value.trim();
+    const relatorio = document.getElementById('dna-relatorio').value.trim();
+    const btn    = document.getElementById('dna-save-btn');
+    const status = document.getElementById('dna-save-status');
+
+    if (!nome) { status.textContent = '⚠️ Preencha o nome do produto'; return; }
+
+    btn.disabled = true;
+    status.textContent = 'salvando...';
+    try {
+      const r = await fetch('/api/produto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, nicho, publico_alvo: publico, preco, relatorio: relatorio.slice(0, 50000) }),
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || 'Erro desconhecido');
+      document.getElementById('dna-produto-id').value = data.produto.id;
+      status.textContent = `✅ Salvo · ID: ${data.produto.id.slice(0, 8)}…`;
+    } catch (err) {
+      status.textContent = `❌ ${err.message}`;
+    } finally {
+      btn.disabled = false;
+    }
   });
 
   // ---- ctype (carousel content format) ----

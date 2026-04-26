@@ -31,19 +31,21 @@ Implementado nos commits do Carlinhos (`6e039d8`, `a03f38b`):
 
 ## 🟢 Melhorias futuras (próximas sessões)
 
-### 3. DNA de Lançamento — Upload de relatório de mercado
-- Campo de upload de PDF/texto na página `/criar`
-- Parser que extrai insights do relatório e salva em `lancamentos.relatorio_texto`
-- Alimenta automaticamente os agentes roteirista/editor com contexto do lançamento
+### 3. ✅ DNA de Lançamento — Upload de relatório de mercado
+- ✅ Upload de PDF/txt/md/csv na página `/criar` (extração de texto via pdfjs)
+- ✅ `POST /api/produto` salva em `produtos` + `lancamentos.relatorio_texto`
+- ✅ `relatorio` injetado nos agentes: estrategista e content_specialist
+- ✅ Botão "Salvar produto" com feedback de ID no painel web
 
 ### 4. Wizard de produto (para usuários sem relatório)
 - Fluxo guiado: nome do produto → nicho → público → benefício → preço
 - O próprio sistema pesquisa mercado (agente `pesquisarMercado` já existe)
 - Salva resultado em `produtos` e `lancamentos` no Supabase
 
-### 6. Comando `/roteiro` com produto do Supabase
-- Atualmente o `/roteiro` no Telegram recebe dados inline (nome|nicho|modo...)
-- Permitir `/roteiro [produto_id]` para buscar dados salvos na tabela `produtos`
+### 6. ✅ Comando `/roteiro` com produto do Supabase
+- ✅ `/roteiro [uuid]` busca produto direto da tabela `produtos`
+- ✅ `/produtos` lista os produtos salvos do usuário com IDs
+- ✅ Modo inline (`nome|nicho|modo|plataforma|duracao`) mantido como fallback
 
 ### 8. ✅ Preview fiel à capa do entregável (`b06e570`)
 - `pdfjs-dist` 3.11 via CDN renderiza a página 1 do PDF gerado num `<canvas>` no overlay de sucesso

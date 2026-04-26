@@ -293,15 +293,18 @@ module.exports = function registerHandlers(bot) {
   // /criar com FOTO — envia foto com legenda: /criar ebook "Título" tema
   // A imagem vira o wallpaper da capa + cores extraídas automaticamente
 
-  // /roteiro [nome] | [nicho] | [modo] | [plataforma] | [duracao]
+  // /roteiro [produto_id] ou /roteiro [nome] | [nicho] | [modo] | [plataforma] | [duracao]
   bot.onText(/\/roteiro(.*)/, async (msg, match) => {
     if (!isAuthorized(msg.chat.id)) return deny(bot, msg.chat.id);
     const args = (match[1] || "").trim();
+    const { supabase } = require("../integrations/supabase");
 
     if (!args) {
       return bot.sendMessage(msg.chat.id,
         `*GERADOR DE ROTEIRO*\n\n` +
-        `Uso: \`/roteiro [nome] | [nicho] | [modo] | [plataforma] | [duracao]\`\n\n` +
+        `*Opção 1 — por ID salvo:*\n\`/roteiro [produto_id]\`\n` +
+        `Use /produtos para ver seus produtos salvos.\n\n` +
+        `*Opção 2 — inline:*\n\`/roteiro [nome] | [nicho] | [modo] | [plataforma] | [duracao]\`\n\n` +
         `*Modos:* venda, engajamento, autoridade, vsl\n` +
         `*Plataformas:* reels, tiktok, shorts\n` +
         `*Duração:* ultra_curto, curto, medio, vsl\n\n` +
@@ -311,24 +314,40 @@ module.exports = function registerHandlers(bot) {
       );
     }
 
-    const partes = args.split("|").map(p => p.trim());
-    const nome      = partes[0] || "Produto";
-    const nicho     = partes[1] || "desenvolvimento pessoal";
-    const modo      = partes[2] || "venda";
-    const plataforma = partes[3] || "reels";
-    const duracao   = partes[4] || "curto";
+    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    let produto, modo, plataforma, duracao;
 
-    const produto = { nome, nicho, tipo: "entregavel digital", publico_alvo: nicho, beneficio_principal: nicho, preco: "link na bio" };
+    if (UUID_RE.test(args)) {
+      // — busca produto pelo ID salvo no Supabase
+      const { data, error } = await supabase.from("produtos").select("*").eq("id", args).single();
+      if (error || !data) {
+        return bot.sendMessage(msg.chat.id, `❌ Produto \`${args}\` não encontrado.`, { parse_mode: "Markdown" });
+      }
+      produto    = data;
+      modo       = "venda";
+      plataforma = "reels";
+      duracao    = "curto";
+    } else {
+      // — inline: nome | nicho | modo | plataforma | duracao
+      const partes = args.split("|").map(p => p.trim());
+      const nome   = partes[0] || "Produto";
+      const nicho  = partes[1] || "desenvolvimento pessoal";
+      modo         = partes[2] || "venda";
+      plataforma   = partes[3] || "reels";
+      duracao      = partes[4] || "curto";
+      produto      = { nome, nicho, tipo: "entregavel digital", publico_alvo: nicho, beneficio_principal: nicho, preco: "link na bio" };
+    }
 
+    const nomeProduto = produto.nome || "Produto";
     const barraFn = (pct) => "█".repeat(Math.round(pct / 10)) + "░".repeat(10 - Math.round(pct / 10));
     const progressMsg = await bot.sendMessage(msg.chat.id,
-      `⚙️ *Gerando roteiro para "${nome}"*\n\`[${barraFn(0)}] 0%\`\n_Iniciando..._`,
+      `⚙️ *Gerando roteiro para "${nomeProduto}"*\n\`[${barraFn(0)}] 0%\`\n_Iniciando..._`,
       { parse_mode: "Markdown" }
     );
     const editProgress = async (pct, etapa) => {
       try {
         await bot.editMessageText(
-          `⚙️ *Gerando roteiro para "${nome}"*\n\`[${barraFn(pct)}] ${pct}%\`\n_${etapa}_`,
+          `⚙️ *Gerando roteiro para "${nomeProduto}"*\n\`[${barraFn(pct)}] ${pct}%\`\n_${etapa}_`,
           { chat_id: msg.chat.id, message_id: progressMsg.message_id, parse_mode: "Markdown" }
         );
       } catch (_) {}
@@ -351,7 +370,7 @@ module.exports = function registerHandlers(bot) {
       ).join("\n\n");
 
       const texto =
-        `✅ *ROTEIRO — ${roteiro.titulo || nome}*\n\n` +
+        `✅ *ROTEIRO — ${roteiro.titulo || nomeProduto}*\n\n` +
         `📱 ${(roteiro.plataforma || plataforma).toUpperCase()} | ${roteiro.formato || ""} | ${roteiro.duracao_estimada || ""}\n` +
         `🎯 Modo: ${modo} | Framework: ${roteiro.framework || ""}\n\n` +
         `${blocos}\n\n` +
@@ -368,6 +387,42 @@ module.exports = function registerHandlers(bot) {
         chat_id: msg.chat.id, message_id: progressMsg.message_id,
       }).catch(() => bot.sendMessage(msg.chat.id, `❌ Erro: ${e.message}`));
     }
+  });
+
+  // /produtos — lista produtos salvos do usuário
+  bot.onText(/\/produtos/, async (msg) => {
+    if (!isAuthorized(msg.chat.id)) return deny(bot, msg.chat.id);
+    const { supabase } = require("../integrations/supabase");
+    const telegramId = String(msg.chat.id);
+
+    const { data, error } = await supabase
+      .from("produtos")
+      .select("id, nome, nicho, preco, created_at")
+      .eq("telegram_id", telegramId)
+      .order("created_at", { ascending: false })
+      .limit(10);
+
+    if (error) return bot.sendMessage(msg.chat.id, `❌ Erro ao buscar produtos: ${error.message}`);
+    if (!data || data.length === 0) {
+      return bot.sendMessage(msg.chat.id,
+        `📦 *Nenhum produto salvo ainda.*\n\nUse o painel web para cadastrar produtos.`,
+        { parse_mode: "Markdown" }
+      );
+    }
+
+    const lista = data.map((p, i) => {
+      const data_br = new Date(p.created_at).toLocaleDateString("pt-BR");
+      return `*${i + 1}. ${p.nome}*\n` +
+             `   Nicho: ${p.nicho || "–"} | Preço: ${p.preco || "–"}\n` +
+             `   ID: \`${p.id}\`\n` +
+             `   📅 ${data_br}`;
+    }).join("\n\n");
+
+    await bot.sendMessage(msg.chat.id,
+      `📦 *SEUS PRODUTOS* (${data.length})\n\n${lista}\n\n` +
+      `Para gerar roteiro: /roteiro [ID]`,
+      { parse_mode: "Markdown" }
+    );
   });
 
   bot.onText(/\/status/, (msg) => {
