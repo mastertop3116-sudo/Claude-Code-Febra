@@ -4,7 +4,12 @@
 // ============================================
 
 const PDFDocument = require("pdfkit");
-const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = require("docx");
+const {
+  Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType,
+  Table, TableRow, TableCell, Header, Footer, PageNumber,
+  BorderStyle, WidthType, ShadingType, LevelFormat,
+  PageBreak, TableOfContents, ImageRun,
+} = require("docx");
 const { geminiJson, geminiFlash, geminiImage } = require("../../integrations/gemini");
 const { gerarConteudoRico } = require("./content_specialist");
 const THEMES = require("./themes");
@@ -679,73 +684,385 @@ async function gerarPDF(config, conteudo) {
 }
 
 // ──────────────────────────────────────────
-// Gerar DOCX
+// Gerar DOCX — versão profissional com tema visual completo
 // ──────────────────────────────────────────
 async function gerarDOCX(config, conteudo) {
-  const tema = config.tema || THEMES.produtividade;
-  const children = [];
+  const cores  = config.cores  || {};
+  const fontes = config.fontes || {};
 
-  const hexColor = (hex) => hex.replace("#", "");
+  // Cores do tema — strip '#' para docx
+  const hex  = (c) => (c || "#2563EB").replace("#", "");
+  const cPrimary  = hex(cores.primary  || "#2563EB");
+  const cAccent   = hex(cores.accent   || "#F59E0B");
+  const cBg       = hex(cores.background || "#FFFFFF");
+  const cCoverBg  = hex(cores.coverBg  || cores.secondary || "#1D2D50");
 
-  // Capa
-  children.push(
+  // Fontes
+  const fTitulo = config.fonteTitulo || fontes.titulo || "Calibri";
+  const fCorpo  = config.fonteCorpo  || fontes.corpo  || "Calibri";
+
+  // Tamanhos DXA (A4: 11906 x 16838, margens 1134 = 2cm)
+  const PAGE_W   = 11906;
+  const MARGIN   = 1134;
+  const CONTENT  = PAGE_W - MARGIN * 2;  // 9638 DXA
+
+  // Borda decorativa para callouts
+  const calloutBorder = (color) => ({
+    top:    { style: BorderStyle.SINGLE, size: 1, color },
+    bottom: { style: BorderStyle.SINGLE, size: 1, color },
+    right:  { style: BorderStyle.SINGLE, size: 1, color },
+    left:   { style: BorderStyle.THICK,  size: 8, color },
+  });
+
+  // Helper: parágrafo de corpo com fonte configurada
+  const bodyPara = (text, opts = {}) => new Paragraph({
+    spacing: { before: 80, after: 180, line: 300, lineRule: "auto" },
+    ...opts,
+    children: [new TextRun({
+      text: text || "",
+      font: fCorpo,
+      size: 24,  // 12pt
+      ...(opts.runOpts || {}),
+    })],
+  });
+
+  // Helper: linha separadora fina com cor do tema
+  const divider = () => new Paragraph({
+    spacing: { before: 120, after: 120 },
+    border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: cPrimary, space: 1 } },
+    children: [],
+  });
+
+  // Processa texto de seção — quebra em parágrafos por '\n'
+  const textoParagrafos = (texto, opts = {}) => {
+    if (!texto) return [];
+    return texto.split(/\n+/).filter(t => t.trim()).map(t => bodyPara(t.trim(), opts));
+  };
+
+  // Callout box com destaque lateral
+  const calloutBox = (texto, color = cAccent) => new Table({
+    width: { size: CONTENT, type: WidthType.DXA },
+    columnWidths: [CONTENT],
+    borders: {
+      top:    { style: BorderStyle.NONE },
+      bottom: { style: BorderStyle.NONE },
+      left:   { style: BorderStyle.NONE },
+      right:  { style: BorderStyle.NONE },
+      insideH:{ style: BorderStyle.NONE },
+      insideV:{ style: BorderStyle.NONE },
+    },
+    rows: [
+      new TableRow({
+        children: [
+          new TableCell({
+            width: { size: CONTENT, type: WidthType.DXA },
+            borders: calloutBorder(color),
+            shading: { fill: cBg === "FFFFFF" ? "F8F9FA" : cBg, type: ShadingType.CLEAR },
+            margins: { top: 100, bottom: 100, left: 200, right: 120 },
+            children: [new Paragraph({
+              spacing: { before: 60, after: 60 },
+              children: [new TextRun({ text: texto || "", font: fCorpo, size: 22, italics: true })],
+            })],
+          }),
+        ],
+      }),
+    ],
+  });
+
+  // ── PÁGINA DE CAPA ────────────────────────────────────────────────────────
+  const capaTitulo    = conteudo.capa?.titulo    || config.titulo    || "Entregável";
+  const capaSubtitulo = conteudo.capa?.subtitulo || config.subtitulo || "";
+  const capaTagline   = conteudo.capa?.tagline   || "";
+  const autorNome     = config.autor || "";
+
+  const coverChildren = [
+    // Espaço superior
+    new Paragraph({ spacing: { before: 1800, after: 0 }, children: [] }),
+
+    // Barra decorativa de cor — simulada como borda bottom em parágrafo vazio
     new Paragraph({
-      text: conteudo.capa.titulo || config.titulo,
-      heading: HeadingLevel.TITLE,
-      alignment: AlignmentType.CENTER,
-      spacing: { before: 800, after: 200 },
+      spacing: { before: 0, after: 0 },
+      border: { bottom: { style: BorderStyle.THICK, size: 40, color: cAccent, space: 1 } },
+      children: [],
     }),
+
+    new Paragraph({ spacing: { before: 400, after: 0 }, children: [] }),
+
+    // Título principal
     new Paragraph({
-      children: [new TextRun({ text: conteudo.capa.subtitulo || "", italics: true, size: 28 })],
-      alignment: AlignmentType.CENTER,
-      spacing: { after: 200 },
+      alignment: AlignmentType.LEFT,
+      spacing: { before: 0, after: 200 },
+      children: [new TextRun({
+        text: capaTitulo,
+        font: fTitulo,
+        size: 72,
+        bold: true,
+        color: cPrimary,
+      })],
     }),
+
+    // Subtítulo
+    ...(capaSubtitulo ? [new Paragraph({
+      alignment: AlignmentType.LEFT,
+      spacing: { before: 0, after: 300 },
+      children: [new TextRun({
+        text: capaSubtitulo,
+        font: fCorpo,
+        size: 32,
+        color: "555555",
+        italics: true,
+      })],
+    })] : []),
+
+    // Tagline / copy da capa
+    ...(capaTagline ? [new Paragraph({
+      alignment: AlignmentType.LEFT,
+      spacing: { before: 200, after: 400 },
+      children: [new TextRun({
+        text: capaTagline,
+        font: fCorpo,
+        size: 24,
+        color: "777777",
+      })],
+    })] : []),
+
+    new Paragraph({ spacing: { before: 800, after: 0 }, children: [] }),
+
+    // Barra inferior + autor
     new Paragraph({
-      children: [new TextRun({ text: config.autor || "", size: 22 })],
-      alignment: AlignmentType.CENTER,
-      spacing: { after: 800 },
+      spacing: { before: 0, after: 0 },
+      border: { top: { style: BorderStyle.SINGLE, size: 6, color: cPrimary, space: 4 } },
+      children: [new TextRun({
+        text: autorNome ? `Por ${autorNome}` : "",
+        font: fCorpo,
+        size: 24,
+        bold: true,
+        color: cPrimary,
+      })],
     }),
-    new Paragraph({ text: "", pageBreakBefore: true }),
-  );
+
+    // Quebra de página
+    new Paragraph({ children: [new PageBreak()] }),
+  ];
+
+  // ── SUMÁRIO ───────────────────────────────────────────────────────────────
+  const tocChildren = [
+    new Paragraph({
+      heading: HeadingLevel.HEADING_1,
+      spacing: { before: 0, after: 200 },
+      children: [new TextRun({ text: "Sumário", font: fTitulo, size: 36, bold: true, color: cPrimary })],
+    }),
+    new TableOfContents("Sumário", {
+      hyperlink: true,
+      headingStyleRange: "1-2",
+    }),
+    new Paragraph({ children: [new PageBreak()] }),
+  ];
+
+  // ── CONTEÚDO PRINCIPAL ───────────────────────────────────────────────────
+  const mainChildren = [];
 
   // Introdução
-  children.push(
-    new Paragraph({ text: "Introdução", heading: HeadingLevel.HEADING_1 }),
-    new Paragraph({ text: conteudo.introducao || "", spacing: { after: 200 } }),
-    new Paragraph({ text: "", pageBreakBefore: true }),
+  mainChildren.push(
+    new Paragraph({
+      heading: HeadingLevel.HEADING_1,
+      spacing: { before: 0, after: 240 },
+      children: [new TextRun({ text: "Introdução", font: fTitulo, size: 36, bold: true, color: cPrimary })],
+    }),
+    divider(),
+    ...textoParagrafos(conteudo.introducao),
+    new Paragraph({ children: [new PageBreak()] }),
   );
 
   // Seções
-  for (const secao of (conteudo.secoes || [])) {
-    children.push(
-      new Paragraph({ text: secao.titulo, heading: HeadingLevel.HEADING_1 }),
-      new Paragraph({ text: secao.conteudo || "", spacing: { after: 200 } }),
+  for (const [i, secao] of (conteudo.secoes || []).entries()) {
+    // Número da seção
+    mainChildren.push(
+      new Paragraph({
+        spacing: { before: 0, after: 40 },
+        children: [new TextRun({
+          text: `CAPÍTULO ${String(i + 1).padStart(2, "0")}`,
+          font: fTitulo, size: 18, bold: true,
+          color: cAccent, allCaps: true,
+        })],
+      }),
+      new Paragraph({
+        heading: HeadingLevel.HEADING_1,
+        spacing: { before: 0, after: 240 },
+        children: [new TextRun({ text: secao.titulo || "", font: fTitulo, size: 36, bold: true, color: cPrimary })],
+      }),
+      divider(),
     );
-    for (const d of (secao.destaques || [])) {
-      children.push(new Paragraph({
-        children: [new TextRun({ text: `▸ ${d}`, bold: true })],
-        spacing: { before: 100, after: 100 },
-      }));
+
+    // Corpo da seção (split por \n)
+    mainChildren.push(...textoParagrafos(secao.conteudo));
+
+    // Destaques como callouts individuais
+    if (secao.destaques?.length) {
+      mainChildren.push(new Paragraph({ spacing: { before: 200, after: 100 }, children: [] }));
+      for (const destaque of secao.destaques) {
+        mainChildren.push(calloutBox(destaque, cAccent));
+        mainChildren.push(new Paragraph({ spacing: { before: 80, after: 0 }, children: [] }));
+      }
     }
-    children.push(new Paragraph({ text: "", pageBreakBefore: true }));
+
+    mainChildren.push(new Paragraph({ children: [new PageBreak()] }));
   }
 
   // Conclusão
-  children.push(
-    new Paragraph({ text: "Conclusão & Próximos Passos", heading: HeadingLevel.HEADING_1 }),
-    new Paragraph({ text: conteudo.conclusao || "", spacing: { after: 200 } }),
+  mainChildren.push(
+    new Paragraph({
+      heading: HeadingLevel.HEADING_1,
+      spacing: { before: 0, after: 240 },
+      children: [new TextRun({ text: "Conclusão & Próximos Passos", font: fTitulo, size: 36, bold: true, color: cPrimary })],
+    }),
+    divider(),
+    ...textoParagrafos(conteudo.conclusao),
   );
 
-  // Sobre o autor
-  if (conteudo.sobre_autor) {
-    children.push(
-      new Paragraph({ text: "Sobre o Autor", heading: HeadingLevel.HEADING_2, spacing: { before: 400 } }),
-      new Paragraph({ text: conteudo.sobre_autor }),
+  // Sobre o Autor
+  if (autorNome || conteudo.sobre_autor) {
+    mainChildren.push(
+      new Paragraph({ children: [new PageBreak()] }),
+      new Paragraph({
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 0, after: 200 },
+        children: [new TextRun({ text: "Sobre o Autor", font: fTitulo, size: 30, bold: true, color: cPrimary })],
+      }),
+      divider(),
+      new Table({
+        width: { size: CONTENT, type: WidthType.DXA },
+        columnWidths: [CONTENT],
+        borders: {
+          top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE },
+          left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE },
+          insideH: { style: BorderStyle.NONE }, insideV: { style: BorderStyle.NONE },
+        },
+        rows: [
+          new TableRow({
+            children: [
+              new TableCell({
+                width: { size: CONTENT, type: WidthType.DXA },
+                shading: { fill: "F8F9FA", type: ShadingType.CLEAR },
+                borders: {
+                  top:    { style: BorderStyle.THICK, size: 6, color: cPrimary },
+                  bottom: { style: BorderStyle.SINGLE, size: 2, color: "DDDDDD" },
+                  left:   { style: BorderStyle.SINGLE, size: 2, color: "DDDDDD" },
+                  right:  { style: BorderStyle.SINGLE, size: 2, color: "DDDDDD" },
+                },
+                margins: { top: 200, bottom: 200, left: 240, right: 240 },
+                children: [
+                  new Paragraph({
+                    spacing: { before: 40, after: 80 },
+                    children: [new TextRun({ text: autorNome, font: fTitulo, size: 28, bold: true, color: cPrimary })],
+                  }),
+                  ...textoParagrafos(conteudo.sobre_autor || ""),
+                ],
+              }),
+            ],
+          }),
+        ],
+      }),
     );
   }
 
+  // ── CABEÇALHO & RODAPÉ ───────────────────────────────────────────────────
+  const cabAtivo = config.cabecalho?.ativo !== false;
+  const rodAtivo = config.rodape?.ativo    !== false;
+  const cabTexto = config.cabecalho?.texto || autorNome || config.titulo || "";
+  const rodTexto = config.rodape?.texto    || "";
+
+  const headerSection = cabAtivo ? {
+    default: new Header({
+      children: [
+        new Paragraph({
+          alignment: AlignmentType.RIGHT,
+          border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: cPrimary, space: 4 } },
+          spacing: { before: 0, after: 120 },
+          children: [new TextRun({ text: cabTexto, font: fCorpo, size: 18, color: "888888" })],
+        }),
+      ],
+    }),
+  } : {};
+
+  const footerSection = rodAtivo ? {
+    default: new Footer({
+      children: [
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          border: { top: { style: BorderStyle.SINGLE, size: 4, color: cPrimary, space: 4 } },
+          spacing: { before: 120, after: 0 },
+          children: [
+            ...(rodTexto ? [new TextRun({ text: `${rodTexto}  ·  `, font: fCorpo, size: 16, color: "AAAAAA" })] : []),
+            new TextRun({ children: [PageNumber.CURRENT], font: fCorpo, size: 16, color: cPrimary, bold: true }),
+          ],
+        }),
+      ],
+    }),
+  } : {};
+
+  // ── MONTAR DOCUMENTO ─────────────────────────────────────────────────────
   const doc = new Document({
-    sections: [{ properties: {}, children }],
+    styles: {
+      default: {
+        document: { run: { font: fCorpo, size: 24, color: "333333" } },
+      },
+      paragraphStyles: [
+        {
+          id: "Heading1", name: "Heading 1",
+          basedOn: "Normal", next: "Normal", quickFormat: true,
+          run: { size: 36, bold: true, font: fTitulo, color: cPrimary },
+          paragraph: { spacing: { before: 360, after: 240 }, outlineLevel: 0 },
+        },
+        {
+          id: "Heading2", name: "Heading 2",
+          basedOn: "Normal", next: "Normal", quickFormat: true,
+          run: { size: 30, bold: true, font: fTitulo, color: cPrimary },
+          paragraph: { spacing: { before: 280, after: 180 }, outlineLevel: 1 },
+        },
+      ],
+    },
+    numbering: {
+      config: [
+        {
+          reference: "bullets",
+          levels: [{
+            level: 0,
+            format: LevelFormat.BULLET,
+            text: "•",
+            alignment: AlignmentType.LEFT,
+            style: {
+              run: { font: "Arial", color: cAccent, bold: true },
+              paragraph: { indent: { left: 720, hanging: 360 }, spacing: { before: 60, after: 60 } },
+            },
+          }],
+        },
+      ],
+    },
+    sections: [
+      // Seção 1 — Capa (sem header/footer)
+      {
+        properties: {
+          page: {
+            size: { width: PAGE_W, height: 16838 },
+            margin: { top: MARGIN, right: MARGIN, bottom: MARGIN, left: MARGIN },
+          },
+        },
+        children: coverChildren,
+      },
+      // Seção 2 — Sumário + Conteúdo (com header/footer)
+      {
+        properties: {
+          page: {
+            size: { width: PAGE_W, height: 16838 },
+            margin: { top: 1440, right: MARGIN, bottom: 1440, left: MARGIN },
+          },
+        },
+        headers: headerSection,
+        footers: footerSection,
+        children: [...tocChildren, ...mainChildren],
+      },
+    ],
   });
 
   return Packer.toBuffer(doc);
