@@ -716,7 +716,7 @@ async function gerarDOCX(config, conteudo) {
 
   // Helper: parágrafo de corpo com fonte configurada
   const bodyPara = (text, opts = {}) => new Paragraph({
-    spacing: { before: 80, after: 180, line: 300, lineRule: "auto" },
+    spacing: { before: 0, after: 220, line: 336, lineRule: "auto" },
     ...opts,
     children: [new TextRun({
       text: text || "",
@@ -776,26 +776,24 @@ async function gerarDOCX(config, conteudo) {
   const autorNome     = config.autor || "";
 
   const coverChildren = [
-    // Espaço superior
-    new Paragraph({ spacing: { before: 1800, after: 0 }, children: [] }),
-
-    // Barra decorativa de cor — simulada como borda bottom em parágrafo vazio
+    // Barra accent no topo da capa
     new Paragraph({
       spacing: { before: 0, after: 0 },
-      border: { bottom: { style: BorderStyle.THICK, size: 40, color: cAccent, space: 1 } },
+      border: { bottom: { style: BorderStyle.THICK, size: 48, color: cAccent, space: 1 } },
       children: [],
     }),
 
-    new Paragraph({ spacing: { before: 400, after: 0 }, children: [] }),
+    // Espaço proporcional antes do título (~30% da altura da página)
+    new Paragraph({ spacing: { before: 3200, after: 0 }, children: [] }),
 
-    // Título principal
+    // Título principal — grande, ocupa espaço
     new Paragraph({
       alignment: AlignmentType.LEFT,
-      spacing: { before: 0, after: 200 },
+      spacing: { before: 0, after: 240 },
       children: [new TextRun({
         text: capaTitulo,
         font: fTitulo,
-        size: 72,
+        size: 80,
         bold: true,
         color: cPrimary,
       })],
@@ -804,7 +802,7 @@ async function gerarDOCX(config, conteudo) {
     // Subtítulo
     ...(capaSubtitulo ? [new Paragraph({
       alignment: AlignmentType.LEFT,
-      spacing: { before: 0, after: 300 },
+      spacing: { before: 0, after: 320 },
       children: [new TextRun({
         text: capaSubtitulo,
         font: fCorpo,
@@ -814,34 +812,48 @@ async function gerarDOCX(config, conteudo) {
       })],
     })] : []),
 
-    // Tagline / copy da capa
+    // Tagline
     ...(capaTagline ? [new Paragraph({
       alignment: AlignmentType.LEFT,
-      spacing: { before: 200, after: 400 },
+      spacing: { before: 0, after: 0 },
       children: [new TextRun({
         text: capaTagline,
         font: fCorpo,
         size: 24,
-        color: "777777",
+        color: "888888",
       })],
     })] : []),
 
-    new Paragraph({ spacing: { before: 800, after: 0 }, children: [] }),
+    // Empurra o autor para baixo (~35% de altura restante)
+    new Paragraph({ spacing: { before: 3600, after: 0 }, children: [] }),
 
-    // Barra inferior + autor
+    // Linha + autor na base da capa
     new Paragraph({
-      spacing: { before: 0, after: 0 },
-      border: { top: { style: BorderStyle.SINGLE, size: 6, color: cPrimary, space: 4 } },
+      spacing: { before: 0, after: 120 },
+      border: { top: { style: BorderStyle.SINGLE, size: 6, color: cPrimary, space: 6 } },
       children: [new TextRun({
         text: autorNome ? `Por ${autorNome}` : "",
         font: fCorpo,
-        size: 24,
+        size: 26,
         bold: true,
         color: cPrimary,
       })],
     }),
 
-    // Quebra de página
+    // Tipo do entregável
+    new Paragraph({
+      alignment: AlignmentType.LEFT,
+      spacing: { before: 0, after: 0 },
+      children: [new TextRun({
+        text: (config.tipo || "ebook").toUpperCase().replace("_", " "),
+        font: fCorpo,
+        size: 18,
+        color: "AAAAAA",
+        allCaps: true,
+      })],
+    }),
+
+    // Quebra para próxima seção
     new Paragraph({ children: [new PageBreak()] }),
   ];
 
@@ -862,23 +874,23 @@ async function gerarDOCX(config, conteudo) {
   // ── CONTEÚDO PRINCIPAL ───────────────────────────────────────────────────
   const mainChildren = [];
 
-  // Introdução
+  // Introdução — sem PageBreak forçado, flui para o próximo capítulo
   mainChildren.push(
     new Paragraph({
       heading: HeadingLevel.HEADING_1,
-      spacing: { before: 0, after: 240 },
+      spacing: { before: 0, after: 160 },
       children: [new TextRun({ text: "Introdução", font: fTitulo, size: 36, bold: true, color: cPrimary })],
     }),
     divider(),
     ...textoParagrafos(conteudo.introducao),
-    new Paragraph({ children: [new PageBreak()] }),
   );
 
-  // Seções
+  // Seções — quebra de página ANTES do capítulo (não depois do conteúdo)
   for (const [i, secao] of (conteudo.secoes || []).entries()) {
-    // Número da seção
     mainChildren.push(
+      // Label de capítulo — sempre inicia nova página
       new Paragraph({
+        pageBreakBefore: true,
         spacing: { before: 0, after: 40 },
         children: [new TextRun({
           text: `CAPÍTULO ${String(i + 1).padStart(2, "0")}`,
@@ -888,32 +900,43 @@ async function gerarDOCX(config, conteudo) {
       }),
       new Paragraph({
         heading: HeadingLevel.HEADING_1,
-        spacing: { before: 0, after: 240 },
+        spacing: { before: 0, after: 160 },
+        keepNext: true,
         children: [new TextRun({ text: secao.titulo || "", font: fTitulo, size: 36, bold: true, color: cPrimary })],
       }),
       divider(),
     );
 
-    // Corpo da seção (split por \n)
+    // Corpo da seção
     mainChildren.push(...textoParagrafos(secao.conteudo));
 
-    // Destaques como callouts individuais
+    // Destaques — callouts logo após o conteúdo, sem espaço extra vazio
     if (secao.destaques?.length) {
-      mainChildren.push(new Paragraph({ spacing: { before: 200, after: 100 }, children: [] }));
       for (const destaque of secao.destaques) {
-        mainChildren.push(calloutBox(destaque, cAccent));
-        mainChildren.push(new Paragraph({ spacing: { before: 80, after: 0 }, children: [] }));
+        mainChildren.push(
+          new Paragraph({ spacing: { before: 160, after: 0 }, children: [] }),
+          calloutBox(destaque, cAccent),
+          new Paragraph({ spacing: { before: 80, after: 0 }, children: [] }),
+        );
       }
     }
-
-    mainChildren.push(new Paragraph({ children: [new PageBreak()] }));
+    // SEM PageBreak depois — conteúdo flui naturalmente
   }
 
-  // Conclusão
+  // Conclusão — nova página antes, conteúdo flui
   mainChildren.push(
     new Paragraph({
+      pageBreakBefore: true,
+      spacing: { before: 0, after: 160 },
+      children: [new TextRun({
+        text: "ENCERRAMENTO",
+        font: fTitulo, size: 18, bold: true, color: cAccent, allCaps: true,
+      })],
+    }),
+    new Paragraph({
       heading: HeadingLevel.HEADING_1,
-      spacing: { before: 0, after: 240 },
+      spacing: { before: 0, after: 160 },
+      keepNext: true,
       children: [new TextRun({ text: "Conclusão & Próximos Passos", font: fTitulo, size: 36, bold: true, color: cPrimary })],
     }),
     divider(),
