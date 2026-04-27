@@ -739,6 +739,58 @@ async function gerarDOCX(config, conteudo) {
     return texto.split(/\n+/).filter(t => t.trim()).map(t => bodyPara(t.trim(), opts));
   };
 
+  // Parseia markdown inline (bold) → array de TextRun
+  const parseInlineMd = (text, size = 24, color = "333333", italic = false) => {
+    const runs = [];
+    const regex = /\*\*([^*]+)\*\*/g;
+    let last = 0, m;
+    while ((m = regex.exec(text)) !== null) {
+      if (m.index > last) runs.push(new TextRun({ text: text.slice(last, m.index), font: fCorpo, size, color, italics: italic }));
+      runs.push(new TextRun({ text: m[1], font: fCorpo, size, color, bold: true, italics: italic }));
+      last = regex.lastIndex;
+    }
+    if (last < text.length) runs.push(new TextRun({ text: text.slice(last), font: fCorpo, size, color, italics: italic }));
+    return runs.length ? runs : [new TextRun({ text: text || "", font: fCorpo, size, color, italics: italic })];
+  };
+
+  // Converte markdown em parágrafos DOCX
+  const mdToDocx = (markdown) => {
+    if (!markdown) return [];
+    const paras = [];
+    for (const line of markdown.split("\n")) {
+      const t = line.trim();
+      if (!t) continue;
+      if (/^##+ /.test(t)) {
+        // Subtítulo ## → Heading2 estilizado
+        paras.push(new Paragraph({
+          spacing: { before: 280, after: 100, line: 300, lineRule: "auto" },
+          children: [new TextRun({ text: t.replace(/^##+ /, ""), font: fTitulo, size: 28, bold: true, color: cPrimary })],
+        }));
+      } else if (/^\d+\. /.test(t)) {
+        // Lista numerada
+        paras.push(new Paragraph({
+          numbering: { reference: "numbered", level: 0 },
+          spacing: { before: 80, after: 80 },
+          children: parseInlineMd(t.replace(/^\d+\. /, ""), 24),
+        }));
+      } else if (/^[-*] /.test(t)) {
+        // Lista com bullet
+        paras.push(new Paragraph({
+          numbering: { reference: "bullets", level: 0 },
+          spacing: { before: 60, after: 60 },
+          children: parseInlineMd(t.replace(/^[-*] /, ""), 24),
+        }));
+      } else {
+        // Parágrafo normal com bold inline
+        paras.push(new Paragraph({
+          spacing: { before: 0, after: 220, line: 336, lineRule: "auto" },
+          children: parseInlineMd(t, 24),
+        }));
+      }
+    }
+    return paras;
+  };
+
   // Callout box com destaque lateral
   const calloutBox = (texto, color = cAccent) => new Table({
     width: { size: CONTENT, type: WidthType.DXA },
@@ -907,11 +959,49 @@ async function gerarDOCX(config, conteudo) {
       divider(),
     );
 
-    // Corpo da seção
-    mainChildren.push(...textoParagrafos(secao.conteudo));
+    // Gancho da seção — frase de impacto em destaque antes do conteúdo
+    if (secao.gancho) {
+      mainChildren.push(
+        new Table({
+          width: { size: CONTENT, type: WidthType.DXA },
+          columnWidths: [CONTENT],
+          borders: {
+            top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE },
+            left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE },
+            insideH: { style: BorderStyle.NONE }, insideV: { style: BorderStyle.NONE },
+          },
+          rows: [new TableRow({
+            children: [new TableCell({
+              width: { size: CONTENT, type: WidthType.DXA },
+              borders: {
+                top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE },
+                right: { style: BorderStyle.NONE },
+                left: { style: BorderStyle.THICK, size: 12, color: cPrimary },
+              },
+              shading: { fill: "F5F7FF", type: ShadingType.CLEAR },
+              margins: { top: 140, bottom: 140, left: 240, right: 120 },
+              children: [new Paragraph({
+                spacing: { before: 0, after: 0 },
+                children: [new TextRun({ text: secao.gancho, font: fCorpo, size: 26, italics: true, color: cPrimary })],
+              })],
+            })],
+          })],
+        }),
+        new Paragraph({ spacing: { before: 180, after: 0 }, children: [] }),
+      );
+    }
 
-    // Destaques — callouts logo após o conteúdo, sem espaço extra vazio
-    if (secao.destaques?.length) {
+    // Corpo da seção — markdown rico
+    mainChildren.push(...mdToDocx(secao.conteudo));
+
+    // Ponto de ação — callout de destaque no final da seção
+    if (secao.ponto_de_acao) {
+      mainChildren.push(
+        new Paragraph({ spacing: { before: 200, after: 0 }, children: [] }),
+        calloutBox(`▶ AÇÃO: ${secao.ponto_de_acao}`, cAccent),
+        new Paragraph({ spacing: { before: 80, after: 0 }, children: [] }),
+      );
+    } else if (secao.destaques?.length) {
       for (const destaque of secao.destaques) {
         mainChildren.push(
           new Paragraph({ spacing: { before: 160, after: 0 }, children: [] }),
@@ -940,7 +1030,7 @@ async function gerarDOCX(config, conteudo) {
       children: [new TextRun({ text: "Conclusão & Próximos Passos", font: fTitulo, size: 36, bold: true, color: cPrimary })],
     }),
     divider(),
-    ...textoParagrafos(conteudo.conclusao),
+    ...mdToDocx(conteudo.conclusao),
   );
 
   // Sobre o Autor
@@ -1057,6 +1147,19 @@ async function gerarDOCX(config, conteudo) {
             style: {
               run: { font: "Arial", color: cAccent, bold: true },
               paragraph: { indent: { left: 720, hanging: 360 }, spacing: { before: 60, after: 60 } },
+            },
+          }],
+        },
+        {
+          reference: "numbered",
+          levels: [{
+            level: 0,
+            format: LevelFormat.DECIMAL,
+            text: "%1.",
+            alignment: AlignmentType.LEFT,
+            style: {
+              run: { font: fCorpo, size: 24, color: cAccent, bold: true },
+              paragraph: { indent: { left: 720, hanging: 360 }, spacing: { before: 80, after: 80 } },
             },
           }],
         },
@@ -1196,4 +1299,130 @@ async function generate(params) {
   return { ...resultado, slides };
 }
 
-module.exports = { generate, gerarConteudo, gerarPDF, gerarDOCX, extrairCoresDaImagem, THEMES };
+// ──────────────────────────────────────────
+// Conversor: cria PDF simples a partir de texto/HTML extraído (mammoth)
+// ──────────────────────────────────────────
+async function criarPDFDeTexto(htmlTexto, nomeArquivo) {
+  return new Promise((resolve, reject) => {
+    const doc = new PDFDocument({ size: "A4", margin: 0, autoFirstPage: false,
+      info: { Title: nomeArquivo || "Documento Convertido", Creator: "Nexus MAX" } });
+    const chunks = [];
+    doc.on("data", c => chunks.push(c));
+    doc.on("end", () => resolve(Buffer.concat(chunks)));
+    doc.on("error", reject);
+
+    const W = 595.28, H = 841.89, ML = 56, MR = 56, CW = W - ML - MR;
+    const STRIPE = 6, CAB = 36, CT = STRIPE + CAB + 22, CB = H - 36 - 14;
+    let cy = CT, pageNum = 0;
+
+    function drawPage() {
+      pageNum++;
+      doc.addPage({ size: "A4", margin: 0 });
+      doc.rect(0, 0, W, H).fill("#FFFFFF");
+      doc.rect(0, 0, W, STRIPE).fill("#2563EB");
+      doc.rect(0, STRIPE, W, CAB).fill("#F9F9F9");
+      doc.rect(0, STRIPE + CAB - 0.5, W, 0.5).fill("#E0E0E0");
+      doc.fillColor("#2563EB").font("Helvetica-Bold").fontSize(7.5)
+        .text("NEXUS MAX", ML, STRIPE + 13, { width: CW, characterSpacing: 1.2 });
+      const fy = H - 36;
+      doc.rect(0, fy, W, 36).fill("#F9F9F9");
+      doc.rect(0, fy, W, 0.5).fill("#E0E0E0");
+      doc.rect(0, H - 2, W, 2).fill("#2563EB");
+      const bw = 30, bh = 18, px = W - ML, py = fy + 9;
+      doc.rect(px - bw, py, bw, bh).fill("#2563EB");
+      doc.fillColor("#FFFFFF").font("Helvetica-Bold").fontSize(9)
+        .text(String(pageNum), px - bw, py + 4, { width: bw, align: "center" });
+      cy = CT;
+    }
+
+    // Parse texto com headings simples
+    const linhas = htmlTexto.replace(/<[^>]+>/g, "\n").split(/\n+/).map(l => l.trim()).filter(Boolean);
+    drawPage();
+    for (const linha of linhas) {
+      const isHeading = /^[A-ZÁÀÃÂÊÉÍÓÔÕÚÇÑ\s]{6,}$/.test(linha) && linha.length < 80;
+      const fontSize = isHeading ? 14 : 11;
+      const est = doc.heightOfString(linha, { width: CW, fontSize });
+      if (cy + est + 12 > CB) drawPage();
+      if (isHeading) {
+        cy += 8;
+        doc.fillColor("#2563EB").font("Helvetica-Bold").fontSize(14)
+          .text(linha, ML, cy, { width: CW });
+        cy = doc.y + 10;
+        doc.rect(ML, cy - 4, 48, 2).fill("#2563EB");
+        cy += 4;
+      } else {
+        doc.fillColor("#1A1A1A").font("Helvetica").fontSize(11)
+          .text(linha, ML, cy, { width: CW, lineGap: 4 });
+        cy = doc.y + 8;
+      }
+    }
+    doc.end();
+  });
+}
+
+// ──────────────────────────────────────────
+// Conversor: cria DOCX simples a partir de texto extraído (pdf-parse)
+// ──────────────────────────────────────────
+async function criarDOCXDeTexto(textoPlano, nomeArquivo) {
+  const linhas = textoPlano.split(/\n+/).map(l => l.trim()).filter(l => l.length > 2);
+  const paragrafos = linhas.map(linha => {
+    const isHeading = /^[A-ZÁÀÃÂÊÉÍÓÔÕÚÇÑ\s]{6,}$/.test(linha) && linha.length < 80;
+    if (isHeading) {
+      return new Paragraph({
+        spacing: { before: 280, after: 120 },
+        children: [new TextRun({ text: linha, font: "Calibri", size: 32, bold: true, color: "2563EB" })],
+      });
+    }
+    return new Paragraph({
+      spacing: { before: 0, after: 200, line: 320, lineRule: "auto" },
+      children: [new TextRun({ text: linha, font: "Calibri", size: 22, color: "333333" })],
+    });
+  });
+
+  const d = new Document({
+    styles: { default: { document: { run: { font: "Calibri", size: 22, color: "333333" } } } },
+    sections: [{
+      properties: {
+        page: {
+          size: { width: 11906, height: 16838 },
+          margin: { top: 1134, right: 1134, bottom: 1134, left: 1134 },
+        },
+      },
+      headers: {
+        default: new Header({
+          children: [new Paragraph({
+            alignment: AlignmentType.RIGHT,
+            border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: "2563EB", space: 4 } },
+            spacing: { before: 0, after: 120 },
+            children: [new TextRun({ text: nomeArquivo || "Documento Convertido", font: "Calibri", size: 18, color: "888888" })],
+          })],
+        }),
+      },
+      footers: {
+        default: new Footer({
+          children: [new Paragraph({
+            alignment: AlignmentType.CENTER,
+            border: { top: { style: BorderStyle.SINGLE, size: 4, color: "2563EB", space: 4 } },
+            spacing: { before: 120, after: 0 },
+            children: [new TextRun({ children: [PageNumber.CURRENT], font: "Calibri", size: 16, color: "2563EB", bold: true })],
+          })],
+        }),
+      },
+      children: [
+        new Paragraph({
+          spacing: { before: 0, after: 400 },
+          children: [new TextRun({ text: nomeArquivo || "Documento Convertido", font: "Calibri", size: 48, bold: true, color: "2563EB" })],
+        }),
+        new Paragraph({
+          spacing: { before: 0, after: 600 },
+          border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: "2563EB", space: 1 } },
+          children: [new TextRun({ text: `Convertido via Nexus MAX · ${new Date().toLocaleDateString("pt-BR")}`, font: "Calibri", size: 18, color: "888888" })],
+        }),
+        ...paragrafos,
+      ],
+    }],
+  });
+  return Packer.toBuffer(d);
+}
+
+module.exports = { generate, gerarConteudo, gerarPDF, gerarDOCX, criarPDFDeTexto, criarDOCXDeTexto, extrairCoresDaImagem, THEMES };

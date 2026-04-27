@@ -404,6 +404,46 @@ app.get("/api/roteiro/progress/:jobId", (req, res) => {
 });
 
 // ──────────────────────────────────────────
+// Conversor de documentos PDF ↔ DOCX
+// ──────────────────────────────────────────
+app.post("/api/convert", async (req, res) => {
+  try {
+    const { arquivo, nome, direcao } = req.body;
+    if (!arquivo || !direcao) return res.status(400).json({ error: "arquivo e direcao obrigatórios" });
+
+    const buf = Buffer.from(arquivo, "base64");
+    const { criarPDFDeTexto, criarDOCXDeTexto } = require("./departments/creative/deliverable_generator");
+
+    if (direcao === "docx2pdf") {
+      const mammoth = require("mammoth");
+      const result = await mammoth.convertToHtml({ buffer: buf });
+      const pdfBuf = await criarPDFDeTexto(result.value, (nome || "documento").replace(/\.docx$/i, ""));
+      return res.json({
+        arquivo: pdfBuf.toString("base64"),
+        nome: (nome || "documento").replace(/\.docx$/i, ".pdf"),
+        tipo: "application/pdf",
+      });
+    }
+
+    if (direcao === "pdf2docx") {
+      const pdfParse = require("pdf-parse");
+      const data = await pdfParse(buf);
+      const docxBuf = await criarDOCXDeTexto(data.text, (nome || "documento").replace(/\.pdf$/i, ""));
+      return res.json({
+        arquivo: docxBuf.toString("base64"),
+        nome: (nome || "documento").replace(/\.pdf$/i, ".docx"),
+        tipo: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      });
+    }
+
+    res.status(400).json({ error: "direcao inválida — use docx2pdf ou pdf2docx" });
+  } catch (e) {
+    console.error("[/api/convert]", e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ──────────────────────────────────────────
 // Webhook GitHub → salva commits no Supabase
 // ──────────────────────────────────────────
 const crypto = require("crypto");

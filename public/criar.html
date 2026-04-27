@@ -330,7 +330,7 @@
   .small-note{margin-top:10px;font-size:11px;color:var(--text-3);text-align:center;font-family:"JetBrains Mono",monospace}
 
   /* ---- mode tabs ---- */
-  .mode-tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:4px}
+  .mode-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px}
   .mode-tab{
     display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px 10px;
     border:2px solid var(--border);border-radius:12px;cursor:pointer;
@@ -351,8 +351,12 @@
 
   /* ---- mode visibility ---- */
   [data-showon="car"]{display:none}
+  [data-showon="conv"]{display:none}
   body.mode-car [data-showon="ent"]{display:none}
   body.mode-car [data-showon="car"]{display:block}
+  body.mode-conv [data-showon="ent"]{display:none}
+  body.mode-conv [data-showon="car"]{display:none}
+  body.mode-conv [data-showon="conv"]{display:block}
 
   /* ---- panels expand ---- */
   .expand-panel{overflow:hidden;max-height:0;transition:max-height .45s ease,opacity .2s;opacity:0}
@@ -595,6 +599,12 @@
   }
   body.mode-car .preview{display:none}
   body.mode-car .preview-slide{display:flex}
+  body.mode-conv .preview{display:none}
+  body.mode-conv .preview-slide{display:none}
+  body.mode-conv .generate{display:none}
+  body.mode-conv .small-note{display:none}
+  body.mode-conv .summary-list{display:none}
+  body.mode-conv .pv-edit-bar{display:none}
   .slide-dots{display:flex;gap:6px;margin-bottom:22px}
   .slide-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.25);transition:all .2s}
   .slide-dot.active{width:20px;border-radius:3px;background:#fff}
@@ -716,6 +726,60 @@
     text-transform:none;letter-spacing:-.02em;color:var(--text);
   }
   .card h2.display .n{font-family:"JetBrains Mono",monospace;font-size:11px}
+
+  /* ---- conversor ---- */
+  .conv-drop{
+    border:2px dashed var(--border);border-radius:16px;padding:0;
+    transition:border-color .2s,background .2s;position:relative;
+    min-height:220px;display:flex;align-items:center;justify-content:center;
+    margin-top:18px;cursor:pointer;
+  }
+  .conv-drop:hover,.conv-drop.over{border-color:var(--accent);background:rgba(217,119,6,.04)}
+  .conv-drop.has-file{border-style:solid;border-color:rgba(217,119,6,.5)}
+  .conv-drop-inner{text-align:center;padding:36px 24px;pointer-events:none;width:100%}
+  .conv-big-icon{font-size:52px;line-height:1;margin-bottom:16px;display:block;filter:drop-shadow(0 4px 12px rgba(217,119,6,.3))}
+  .conv-drop-title{font-size:18px;font-weight:700;color:var(--text);margin:0 0 6px;letter-spacing:-.02em}
+  .conv-drop-sub{font-size:13px;color:var(--text-3);margin:0 0 18px}
+  .conv-file-badge{
+    display:inline-flex;align-items:center;gap:10px;
+    background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.3);
+    border-radius:10px;padding:10px 16px;margin-top:8px;
+    font-size:13px;font-weight:600;color:#FCD34D;
+  }
+  .conv-file-badge .rm{
+    background:none;border:none;color:var(--text-3);cursor:pointer;padding:0 0 0 6px;
+    font-size:14px;transition:color .12s;pointer-events:all;
+  }
+  .conv-file-badge .rm:hover{color:var(--text)}
+  .conv-dir-cards{
+    display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px;
+  }
+  .conv-dir-card{
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+    padding:20px 14px;border:2px solid var(--border);border-radius:14px;
+    background:rgba(10,11,22,.45);cursor:pointer;transition:all .15s;text-align:center;
+  }
+  .conv-dir-card:hover{border-color:var(--border-hi);background:rgba(14,15,28,.7);transform:translateY(-2px)}
+  .conv-dir-card.active{
+    border-color:var(--accent);
+    background:linear-gradient(180deg,rgba(217,119,6,.14),rgba(217,119,6,.03));
+    box-shadow:0 0 0 3px rgba(217,119,6,.18);
+  }
+  .conv-dir-card .dico{font-size:32px;line-height:1}
+  .conv-dir-card b{font-size:13px;font-weight:700;color:var(--text);display:block}
+  .conv-dir-card small{font-size:11px;color:var(--text-3);font-family:"JetBrains Mono",monospace}
+  .conv-result{text-align:center;padding:24px 0 8px}
+  .conv-result h3{font-size:20px;font-weight:700;margin:12px 0 6px;color:var(--text)}
+  .conv-result p{font-size:13px;color:var(--text-3);margin:0 0 20px}
+  .conv-progress{
+    margin:16px 0;background:rgba(255,255,255,.08);border-radius:999px;height:6px;overflow:hidden;
+  }
+  .conv-progress-fill{
+    height:100%;width:0%;border-radius:999px;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    transition:width .4s ease;
+  }
+  .conv-status-msg{font-size:12px;color:var(--text-3);font-style:italic;text-align:center;margin-top:8px;min-height:18px}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>if(window.pdfjsLib)pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
@@ -773,6 +837,11 @@
             <span class="mico">📱</span>
             <b>Carrossel / Post</b>
             <small>Instagram · LinkedIn</small>
+          </div>
+          <div class="mode-tab" data-mode="conv">
+            <span class="mico">🔄</span>
+            <b>Conversor</b>
+            <small>PDF ↔ Word</small>
           </div>
         </div>
       </section>
@@ -996,6 +1065,67 @@
             </div>
           </div>
 
+        </div>
+      </section>
+
+      <!-- CONVERSOR PDF ↔ DOCX -->
+      <section class="card" data-showon="conv">
+        <h2><span class="n">🔄</span>Conversor de Documentos<span class="hint">mantém texto · formatos complexos simplificados</span></h2>
+
+        <!-- Upload zone -->
+        <div class="conv-drop" id="conv-drop">
+          <input type="file" id="conv-file-input" accept=".pdf,.docx" style="display:none;position:absolute;inset:0;opacity:0;cursor:pointer">
+          <div class="conv-drop-inner" id="conv-drop-inner">
+            <span class="conv-big-icon">📄</span>
+            <p class="conv-drop-title">Arraste seu arquivo aqui</p>
+            <p class="conv-drop-sub">PDF ou Word (.docx) · máx. 10MB</p>
+            <button class="btn" id="conv-pick-btn" style="pointer-events:all">Escolher arquivo</button>
+          </div>
+        </div>
+
+        <!-- File info + direction (hidden until file selected) -->
+        <div id="conv-options" style="display:none;margin-top:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <span id="conv-file-badge" class="conv-file-badge">
+              <span id="conv-file-name">arquivo.pdf</span>
+              <button class="rm" id="conv-remove-btn" title="Remover">✕</button>
+            </span>
+            <span style="font-size:11px;color:var(--text-3);font-family:'JetBrains Mono',monospace" id="conv-file-size"></span>
+          </div>
+
+          <label class="lbl" style="margin-bottom:10px">Converter para:</label>
+          <div class="conv-dir-cards">
+            <div class="conv-dir-card active" data-dir="auto-pdf" id="cdir-pdf">
+              <span class="dico">📕</span>
+              <b>→ PDF</b>
+              <small>Word para PDF</small>
+            </div>
+            <div class="conv-dir-card" data-dir="auto-docx" id="cdir-docx">
+              <span class="dico">📝</span>
+              <b>→ Word</b>
+              <small>PDF para Word</small>
+            </div>
+          </div>
+
+          <!-- Progress -->
+          <div class="conv-progress" id="conv-progress" style="display:none;margin-top:16px">
+            <div class="conv-progress-fill" id="conv-progress-fill"></div>
+          </div>
+          <div class="conv-status-msg" id="conv-status-msg"></div>
+
+          <!-- Action button -->
+          <button class="generate" id="conv-btn" style="display:block;margin-top:16px">🔄 Converter agora</button>
+        </div>
+
+        <!-- Result (hidden until done) -->
+        <div class="conv-result" id="conv-result" style="display:none">
+          <div class="ov-check" style="margin:0 auto 12px">✓</div>
+          <h3>Conversão concluída!</h3>
+          <p>Seu arquivo foi convertido com sucesso</p>
+          <div class="dl-row">
+            <button class="dl-btn pdf" id="conv-download-btn">⬇ Baixar arquivo</button>
+            <button class="dl-btn reset" id="conv-reset-btn">Nova conversão</button>
+          </div>
         </div>
       </section>
 
@@ -2461,6 +2591,8 @@
         genNote.textContent  = '~60s · slides PNG · sem marca d\'água';
         hintText.textContent = '✏️ Clique no gancho para editar';
         updateSlidePreviewColors();
+      } else if (currentMode === 'conv') {
+        // conversor — botão principal fica oculto via CSS, apenas limpa o estado
       } else {
         btnGerar.textContent = '🚀 Gerar Infoproduto';
         genNote.textContent  = (TYPE_TIME[selectedType] || '~90s') + ' · gerado no servidor · sem marca d\'água';
@@ -2631,6 +2763,163 @@
       });
     });
   });
+
+  // ── CONVERSOR PDF ↔ DOCX ──────────────────────────────────────────────────
+  (function() {
+    const drop      = document.getElementById('conv-drop');
+    const fileInput = document.getElementById('conv-file-input');
+    const pickBtn   = document.getElementById('conv-pick-btn');
+    const options   = document.getElementById('conv-options');
+    const fileName  = document.getElementById('conv-file-name');
+    const fileSize  = document.getElementById('conv-file-size');
+    const removeBtn = document.getElementById('conv-remove-btn');
+    const dirCards  = document.querySelectorAll('.conv-dir-card');
+    const convBtn   = document.getElementById('conv-btn');
+    const progressW = document.getElementById('conv-progress');
+    const progressF = document.getElementById('conv-progress-fill');
+    const statusMsg = document.getElementById('conv-status-msg');
+    const resultDiv = document.getElementById('conv-result');
+    const dlBtn     = document.getElementById('conv-download-btn');
+    const resetBtn  = document.getElementById('conv-reset-btn');
+
+    let convFile = null;
+    let convDirection = 'docx2pdf'; // default
+    let convResultData = null;
+
+    function fmt(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+      return (bytes/(1024*1024)).toFixed(1) + ' MB';
+    }
+
+    function setFile(file) {
+      if (!file) return;
+      if (file.size > 10 * 1024 * 1024) { showErr('Arquivo muito grande. Máximo 10MB.'); return; }
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (!['pdf','docx'].includes(ext)) { showErr('Formato inválido. Use .pdf ou .docx'); return; }
+      convFile = file;
+      fileName.textContent = file.name;
+      fileSize.textContent = fmt(file.size);
+      drop.classList.add('has-file');
+
+      // Auto-detectar direção pelo tipo do arquivo
+      if (ext === 'docx') {
+        convDirection = 'docx2pdf';
+        document.getElementById('cdir-pdf').classList.add('active');
+        document.getElementById('cdir-docx').classList.remove('active');
+      } else {
+        convDirection = 'pdf2docx';
+        document.getElementById('cdir-docx').classList.add('active');
+        document.getElementById('cdir-pdf').classList.remove('active');
+      }
+
+      options.style.display = 'block';
+      resultDiv.style.display = 'none';
+      progressW.style.display = 'none';
+      statusMsg.textContent = '';
+    }
+
+    function resetConv() {
+      convFile = null;
+      convResultData = null;
+      drop.classList.remove('has-file');
+      options.style.display = 'none';
+      resultDiv.style.display = 'none';
+      progressW.style.display = 'none';
+      statusMsg.textContent = '';
+      progressF.style.width = '0%';
+      fileInput.value = '';
+      // Restore drop zone inner
+      document.getElementById('conv-drop-inner').style.display = 'block';
+    }
+
+    // Drag & drop
+    drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+    drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+    drop.addEventListener('drop', e => {
+      e.preventDefault();
+      drop.classList.remove('over');
+      const f = e.dataTransfer?.files?.[0];
+      if (f) setFile(f);
+    });
+    drop.addEventListener('click', e => {
+      if (e.target === pickBtn || e.target === removeBtn) return;
+      if (!convFile) fileInput.click();
+    });
+    pickBtn.addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
+    fileInput.addEventListener('change', () => { if (fileInput.files[0]) setFile(fileInput.files[0]); });
+    removeBtn.addEventListener('click', e => { e.stopPropagation(); resetConv(); });
+
+    // Direction selector
+    dirCards.forEach(card => {
+      card.addEventListener('click', () => {
+        dirCards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        convDirection = card.dataset.dir === 'auto-pdf' ? 'docx2pdf' : 'pdf2docx';
+      });
+    });
+
+    // Convert button
+    convBtn.addEventListener('click', async () => {
+      if (!convFile) return;
+      convBtn.disabled = true;
+      progressW.style.display = 'block';
+      statusMsg.textContent = 'Lendo arquivo...';
+      progressF.style.width = '20%';
+
+      try {
+        const base64 = await new Promise((res, rej) => {
+          const reader = new FileReader();
+          reader.onload = () => res(reader.result.split(',')[1]);
+          reader.onerror = rej;
+          reader.readAsDataURL(convFile);
+        });
+
+        statusMsg.textContent = 'Convertendo...';
+        progressF.style.width = '55%';
+
+        const resp = await fetch('/api/convert', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ arquivo: base64, nome: convFile.name, direcao: convDirection }),
+        });
+
+        progressF.style.width = '85%';
+        if (!resp.ok) {
+          const err = await resp.json();
+          throw new Error(err.error || 'Erro na conversão');
+        }
+
+        convResultData = await resp.json();
+        progressF.style.width = '100%';
+        statusMsg.textContent = '';
+
+        setTimeout(() => {
+          progressW.style.display = 'none';
+          document.getElementById('conv-drop-inner').style.display = 'none';
+          options.style.display = 'none';
+          resultDiv.style.display = 'block';
+        }, 400);
+
+      } catch (e) {
+        progressW.style.display = 'none';
+        statusMsg.textContent = '';
+        showErr('Falha na conversão: ' + e.message);
+        convBtn.disabled = false;
+      }
+    });
+
+    // Download
+    dlBtn.addEventListener('click', () => {
+      if (!convResultData) return;
+      const a = document.createElement('a');
+      a.href = `data:${convResultData.tipo};base64,${convResultData.arquivo}`;
+      a.download = convResultData.nome;
+      a.click();
+    });
+
+    resetBtn.addEventListener('click', resetConv);
+  })();
 </script>
 </body>
 </html>
