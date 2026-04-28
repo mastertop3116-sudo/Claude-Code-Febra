@@ -66,6 +66,26 @@ function _cacheKey(estrategia, estrutura, autor, tipo) {
 // Tipos que exigem Pro: copy complexa, VSL, conteúdo longo/persuasivo
 const PRO_TYPES = new Set(['ebook', 'workbook', 'script_vsl'])
 
+async function _callModel(modelName, systemPrompt, prompt) {
+  const model = genai.getGenerativeModel({
+    model: modelName,
+    systemInstruction: systemPrompt,
+    generationConfig: { responseMimeType: 'application/json' },
+  })
+  const r = await model.generateContent(prompt)
+  let raw = r.response.text().trim()
+  raw = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '')
+  const s = raw.indexOf('{'), e = raw.lastIndexOf('}')
+  if (s !== -1 && e !== -1) raw = raw.slice(s, e + 1)
+  raw = raw.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+  try {
+    return JSON.parse(raw)
+  } catch (_) {
+    const { jsonrepair } = require('jsonrepair')
+    return JSON.parse(jsonrepair(raw))
+  }
+}
+
 async function run({ estrategia, estrutura, autor, tipo }) {
   const key = _cacheKey(estrategia, estrutura, autor, tipo)
   if (_cache.has(key)) {
@@ -74,30 +94,20 @@ async function run({ estrategia, estrutura, autor, tipo }) {
   }
 
   const usePro = PRO_TYPES.has(tipo)
-  const model = genai.getGenerativeModel({
-    model: usePro ? 'gemini-2.5-pro' : 'gemini-2.5-flash',
-    systemInstruction: usePro ? SYSTEM_PRO : SYSTEM_FLASH,
-    generationConfig: { responseMimeType: 'application/json' },
-  })
-
-  console.log(`[copywriter] tipo=${tipo} → modelo: ${usePro ? 'Pro' : 'Flash'}`)
-
-  const r = await model.generateContent(
-    `Autor: ${autor}\nTipo: ${tipo}\nEstratégia: ${JSON.stringify(estrategia)}\nEstrutura: ${JSON.stringify(estrutura)}\nEscreva todas as seções.`
-  )
-
-  let raw = r.response.text().trim()
-  raw = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '')
-  const s = raw.indexOf('{'), e = raw.lastIndexOf('}')
-  if (s !== -1 && e !== -1) raw = raw.slice(s, e + 1)
-  raw = raw.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+  const prompt = `Autor: ${autor}\nTipo: ${tipo}\nEstratégia: ${JSON.stringify(estrategia)}\nEstrutura: ${JSON.stringify(estrutura)}\nEscreva todas as seções.`
 
   let result
-  try {
-    result = JSON.parse(raw)
-  } catch (_) {
-    const { jsonrepair } = require('jsonrepair')
-    result = JSON.parse(jsonrepair(raw))
+  if (usePro) {
+    console.log(`[copywriter] tipo=${tipo} → modelo: Pro`)
+    try {
+      result = await _callModel('gemini-2.5-pro', SYSTEM_PRO, prompt)
+    } catch (err) {
+      console.warn(`[copywriter] Pro falhou (${err.message?.slice(0, 60)}), usando Flash como fallback`)
+      result = await _callModel('gemini-2.5-flash', SYSTEM_FLASH, prompt)
+    }
+  } else {
+    console.log(`[copywriter] tipo=${tipo} → modelo: Flash`)
+    result = await _callModel('gemini-2.5-flash', SYSTEM_FLASH, prompt)
   }
 
   _cache.set(key, result)
