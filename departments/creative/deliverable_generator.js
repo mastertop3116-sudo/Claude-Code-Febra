@@ -419,8 +419,8 @@ async function gerarPDF(config, conteudo) {
       const cleanText = line.replace(/^▸\s*/, "").replace(/\*\*/g, "").trim();
       if (!cleanText) return;
       const est  = doc.heightOfString(cleanText, { width: CW - 46, fontSize: 10.5, lineGap: 3 });
-      const boxH = Math.max(38, est + 26);
-      if (cy + boxH + 8 > CB) newPage();
+      const boxH = Math.max(48, Math.ceil(est * 1.4) + 32);
+      if (cy + boxH + 16 > CB) newPage();
       doc.save();
       doc.fillOpacity(0.07);
       doc.rect(ML, cy, CW, boxH).fill(C.primary);
@@ -448,10 +448,11 @@ async function gerarPDF(config, conteudo) {
     function writeParagraph(line) {
       const cleanText = line.replace(/\*\*/g, "").trim();
       if (!cleanText) return;
-      if (cy + 18 > CB) newPage();
+      if (cy + 24 > CB) newPage();
       doc.fillColor(TEXT_DARK).font(F.body).fontSize(11)
         .text(cleanText, ML, cy, { width: CW, lineGap: 5 });
-      cy = doc.y + 14;
+      cy = doc.y + 16;
+      if (cy > CB - 16) { newPage(); }
     }
 
     // ── Dispatcher de linha ──
@@ -484,8 +485,8 @@ async function gerarPDF(config, conteudo) {
       if (/^(FATO\/DADO|FATO|DADO)\s*:/i.test(t))   { writeFactBox(t);     return; }
       const cleanText = t.replace(/\*\*/g, "");
       const est  = doc.heightOfString(cleanText, { width: CW - 50, fontSize: 10.5, lineGap: 3.5 });
-      const boxH = Math.max(44, est + 32);
-      if (cy + boxH + 8 > CB) newPage();
+      const boxH = Math.max(54, Math.ceil(est * 1.4) + 38);
+      if (cy + boxH + 16 > CB) newPage();
       doc.save();
       doc.fillOpacity(0.06);
       doc.rect(ML, cy, CW, boxH).fill(C.primary);
@@ -505,8 +506,8 @@ async function gerarPDF(config, conteudo) {
       if (!text) return;
       const cleanText = text.replace(/^(FATO\/DADO|FATO|DADO|Fato\/Dado)\s*:\s*/i, "").replace(/\*\*/g, "").trim();
       const est  = doc.heightOfString(cleanText, { width: CW - 70, fontSize: 10.5, lineGap: 3.5 });
-      const boxH = Math.max(58, est + 36);
-      if (cy + boxH + 8 > CB) newPage();
+      const boxH = Math.max(68, Math.ceil(est * 1.4) + 42);
+      if (cy + boxH + 16 > CB) newPage();
       doc.rect(ML, cy, CW, boxH).fill("#EEF4FF");
       doc.rect(ML, cy, CW, boxH).lineWidth(0.5).strokeColor("#C0D4F8").stroke();
       doc.rect(ML, cy, 5, boxH).fill("#3B7BF0");
@@ -544,8 +545,8 @@ async function gerarPDF(config, conteudo) {
       if (!text) return;
       // Estima com padding generoso para evitar overflow
       const est   = doc.heightOfString(text, { width: CW - 52, fontSize: 11, lineGap: 3 });
-      const itemH = Math.max(40, est + 26);
-      if (cy + itemH + 12 > CB) newPage();
+      const itemH = Math.max(52, Math.ceil(est * 1.5) + 32);
+      if (cy + itemH + 20 > CB) newPage();
       const startY = cy;
       doc.save();
       doc.fillOpacity(0.04).rect(ML + 30, startY, CW - 30, itemH).fill(C.primary);
@@ -567,8 +568,8 @@ async function gerarPDF(config, conteudo) {
       if (!texto) return;
       const clean = texto.replace(/\*\*/g, "").trim();
       const est  = doc.heightOfString(clean, { width: CW - 68, fontSize: 12.5, lineGap: 5 });
-      const boxH = Math.max(74, est + 50);
-      if (cy + boxH + 16 > CB) newPage();
+      const boxH = Math.max(84, Math.ceil(est * 1.4) + 56);
+      if (cy + boxH + 20 > CB) newPage();
       doc.save();
       doc.fillOpacity(0.06).rect(ML, cy, CW, boxH).fill(C.primary);
       doc.restore();
@@ -579,7 +580,7 @@ async function gerarPDF(config, conteudo) {
       doc.restore();
       doc.fillColor("#222222").font(F.subtitle || F.body).fontSize(12.5)
         .text(clean, ML + 46, cy + 17, { width: CW - 62, lineGap: 5 });
-      cy = doc.y + 10;
+      cy = doc.y + 20;
     }
 
     // ── Chapter banner (abre cada capítulo) ──
