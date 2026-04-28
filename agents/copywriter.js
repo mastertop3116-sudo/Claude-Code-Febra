@@ -71,12 +71,7 @@ function _sanitizeJson(raw) {
   raw = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '')
   const s = raw.indexOf('{'), e = raw.lastIndexOf('}')
   if (s !== -1 && e !== -1) raw = raw.slice(s, e + 1)
-  // Remove caracteres de controle inválidos
   raw = raw.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
-  // Escapa quebras de linha literais dentro de strings JSON
-  raw = raw.replace(/"([^"]*)"/g, (_, inner) =>
-    '"' + inner.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t') + '"'
-  )
   return raw
 }
 
@@ -91,15 +86,8 @@ async function _callModel(modelName, systemPrompt, prompt) {
   try {
     return JSON.parse(raw)
   } catch (_) {
-    try {
-      const { jsonrepair } = require('jsonrepair')
-      return JSON.parse(jsonrepair(raw))
-    } catch (e2) {
-      // Última tentativa: jsonrepair no raw original sem sanitização agressiva
-      const rawOriginal = r.response.text().trim()
-      const { jsonrepair } = require('jsonrepair')
-      return JSON.parse(jsonrepair(rawOriginal))
-    }
+    const { jsonrepair } = require('jsonrepair')
+    return JSON.parse(jsonrepair(raw))
   }
 }
 
