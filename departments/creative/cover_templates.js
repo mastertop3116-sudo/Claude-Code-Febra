@@ -48,10 +48,10 @@ function P(temaKey) {
 // Barra vertical esquerda · título no centro · rodapé com linha
 function coverMinimal({ titulo, subtitulo, autor, tagline, temaKey, fontTitle, fontBody }) {
   const c = P(temaKey);
-  const t = String(titulo  || "").slice(0, 60);
-  const s = String(subtitulo || "").slice(0, 100);
+  const t = String(titulo  || "").slice(0, 80);
+  const s = String(subtitulo || "").slice(0, 180);
   const a = String(autor   || "Nexus Digital").toUpperCase();
-  const g = String(tagline || "").toUpperCase().slice(0, 50);
+  const g = String(tagline || "").toUpperCase().slice(0, 70);
 
   return `<div style="width:100%;height:100%;background:${c.bg};display:flex;flex-direction:column;padding:144px 160px 120px;position:relative;">
 
@@ -85,10 +85,10 @@ function coverMinimal({ titulo, subtitulo, autor, tagline, temaKey, fontTitle, f
 // Faixa accent topo · título grande upper · bloco cor inferior
 function coverGeometric({ titulo, subtitulo, autor, tagline, temaKey, fontTitle, fontBody }) {
   const c = P(temaKey);
-  const t = String(titulo  || "").slice(0, 55);
-  const s = String(subtitulo || "").slice(0, 90);
+  const t = String(titulo  || "").slice(0, 80);
+  const s = String(subtitulo || "").slice(0, 180);
   const a = String(autor   || "Nexus Digital").toUpperCase();
-  const g = String(tagline || "").toUpperCase().slice(0, 50);
+  const g = String(tagline || "").toUpperCase().slice(0, 70);
 
   return `<div style="width:100%;height:100%;background:${c.bg};display:flex;flex-direction:column;position:relative;">
 
@@ -125,10 +125,10 @@ function coverGeometric({ titulo, subtitulo, autor, tagline, temaKey, fontTitle,
 // Fundo escuro · blobs de cor · conteúdo centralizado + badge
 function coverHero({ titulo, subtitulo, autor, tagline, temaKey, fontTitle, fontBody }) {
   const c = P(temaKey);
-  const t = String(titulo  || "").slice(0, 55);
-  const s = String(subtitulo || "").slice(0, 90);
+  const t = String(titulo  || "").slice(0, 80);
+  const s = String(subtitulo || "").slice(0, 180);
   const a = String(autor   || "Nexus Digital").toUpperCase();
-  const g = String(tagline || "").toUpperCase().slice(0, 50);
+  const g = String(tagline || "").toUpperCase().slice(0, 70);
 
   return `<div style="width:100%;height:100%;background:${c.bg};display:flex;flex-direction:column;justify-content:center;align-items:center;padding:160px;position:relative;">
 

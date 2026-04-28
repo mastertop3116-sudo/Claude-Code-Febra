@@ -377,6 +377,7 @@ async function gerarPDF(config, conteudo) {
       const l = line.trim();
       if (/^\[\s*[xX✓]?\s*\]/.test(l))           return "checkbox";
       if (/^[-*•]\s+/.test(l))                     return "bullet";
+      if (/^\d+\.\s+/.test(l))                     return "numbered";
       if (/^▸\s*/.test(l))                          return "action";
       if (/^#{1,3}\s+/.test(l))                     return "heading";
       if (/^(FATO\/DADO|FATO|DADO)\s*:/i.test(l)) return "fact";
@@ -388,8 +389,8 @@ async function gerarPDF(config, conteudo) {
       const checked   = /^\[\s*[xX✓]\s*\]/.test(line.trim());
       const cleanText = line.replace(/^\[\s*[xX✓]?\s*\]\s*/, "").replace(/\*\*/g, "").trim();
       if (!cleanText) return;
-      const est  = doc.heightOfString(cleanText, { width: CW - 30, fontSize: 11 });
-      const boxH = Math.max(20, est);
+      const est  = doc.heightOfString(cleanText, { width: CW - 30, fontSize: 11, lineGap: 3 });
+      const boxH = Math.max(20, est + 4);
       if (cy + boxH + 8 > CB) newPage();
       const bx = ML + 2, by = cy + (boxH / 2) - 7;
       doc.rect(bx, by, 13, 13).lineWidth(1).strokeColor(checked ? C.primary : "#AAAAAA").stroke();
@@ -410,15 +411,15 @@ async function gerarPDF(config, conteudo) {
       doc.circle(ML + 7, cy + 6, 2.5).fill(C.accent || C.primary);
       doc.fillColor(TEXT_DARK).font(F.body).fontSize(11)
         .text(cleanText, ML + 20, cy, { width: CW - 24, lineGap: 3 });
-      cy = doc.y + 7;
+      cy = doc.y + 10;
     }
 
     // ── Ponto de ação (▸) ──
     function writeActionPoint(line) {
       const cleanText = line.replace(/^▸\s*/, "").replace(/\*\*/g, "").trim();
       if (!cleanText) return;
-      const est  = doc.heightOfString(cleanText, { width: CW - 46, fontSize: 10.5 });
-      const boxH = Math.max(38, est + 22);
+      const est  = doc.heightOfString(cleanText, { width: CW - 46, fontSize: 10.5, lineGap: 3 });
+      const boxH = Math.max(38, est + 26);
       if (cy + boxH + 8 > CB) newPage();
       doc.save();
       doc.fillOpacity(0.07);
@@ -450,7 +451,7 @@ async function gerarPDF(config, conteudo) {
       if (cy + 18 > CB) newPage();
       doc.fillColor(TEXT_DARK).font(F.body).fontSize(11)
         .text(cleanText, ML, cy, { width: CW, lineGap: 5 });
-      cy = doc.y + 10;
+      cy = doc.y + 14;
     }
 
     // ── Dispatcher de linha ──
@@ -458,25 +459,21 @@ async function gerarPDF(config, conteudo) {
       const l = line.trim();
       if (!l) return;
       switch (getLineType(l)) {
-        case "checkbox": writeChecklistItem(l); break;
-        case "bullet":   writeBulletItem(l);   break;
-        case "action":   writeActionPoint(l);  break;
-        case "heading":  writeInlineHeading(l); break;
-        case "fact":     writeFactBox(l);       break;
-        default:         writeParagraph(l);     break;
+        case "checkbox": writeChecklistItem(l);  break;
+        case "bullet":   writeBulletItem(l);     break;
+        case "numbered": writeNumberedItem(l);   break;
+        case "action":   writeActionPoint(l);    break;
+        case "heading":  writeInlineHeading(l);  break;
+        case "fact":     writeFactBox(l);        break;
+        default:         writeParagraph(l);      break;
       }
     }
 
     // ── Corpo principal ──
     function writeBody(text) {
       if (!text) return;
-      const segments = String(text).split(";").map(p => p.trim()).filter(Boolean);
-      for (const seg of segments) {
-        const lines = seg.split(/\n/).map(l => l.trim()).filter(Boolean);
-        if (lines.length === 0) continue;
-        if (lines.length === 1) dispatchLine(lines[0]);
-        else for (const line of lines) dispatchLine(line);
-      }
+      const lines = String(text).split(/\n/).map(l => l.trim()).filter(Boolean);
+      for (const line of lines) dispatchLine(line);
     }
 
     // ── Callout box ──
@@ -486,8 +483,8 @@ async function gerarPDF(config, conteudo) {
       if (/^▸/.test(t))                              { writeActionPoint(t); return; }
       if (/^(FATO\/DADO|FATO|DADO)\s*:/i.test(t))   { writeFactBox(t);     return; }
       const cleanText = t.replace(/\*\*/g, "");
-      const est  = doc.heightOfString(cleanText, { width: CW - 50, fontSize: 10.5 });
-      const boxH = Math.max(44, est + 28);
+      const est  = doc.heightOfString(cleanText, { width: CW - 50, fontSize: 10.5, lineGap: 3.5 });
+      const boxH = Math.max(44, est + 32);
       if (cy + boxH + 8 > CB) newPage();
       doc.save();
       doc.fillOpacity(0.06);
@@ -507,8 +504,8 @@ async function gerarPDF(config, conteudo) {
     function writeFactBox(text) {
       if (!text) return;
       const cleanText = text.replace(/^(FATO\/DADO|FATO|DADO|Fato\/Dado)\s*:\s*/i, "").replace(/\*\*/g, "").trim();
-      const est  = doc.heightOfString(cleanText, { width: CW - 70, fontSize: 10.5 });
-      const boxH = Math.max(58, est + 32);
+      const est  = doc.heightOfString(cleanText, { width: CW - 70, fontSize: 10.5, lineGap: 3.5 });
+      const boxH = Math.max(58, est + 36);
       if (cy + boxH + 8 > CB) newPage();
       doc.rect(ML, cy, CW, boxH).fill("#EEF4FF");
       doc.rect(ML, cy, CW, boxH).lineWidth(0.5).strokeColor("#C0D4F8").stroke();
@@ -536,6 +533,135 @@ async function gerarPDF(config, conteudo) {
         .moveTo(mx, my - 4).lineTo(mx + 4, my).lineTo(mx, my + 4).lineTo(mx - 4, my).closePath().fill();
       doc.restore();
       cy += 22;
+    }
+
+    // ── Numbered technique card (badge + texto) ──
+    function writeNumberedItem(line) {
+      const match = line.match(/^(\d+)\.\s+(.*)/);
+      if (!match) { writeParagraph(line); return; }
+      const num  = match[1];
+      const text = match[2].replace(/\*\*/g, "").trim();
+      if (!text) return;
+      // Estima com padding generoso para evitar overflow
+      const est   = doc.heightOfString(text, { width: CW - 52, fontSize: 11, lineGap: 3 });
+      const itemH = Math.max(40, est + 26);
+      if (cy + itemH + 12 > CB) newPage();
+      const startY = cy;
+      doc.save();
+      doc.fillOpacity(0.04).rect(ML + 30, startY, CW - 30, itemH).fill(C.primary);
+      doc.restore();
+      doc.fillColor(TEXT_DARK).font(F.body).fontSize(11)
+        .text(text, ML + 38, startY + 13, { width: CW - 52, lineGap: 3 });
+      // usa doc.y real para saber onde o texto terminou
+      const realBottom = Math.max(startY + itemH, doc.y + 6);
+      const realH = realBottom - startY;
+      // desenha badge agora que sabemos a altura real
+      doc.rect(ML, startY, 30, realH).fill(C.primary);
+      doc.fillColor("#FFFFFF").font(F.title).fontSize(13)
+        .text(num, ML, startY + realH / 2 - 9, { width: 30, align: "center" });
+      cy = realBottom + 10;
+    }
+
+    // ── Quote / gancho box ──
+    function writeGanchoBox(texto) {
+      if (!texto) return;
+      const clean = texto.replace(/\*\*/g, "").trim();
+      const est  = doc.heightOfString(clean, { width: CW - 68, fontSize: 12.5, lineGap: 5 });
+      const boxH = Math.max(74, est + 50);
+      if (cy + boxH + 16 > CB) newPage();
+      doc.save();
+      doc.fillOpacity(0.06).rect(ML, cy, CW, boxH).fill(C.primary);
+      doc.restore();
+      doc.rect(ML, cy, 5, boxH).fill(C.primary);
+      doc.save();
+      doc.fillOpacity(0.16).fillColor(C.primary).font(F.title).fontSize(76)
+        .text("“", ML + 10, cy - 14, { lineBreak: false });
+      doc.restore();
+      doc.fillColor("#222222").font(F.subtitle || F.body).fontSize(12.5)
+        .text(clean, ML + 46, cy + 17, { width: CW - 62, lineGap: 5 });
+      cy = doc.y + 10;
+    }
+
+    // ── Chapter banner (abre cada capítulo) ──
+    function drawChapterBanner(titulo, numStr) {
+      const BH = 196;
+      // Ghost number decorativo
+      if (numStr) {
+        doc.save();
+        doc.fillColor(C.primary).fillOpacity(0.05)
+          .font(F.title).fontSize(210)
+          .text(numStr, W - 215, CT - 26, { width: 240, align: "right", lineBreak: false });
+        doc.restore();
+      }
+      // Linha accent topo
+      doc.rect(ML, CT + 6, CW, 2).fill(C.primary);
+      // Badge do número
+      if (numStr) {
+        doc.rect(ML, CT + 20, 36, 26).fill(C.primary);
+        doc.fillColor("#FFFFFF").font(F.title).fontSize(12)
+          .text(numStr, ML, CT + 26, { width: 36, align: "center" });
+        doc.fillColor(C.primary).font(F.body).fontSize(8)
+          .text("CAPÍTULO", ML + 46, CT + 27, { characterSpacing: 2.5 });
+      }
+      // Título do capítulo
+      const titleY = CT + 60;
+      doc.fillColor(TEXT_DARK).font(F.title).fontSize(26)
+        .text(titulo, ML, titleY, { width: numStr ? CW * 0.76 : CW, lineGap: 5 });
+      // Traço accent abaixo do título
+      const underY = doc.y + 10;
+      doc.rect(ML, underY, 62, 4).fill(C.accent || C.primary);
+      // cy respeita tanto o banner fixo quanto o título longo
+      cy = Math.max(CT + BH + 8, doc.y + 24);
+    }
+
+    // ── Página de transição (ebooks, entre capítulos) ──
+    function drawTransitionPage(titulo, numStr, gancho) {
+      pageNum++;
+      doc.addPage({ size: "A4", margin: 0 });
+      const tBg  = C.coverBg || C.secondary || "#1D1D1D";
+      const tAcc = C.coverAccent || C.accent || C.primary;
+
+      doc.rect(0, 0, W, H).fill(tBg);
+
+      // Faixa lateral decorativa
+      doc.save();
+      doc.fillOpacity(0.10).rect(0, 0, 8, H).fill(tAcc);
+      doc.restore();
+
+      // Número fantasma gigante
+      if (numStr) {
+        doc.save();
+        doc.fillColor(tAcc).fillOpacity(0.07).font(F.title).fontSize(380)
+          .text(numStr, W * 0.18, H * 0.08, { lineBreak: false });
+        doc.restore();
+      }
+
+      // Badge capítulo
+      if (numStr) {
+        const bx = ML + 16, by = H * 0.36;
+        doc.rect(bx, by, 44, 22).fill(tAcc);
+        doc.fillColor("#000000").font(F.title).fontSize(8.5)
+          .text(`CAP ${numStr}`, bx, by + 7, { width: 44, align: "center", characterSpacing: 1.5 });
+      }
+
+      // Título do capítulo
+      doc.fillColor("#FFFFFF").font(F.title).fontSize(32)
+        .text(titulo, ML + 16, H * 0.42, { width: CW * 0.80, lineGap: 5 });
+      const titleEnd = doc.y + 20;
+
+      // Traço accent
+      doc.rect(ML + 16, titleEnd, 50, 3).fill(tAcc);
+
+      // Gancho (preview da seção)
+      if (gancho) {
+        doc.save();
+        doc.fillOpacity(0.55).fillColor("#FFFFFF").font(F.subtitle || F.body).fontSize(11.5)
+          .text(gancho, ML + 16, titleEnd + 22, { width: CW * 0.72, lineGap: 4 });
+        doc.restore();
+      }
+
+      // Rodapé mínimo
+      doc.rect(0, H - 4, W, 4).fill(tAcc);
     }
 
     // ════════════════════════════════════════
@@ -582,25 +708,102 @@ async function gerarPDF(config, conteudo) {
         .text(String(new Date().getFullYear()), ML, H * 0.855, { width: CW, align: "center" });
       doc.restore();
     } else {
+      // ── Capa vetorial nativa (fallback de alta qualidade) ──
       doc.rect(0, 0, W, H).fill(COV);
+
+      // Painel lateral decorativo direito
+      doc.save();
+      doc.fillOpacity(0.08).rect(W * 0.68, 0, W * 0.32, H).fill(COV_ACC);
+      doc.restore();
+
+      // Número fantasma decorativo
+      doc.save();
+      doc.fillColor(COV_ACC).fillOpacity(0.06).font(F.title).fontSize(420)
+        .text("1", W * 0.38, -60, { lineBreak: false });
+      doc.restore();
+
+      // Stripe superior
       doc.rect(0, 0, W, 6).fill(COV_ACC);
-      doc.rect(0, H * 0.82, W, H * 0.18).fill(COV_ACC);
-      doc.fillColor(C.coverText || "#FFFFFF").font(F.title).fontSize(36)
-        .text(conteudo.capa.titulo || config.titulo, ML, H * 0.28, { width: CW * 0.72 });
-      if (config.autor)
-        doc.fillColor(COV).font(F.title).fontSize(11)
-          .text(config.autor.toUpperCase(), ML, H * 0.855, { width: CW, align: "center" });
+      // Stripe inferior
+      doc.rect(0, H - 6, W, 6).fill(COV_ACC);
+
+      // Bloco de acento esquerdo
+      doc.rect(ML, H * 0.26, 5, H * 0.28).fill(COV_ACC);
+
+      // Tipo do produto badge
+      const tipoLabel = {
+        ebook: "E-BOOK", checklist: "CHECKLIST", workbook: "WORKBOOK",
+        planner: "PLANNER", script_vsl: "VSL SCRIPT", cheat_sheet: "GUIA RÁPIDO",
+        certificado: "CERTIFICADO",
+      }[config.tipo] || "GUIA";
+      const badgeW = 90, badgeH = 20;
+      doc.rect(ML + 14, H * 0.22, badgeW, badgeH).fill(COV_ACC);
+      doc.fillColor("#000000").font(F.title).fontSize(7.5)
+        .text(tipoLabel, ML + 14, H * 0.22 + 6, { width: badgeW, align: "center", characterSpacing: 2 });
+
+      // Título principal
+      const tituloText = conteudo.capa.titulo || config.titulo || "Entregável";
+      doc.fillColor("#FFFFFF").font(F.title).fontSize(38)
+        .text(tituloText, ML + 14, H * 0.28, { width: CW * 0.64, lineGap: 6 });
+
+      const tituloBottom = doc.y + 18;
+
+      // Linha acento após título
+      doc.rect(ML + 14, tituloBottom, 54, 3).fill(COV_ACC);
+
+      // Subtítulo
+      if (conteudo.capa.subtitulo) {
+        doc.save();
+        doc.fillOpacity(0.70).fillColor("#FFFFFF").font(F.subtitle || F.body).fontSize(12.5)
+          .text(conteudo.capa.subtitulo, ML + 14, tituloBottom + 18, { width: CW * 0.62, lineGap: 4 });
+        doc.restore();
+      }
+
+      // Tagline centralizada
+      if (conteudo.capa.tagline) {
+        doc.save();
+        doc.fillOpacity(0.50).fillColor(COV_ACC).font(F.body).fontSize(9.5)
+          .text(conteudo.capa.tagline.toUpperCase(), ML, H * 0.72, { width: CW, align: "center", characterSpacing: 1.5 });
+        doc.restore();
+      }
+
+      // Bloco do autor no rodapé
+      doc.rect(0, H * 0.84, W, H * 0.16).fill("#000000");
+      doc.save();
+      doc.fillOpacity(0.25).rect(0, H * 0.84, W, 1).fill(COV_ACC);
+      doc.restore();
+      if (config.autor) {
+        doc.fillColor(COV_ACC).font(F.title).fontSize(11)
+          .text(config.autor.toUpperCase(), ML, H * 0.87, { width: CW, align: "center", characterSpacing: 1.5 });
+      }
+      doc.save();
+      doc.fillOpacity(0.40).fillColor("#FFFFFF").font(F.body).fontSize(8)
+        .text(String(new Date().getFullYear()), ML, H * 0.90, { width: CW, align: "center" });
+      doc.restore();
     }
 
     // ════════════════════════════════════════
-    // SUMÁRIO
+    // SUMÁRIO — redesigned
     // ════════════════════════════════════════
     newPage("Sumário");
-    doc.fillColor(C.primary).font(F.title).fontSize(24)
-      .text("SUMÁRIO", ML, cy, { width: CW, characterSpacing: 4 });
-    cy = doc.y + 6;
-    doc.rect(ML, cy, 60, 3).fill(C.primary);
-    cy += 22;
+
+    // Ghost "SUMÁRIO" no fundo
+    doc.save();
+    doc.translate(ML - 8, CT + 160);
+    doc.rotate(-90);
+    doc.fillColor(C.primary).fillOpacity(0.035).font(F.title).fontSize(120)
+      .text("SUMÁRIO", 0, 0, { lineBreak: false });
+    doc.restore();
+
+    // Barra lateral esquerda
+    doc.rect(ML, CT, 4, CB - CT).fill(C.primary);
+
+    // Título
+    doc.fillColor(C.primary).font(F.title).fontSize(30)
+      .text("SUMÁRIO", ML + 18, cy, { characterSpacing: 5 });
+    cy = doc.y + 4;
+    doc.rect(ML + 18, cy, 48, 3).fill(C.accent || C.primary);
+    cy += 28;
 
     const indiceItens = [{ num: null, nome: "Introdução" }];
     for (let i = 0; i < (conteudo.secoes || []).length; i++)
@@ -608,22 +811,26 @@ async function gerarPDF(config, conteudo) {
     indiceItens.push({ num: null, nome: "Conclusão & Próximos Passos" });
 
     for (const item of indiceItens) {
-      if (cy + 36 > CB) newPage("Sumário");
+      if (cy + 42 > CB) newPage("Sumário");
+      const rowH = 38;
       if (item.num) {
-        doc.rect(ML, cy + 2, 28, 22).fill(C.primary);
-        doc.fillColor("#FFFFFF").font(F.title).fontSize(10)
-          .text(item.num, ML, cy + 7, { width: 28, align: "center" });
+        // Número preenchido
+        doc.rect(ML + 18, cy, 36, rowH).fill(C.primary);
+        doc.fillColor("#FFFFFF").font(F.title).fontSize(12)
+          .text(item.num, ML + 18, cy + 10, { width: 36, align: "center" });
       } else {
-        doc.rect(ML, cy + 2, 28, 22).fill("#EEEEEE");
-        doc.fillColor("#999999").font(F.title).fontSize(10)
-          .text("—", ML, cy + 7, { width: 28, align: "center" });
+        // Entrada sem número
+        doc.rect(ML + 18, cy, 36, rowH).fill("#F0F0F0");
+        doc.fillColor("#999999").font(F.body).fontSize(10)
+          .text("—", ML + 18, cy + 12, { width: 36, align: "center" });
       }
-      doc.fillColor(TEXT_DARK).font(F.body).fontSize(12)
-        .text(item.nome, ML + 38, cy + 7, { width: CW - 38 });
-      cy = doc.y + 10;
+      // Nome do capítulo
+      doc.fillColor(TEXT_DARK).font(F.body).fontSize(13)
+        .text(item.nome, ML + 62, cy + 11, { width: CW - 80 });
+      cy += rowH + 4;
+      // Linha separadora fina
       doc.save();
-      doc.fillOpacity(0.08);
-      doc.rect(ML + 38, cy - 4, CW - 38, 0.5).fill(C.primary);
+      doc.fillOpacity(0.06).rect(ML + 18, cy, CW - 18, 0.5).fill(C.primary);
       doc.restore();
     }
 
@@ -631,19 +838,25 @@ async function gerarPDF(config, conteudo) {
     // INTRODUÇÃO
     // ════════════════════════════════════════
     newPage("Introdução");
-    sectionTitle("Introdução", null);
+    drawChapterBanner("Introdução", null);
     writeBody(conteudo.introducao);
 
     // ════════════════════════════════════════
     // SEÇÕES
     // ════════════════════════════════════════
+    const usaTransicao = config.tipo === "ebook" && (config.paginas || 0) >= 15;
     for (let i = 0; i < (conteudo.secoes || []).length; i++) {
       const secao  = conteudo.secoes[i];
       const numStr = String(i + 1).padStart(2, "0");
+      if (usaTransicao) drawTransitionPage(secao.titulo, numStr, secao.gancho);
       newPage(secao.titulo);
-      sectionTitle(secao.titulo, numStr);
+      drawChapterBanner(secao.titulo, numStr);
+      if (secao.gancho) writeGanchoBox(secao.gancho);
       writeBody(secao.conteudo);
-      if (secao.destaques?.length) {
+      if (secao.ponto_de_acao) {
+        cy += 6;
+        writeActionPoint(`▸ ${secao.ponto_de_acao}`);
+      } else if (secao.destaques?.length) {
         cy += 8;
         writeDivider();
         for (const d of secao.destaques) {
@@ -657,26 +870,74 @@ async function gerarPDF(config, conteudo) {
     // CONCLUSÃO
     // ════════════════════════════════════════
     newPage("Conclusão");
-    sectionTitle("Conclusão & Próximos Passos", null);
+    drawChapterBanner("Conclusão & Próximos Passos", null);
     writeBody(conteudo.conclusao);
 
     // ════════════════════════════════════════
     // SOBRE O AUTOR
     // ════════════════════════════════════════
     if (conteudo.sobre_autor) {
-      if (cy + 120 > CB) newPage();
-      cy += 20;
-      writeDivider();
+      newPage("Sobre o Autor");
+      drawChapterBanner("Sobre o Autor", null);
+
       const sobreText = String(conteudo.sobre_autor);
-      const sobreH    = Math.max(80, doc.heightOfString(sobreText, { width: CW - 36, fontSize: 10.5 }) + 44);
-      doc.rect(ML, cy, CW, sobreH).fill("#F8F8F8");
-      doc.rect(ML, cy, CW, sobreH).lineWidth(0.5).strokeColor("#E0E0E0").stroke();
-      doc.rect(ML, cy, 5, sobreH).fill(C.primary);
-      doc.fillColor(C.primary).font(F.title).fontSize(10)
-        .text("SOBRE O AUTOR", ML + 18, cy + 14, { width: CW - 28, characterSpacing: 1 });
+      const photoR = 44;
+      const photoX = W - ML - photoR * 2;
+      const photoY = cy;
+
+      // Círculo placeholder para foto
+      doc.save();
+      doc.circle(photoX + photoR, photoY + photoR, photoR).fill("#F0F0F0");
+      doc.circle(photoX + photoR, photoY + photoR, photoR).lineWidth(3).strokeColor(C.primary).stroke();
+      // Silhueta simples
+      doc.fillColor(C.primary).fillOpacity(0.18)
+        .circle(photoX + photoR, photoY + photoR - 10, 16).fill();
+      doc.fillColor(C.primary).fillOpacity(0.14)
+        .ellipse(photoX + photoR, photoY + photoR * 2 + 6, 28, 20).fill();
+      doc.restore();
+
+      // Texto ao lado da foto
+      const textW = photoX - ML - 20;
+      doc.fillColor(C.primary).font(F.title).fontSize(11)
+        .text("SOBRE O AUTOR", ML, cy, { width: textW, characterSpacing: 1.5 });
+      cy = doc.y + 6;
       doc.fillColor(TEXT_DARK).font(F.body).fontSize(10.5)
-        .text(sobreText, ML + 18, cy + 34, { width: CW - 28, lineGap: 4 });
-      cy = doc.y + 16;
+        .text(sobreText, ML, cy, { width: textW, lineGap: 4 });
+      cy = Math.max(doc.y, photoY + photoR * 2) + 24;
+    }
+
+    // ════════════════════════════════════════
+    // PÁGINA DE ENCERRAMENTO
+    // ════════════════════════════════════════
+    {
+      pageNum++;
+      doc.addPage({ size: "A4", margin: 0 });
+      doc.rect(0, 0, W, H).fill(C.coverBg || C.secondary || "#1D1D1D");
+      // Painel central
+      const panH = 280, panY = (H - panH) / 2;
+      doc.save();
+      doc.fillOpacity(0.12).rect(ML, panY, CW, panH).fill("#FFFFFF");
+      doc.restore();
+      doc.rect(ML, panY, 5, panH).fill(C.accent || C.coverAccent || C.primary);
+      // Aspas decorativas
+      doc.save();
+      doc.fillColor("#FFFFFF").fillOpacity(0.06).font(F.title).fontSize(180)
+        .text("“", ML + 14, panY - 28, { lineBreak: false });
+      doc.restore();
+      // Texto central
+      const thanksTitle = "Obrigado por chegar até aqui.";
+      const thanksBody  = config.autor ? `— ${config.autor}` : "";
+      doc.fillColor("#FFFFFF").font(F.title).fontSize(22)
+        .text(thanksTitle, ML + 24, panY + 52, { width: CW - 40, align: "center", lineGap: 6 });
+      doc.rect(ML + CW * 0.35, panY + 130, CW * 0.3, 2).fill(C.accent || C.primary);
+      if (thanksBody) {
+        doc.save();
+        doc.fillOpacity(0.75).fillColor("#FFFFFF").font(F.subtitle || F.body).fontSize(12)
+          .text(thanksBody, ML, panY + 148, { width: CW, align: "center", characterSpacing: 0.5 });
+        doc.restore();
+      }
+      // Stripe no rodapé
+      doc.rect(0, H - 5, W, 5).fill(C.accent || C.primary);
     }
 
     doc.end();
@@ -1251,7 +1512,9 @@ async function generate(params) {
     secoes: (copy.secoes || []).map(s => ({
       titulo: s.titulo,
       conteudo: s.conteudo,
-      destaques: s.ponto_de_acao ? [s.ponto_de_acao] : [],
+      gancho: s.gancho || null,
+      ponto_de_acao: s.ponto_de_acao || null,
+      destaques: [],
     })),
     conclusao: copy.copy_contracapa || "",
     sobre_autor: autor || "",
@@ -1278,8 +1541,8 @@ async function generate(params) {
     formato:   formato || "pdf",
     capaImagem: capaBuffer,
     capaImagemOpacidade,
-    fonteTitulo: fonteTitulo || "Poppins",
-    fonteCorpo:  fonteCorpo  || "Poppins",
+    fonteTitulo: fonteTitulo || "Oswald",
+    fonteCorpo:  fonteCorpo  || "Nunito",
   };
 
   await progress(90, "Montando PDF...");

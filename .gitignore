@@ -16,3 +16,10 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+
+# Scripts temporários de teste
+gerar_teste.js
+conselho_consulta.js
+
+# Claude Code local
+.claude/

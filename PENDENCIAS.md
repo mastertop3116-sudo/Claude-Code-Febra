@@ -31,6 +31,31 @@ Implementado nos commits do Carlinhos (`6e039d8`, `a03f38b`):
 
 ## 🟢 Melhorias futuras (próximas sessões)
 
+### 9. ✅ Redesign completo do gerador de PDF v4 (2026-04-27)
+- ✅ `drawChapterBanner` + `writeGanchoBox` — novo visual de abertura de capítulo
+- ✅ `writeNumberedItem` — badge desenhado após texto (bug de overflow corrigido)
+- ✅ `writeBody` — split por `\n` (era `;`)
+- ✅ 6 bugs de `heightOfString` corrigidos em todos os boxes (lineGap matching)
+- ✅ "Sobre o Autor" com círculo de foto placeholder
+- ✅ Página de encerramento "Obrigado" dark + painel central
+- ✅ Capa vetorial nativa (fallback de alta qualidade, sem depender de imagem AI)
+- ✅ Páginas de transição entre capítulos (ebooks ≥15 páginas) — recomendação Conselho
+- ✅ Fontes padrão → Oswald + Nunito — recomendação Conselho
+- ✅ Espaçamento aumentado entre parágrafos e bullets
+
+### 10. ✅ Agentes reescritos (2026-04-27)
+- ✅ `copywriter.js` — SYSTEM_PRO/Flash, PRO_TYPES auto-seleção, cache em memória, jsonrepair fallback
+- ✅ `capa.js` — Imagen 4 fast, prompt anti-texto reforçado
+- ✅ `carrossel.js` — migrado para Flash
+- ✅ `cover_templates.js` — slices expandidos (titulo:80, subtitulo:180)
+
+### 11. ✅ UX da página de criação (2026-04-27)
+- ✅ "02 Tema visual" oculto no carrossel/converter (`data-showon="ent"`)
+- ✅ Seletor de tema compacto no carrossel
+- ✅ "Relatório de pesquisa" gerado por IA (`/api/relatorio`)
+- ✅ Chips de sugestão em todos os campos
+- ✅ Modo Econômico removido — sistema auto-seleciona modelo por tipo
+
 ### 3. ✅ DNA de Lançamento — Upload de relatório de mercado
 - ✅ Upload de PDF/txt/md/csv na página `/criar` (extração de texto via pdfjs)
 - ✅ `POST /api/produto` salva em `produtos` + `lancamentos.relatorio_texto`

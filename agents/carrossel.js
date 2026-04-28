@@ -5,7 +5,7 @@ const SYSTEM = `Especialista em carrosséis para Instagram e LinkedIn. Máx 10 p
 
 async function run({ copy, estrategia, autor, formato = 'instagram_feed' }) {
   const model = genai.getGenerativeModel({
-    model: 'gemini-2.5-pro',
+    model: 'gemini-2.5-flash',
     systemInstruction: SYSTEM,
     generationConfig: { responseMimeType: 'application/json' },
   })
