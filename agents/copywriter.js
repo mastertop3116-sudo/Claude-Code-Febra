@@ -64,7 +64,7 @@ function _cacheKey(estrategia, estrutura, autor, tipo) {
 }
 
 // Tipos que exigem Pro: copy complexa, VSL, conteúdo longo/persuasivo
-const PRO_TYPES = new Set(['ebook', 'workbook', 'script_vsl'])
+const PRO_TYPES = new Set(['workbook', 'script_vsl'])
 
 async function _callModel(modelName, systemPrompt, prompt) {
   const model = genai.getGenerativeModel({
