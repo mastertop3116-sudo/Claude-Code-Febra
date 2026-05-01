@@ -76,6 +76,38 @@ Implementado nos commits do Carlinhos (`6e039d8`, `a03f38b`):
 - `pdfjs-dist` 3.11 via CDN renderiza a página 1 do PDF gerado num `<canvas>` no overlay de sucesso
 - Zero mudança no servidor — usa o base64 que já chega no browser
 
+### 13. Renovar/verificar chave GEMINI_API_KEY local
+- A chave local no `.env` recebeu erro 403 "Your project has been denied access"
+- Render funciona (chave do ambiente de produção está ok)
+- Verificar no Google AI Studio se a chave local expirou ou projeto foi suspenso
+- Gerar nova chave e atualizar o `.env` local
+
+### 12. Sistema de imagens profissionais para Criativos em Imagem
+- Geração de imagens de alta qualidade para uso em criativos (posts, banners, capas)
+- Integrar com o fluxo de Criativos existente
+- Explorar: Imagen 4, Gemini Flash Image, ou pipeline próprio
+- Qualidade profissional: proporções corretas por plataforma (feed, stories, YouTube thumb)
+
+### 14. ✅ Otimização radical de tokens Gemini (2026-05-01)
+- ✅ roteirista.js + editor.js: Pro → Flash (3-4x mais barato)
+- ✅ design_reviewer.js + content_specialist.js: Pro → Flash
+- ✅ copywriter.js: Flash em todos; word minimums 600→400 (PRO_TYPES), 350→250 (padrão)
+- ✅ gemini.js: geminiImage() de até 9 chamadas → 2 tentativas lineares
+- ✅ max.js: histórico 10→5, aprendizados 5→3, extractLearning condicional (>80 chars)
+- ✅ server.js: compression middleware + cache headers (assets 1h, fontes 7d)
+- ✅ criar.html: fontes Google split crítico/async (13 famílias carregam pós-render)
+- Estimativa: -80% custo Gemini, +60% throughput servidor
+
+### 15. Integração API Gamma (próxima sessão)
+- Conectar API Gamma para geração de apresentações/slides
+- Criar endpoint `/api/gamma` e comando `/apresentacao`
+- Integrar no fluxo de criação junto com PDF/Word
+
+### 16. Corrigir conteúdo ebook de pregações (PENDENTE)
+- O agente gera manual metodológico em vez de pregações prontas
+- Ajustar prompts de estrategista/arquiteto para gerar pregações completas
+  (texto bíblico + intro + 3 pontos + aplicação + conclusão)
+
 ### 7. Dashboard/Studio (sessão dedicada)
 - Seletor de produto cadastrado
 - Histórico de criativos gerados por produto
