@@ -435,6 +435,27 @@ Linguagem direta, sem rodeios. Fale como um estrategista experiente.`;
 });
 
 // ──────────────────────────────────────────
+// Gamma — Geração de Apresentações
+// ──────────────────────────────────────────
+app.post("/api/gamma", async (req, res) => {
+  try {
+    const { titulo, conteudo, numSlides = 10, exportar = 'pptx' } = req.body;
+    if (!titulo || !conteudo) return res.status(400).json({ error: "titulo e conteudo obrigatórios" });
+    const { criarApresentacao, aguardarGeracao } = require("./integrations/gamma");
+    const generationId = await criarApresentacao({ titulo, conteudo, numSlides, exportar });
+    const resultado = await aguardarGeracao(generationId);
+    res.json({
+      url: resultado.gammaUrl,
+      exportUrl: resultado.exportUrl,
+      creditsUsed: resultado.creditsUsed,
+    });
+  } catch (e) {
+    console.error("[/api/gamma]", e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ──────────────────────────────────────────
 // Conversor de documentos PDF ↔ DOCX
 // ──────────────────────────────────────────
 app.post("/api/convert", async (req, res) => {
