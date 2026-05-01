@@ -24,13 +24,37 @@ function withTimeout(promise, ms, label) {
   ]);
 }
 
+// Retry automático para 503/overload do Gemini (até 3 tentativas, backoff 4s/8s)
+function is503(err) {
+  const msg = err?.message || "";
+  return msg.includes("503") || msg.includes("overloaded") || msg.includes("high demand") || msg.includes("Service Unavailable");
+}
+
+async function withRetry(fn, label, maxTries = 3) {
+  for (let i = 1; i <= maxTries; i++) {
+    try {
+      return await fn();
+    } catch (e) {
+      if (is503(e) && i < maxTries) {
+        const delay = i * 4000;
+        console.warn(`[Gemini] ${label} 503 — tentativa ${i}/${maxTries}, aguardando ${delay / 1000}s...`);
+        await new Promise(r => setTimeout(r, delay));
+      } else {
+        throw e;
+      }
+    }
+  }
+}
+
 async function geminiFlash(prompt, systemInstruction = null) {
   const model = genAI.getGenerativeModel({
     model: FLASH_MODEL,
     ...(systemInstruction && { systemInstruction }),
   });
-  const result = await withTimeout(model.generateContent(prompt), 90_000, "geminiFlash");
-  return result.response.text();
+  return withRetry(async () => {
+    const result = await withTimeout(model.generateContent(prompt), 90_000, "geminiFlash");
+    return result.response.text();
+  }, "geminiFlash");
 }
 
 async function geminiPro(prompt, systemInstruction = null) {
@@ -38,8 +62,10 @@ async function geminiPro(prompt, systemInstruction = null) {
     model: PRO_MODEL,
     ...(systemInstruction && { systemInstruction }),
   });
-  const result = await withTimeout(model.generateContent(prompt), 120_000, "geminiPro");
-  return result.response.text();
+  return withRetry(async () => {
+    const result = await withTimeout(model.generateContent(prompt), 120_000, "geminiPro");
+    return result.response.text();
+  }, "geminiPro");
 }
 
 function geminiChat(systemInstruction = null, usePro = false) {
@@ -55,8 +81,10 @@ async function geminiJson(prompt, usePro = false) {
     model: usePro ? PRO_MODEL : FLASH_MODEL,
     generationConfig: { responseMimeType: "application/json" },
   });
-  const result = await withTimeout(model.generateContent(prompt), 90_000, "geminiJson");
-  return result.response.text();
+  return withRetry(async () => {
+    const result = await withTimeout(model.generateContent(prompt), 90_000, "geminiJson");
+    return result.response.text();
+  }, "geminiJson");
 }
 
 // Nano Banana — geração de imagens
