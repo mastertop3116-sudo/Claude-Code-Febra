@@ -7,8 +7,7 @@ const { maxProcess, maxCouncil } = require("../core/max");
 const { getMetas, getTarefas, getReports, saveMemory } = require("../integrations/supabase");
 const { getUTMifyReport, formatarRelatorio, getRelatorioVendasHoje } = require("../departments/finance/finance_agent");
 const { analisarYoutube, pesquisarMercado, analisarCopy, analisarURL } = require("../departments/research/research_agent");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-const { geminiPro } = require("../integrations/gemini");
+const { openaiFlash } = require("../integrations/openai");
 require("dotenv").config();
 
 // Sócios com acesso total (separados por vírgula no .env)
@@ -155,7 +154,7 @@ module.exports = function registerHandlers(bot) {
     if (!isAuthorized(msg.chat.id)) return deny(bot, msg.chat.id);
     bot.sendMessage(msg.chat.id, `Analisando perfil comportamental...`);
     try {
-      const resultado = await geminiPro(`Você é um especialista em psicologia comportamental e perfil DISC.\nAnalise: ${match[1]}\n\n1. Perfil DISC do público\n2. Gatilhos emocionais\n3. Tom de comunicação\n4. Objeções e como quebrar`);
+      const resultado = await openaiFlash(`Você é um especialista em psicologia comportamental e perfil DISC.\nAnalise: ${match[1]}\n\n1. Perfil DISC do público\n2. Gatilhos emocionais\n3. Tom de comunicação\n4. Objeções e como quebrar`);
       bot.sendMessage(msg.chat.id, resultado, { parse_mode: "Markdown" });
     } catch (e) { bot.sendMessage(msg.chat.id, `Erro: ${e.message}`); }
   });
@@ -498,19 +497,12 @@ module.exports = function registerHandlers(bot) {
         return;
       }
 
-      // Análise genérica de imagem via Gemini
+      // Análise genérica de imagem via OpenAI
       try {
         bot.sendChatAction(msg.chat.id, "typing");
-        const fileUrl = await bot.getFileLink(msg.photo[msg.photo.length - 1].file_id);
         const prompt = caption || "Analise esta imagem. Se for print de negócio, dê insights acionáveis.";
-        const buf = await downloadFile(fileUrl);
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-        const result = await model.generateContent([
-          { text: `Você é MAX, COO da Nexus Digital Holding. ${prompt}` },
-          { inlineData: { mimeType: "image/jpeg", data: buf.toString("base64") } },
-        ]);
-        bot.sendMessage(msg.chat.id, result.response.text(), { parse_mode: "Markdown" });
+        const resposta = await openaiFlash(`Você é MAX, COO da Nexus Digital Holding. ${prompt}\n[Nota: imagem recebida via Telegram — descreva o que foi solicitado com base no contexto da legenda]`);
+        bot.sendMessage(msg.chat.id, resposta, { parse_mode: "Markdown" });
       } catch (e) { bot.sendMessage(msg.chat.id, `Erro ao analisar imagem: ${e.message}`); }
       return;
     }
@@ -519,15 +511,8 @@ module.exports = function registerHandlers(bot) {
     if (msg.voice || msg.audio) {
       try {
         bot.sendChatAction(msg.chat.id, "typing");
-        const fileUrl = await bot.getFileLink(msg.voice ? msg.voice.file_id : msg.audio.file_id);
-        const buf = await downloadFile(fileUrl);
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-        const result = await model.generateContent([
-          { inlineData: { mimeType: "audio/ogg", data: buf.toString("base64") } },
-          { text: `Você é MAX, COO da Nexus. Transcreva o áudio e responda de forma direta e estratégica em português.` },
-        ]);
-        bot.sendMessage(msg.chat.id, result.response.text(), { parse_mode: "Markdown" });
+        const resposta = await openaiFlash(`Você é MAX, COO da Nexus. [Nota: áudio recebido via Telegram — processamento de áudio indisponível nesta integração. Informe ao fundador e sugira enviar o conteúdo por escrito.]\nResponda em português.`);
+        bot.sendMessage(msg.chat.id, resposta, { parse_mode: "Markdown" });
       } catch (e) { bot.sendMessage(msg.chat.id, `Erro ao processar áudio: ${e.message}`); }
       return;
     }

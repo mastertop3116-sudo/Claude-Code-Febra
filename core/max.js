@@ -4,12 +4,10 @@
 // Interface: Telegram | Motor: Claude + Gemini
 // ============================================
 
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { openaiFlash, openaiJson } = require("../integrations/openai");
 const { saveMemory, getMemory, supabase } = require("../integrations/supabase");
 const { getUTMifyReport, formatarRelatorio, getRelatorioVendasHoje } = require("../departments/finance/finance_agent");
 require("dotenv").config();
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const MAX_SYSTEM_PROMPT = `
 Você é MAX, o COO e cérebro central da Nexus Digital Holding.
@@ -225,9 +223,7 @@ async function saveConversation(telegramId, userMsg, maxReply) {
 // ──────────────────────────────────────────
 async function extractLearning(userMsg, maxReply) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-    const result = await model.generateContent(`
+    const learning = (await openaiFlash(`
 Analise esta interação entre o Fundador e MAX da Nexus Digital Holding.
 Se houver algo importante para aprender ou lembrar (preferência, decisão estratégica, dado do negócio, padrão de comportamento), escreva em UMA linha curta.
 Se não houver nada relevante para aprender, responda apenas: NADA.
@@ -235,9 +231,7 @@ Se não houver nada relevante para aprender, responda apenas: NADA.
 Fundador: ${userMsg}
 MAX: ${maxReply}
 
-Aprendizado:`);
-
-    const learning = result.response.text().trim();
+Aprendizado:`)).trim();
     if (learning && learning !== "NADA" && !learning.includes("NADA")) {
       await saveMemory("MAX", "learning", learning, { origem: "conversa" });
       console.log(`[MAX] Aprendizado registrado: ${learning}`);
@@ -255,14 +249,11 @@ async function maxProcess(order, telegramId = null) {
 
   const context = telegramId ? await buildContext(telegramId, order) : "";
 
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
   const fullPrompt = context
     ? `${MAX_SYSTEM_PROMPT}\n\n${context}NOVA MENSAGEM DO FUNDADOR:\n${order}`
     : order;
 
-  const result = await model.generateContent(fullPrompt);
-  const reply = result.response.text();
+  const reply = await openaiFlash(fullPrompt);
 
   // Salva no Supabase e aprende
   if (telegramId) {
@@ -276,9 +267,7 @@ async function maxProcess(order, telegramId = null) {
 // maxCouncil — Conselho de Titãs
 // ──────────────────────────────────────────
 async function maxCouncil(decision) {
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
-
-  const result = await model.generateContent(`
+  const reply = await openaiFlash(`
 ${MAX_SYSTEM_PROMPT}
 
 MODO: CONSELHO DE TITÃS ATIVADO
@@ -294,8 +283,6 @@ DECISÃO A ANALISAR: ${decision}
 Cada conselheiro deve dar sua análise e recomendação.
 MAX fecha com o veredito final consolidado.
 `);
-
-  const reply = result.response.text();
   await saveMemory("MAX", "council", decision, { veredito: reply });
   return reply;
 }

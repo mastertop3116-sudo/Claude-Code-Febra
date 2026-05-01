@@ -4,11 +4,9 @@
 // YouTube, PDFs, URLs, mercado e concorrentes
 // ============================================
 
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { openaiFlash } = require("../../integrations/openai");
 const { saveMemory } = require("../../integrations/supabase");
 require("dotenv").config();
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const BIBLIOTECARIO_PROMPT = `
 Você é O Bibliotecário, gestor do Departamento de Pesquisa da Nexus Digital Holding.
@@ -32,18 +30,11 @@ FORMATO DE ENTREGA:
  * Gemini consegue processar YouTube URLs diretamente
  */
 async function analisarYoutube(url, foco = null) {
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
   const prompt = foco
     ? `Analise este vídeo com foco em: ${foco}\n\nURL: ${url}`
     : `Analise este vídeo e extraia:\n1. Estratégia de conteúdo usada\n2. Ângulo de vendas/copy\n3. Pontos fortes e fracos\n4. O que podemos usar na Nexus\n\nURL: ${url}`;
 
-  const result = await model.generateContent([
-    { text: BIBLIOTECARIO_PROMPT },
-    { text: prompt },
-  ]);
-
-  const resposta = result.response.text();
+  const resposta = await openaiFlash(`${BIBLIOTECARIO_PROMPT}\n\n${prompt}`);
   await saveMemory("research", "youtube", url, { foco, resposta });
   return resposta;
 }
@@ -52,12 +43,9 @@ async function analisarYoutube(url, foco = null) {
  * Pesquisa de mercado sobre um nicho ou tema
  */
 async function pesquisarMercado(tema) {
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  const resposta = await openaiFlash(`${BIBLIOTECARIO_PROMPT}
 
-  const result = await model.generateContent([
-    { text: BIBLIOTECARIO_PROMPT },
-    {
-      text: `Faça uma pesquisa de mercado completa sobre: "${tema}"
+Faça uma pesquisa de mercado completa sobre: "${tema}"
 
 Inclua:
 1. Tamanho e potencial do mercado
@@ -68,11 +56,7 @@ Inclua:
 6. Faixa de preço que converte melhor
 7. Objeções mais comuns
 
-INSIGHTS ACIONÁVEIS para a Nexus:`,
-    },
-  ]);
-
-  const resposta = result.response.text();
+INSIGHTS ACIONÁVEIS para a Nexus:`);
   await saveMemory("research", "market", tema, { resposta });
   return resposta;
 }
@@ -81,12 +65,9 @@ INSIGHTS ACIONÁVEIS para a Nexus:`,
  * Analisa copy/VSL de um concorrente
  */
 async function analisarCopy(texto) {
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  return await openaiFlash(`${BIBLIOTECARIO_PROMPT}
 
-  const result = await model.generateContent([
-    { text: BIBLIOTECARIO_PROMPT },
-    {
-      text: `Analise esta copy/VSL como um especialista em persuasão e vendas:
+Analise esta copy/VSL como um especialista em persuasão e vendas:
 
 ${texto}
 
@@ -96,23 +77,16 @@ Extraia:
 3. Perfil DISC do público-alvo
 4. Headline e ângulo principal
 5. Promessa central e prova
-6. O que replicar e o que melhorar`,
-    },
-  ]);
-
-  return result.response.text();
+6. O que replicar e o que melhorar`);
 }
 
 /**
  * Analisa uma URL (landing page, site de concorrente)
  */
 async function analisarURL(url) {
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  return await openaiFlash(`${BIBLIOTECARIO_PROMPT}
 
-  const result = await model.generateContent([
-    { text: BIBLIOTECARIO_PROMPT },
-    {
-      text: `Analise esta página web como estrategista de marketing digital:
+Analise esta página web como estrategista de marketing digital:
 URL: ${url}
 
 Foque em:
@@ -120,11 +94,7 @@ Foque em:
 2. Estrutura da página e fluxo
 3. Chamadas para ação (CTAs)
 4. Estratégia de copy
-5. O que roubar de inspiração para a Nexus`,
-    },
-  ]);
-
-  return result.response.text();
+5. O que roubar de inspiração para a Nexus`);
 }
 
 module.exports = { analisarYoutube, pesquisarMercado, analisarCopy, analisarURL };

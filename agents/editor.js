@@ -1,18 +1,4 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai')
-const genai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
 const { openaiJson } = require('../integrations/openai')
-
-function _retry(fn, tries = 3) {
-  return fn().catch(async e => {
-    const is503 = e?.message?.includes('503') || e?.message?.includes('overloaded') || e?.message?.includes('high demand')
-    if (is503 && tries > 1) {
-      await new Promise(r => setTimeout(r, (4 - tries) * 4000))
-      return _retry(fn, tries - 1)
-    }
-    throw e
-  })
-}
-const is429 = e => e?.message?.includes('429') || e?.message?.toLowerCase().includes('quota') || e?.message?.toLowerCase().includes('exceeded')
 
 const SYSTEM = `Você é um especialista em edição de vídeo para Instagram Reels, TikTok e YouTube Shorts focado em conversão e retenção.
 
@@ -95,22 +81,8 @@ Retorne APENAS este JSON:
 }`
 
 async function run({ roteiro, plataforma }) {
-  const model = genai.getGenerativeModel({
-    model: 'gemini-2.5-flash',
-    systemInstruction: SYSTEM,
-    generationConfig: { responseMimeType: 'application/json' },
-  })
-  const promptText = `Plataforma: ${plataforma || roteiro.plataforma || 'reels'}\nDuracao estimada: ${roteiro.duracao_estimada || 'curto'}\n\nRoteiro:\n${JSON.stringify(roteiro, null, 2)}\n\nGere as instrucoes completas de edicao.`
-  try {
-    const r = await _retry(() => model.generateContent(promptText))
-    return JSON.parse(r.response.text().trim())
-  } catch (e) {
-    if (is429(e)) {
-      console.warn('[editor] 429 quota — fallback OpenAI')
-      return JSON.parse(await openaiJson(promptText, SYSTEM))
-    }
-    throw e
-  }
+  const prompt = `Plataforma: ${plataforma || roteiro.plataforma || 'reels'}\nDuracao estimada: ${roteiro.duracao_estimada || 'curto'}\n\nRoteiro:\n${JSON.stringify(roteiro, null, 2)}\n\nGere as instrucoes completas de edicao.`
+  return JSON.parse(await openaiJson(prompt, SYSTEM))
 }
 
 module.exports = { run }

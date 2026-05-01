@@ -1,5 +1,5 @@
-const { GoogleGenAI } = require('@google/genai')
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
+const { openaiFlash } = require('../integrations/openai')
+const OpenAI = require('openai')
 
 const TEMA_MAP = {
   impacto:      'bold red orange energy dynamic',
@@ -12,15 +12,25 @@ const TEMA_MAP = {
 
 async function run({ titulo, nicho, tema }) {
   const temaKey = Object.keys(TEMA_MAP).find(k => tema?.toLowerCase().includes(k)) || 'elegancia'
-  const prompt = `Abstract digital art for ebook cover. Visual style: ${TEMA_MAP[temaKey]}. Topic concept: ${nicho}. STRICT RULES: absolutely no text, no letters, no numbers, no words, no typography of any kind anywhere in the image. Pure abstract shapes, colors, and textures only. No faces, no people, no identifiable objects. Dark rich background. High-end editorial art direction.`
+  const prompt = `Abstract digital art for ebook cover. Visual style: ${TEMA_MAP[temaKey]}. Topic concept: ${nicho}. STRICT RULES: absolutely no text, no letters, no numbers, no words. Pure abstract shapes, colors, and textures only. No faces, no people. Dark rich background. High-end editorial art direction.`
 
-  const response = await ai.models.generateImages({
-    model: 'imagen-4.0-fast-generate-001',
+  let _client = null
+  function _getClient() {
+    if (!_client) _client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+    return _client
+  }
+
+  const response = await _getClient().images.generate({
+    model: 'dall-e-3',
     prompt,
-    config: { numberOfImages: 1, aspectRatio: '3:4', personGeneration: 'dont_allow' }
+    size: '1024x1792',
+    quality: 'standard',
+    n: 1,
   })
 
-  return Buffer.from(response.generatedImages[0].image.imageBytes, 'base64')
+  const imageUrl = response.data[0].url
+  const res = await fetch(imageUrl)
+  return Buffer.from(await res.arrayBuffer())
 }
 
 module.exports = { run }

@@ -202,8 +202,8 @@ CONTEXTO: ${contexto}
 `;
 
   try {
-    const { geminiPro } = require("../integrations/gemini");
-    const resultado = await geminiPro(prompt);
+    const { openaiFlash } = require("../integrations/openai");
+    const resultado = await openaiFlash(prompt);
     bot.sendMessage(msg.chat.id, resultado, { parse_mode: "Markdown" });
   } catch (e) {
     bot.sendMessage(msg.chat.id, `Erro na análise: ${e.message}`);
@@ -317,16 +317,8 @@ bot.on("message", async (msg) => {
         });
       });
 
-      const { GoogleGenerativeAI } = require("@google/generative-ai");
-      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-      const result = await model.generateContent([
-        { text: `Você é MAX, COO da Nexus Digital Holding. ${caption}` },
-        { inlineData: { mimeType: "image/jpeg", data: imageBuffer.toString("base64") } },
-      ]);
-
-      const resposta = result.response.text();
+      const { openaiFlash } = require("../integrations/openai");
+      const resposta = await openaiFlash(`Você é MAX, COO da Nexus Digital Holding. ${caption}\n[Nota: imagem recebida via Telegram — descreva o que foi solicitado com base no contexto da legenda]`);
       bot.sendMessage(msg.chat.id, resposta, { parse_mode: "Markdown" });
       await saveMemory("MAX", "image_analysis", caption, { resposta });
     } catch (e) {
@@ -355,23 +347,8 @@ bot.on("message", async (msg) => {
         });
       });
 
-      const { GoogleGenerativeAI } = require("@google/generative-ai");
-      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-      const result = await model.generateContent([
-        {
-          inlineData: {
-            mimeType: "audio/ogg",
-            data: audioBuffer.toString("base64"),
-          },
-        },
-        `Você é MAX, COO da Nexus Digital Holding.
-Primeiro transcreva o áudio. Depois responda ao que foi dito de forma direta e estratégica.
-Responda em português brasileiro.`,
-      ]);
-
-      const resposta = result.response.text();
+      const { openaiFlash } = require("../integrations/openai");
+      const resposta = await openaiFlash(`Você é MAX, COO da Nexus Digital Holding.\n[Nota: áudio recebido via Telegram — não é possível transcrever diretamente sem suporte multimodal. Informe ao fundador que o processamento de áudio está temporariamente indisponível e sugira enviar o texto por escrito.]\nResponda em português brasileiro.`);
       bot.sendMessage(msg.chat.id, resposta, { parse_mode: "Markdown" });
       await saveMemory("MAX", "voice", "[áudio]", { resposta });
     } catch (e) {

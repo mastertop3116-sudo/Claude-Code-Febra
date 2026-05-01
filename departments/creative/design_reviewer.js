@@ -5,12 +5,9 @@
 // Critérios específicos por nicho
 // ============================================
 
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-const { geminiJson, geminiImage } = require("../../integrations/gemini");
+const { geminiJson } = require("../../integrations/gemini");
 const { saveMemory } = require("../../integrations/supabase");
 require("dotenv").config();
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Critérios visuais específicos por nicho/tema
 const NICHE_VISUAL_CRITERIA = {
@@ -62,10 +59,12 @@ async function revisarCapaVisual(coverImageBuffer, titulo, temaKey) {
   const critEspecificos = NICHE_VISUAL_CRITERIA[temaKey] || NICHE_VISUAL_CRITERIA.produtividade;
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-    const result = await model.generateContent([
-      {
-        text: `Você é um diretor de arte RIGOROSO especialista em capas de produtos digitais para o mercado brasileiro de infoprodutos.
+    const { openaiJson: _oaiJson } = require("../../integrations/openai");
+    const OpenAI = require("openai");
+    let _client = null;
+    const _getClient = () => { if (!_client) _client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY }); return _client; };
+
+    const reviewPrompt = `Você é um diretor de arte RIGOROSO especialista em capas de produtos digitais para o mercado brasileiro de infoprodutos.
 Avalie esta imagem para ser usada como capa do entregável "${titulo}" (nicho: ${temaKey}).
 
 CRITÉRIOS GERAIS (peso 50%):
@@ -86,19 +85,21 @@ Responda EM JSON puro (sem markdown):
   "melhoria_prompt": "instrução detalhada em inglês para melhorar a imagem no próximo prompt de geração"
 }
 
-Score: 1-10. Aprovado = true APENAS se score >= 8. Seja rigoroso — score 8+ significa produto competitivo no mercado atual.`,
-      },
-      {
-        inlineData: {
-          mimeType: "image/png",
-          data: coverImageBuffer.toString("base64"),
-        },
-      },
-    ]);
+Score: 1-10. Aprovado = true APENAS se score >= 8. Seja rigoroso — score 8+ significa produto competitivo no mercado atual.`;
 
-    const text = result.response.text().trim()
-      .replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/, "");
-    const review = JSON.parse(text);
+    const r = await _getClient().chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{
+        role: "user",
+        content: [
+          { type: "text", text: reviewPrompt },
+          { type: "image_url", image_url: { url: `data:image/png;base64,${coverImageBuffer.toString("base64")}` } },
+        ],
+      }],
+      response_format: { type: "json_object" },
+    });
+
+    const review = JSON.parse(r.choices[0].message.content);
     console.log(`[Revisor Visual] "${titulo}" — Capa: ${review.score}/10`);
     return review;
   } catch (e) {

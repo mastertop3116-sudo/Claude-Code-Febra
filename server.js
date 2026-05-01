@@ -412,9 +412,7 @@ app.post("/api/relatorio", async (req, res) => {
   try {
     const { nicho, publico, nome } = req.body;
     if (!nicho) return res.status(400).json({ error: "nicho obrigatório" });
-    const { GoogleGenerativeAI } = require("@google/generative-ai");
-    const genai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genai.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const { openaiFlash } = require("./integrations/openai");
     const prompt = `Você é um analista de mercado de infoprodutos brasileiros.
 Gere um relatório de pesquisa de mercado CONCISO (máx 400 palavras) para:
 - Produto: ${nome || nicho}
@@ -428,8 +426,8 @@ Estruture em 4 blocos (sem cabeçalhos longos, texto direto):
 4. ÂNGULO DE DIFERENCIAÇÃO: como se destacar (1 ideia forte)
 
 Linguagem direta, sem rodeios. Fale como um estrategista experiente.`;
-    const r = await model.generateContent(prompt);
-    res.json({ relatorio: r.response.text().trim() });
+    const relatorio = await openaiFlash(prompt);
+    res.json({ relatorio: relatorio.trim() });
   } catch (e) {
     console.error("[relatorio]", e.message);
     res.status(500).json({ error: e.message });
