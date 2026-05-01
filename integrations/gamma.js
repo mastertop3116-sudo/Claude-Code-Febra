@@ -13,26 +13,24 @@ async function _fetch(path, opts = {}) {
   return res.json()
 }
 
-async function criarApresentacao({ titulo, conteudo, numSlides = 10, idioma = 'pt', exportar = 'pptx' }) {
-  const inputText = `# ${titulo}\n\n${conteudo}`
-  const data = await _fetch('/generations', {
+// Gera um entregável (documento ou apresentação) e aguarda o resultado
+// Retorna { gammaUrl, exportUrl, creditsUsed }
+async function gerarEntregavel(inputText, { formato = 'document', numCards = 10, exportar = 'pdf' } = {}) {
+  const { generationId } = await _fetch('/generations', {
     method: 'POST',
     body: JSON.stringify({
       inputText,
-      textMode: 'generate',
-      format: 'presentation',
-      numCards: numSlides,
+      textMode: 'preserve',
+      format: formato,
+      numCards,
       cardSplit: 'auto',
       exportAs: exportar,
-      textOptions: { amount: 'detailed', language: idioma, tone: 'professional' },
+      textOptions: { amount: 'detailed', language: 'pt', tone: 'professional' },
     }),
   })
-  return data.generationId
-}
 
-async function aguardarGeracao(generationId, timeoutMs = 180_000) {
   const start = Date.now()
-  while (Date.now() - start < timeoutMs) {
+  while (Date.now() - start < 180_000) {
     const data = await _fetch(`/generations/${generationId}`)
     if (data.status === 'completed') return data
     if (data.status === 'failed') throw new Error('[Gamma] Geração falhou')
@@ -41,8 +39,13 @@ async function aguardarGeracao(generationId, timeoutMs = 180_000) {
   throw new Error('[Gamma] Timeout após 3 minutos')
 }
 
+// Endpoint /api/gamma — cria apresentação a partir de título + conteúdo livre
+async function criarApresentacao({ titulo, conteudo, numSlides = 10, exportar = 'pptx' }) {
+  return gerarEntregavel(`# ${titulo}\n\n${conteudo}`, { formato: 'presentation', numCards: numSlides, exportar })
+}
+
 async function listarTemas() {
   return _fetch('/themes')
 }
 
-module.exports = { criarApresentacao, aguardarGeracao, listarTemas }
+module.exports = { gerarEntregavel, criarApresentacao, listarTemas }

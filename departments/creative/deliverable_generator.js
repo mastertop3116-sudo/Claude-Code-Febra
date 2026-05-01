@@ -1416,6 +1416,27 @@ async function gerarDOCX(config, conteudo) {
 }
 
 // ──────────────────────────────────────────
+// Formata o conteúdo gerado como Markdown para o Gamma
+// ──────────────────────────────────────────
+function _markdownParaGamma(titulo, subtitulo, autor, estrategia, copy) {
+  const l = [`# ${titulo}`]
+  if (subtitulo) l.push(`### ${subtitulo}`)
+  if (copy.copy_capa) l.push('', `> ${copy.copy_capa}`)
+  if (estrategia.promessa_central) {
+    l.push('', '## Introdução', '', estrategia.promessa_central)
+  }
+  for (const s of (copy.secoes || [])) {
+    l.push('', `## ${s.titulo}`)
+    if (s.gancho) l.push('', `*${s.gancho}*`)
+    if (s.conteudo) l.push('', s.conteudo)
+    if (s.ponto_de_acao) l.push('', `**Próximo passo:** ${s.ponto_de_acao}`)
+  }
+  if (copy.copy_contracapa) l.push('', '## Conclusão', '', copy.copy_contracapa)
+  if (autor) l.push('', '---', `*Por ${autor}*`)
+  return l.join('\n')
+}
+
+// ──────────────────────────────────────────
 // Função principal
 // config.onProgress(pct, msg) — callback opcional para progresso em tempo real
 // ──────────────────────────────────────────
@@ -1499,17 +1520,41 @@ async function generate(params) {
     fonteCorpo:  fonteCorpo  || "Nunito",
   };
 
-  await progress(90, "Montando PDF...");
+  const fileSlug = finalConfig.titulo.replace(/[^a-zA-Z0-9]/g, "_")
   const resultado = { titulo: finalConfig.titulo, conteudo, coverImageBuffer: capaBuffer };
 
   if (finalConfig.formato === "pdf" || finalConfig.formato === "ambos") {
-    resultado.pdf = await gerarPDF(finalConfig, conteudo);
-    resultado.pdfFilename = `${finalConfig.titulo.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`;
+    await progress(88, "Gerando PDF com Gamma...");
+    let pdfGerado = false
+    try {
+      const { gerarEntregavel } = require("../../integrations/gamma")
+      const gammaFormato = ["script_vsl"].includes(tipo) ? "presentation" : "document"
+      const inputText = _markdownParaGamma(titulo, subtitulo, autor || "", estrategia, copy)
+      const gammaResult = await gerarEntregavel(inputText, { formato: gammaFormato, numCards: Math.min(copy.secoes?.length + 3 || 10, 30), exportar: "pdf" })
+      resultado.gammaUrl = gammaResult.gammaUrl
+      if (gammaResult.exportUrl) {
+        const r = await fetch(gammaResult.exportUrl)
+        if (r.ok) {
+          resultado.pdf = Buffer.from(await r.arrayBuffer())
+          resultado.pdfFilename = `${fileSlug}.pdf`
+          pdfGerado = true
+          console.log(`[Gamma] PDF gerado: ${gammaResult.gammaUrl}`)
+        }
+      }
+    } catch (e) {
+      console.warn("[Gamma] Falha — usando PDFKit:", e.message)
+    }
+    if (!pdfGerado) {
+      await progress(92, "Montando PDF (PDFKit)...");
+      resultado.pdf = await gerarPDF(finalConfig, conteudo)
+      resultado.pdfFilename = `${fileSlug}.pdf`
+    }
   }
 
   if (finalConfig.formato === "docx" || finalConfig.formato === "ambos") {
-    resultado.docx = await gerarDOCX(finalConfig, conteudo);
-    resultado.docxFilename = `${finalConfig.titulo.replace(/[^a-zA-Z0-9]/g, "_")}.docx`;
+    await progress(95, "Montando DOCX...");
+    resultado.docx = await gerarDOCX(finalConfig, conteudo)
+    resultado.docxFilename = `${fileSlug}.docx`
   }
 
   await progress(100, "Pronto.");
