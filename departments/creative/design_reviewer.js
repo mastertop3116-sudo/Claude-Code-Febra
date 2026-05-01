@@ -136,7 +136,7 @@ JSON (sem texto fora):
 Score 1-10. Aprovado = true APENAS se >= 8. Seja criterioso — qualidade de mercado.`;
 
   try {
-    const raw = await geminiJson(prompt, true);
+    const raw = await geminiJson(prompt, false);
     const review = JSON.parse(raw.trim()
       .replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/, ""));
 

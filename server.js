@@ -4,9 +4,11 @@
 // ============================================
 
 require("dotenv").config();
-const express = require("express");
+const express     = require("express");
+const compression = require("compression");
 const app = express();
 
+app.use(compression());
 app.use(express.json({ limit: "8mb", verify: (req, _, buf) => { req.rawBody = buf; } }));
 
 // ──────────────────────────────────────────
@@ -48,8 +50,8 @@ app.use("/webhook", ggCheckout);
 // Gerador de Entregáveis (web + API com progresso SSE)
 // ──────────────────────────────────────────
 const path = require("path");
-app.use(express.static(path.join(__dirname, "public")));
-app.use("/fonts", express.static(path.join(__dirname, "assets/fonts")));
+app.use(express.static(path.join(__dirname, "public"), { maxAge: "1h" }));
+app.use("/fonts", express.static(path.join(__dirname, "assets/fonts"), { maxAge: "7d" }));
 
 app.get("/criar", (req, res) => {
   res.setHeader("Cache-Control", "no-store");

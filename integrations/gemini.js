@@ -13,14 +13,6 @@ const genAINew = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const FLASH_MODEL = "gemini-2.5-flash";
 const PRO_MODEL   = "gemini-2.5-pro";
-// Nano Banana: Imagen 4 (primário) → Gemini Flash (fallback via responseModalities)
-const IMAGEN_MODELS = [
-  "imagen-4.0-generate-preview-05-20",
-  "imagen-3.0-generate-002",
-];
-const IMAGE_MODELS_FALLBACK = [
-  "gemini-2.0-flash-preview-image-generation",
-];
 
 // Timeout universal — evita travamentos infinitos
 function withTimeout(promise, ms, label) {
@@ -68,60 +60,48 @@ async function geminiJson(prompt, usePro = false) {
 }
 
 // Nano Banana — geração de imagens
-// Fase 1: tenta Imagen 4 / Imagen 3 via novo SDK @google/genai
-// Fase 2: fallback via responseModalities (gemini-2.0-flash-preview-image-generation)
+// Tenta Imagen 4 uma vez; se falhar, tenta Gemini Flash Image uma vez.
+// Planos gratuitos não têm acesso à Imagen — o caller usa satori como fallback.
 // Retorna { buffer, mimeType }.
 async function geminiImage(prompt) {
-  let ultimoErro = null;
-
-  // ── Fase 1: Imagen 4 / Imagen 3 (qualidade máxima) ──
-  for (const modelName of IMAGEN_MODELS) {
-    try {
-      const response = await withTimeout(
-        genAINew.models.generateImages({
-          model: modelName,
-          prompt,
-          config: { numberOfImages: 1, aspectRatio: "3:4" },
-        }),
-        90_000, `imagen(${modelName})`
-      );
-      const imgBytes = response.generatedImages?.[0]?.image?.imageBytes;
-      if (imgBytes) {
-        console.log(`[Nano Banana] Imagen OK: ${modelName}`);
-        return { buffer: Buffer.from(imgBytes, "base64"), mimeType: "image/png" };
-      }
-      ultimoErro = new Error(`${modelName}: resposta sem imagem`);
-    } catch (e) {
-      console.warn(`[Nano Banana] ${modelName} falhou: ${e.message}`);
-      ultimoErro = e;
+  // ── Tentativa 1: Imagen 4 Fast (plano pago) ──
+  try {
+    const response = await withTimeout(
+      genAINew.models.generateImages({
+        model: "imagen-4.0-generate-preview-05-20",
+        prompt,
+        config: { numberOfImages: 1, aspectRatio: "3:4" },
+      }),
+      60_000, "imagen-4"
+    );
+    const imgBytes = response.generatedImages?.[0]?.image?.imageBytes;
+    if (imgBytes) {
+      console.log("[Nano Banana] Imagen 4 OK");
+      return { buffer: Buffer.from(imgBytes, "base64"), mimeType: "image/png" };
     }
+  } catch (e) {
+    console.warn(`[Nano Banana] Imagen 4 falhou: ${e.message}`);
   }
 
-  // ── Fase 2: Fallback Gemini Flash com responseModalities ──
-  for (const modelName of IMAGE_MODELS_FALLBACK) {
-    try {
-      const model = genAI.getGenerativeModel({
-        model: modelName,
-        generationConfig: { responseModalities: ["IMAGE", "TEXT"] },
-      });
-      const result = await withTimeout(
-        model.generateContent(prompt), 60_000, `geminiFlashImage(${modelName})`
-      );
-      const parts = result.response.candidates?.[0]?.content?.parts || [];
-      for (const part of parts) {
-        if (part.inlineData?.mimeType?.startsWith("image/")) {
-          console.log(`[Nano Banana] Fallback OK: ${modelName}`);
-          return { buffer: Buffer.from(part.inlineData.data, "base64"), mimeType: part.inlineData.mimeType };
-        }
+  // ── Tentativa 2: Gemini Flash Image (disponível em planos gratuitos) ──
+  try {
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.0-flash-preview-image-generation",
+      generationConfig: { responseModalities: ["IMAGE", "TEXT"] },
+    });
+    const result = await withTimeout(model.generateContent(prompt), 60_000, "geminiFlashImage");
+    const parts = result.response.candidates?.[0]?.content?.parts || [];
+    for (const part of parts) {
+      if (part.inlineData?.mimeType?.startsWith("image/")) {
+        console.log("[Nano Banana] Flash Image OK");
+        return { buffer: Buffer.from(part.inlineData.data, "base64"), mimeType: part.inlineData.mimeType };
       }
-      ultimoErro = new Error(`${modelName}: resposta sem imagem`);
-    } catch (e) {
-      console.warn(`[Nano Banana] ${modelName} falhou: ${e.message}`);
-      ultimoErro = e;
     }
+  } catch (e) {
+    console.warn(`[Nano Banana] Flash Image falhou: ${e.message}`);
   }
 
-  throw ultimoErro || new Error("Nano Banana: todos os modelos falharam");
+  throw new Error("Nano Banana: imagem não disponível — usando satori");
 }
 
 module.exports = { geminiFlash, geminiPro, geminiChat, geminiJson, geminiImage };

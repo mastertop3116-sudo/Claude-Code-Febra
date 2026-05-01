@@ -4,7 +4,7 @@
 // progressão lógica — calibrado na referência Manual de Dinâmicas
 // ============================================
 
-const { geminiJson, geminiPro } = require("../../integrations/gemini");
+const { geminiJson, geminiFlash } = require("../../integrations/gemini");
 
 // Estilo de nomeação temática por nicho
 const NICHE_STYLES = {
@@ -442,10 +442,10 @@ async function gerarConteudoRico(config) {
     try {
       let raw;
       if (tentativa === MAX_TENTATIVAS) {
-        console.log("[Content Specialist] Última tentativa — texto puro com Gemini Pro");
-        raw = await geminiPro(prompt);
+        console.log("[Content Specialist] Última tentativa — texto puro com Flash");
+        raw = await geminiFlash(prompt);
       } else {
-        raw = await geminiJson(prompt, true); // sempre Pro para qualidade máxima
+        raw = await geminiJson(prompt, false);
       }
 
       let text = raw.trim()

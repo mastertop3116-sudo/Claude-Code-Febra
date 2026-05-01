@@ -128,8 +128,9 @@ Duracao: ${duracao}
 
 Gere o roteiro completo.`
 
+  // VSL usa Flash — qualidade equivalente a Pro com 10% do custo
   const model = genai.getGenerativeModel({
-    model: 'gemini-2.5-pro',
+    model: 'gemini-2.5-flash',
     systemInstruction: SYSTEM,
     generationConfig: { responseMimeType: 'application/json' },
   })

@@ -139,9 +139,9 @@ async function buildContext(telegramId, order = "") {
       .select("role, content, created_at")
       .eq("telegram_id", String(telegramId))
       .order("created_at", { ascending: false })
-      .limit(10);
+      .limit(5);
 
-    const learnings = await getMemory("MAX", "learning", 5);
+    const learnings = await getMemory("MAX", "learning", 3);
 
     let context = "";
 
@@ -213,8 +213,8 @@ async function saveConversation(telegramId, userMsg, maxReply) {
       agent: "MAX",
     });
 
-    // Extrai aprendizado se a conversa tiver conteúdo relevante
-    await extractLearning(userMsg, maxReply);
+    // Extrai aprendizado apenas em mensagens substantivas (>80 chars) — evita chamadas desnecessárias
+    if (userMsg.length > 80) await extractLearning(userMsg, maxReply);
   } catch (e) {
     console.error("[MAX] Erro ao salvar conversa:", e.message);
   }
