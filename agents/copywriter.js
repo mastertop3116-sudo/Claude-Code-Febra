@@ -63,7 +63,15 @@ async function _callModel(modelName, systemPrompt, prompt) {
     systemInstruction: systemPrompt,
     generationConfig: { responseMimeType: 'application/json' },
   })
-  const r = await model.generateContent(prompt)
+  const is503 = e => e?.message?.includes('503') || e?.message?.includes('overloaded') || e?.message?.includes('high demand')
+  let r
+  for (let i = 1; i <= 3; i++) {
+    try { r = await model.generateContent(prompt); break }
+    catch (e) {
+      if (i < 3 && is503(e)) { await new Promise(x => setTimeout(x, i * 4000)) }
+      else throw e
+    }
+  }
   const raw = _sanitizeJson(r.response.text())
   try {
     return JSON.parse(raw)
