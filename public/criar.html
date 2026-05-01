@@ -1321,25 +1321,16 @@
         </div>
 
         <div style="margin-top:18px" class="stack" data-showon="ent">
-          <div class="toggle-row">
-            <span class="tag">🍌</span>
-            <div class="txt">
-              <b>Nano Banana ativo — capa gerada automaticamente</b>
-              <span>Gemini cria uma capa exclusiva baseada no tema e título escolhidos.</span>
-            </div>
-            <div class="switch on" id="sw-nano"></div>
+          <div class="row2 eq">
+            <div class="check-row" id="ck-img"><span class="chk">✓</span><span>Usar minha própria imagem na capa</span><span class="meta">PNG / JPEG</span></div>
+            <div class="check-row" id="ck-cor"><span class="chk">✓</span><span>Personalizar cores manualmente</span><span class="meta">avançado</span></div>
           </div>
 
-          <div>
+          <div id="darken-wrap" style="display:none">
             <div class="slider-wrap">
-              <div class="top"><span>Escurecimento sobre a capa</span><b id="dark-val">25%</b></div>
+              <div class="top"><span>Escurecimento sobre a imagem</span><b id="dark-val">25%</b></div>
               <input type="range" min="0" max="100" value="25" id="darken" style="--val:25%">
             </div>
-          </div>
-
-          <div class="row2 eq">
-            <div class="check-row" id="ck-img"><span class="chk">✓</span><span>Usar minha própria imagem</span><span class="meta">substitui geração</span></div>
-            <div class="check-row" id="ck-cor"><span class="chk">✓</span><span>Personalizar cores manualmente</span><span class="meta">avançado</span></div>
           </div>
 
           <!-- Image upload panel -->
@@ -1504,7 +1495,7 @@
             <!-- infoproduto rows -->
             <div class="r ent-row"><span class="k">Tipo</span><span class="v" id="s-type">Ebook / Guia Completo</span></div>
             <div class="r ent-row"><span class="k">Páginas</span><span class="v" id="s-pages">15</span></div>
-            <div class="r ent-row"><span class="k">Capa</span><span class="v" id="s-capa">Nano Banana · 25%</span></div>
+            <div class="r ent-row"><span class="k">Capa</span><span class="v" id="s-capa">Capa vetorial</span></div>
             <div class="r ent-row"><span class="k">Formato</span><span class="v" id="s-fmt">PDF</span></div>
             <!-- carrossel rows -->
             <div class="r car-row"><span class="k">Assunto</span><span class="v" id="s-car-assunto">—</span></div>
@@ -1841,12 +1832,6 @@
 
 
   // ---- switches com comportamento específico ----
-  function syncNano() {
-    const on = document.getElementById('sw-nano').classList.contains('on');
-    const darkenParent = document.getElementById('darken').closest('.slider-wrap').parentElement;
-    darkenParent.classList.toggle('field-disabled', !on);
-    updateCapaStatus();
-  }
   function syncHead() {
     const on = document.getElementById('sw-head').classList.contains('on');
     document.getElementById('inp-cab').classList.toggle('field-disabled', !on);
@@ -1857,9 +1842,6 @@
     document.getElementById('foot-copyright-wrap').classList.toggle('field-disabled', !on);
   }
 
-  document.getElementById('sw-nano').addEventListener('click', function() {
-    this.classList.toggle('on'); syncNano();
-  });
   document.getElementById('sw-head').addEventListener('click', function() {
     this.classList.toggle('on'); syncHead();
   });
@@ -1875,7 +1857,9 @@
 
   document.getElementById('ck-img').addEventListener('click', function() {
     this.classList.toggle('on');
-    document.getElementById('panel-img').classList.toggle('open', this.classList.contains('on'));
+    const on = this.classList.contains('on');
+    document.getElementById('panel-img').classList.toggle('open', on);
+    document.getElementById('darken-wrap').style.display = on ? '' : 'none';
     updateCapaStatus();
   });
 
@@ -1896,16 +1880,13 @@
   });
 
   function updateCapaStatus() {
-    const nano = document.getElementById('sw-nano').classList.contains('on');
-    const img  = document.getElementById('ck-img').classList.contains('on');
+    const img = document.getElementById('ck-img').classList.contains('on');
     document.getElementById('s-capa').textContent =
-      img ? 'Imagem própria · ' + darken.value + '%'
-          : nano ? 'Nano Banana · ' + darken.value + '%'
-          : 'Sem capa gerada';
+      img ? 'Imagem própria · ' + darken.value + '%' : 'Capa vetorial';
   }
 
   // inicializa estados dos switches (depois que darken está declarado)
-  syncNano(); syncHead(); syncFoot();
+  syncHead(); syncFoot();
   updatePreviewColors(); updateMeta();
 
   // ---- color pickers ----

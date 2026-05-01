@@ -10,7 +10,7 @@ const {
   BorderStyle, WidthType, ShadingType, LevelFormat,
   PageBreak, TableOfContents, ImageRun,
 } = require("docx");
-const { geminiJson, geminiFlash, geminiImage } = require("../../integrations/gemini");
+const { geminiJson, geminiFlash } = require("../../integrations/gemini");
 const { gerarConteudoRico } = require("./content_specialist");
 const THEMES = require("./themes");
 const { revisarCapaVisual, revisarConteudo } = require("./design_reviewer");
@@ -20,7 +20,6 @@ const fs   = require("fs");
 const estrategista = require("../../agents/estrategista");
 const arquiteto    = require("../../agents/arquiteto");
 const copywriter   = require("../../agents/copywriter");
-const capaAgent    = require("../../agents/capa");
 const carrosselAgent = require("../../agents/carrossel");
 
 const MAX_TENTATIVAS = 3;
@@ -92,46 +91,6 @@ function sanitizeAndParse(raw) {
   text = text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "");
 
   return JSON.parse(text);
-}
-
-// ──────────────────────────────────────────
-// Gera capa com Nano Banana (gemini-2.5-flash-image)
-// Prompt contextualizado por tema + tipo + título
-// ──────────────────────────────────────────
-const TEMA_VISUAL_PROMPTS = {
-  impacto:      "bold dramatic sports energy, deep black and vivid red, strong geometric shapes, martial arts or athletics silhouette, powerful composition",
-  elegancia:    "elegant feminine grace, soft rose pink and deep purple palette, ballet dancer silhouette, delicate floral elements, luxurious feel",
-  sabedoria:    "spiritual sacred atmosphere, warm golden and deep brown tones, ancient book or cross motif, soft candle light, reverent calm",
-  produtividade:"clean modern corporate, deep blue and white, geometric minimal design, professional executive aesthetic",
-  bemestar:     "serene natural wellness, lush green and soft white, leaves or nature elements, calm light, organic texture",
-  criatividade: "vibrant creative digital, deep purple and electric cyan, abstract geometric shapes, innovative modern design",
-};
-
-async function gerarCapaComGemini(tipo, titulo, descricao, temaKey, melhoriaHint = null) {
-  const temaDesc = TEMA_VISUAL_PROMPTS[temaKey] || TEMA_VISUAL_PROMPTS.produtividade;
-  const tipoLabel = { ebook: "ebook", checklist: "checklist guide", workbook: "workbook",
-    planner: "planner", script_vsl: "video script guide", cheat_sheet: "quick reference card",
-    certificado: "certificate" }[tipo] || "digital guide";
-
-  const prompt = `Create a stunning professional ${tipoLabel} PDF cover image.
-Title concept: "${titulo}"
-Subject: ${descricao || titulo}
-Visual style: ${temaDesc}
-Requirements:
-- Portrait A4 format, full bleed, no white borders
-- NO text, numbers, or letters anywhere in the image
-- Professional quality suitable for a Brazilian digital product market
-- Rich, deep colors with strong contrast
-- Cinematic lighting and depth${melhoriaHint ? `\nIMPROVEMENT REQUIRED: ${melhoriaHint}` : ""}`;
-
-  try {
-    const { buffer } = await geminiImage(prompt);
-    console.log(`[Nano Banana] Capa gerada para "${titulo}": ${(buffer.length / 1024).toFixed(0)}KB`);
-    return buffer;
-  } catch (e) {
-    console.warn("[Nano Banana] Geração de capa falhou:", e.message);
-    return null;
-  }
 }
 
 // ──────────────────────────────────────────
@@ -1489,12 +1448,6 @@ async function generate(params) {
   let capaBuffer = null;
   if (capaImagem) {
     capaBuffer = typeof capaImagem === "string" ? Buffer.from(capaImagem, "base64") : capaImagem;
-  } else {
-    try {
-      capaBuffer = await capaAgent.run({ titulo, nicho: nichoFinal, tema: temaKey });
-    } catch (e) {
-      console.warn("[capa] Nano Banana falhou, usando capa satori:", e.message);
-    }
   }
 
   let slides = null;
