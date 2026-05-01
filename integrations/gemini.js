@@ -8,6 +8,8 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { GoogleGenAI }        = require("@google/genai");
 require("dotenv").config();
 
+const { openaiFlash, openaiJson } = require("./openai");
+
 const genAI    = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const genAINew = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -46,15 +48,28 @@ async function withRetry(fn, label, maxTries = 3) {
   }
 }
 
+function is429(err) {
+  const msg = err?.message || "";
+  return msg.includes("429") || msg.toLowerCase().includes("quota") || msg.toLowerCase().includes("exceeded");
+}
+
 async function geminiFlash(prompt, systemInstruction = null) {
   const model = genAI.getGenerativeModel({
     model: FLASH_MODEL,
     ...(systemInstruction && { systemInstruction }),
   });
-  return withRetry(async () => {
-    const result = await withTimeout(model.generateContent(prompt), 90_000, "geminiFlash");
-    return result.response.text();
-  }, "geminiFlash");
+  try {
+    return await withRetry(async () => {
+      const result = await withTimeout(model.generateContent(prompt), 90_000, "geminiFlash");
+      return result.response.text();
+    }, "geminiFlash");
+  } catch (e) {
+    if (is429(e)) {
+      console.warn("[Gemini] geminiFlash 429 — fallback OpenAI");
+      return openaiFlash(prompt, systemInstruction);
+    }
+    throw e;
+  }
 }
 
 async function geminiPro(prompt, systemInstruction = null) {
@@ -62,10 +77,18 @@ async function geminiPro(prompt, systemInstruction = null) {
     model: PRO_MODEL,
     ...(systemInstruction && { systemInstruction }),
   });
-  return withRetry(async () => {
-    const result = await withTimeout(model.generateContent(prompt), 120_000, "geminiPro");
-    return result.response.text();
-  }, "geminiPro");
+  try {
+    return await withRetry(async () => {
+      const result = await withTimeout(model.generateContent(prompt), 120_000, "geminiPro");
+      return result.response.text();
+    }, "geminiPro");
+  } catch (e) {
+    if (is429(e)) {
+      console.warn("[Gemini] geminiPro 429 — fallback OpenAI");
+      return openaiFlash(prompt, systemInstruction);
+    }
+    throw e;
+  }
 }
 
 function geminiChat(systemInstruction = null, usePro = false) {
@@ -81,10 +104,18 @@ async function geminiJson(prompt, usePro = false) {
     model: usePro ? PRO_MODEL : FLASH_MODEL,
     generationConfig: { responseMimeType: "application/json" },
   });
-  return withRetry(async () => {
-    const result = await withTimeout(model.generateContent(prompt), 90_000, "geminiJson");
-    return result.response.text();
-  }, "geminiJson");
+  try {
+    return await withRetry(async () => {
+      const result = await withTimeout(model.generateContent(prompt), 90_000, "geminiJson");
+      return result.response.text();
+    }, "geminiJson");
+  } catch (e) {
+    if (is429(e)) {
+      console.warn("[Gemini] geminiJson 429 — fallback OpenAI");
+      return openaiJson(prompt);
+    }
+    throw e;
+  }
 }
 
 // Nano Banana — geração de imagens

@@ -1,5 +1,18 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai')
 const genai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+const { openaiJson } = require('../integrations/openai')
+
+function _retry(fn, tries = 3) {
+  return fn().catch(async e => {
+    const is503 = e?.message?.includes('503') || e?.message?.includes('overloaded') || e?.message?.includes('high demand')
+    if (is503 && tries > 1) {
+      await new Promise(r => setTimeout(r, (4 - tries) * 4000))
+      return _retry(fn, tries - 1)
+    }
+    throw e
+  })
+}
+const is429 = e => e?.message?.includes('429') || e?.message?.toLowerCase().includes('quota') || e?.message?.toLowerCase().includes('exceeded')
 
 const SYSTEM = `Você é um especialista em roteiros de vídeo curto para vender produtos digitais em Instagram Reels, TikTok e YouTube Shorts.
 
@@ -128,14 +141,21 @@ Duracao: ${duracao}
 
 Gere o roteiro completo.`
 
-  // VSL usa Flash — qualidade equivalente a Pro com 10% do custo
   const model = genai.getGenerativeModel({
     model: 'gemini-2.5-flash',
     systemInstruction: SYSTEM,
     generationConfig: { responseMimeType: 'application/json' },
   })
-  const r = await model.generateContent(prompt)
-  return JSON.parse(r.response.text().trim())
+  try {
+    const r = await _retry(() => model.generateContent(prompt))
+    return JSON.parse(r.response.text().trim())
+  } catch (e) {
+    if (is429(e)) {
+      console.warn('[roteirista] 429 quota — fallback OpenAI')
+      return JSON.parse(await openaiJson(prompt, SYSTEM))
+    }
+    throw e
+  }
 }
 
 module.exports = { run }

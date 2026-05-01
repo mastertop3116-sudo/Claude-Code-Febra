@@ -38,6 +38,9 @@ JSON APENAS:
   "copy_contracapa": "string (2 parágrafos + CTA)"
 }`
 
+const { openaiJson } = require('../integrations/openai')
+const is429 = e => e?.message?.includes('429') || e?.message?.toLowerCase().includes('quota') || e?.message?.toLowerCase().includes('exceeded')
+
 // Cache em memória para evitar chamadas duplicadas na mesma sessão
 const _cache = new Map()
 
@@ -69,6 +72,10 @@ async function _callModel(modelName, systemPrompt, prompt) {
     try { r = await model.generateContent(prompt); break }
     catch (e) {
       if (i < 3 && is503(e)) { await new Promise(x => setTimeout(x, i * 4000)) }
+      else if (is429(e)) {
+        console.warn('[copywriter] 429 quota — fallback OpenAI')
+        return JSON.parse(await openaiJson(prompt, systemPrompt))
+      }
       else throw e
     }
   }
