@@ -558,6 +558,12 @@
   .dna-save-btn:hover{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.28)}
   .dna-save-btn:disabled{opacity:.45;cursor:default}
   .dna-save-status{font-size:12px;color:var(--text-3);font-family:"JetBrains Mono",monospace}
+  .dna-load-item{padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .12s;display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .dna-load-item:last-child{border-bottom:none}
+  .dna-load-item:hover{background:rgba(255,255,255,.06)}
+  .dna-load-item .li-nome{font-size:13px;font-weight:600;color:var(--text)}
+  .dna-load-item .li-meta{font-size:11px;color:var(--text-3);font-family:"JetBrains Mono",monospace}
+  .autosave-badge{position:fixed;bottom:18px;left:18px;background:rgba(14,15,28,.9);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:11px;color:var(--text-3);font-family:"JetBrains Mono",monospace;opacity:0;transition:opacity .4s;pointer-events:none;z-index:50}
 
   /* ---- carousel content type ---- */
   .ctype-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -910,9 +916,15 @@
               <span class="dna-chars" id="dna-chars"></span>
               <span id="relatorio-status" style="font-size:11px;color:var(--accent)"></span>
             </div>
-            <div class="dna-upload-row" style="margin-top:12px">
+            <div class="dna-upload-row" style="margin-top:12px;flex-wrap:wrap;gap:8px">
               <button type="button" class="dna-save-btn" id="dna-save-btn">💾 Salvar produto</button>
+              <button type="button" class="dna-save-btn" id="dna-load-btn" style="background:rgba(255,255,255,.08)">📂 Carregar salvo</button>
               <span class="dna-save-status" id="dna-save-status"></span>
+            </div>
+            <!-- dropdown de produtos salvos -->
+            <div id="dna-load-panel" style="display:none;margin-top:10px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:10px;overflow:hidden">
+              <div style="padding:10px 12px;font-size:11px;color:var(--text-3);font-family:'JetBrains Mono',monospace;letter-spacing:.06em">PRODUTOS SALVOS — clique para carregar</div>
+              <div id="dna-load-list" style="max-height:220px;overflow-y:auto"></div>
             </div>
             <input type="hidden" id="dna-produto-id" value="">
           </div>
@@ -1523,6 +1535,8 @@
     </aside>
 
   </div>
+
+  <div class="autosave-badge" id="autosave-badge">✓ rascunho salvo</div>
 
   <footer style="margin-top:60px;display:flex;justify-content:space-between;align-items:center;color:var(--text-3);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em">
     <span>© Nexus Max · 2026</span>
@@ -2474,6 +2488,129 @@
       status.textContent = `❌ ${err.message}`;
     } finally {
       btn.disabled = false;
+    }
+  });
+
+  // ──────────────────────────────────────────
+  // AUTO-SAVE no localStorage + RESTORE ao carregar
+  // ──────────────────────────────────────────
+  const LS_KEY = 'nexus_rascunho_v1';
+  const AUTOSAVE_FIELDS = [
+    'dna-nome','dna-nicho','dna-publico','dna-preco','dna-relatorio',
+    'inp-titulo','inp-subtitulo','inp-autor','inp-descricao','inp-avatar',
+    'inp-paginas','inp-caps','inp-cab','inp-rod','inp-copyright','inp-gancho',
+  ];
+
+  function autosaveBadge() {
+    const el = document.getElementById('autosave-badge');
+    if (!el) return;
+    el.style.opacity = '1';
+    clearTimeout(el._t);
+    el._t = setTimeout(() => { el.style.opacity = '0'; }, 2000);
+  }
+
+  function saveRascunho() {
+    const data = {};
+    AUTOSAVE_FIELDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) data[id] = el.value;
+    });
+    data._tipo   = selectedType;
+    data._tema   = selectedTheme;
+    data._fmt    = selectedFmt;
+    data._ts     = Date.now();
+    localStorage.setItem(LS_KEY, JSON.stringify(data));
+    autosaveBadge();
+  }
+
+  function restoreRascunho() {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      AUTOSAVE_FIELDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && data[id]) { el.value = data[id]; el.dispatchEvent(new Event('input')); }
+      });
+      if (data._tipo) {
+        const card = document.querySelector(`.type-card[data-type="${data._tipo}"]`);
+        if (card) card.click();
+      }
+      if (data._tema) {
+        const tc = document.querySelector(`.theme-card[data-theme="${data._tema}"]`);
+        if (tc) tc.click();
+      }
+      if (data._fmt) {
+        const fc = document.querySelector(`.fmt-card[data-fmt="${data._fmt}"]`);
+        if (fc) fc.click();
+      }
+      if (data['inp-titulo']) {
+        document.getElementById('pv-title').textContent = data['inp-titulo'];
+      }
+      if (data['inp-subtitulo']) {
+        document.getElementById('pv-sub').textContent = data['inp-subtitulo'];
+      }
+      if (data['inp-autor']) {
+        document.getElementById('pv-autor').textContent = data['inp-autor'];
+      }
+    } catch (_) {}
+  }
+
+  // Salva em cada digitação (debounced 800ms)
+  let _asTimer;
+  function debouncedSave() { clearTimeout(_asTimer); _asTimer = setTimeout(saveRascunho, 800); }
+  AUTOSAVE_FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', debouncedSave);
+  });
+
+  // Restaura ao carregar
+  restoreRascunho();
+
+  // ──────────────────────────────────────────
+  // CARREGAR PRODUTO SALVO (Supabase)
+  // ──────────────────────────────────────────
+  const loadBtn   = document.getElementById('dna-load-btn');
+  const loadPanel = document.getElementById('dna-load-panel');
+  const loadList  = document.getElementById('dna-load-list');
+  let loadPanelOpen = false;
+
+  loadBtn.addEventListener('click', async () => {
+    loadPanelOpen = !loadPanelOpen;
+    loadPanel.style.display = loadPanelOpen ? 'block' : 'none';
+    if (!loadPanelOpen) return;
+    loadList.innerHTML = '<div style="padding:12px 14px;font-size:12px;color:var(--text-3)">Carregando…</div>';
+    try {
+      const r = await fetch('/api/produtos');
+      const { produtos } = await r.json();
+      if (!produtos?.length) {
+        loadList.innerHTML = '<div style="padding:12px 14px;font-size:12px;color:var(--text-3)">Nenhum produto salvo ainda.</div>';
+        return;
+      }
+      loadList.innerHTML = '';
+      produtos.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'dna-load-item';
+        const dt = new Date(p.created_at).toLocaleDateString('pt-BR');
+        item.innerHTML = `<div><div class="li-nome">${p.nome}</div><div class="li-meta">${p.nicho || '—'} · ${dt}</div></div><div class="li-meta" style="color:var(--accent)">carregar →</div>`;
+        item.addEventListener('click', () => {
+          document.getElementById('dna-nome').value    = p.nome || '';
+          document.getElementById('dna-nicho').value   = p.nicho || '';
+          document.getElementById('dna-publico').value = p.publico_alvo || '';
+          document.getElementById('dna-preco').value   = p.preco || '';
+          document.getElementById('dna-produto-id').value = p.id;
+          ['dna-nome','dna-nicho','dna-publico','dna-preco'].forEach(id => {
+            document.getElementById(id).dispatchEvent(new Event('input'));
+          });
+          loadPanel.style.display = 'none';
+          loadPanelOpen = false;
+          document.getElementById('dna-save-status').textContent = `✅ Produto carregado`;
+          saveRascunho();
+        });
+        loadList.appendChild(item);
+      });
+    } catch (e) {
+      loadList.innerHTML = `<div style="padding:12px 14px;font-size:12px;color:#f87171">Erro: ${e.message}</div>`;
     }
   });
 

@@ -67,6 +67,23 @@ function limparJobsAntigos() {
   }
 }
 
+// GET /api/produtos → lista produtos salvos (recentes primeiro)
+app.get("/api/produtos", async (req, res) => {
+  try {
+    const { createClient } = require("@supabase/supabase-js");
+    const _supa = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+    const { data, error } = await _supa
+      .from("produtos")
+      .select("id, nome, nicho, publico_alvo, preco, created_at")
+      .order("created_at", { ascending: false })
+      .limit(20);
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ produtos: data || [] });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // POST /api/produto → salva produto + lançamento no Supabase
 app.post("/api/produto", async (req, res) => {
   try {
