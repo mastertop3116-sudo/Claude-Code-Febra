@@ -815,7 +815,7 @@
       <p>Ebooks, workbooks, checklists, planners, scripts de VSL, guias e certificados — com layout profissional automático. Preencha, clique, exporte.</p>
     </div>
     <div class="head-right">
-      <div class="row"><span class="led"></span><span>motor pronto · nano banana online</span></div>
+      <div class="row"><span class="led"></span><span>motor pronto · online</span></div>
       <div class="row"><span>2026</span></div>
     </div>
   </header>
@@ -2034,7 +2034,6 @@
     if (!titulo) { showErr('Informe o título do entregável antes de gerar.'); return; }
 
     const useManual = document.getElementById('ck-img').classList.contains('on') && capaBase64;
-    const useNano   = document.getElementById('sw-nano').classList.contains('on');
     const useCores  = document.getElementById('ck-cor').classList.contains('on');
 
     const numCaps = parseInt(document.getElementById('inp-caps').value);
@@ -2049,7 +2048,6 @@
       ...(numCaps && { numCapitulos: numCaps }),
       temaKey:   selectedTheme,
       formato:   selectedFmt,
-      capaGemini: useNano && !useManual,
       capaImagemOpacidade: parseInt(darken.value) / 100,
       cabecalho: {
         ativo: document.getElementById('sw-head').classList.contains('on'),
