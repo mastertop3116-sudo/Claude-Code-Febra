@@ -535,7 +535,7 @@ async function gerarPDF(config, conteudo) {
       doc.rect(ML, cy, 5, boxH).fill(C.primary);
       doc.save();
       doc.fillOpacity(0.16).fillColor(C.primary).font(F.title).fontSize(56)
-        .text(“””, ML + 10, cy + 2, { lineBreak: false });
+        .text('"', ML + 10, cy + 2, { lineBreak: false });
       doc.restore();
       doc.fillColor("#222222").font(F.subtitle || F.body).fontSize(12.5)
         .text(clean, ML + 46, cy + 17, { width: CW - 62, lineGap: 5 });
@@ -881,8 +881,8 @@ async function gerarPDF(config, conteudo) {
       doc.rect(ML, panY, 5, panH).fill(C.accent || C.coverAccent || C.primary);
       // Aspas decorativas (dentro dos limites do painel)
       doc.save();
-      doc.fillColor(“#FFFFFF”).fillOpacity(0.06).font(F.title).fontSize(130)
-        .text(“””, ML + 14, panY + 8, { lineBreak: false });
+      doc.fillColor("#FFFFFF").fillOpacity(0.06).font(F.title).fontSize(130)
+        .text('"', ML + 14, panY + 8, { lineBreak: false });
       doc.restore();
       // Texto central
       const thanksTitle = "Obrigado por chegar até aqui.";
