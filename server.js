@@ -458,12 +458,11 @@ app.post("/api/gamma", async (req, res) => {
   try {
     const { titulo, conteudo, numSlides = 10, exportar = 'pptx' } = req.body;
     if (!titulo || !conteudo) return res.status(400).json({ error: "titulo e conteudo obrigatórios" });
-    const { criarApresentacao, aguardarGeracao } = require("./integrations/gamma");
-    const generationId = await criarApresentacao({ titulo, conteudo, numSlides, exportar });
-    const resultado = await aguardarGeracao(generationId);
+    const { criarApresentacao } = require("./integrations/gamma");
+    const resultado = await criarApresentacao({ titulo, conteudo, numSlides, exportar });
     res.json({
-      url: resultado.gammaUrl,
-      exportUrl: resultado.exportUrl,
+      url: resultado.url || resultado.gammaUrl,
+      exportUrl: resultado.exportUrl || resultado.export_url,
       creditsUsed: resultado.creditsUsed,
     });
   } catch (e) {

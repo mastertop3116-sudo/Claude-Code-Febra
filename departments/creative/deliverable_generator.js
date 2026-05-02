@@ -1531,14 +1531,16 @@ async function generate(params) {
       const gammaFormato = ["script_vsl"].includes(tipo) ? "presentation" : "document"
       const inputText = _markdownParaGamma(titulo, subtitulo, autor || "", estrategia, copy)
       const gammaResult = await gerarEntregavel(inputText, { formato: gammaFormato, numCards: Math.min(copy.secoes?.length + 3 || 10, 30), exportar: "pdf" })
-      resultado.gammaUrl = gammaResult.gammaUrl
-      if (gammaResult.exportUrl) {
-        const r = await fetch(gammaResult.exportUrl)
+      const gammaUrl = gammaResult.url || gammaResult.gammaUrl
+      const gammaExportUrl = gammaResult.exportUrl || gammaResult.export_url
+      resultado.gammaUrl = gammaUrl
+      if (gammaExportUrl) {
+        const r = await fetch(gammaExportUrl)
         if (r.ok) {
           resultado.pdf = Buffer.from(await r.arrayBuffer())
           resultado.pdfFilename = `${fileSlug}.pdf`
           pdfGerado = true
-          console.log(`[Gamma] PDF gerado: ${gammaResult.gammaUrl}`)
+          console.log(`[Gamma] PDF gerado: ${gammaUrl}`)
         }
       }
     } catch (e) {
