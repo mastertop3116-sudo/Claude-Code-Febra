@@ -1592,7 +1592,7 @@
   <div class="overlay-box">
     <div class="ov-spinner"></div>
     <div class="ov-title">Gerando carrossel…</div>
-    <div class="ov-sub">Gemini Pro criando o conteúdo · Satori renderizando os slides.</div>
+    <div class="ov-sub">OpenAI GPT-4o Mini criando o conteúdo · Satori renderizando os slides.</div>
     <div class="prog-bar"><div class="prog-fill" id="carousel-prog-fill"></div></div>
     <div class="prog-meta">
       <div class="prog-pct" id="carousel-prog-pct">0%</div>
@@ -2243,14 +2243,30 @@
       a.textContent = '⬇ Baixar Word';
       row.appendChild(a);
     }
+    if (data.gammaUrl) {
+      const a = document.createElement('a');
+      a.href = data.gammaUrl;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.className = 'dl-btn';
+      a.style.cssText = 'background:linear-gradient(180deg,#7C3AED,#5B21B6);border-color:rgba(167,139,250,.3)';
+      a.textContent = '✦ Abrir no Gamma';
+      row.appendChild(a);
+    }
     document.getElementById('overlay-ok').classList.add('show');
   }
 
   function showErr(msg) {
+    document.getElementById('overlay-prog').classList.remove('show');
+    document.getElementById('btn-gerar').disabled = false;
     const el = document.getElementById('err-box');
-    el.textContent = msg;
-    el.style.display = 'block';
-    setTimeout(() => { el.style.display = 'none'; }, 7000);
+    const isTimeout = msg && (msg.toLowerCase().includes('timeout') || msg.toLowerCase().includes('5 minutos') || msg.toLowerCase().includes('15 minutos'));
+    el.innerHTML = `<span>${msg}</span>` + (isTimeout
+      ? `<button onclick="hideErr();document.getElementById('btn-gerar').click()" style="margin-left:12px;background:rgba(217,119,6,.2);border:1px solid rgba(217,119,6,.4);color:#FCD34D;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer">↻ Tentar novamente</button>`
+      : '');
+    el.style.display = 'flex';
+    el.style.alignItems = 'center';
+    if (!isTimeout) setTimeout(() => { el.style.display = 'none'; }, 10000);
   }
   function hideErr() { document.getElementById('err-box').style.display = 'none'; }
 

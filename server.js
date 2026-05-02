@@ -165,6 +165,7 @@ app.post("/api/criar", (req, res) => {
       pdfFilename: resultado.pdfFilename,
       docx: resultado.docx ? resultado.docx.toString("base64") : null,
       docxFilename: resultado.docxFilename,
+      gammaUrl: resultado.gammaUrl || null,
     });
   }).catch(e => {
     clearTimeout(jobKiller);
@@ -191,7 +192,7 @@ app.get("/api/criar/progress/:jobId", (req, res) => {
 
     if (job.status === "done") {
       enviar({ done: true, titulo: job.titulo, pdf: job.pdf, pdfFilename: job.pdfFilename,
-        docx: job.docx, docxFilename: job.docxFilename });
+        docx: job.docx, docxFilename: job.docxFilename, gammaUrl: job.gammaUrl });
       clearInterval(tick);
       criarJobs.delete(jobId);
       res.end();
