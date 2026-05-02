@@ -314,6 +314,14 @@
   @media(max-width:900px){.grid{grid-template-columns:1fr}.head h1{font-size:38px}nav.top{padding:18px 20px}main{padding:10px 20px 60px}.sticky{position:static}}
   @media(max-width:640px){.themes{grid-template-columns:1fr 1fr}.formats{grid-template-columns:1fr}.row2,.row2.eq{grid-template-columns:1fr}.nav-mid{display:none}.head{flex-direction:column;gap:12px}.head h1{font-size:28px}.head-right{align-items:flex-start}.head p{font-size:14px}.overlay-box{padding:24px 18px;width:calc(100vw - 24px)}.dl-row{flex-direction:column;align-items:stretch}.dl-btn{justify-content:center}.prog-meta{flex-direction:column;align-items:flex-start;gap:4px}.prog-msg{max-width:100%;text-align:left}.generate{padding:15px;font-size:14px}.card{padding:18px}.summary-list .r .v{max-width:60%}.mode-tabs{grid-template-columns:repeat(2,1fr)}.cformats{grid-template-columns:repeat(2,1fr)}.fpick-grid{grid-template-columns:repeat(2,1fr)}#gamma-themes-grid{grid-template-columns:repeat(2,1fr)!important}}
   @media(max-width:480px){.head h1{font-size:22px;line-height:1.1}nav.top{padding:14px 16px}.nav-end a:not(.btn){display:none}.btn{font-size:13px;padding:8px 14px}main{padding:8px 14px 50px}.head-left .pill{font-size:11px}#err-box{bottom:16px;left:12px;right:12px;transform:none;width:auto}.toast{right:12px;left:12px;max-width:none;bottom:16px}}
+  /* CTA fixo no mobile — botão sempre visível sem scroll */
+  #mobile-cta-bar{display:none}
+  @media(max-width:900px){
+    #mobile-cta-bar{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:90;background:rgba(5,8,17,.97);backdrop-filter:blur(16px);border-top:1px solid var(--border);padding:12px 16px;gap:10px;align-items:center}
+    #mobile-cta-bar .mcta-btn{flex:1;padding:15px;font-size:15px;font-weight:700;border-radius:12px;background:linear-gradient(180deg,rgba(255,100,100,.18),rgba(255,71,87,0) 50%),linear-gradient(90deg,var(--brand),#FF2742);border:1px solid rgba(255,100,100,.25);color:#fff;cursor:pointer;letter-spacing:-.01em;font-family:"Bricolage Grotesque",sans-serif;box-shadow:0 1px 0 rgba(255,255,255,.15) inset,0 10px 30px -8px rgba(255,71,87,.5)}
+    #mobile-cta-bar .mcta-note{font-size:10px;color:var(--text-3);font-family:"DM Mono",monospace;white-space:nowrap}
+    main{padding-bottom:90px}
+  }
   .field-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
   .chip{display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;background:rgba(200,255,71,.06);border:1px solid rgba(200,255,71,.15);color:var(--text-2);font-size:12px;cursor:pointer;transition:background .15s,border-color .15s,color .15s;user-select:none;white-space:nowrap}
   .chip:hover{background:rgba(200,255,71,.14);border-color:rgba(200,255,71,.3);color:var(--accent)}
@@ -415,9 +423,112 @@
         </div>
       </section>
 
-      <!-- DNA do Produto -->
+      <!-- 01 informações básicas - PRIMEIRO para o usuário digitar o título imediatamente -->
+      <section class="card" data-showon="ent" data-sec-num="01">
+        <h2><span class="n">01</span>Informações básicas<span class="hint">o essencial para montar o conteúdo</span></h2>
+        <div class="stack">
+          <div class="row2">
+            <div>
+              <label class="lbl">Tipo de entregável</label>
+              <div class="type-select">
+                <div class="trigger" id="type-trigger">
+                  <span class="ico" id="type-ico">📕</span>
+                  <span id="type-label">Ebook / Guia Completo</span>
+                  <span class="chev">▾</span>
+                </div>
+                <div class="type-menu" id="type-menu" style="display:none">
+                  <div class="opt active" data-v="ebook" data-ico="📕"><span class="ico">📕</span>Ebook / Guia Completo<span class="meta">50–200 pg</span></div>
+                  <div class="opt" data-v="workbook" data-ico="🖍️"><span class="ico">🖍️</span>Workbook / Caderno de Exercícios<span class="meta">30–80 pg</span></div>
+                  <div class="opt" data-v="checklist" data-ico="✅"><span class="ico">✅</span>Checklist<span class="meta">5–20 pg</span></div>
+                  <div class="opt" data-v="planner" data-ico="📒"><span class="ico">📒</span>Planner / Organizador<span class="meta">30–120 pg</span></div>
+                  <div class="opt" data-v="script_vsl" data-ico="🎬"><span class="ico">🎬</span>Script VSL / Vídeo de Vendas<span class="meta">roteiro</span></div>
+                  <div class="opt" data-v="cheat_sheet" data-ico="⚡"><span class="ico">⚡</span>Guia de Consulta Rápida<span class="meta">5–15 pg</span></div>
+                  <div class="opt" data-v="certificado" data-ico="🏅"><span class="ico">🏅</span>Certificado de Conclusão<span class="meta">1 pg</span></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <label class="lbl">Nº de páginas</label>
+              <input class="input" type="number" id="inp-paginas" value="15" min="1" max="80">
+            </div>
+          </div>
+
+          <div>
+            <label class="lbl">Título do entregável <span style="color:var(--brand);font-size:11px">obrigatório</span></label>
+            <input class="input" id="inp-titulo" placeholder="Ex: 10 Fundamentos do Jiu-Jitsu para Iniciantes">
+            <div class="field-chips" data-target="inp-titulo">
+              <span class="chip">O Guia Definitivo de…</span>
+              <span class="chip">7 Passos para…</span>
+              <span class="chip">Do Zero ao…</span>
+              <span class="chip">O Método…</span>
+              <span class="chip">Secrets de…</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="lbl">Subtítulo <span class="opt">opcional</span></label>
+            <input class="input" id="inp-subtitulo" placeholder="Ex: O guia completo para quem quer resultados reais em 30 dias">
+            <div class="field-chips" data-target="inp-subtitulo">
+              <span class="chip">O guia definitivo para resultados reais</span>
+              <span class="chip">Do zero ao avançado em 30 dias</span>
+              <span class="chip">Sem precisar de experiência prévia</span>
+              <span class="chip">O método que ninguém ensina</span>
+              <span class="chip">Passo a passo comprovado</span>
+            </div>
+          </div>
+
+          <div class="row2 eq">
+            <div>
+              <label class="lbl">Nome do autor / marca</label>
+              <input class="input" id="inp-autor" placeholder="Ex: Ana Martins | Studio Vida Leve">
+              <div class="field-chips" data-target="inp-autor">
+                <span class="chip">usar nome do DNA</span>
+                <span class="chip">Instituto…</span>
+                <span class="chip">Academy…</span>
+                <span class="chip">Método…</span>
+              </div>
+            </div>
+            <div>
+              <label class="lbl">Nicho / assunto principal</label>
+              <input class="input" id="inp-descricao" placeholder="Ex: Emagrecimento feminino, dieta low carb">
+              <div class="field-chips" data-target="inp-descricao">
+                <span class="chip">Emagrecimento</span>
+                <span class="chip">Finanças</span>
+                <span class="chip">Mindset</span>
+                <span class="chip">Vendas</span>
+                <span class="chip">Saúde</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="lbl">Avatar do público-alvo <span class="opt">recomendado · melhora muito o conteúdo</span></label>
+            <input class="input" id="inp-avatar" placeholder="Ex: Mulheres 28–42 anos que tentaram várias dietas sem sucesso e buscam uma solução definitiva">
+            <div class="field-chips" data-target="inp-avatar">
+              <span class="chip">Mães 28–42 com pouco tempo</span>
+              <span class="chip">Empreendedores que travam nas vendas</span>
+              <span class="chip">Jovens endividados querendo sair das dívidas</span>
+              <span class="chip">Profissionais sobrecarregados sem produtividade</span>
+            </div>
+          </div>
+
+          <div class="row2 eq">
+            <div>
+              <label class="lbl">Nº de capítulos <span class="opt">opcional</span></label>
+              <input class="input" type="number" id="inp-caps" placeholder="automático" min="1" max="20">
+            </div>
+            <div style="display:flex;flex-direction:column;justify-content:flex-end">
+              <div style="font-size:12px;color:var(--text-3);line-height:1.5;padding-bottom:13px" id="caps-hint">Deixe vazio para o MAX calcular pelo nº de páginas</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DNA do Produto — colapsável, aparece após informações básicas -->
       <section class="card" id="sec-dna" data-showon="ent">
-        <h2><span class="n">🧬</span>DNA do Produto<span class="hint">pré-preenche os campos e alimenta os agentes</span></h2>
+        <h2 id="dna-toggle" style="cursor:pointer;user-select:none;margin-bottom:0"><span class="n">🧬</span>DNA do Produto<span class="hint">conteúdo mais rico · opcional</span><span id="dna-chev" style="margin-left:auto;font-size:11px;color:var(--text-3);transition:transform .3s;display:inline-block">▾</span></h2>
+        <div id="dna-stack" style="overflow:hidden;max-height:0;opacity:0;transition:max-height .45s ease,opacity .3s;margin-top:0">
+        <div style="height:18px"></div>
         <div class="stack">
           <div class="row2 eq">
             <div>
@@ -491,107 +602,7 @@
             <input type="hidden" id="dna-produto-id" value="">
           </div>
         </div>
-      </section>
-
-      <!-- 01 informações básicas -->
-      <section class="card" data-showon="ent" data-sec-num="01">
-        <h2><span class="n">01</span>Informações básicas<span class="hint">o essencial para montar o conteúdo</span></h2>
-        <div class="stack">
-          <div class="row2">
-            <div>
-              <label class="lbl">Tipo de entregável</label>
-              <div class="type-select">
-                <div class="trigger" id="type-trigger">
-                  <span class="ico" id="type-ico">📕</span>
-                  <span id="type-label">Ebook / Guia Completo</span>
-                  <span class="chev">▾</span>
-                </div>
-                <div class="type-menu" id="type-menu" style="display:none">
-                  <div class="opt active" data-v="ebook" data-ico="📕"><span class="ico">📕</span>Ebook / Guia Completo<span class="meta">50–200 pg</span></div>
-                  <div class="opt" data-v="workbook" data-ico="🖍️"><span class="ico">🖍️</span>Workbook / Caderno de Exercícios<span class="meta">30–80 pg</span></div>
-                  <div class="opt" data-v="checklist" data-ico="✅"><span class="ico">✅</span>Checklist<span class="meta">5–20 pg</span></div>
-                  <div class="opt" data-v="planner" data-ico="📒"><span class="ico">📒</span>Planner / Organizador<span class="meta">30–120 pg</span></div>
-                  <div class="opt" data-v="script_vsl" data-ico="🎬"><span class="ico">🎬</span>Script VSL / Vídeo de Vendas<span class="meta">roteiro</span></div>
-                  <div class="opt" data-v="cheat_sheet" data-ico="⚡"><span class="ico">⚡</span>Guia de Consulta Rápida<span class="meta">5–15 pg</span></div>
-                  <div class="opt" data-v="certificado" data-ico="🏅"><span class="ico">🏅</span>Certificado de Conclusão<span class="meta">1 pg</span></div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <label class="lbl">Nº de páginas</label>
-              <input class="input" type="number" id="inp-paginas" value="15" min="1" max="80">
-            </div>
-          </div>
-
-          <div>
-            <label class="lbl">Título do entregável</label>
-            <input class="input" id="inp-titulo" placeholder="Ex: 10 Fundamentos do Jiu-Jitsu para Iniciantes">
-            <div class="field-chips" data-target="inp-titulo">
-              <span class="chip">O Guia Definitivo de…</span>
-              <span class="chip">7 Passos para…</span>
-              <span class="chip">Do Zero ao…</span>
-              <span class="chip">O Método…</span>
-              <span class="chip">Secrets de…</span>
-            </div>
-          </div>
-
-          <div>
-            <label class="lbl">Subtítulo <span class="opt">opcional</span></label>
-            <input class="input" id="inp-subtitulo" placeholder="Ex: O guia completo para quem quer resultados reais em 30 dias">
-            <div class="field-chips" data-target="inp-subtitulo">
-              <span class="chip">O guia definitivo para resultados reais</span>
-              <span class="chip">Do zero ao avançado em 30 dias</span>
-              <span class="chip">Sem precisar de experiência prévia</span>
-              <span class="chip">O método que ninguém ensina</span>
-              <span class="chip">Passo a passo comprovado</span>
-            </div>
-          </div>
-
-          <div class="row2 eq">
-            <div>
-              <label class="lbl">Nome do autor / marca</label>
-              <input class="input" id="inp-autor" placeholder="Ex: Ana Martins | Studio Vida Leve">
-              <div class="field-chips" data-target="inp-autor">
-                <span class="chip">usar nome do DNA</span>
-                <span class="chip">Instituto…</span>
-                <span class="chip">Academy…</span>
-                <span class="chip">Método…</span>
-              </div>
-            </div>
-            <div>
-              <label class="lbl">Nicho / assunto principal</label>
-              <input class="input" id="inp-descricao" placeholder="Ex: Emagrecimento feminino, dieta low carb">
-              <div class="field-chips" data-target="inp-descricao">
-                <span class="chip">Emagrecimento</span>
-                <span class="chip">Finanças</span>
-                <span class="chip">Mindset</span>
-                <span class="chip">Vendas</span>
-                <span class="chip">Saúde</span>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label class="lbl">Avatar do público-alvo <span class="opt">recomendado · melhora muito o conteúdo</span></label>
-            <input class="input" id="inp-avatar" placeholder="Ex: Mulheres 28–42 anos que tentaram várias dietas sem sucesso e buscam uma solução definitiva">
-            <div class="field-chips" data-target="inp-avatar">
-              <span class="chip">Mães 28–42 com pouco tempo</span>
-              <span class="chip">Empreendedores que travam nas vendas</span>
-              <span class="chip">Jovens endividados querendo sair das dívidas</span>
-              <span class="chip">Profissionais sobrecarregados sem produtividade</span>
-            </div>
-          </div>
-
-          <div class="row2 eq">
-            <div>
-              <label class="lbl">Nº de capítulos <span class="opt">opcional</span></label>
-              <input class="input" type="number" id="inp-caps" placeholder="automático" min="1" max="20">
-            </div>
-            <div style="display:flex;flex-direction:column;justify-content:flex-end">
-              <div style="font-size:12px;color:var(--text-3);line-height:1.5;padding-bottom:13px" id="caps-hint">Deixe vazio para o MAX calcular pelo nº de páginas</div>
-            </div>
-          </div>
-        </div>
+        </div><!-- /dna-stack -->
       </section>
 
       <!-- CARROSSEL — campos exclusivos -->
@@ -681,50 +692,76 @@
         </div>
       </section>
 
-      <!-- CRIATIVO EM IMAGEM -->
+      <!-- CRIATIVO EM IMAGEM — Meta Ads & Google Ads -->
       <section class="card" data-showon="cri">
-        <h2><span class="n">🎨</span>Criativo em Imagem<span class="hint">banner, story ou post para redes sociais</span></h2>
+        <h2><span class="n">🎯</span>Criativo para Anúncio<span class="hint">Meta Ads · Google Ads · gerado como imagem PNG</span></h2>
+
+        <!-- Banner informativo sobre saída -->
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(200,255,71,.05);border:1px solid rgba(200,255,71,.15);border-radius:10px;margin-bottom:18px;font-size:12px;color:var(--text-2)">
+          <span style="font-size:18px">🖼</span>
+          <div><b style="color:var(--accent)">Saída: imagem PNG 1080px</b> — pronta para upload no Meta Ads Manager, Google Ads ou agendamento. A IA gera o layout, aplica o tema e exporta em alta resolução.</div>
+        </div>
+
         <div class="stack">
 
-          <!-- Formato -->
+          <!-- Plataforma / Formato -->
           <div>
-            <label class="lbl">Formato</label>
+            <label class="lbl">Plataforma e formato</label>
             <div class="cri-formats" id="cri-formats">
-              <div class="fmt active" data-v="instagram_feed"><span class="ico">📸</span><div><b>Feed 1:1</b><span>1080×1080</span></div></div>
-              <div class="fmt" data-v="instagram_feed_4x5"><span class="ico">📱</span><div><b>Feed 4:5</b><span>1080×1350</span></div></div>
-              <div class="fmt" data-v="instagram_story"><span class="ico">⬆</span><div><b>Story</b><span>1080×1920</span></div></div>
-              <div class="fmt" data-v="linkedin"><span class="ico">💼</span><div><b>LinkedIn</b><span>1200×627</span></div></div>
+              <div class="fmt active" data-v="instagram_feed"><span class="ico">📸</span><div><b>Feed Meta 1:1</b><span>1080×1080 · Stories/Feed</span></div></div>
+              <div class="fmt" data-v="instagram_feed_4x5"><span class="ico">📱</span><div><b>Feed Meta 4:5</b><span>1080×1350 · maior entrega</span></div></div>
+              <div class="fmt" data-v="instagram_story"><span class="ico">⬆</span><div><b>Story / Reels</b><span>1080×1920 · fullscreen</span></div></div>
+              <div class="fmt" data-v="linkedin"><span class="ico">💼</span><div><b>Google / LinkedIn</b><span>1200×627 · banner</span></div></div>
             </div>
           </div>
 
-          <!-- Headline -->
+          <!-- Headline (copy principal do anúncio) -->
           <div>
-            <label class="lbl">Headline principal</label>
-            <input class="input" id="cri-headline" placeholder="Ex: 3 erros que impedem seu crescimento">
+            <label class="lbl">Headline do anúncio <span style="color:var(--brand);font-size:11px">obrigatório</span></label>
+            <input class="input" id="cri-headline" placeholder="Ex: Aprenda Jiu-Jitsu em casa por R$17">
+            <div class="field-chips" data-target="cri-headline">
+              <span class="chip">Aprenda [nicho] do zero</span>
+              <span class="chip">Método comprovado para…</span>
+              <span class="chip">R$[preço] hoje, R$[âncora] amanhã</span>
+              <span class="chip">Últimas vagas — só hoje</span>
+              <span class="chip">Resultado em [tempo]</span>
+            </div>
           </div>
 
-          <!-- Sub -->
+          <!-- Subtexto / Proposta de valor -->
           <div>
-            <label class="lbl">Subtexto <span class="opt">opcional</span></label>
-            <input class="input" id="cri-sub" placeholder="Ex: Descubra o método que top criadores usam">
+            <label class="lbl">Proposta de valor <span class="opt">opcional · aparece abaixo da headline</span></label>
+            <input class="input" id="cri-sub" placeholder="Ex: +3.200 alunos · acesso imediato · sem mensalidade">
+            <div class="field-chips" data-target="cri-sub">
+              <span class="chip">Acesso imediato · sem mensalidade</span>
+              <span class="chip">Garantia de 7 dias</span>
+              <span class="chip">+[N] alunos satisfeitos</span>
+              <span class="chip">Resultado ou devolução</span>
+            </div>
           </div>
 
-          <!-- CTA -->
+          <!-- CTA / Marca -->
           <div>
-            <label class="lbl">CTA / Marca</label>
-            <input class="input" id="cri-cta" placeholder="Ex: @suamarca | Siga para mais">
+            <label class="lbl">CTA e marca <span class="opt">botão ou @handle</span></label>
+            <input class="input" id="cri-cta" placeholder="Ex: Comprar agora · @nexusdigital">
+            <div class="field-chips" data-target="cri-cta">
+              <span class="chip">Comprar agora</span>
+              <span class="chip">Quero meu acesso</span>
+              <span class="chip">Saiba mais</span>
+              <span class="chip">Garantir vaga</span>
+            </div>
           </div>
 
-          <!-- Tema -->
+          <!-- Tema visual — otimizado para anúncios -->
           <div>
-            <label class="lbl">Tema visual</label>
+            <label class="lbl">Paleta visual <span class="opt">escolha a que mais converte pro seu avatar</span></label>
             <div class="themes" id="themes-cri" style="grid-template-columns:repeat(3,1fr)">
-              <div class="theme active" data-v="impacto" data-cri-theme><div class="theme-mini" style="background:linear-gradient(160deg,#0d0d0d,#1d1d1d)"><div class="mini-stripe" style="background:#E63946"></div><div class="mini-body"><div class="mini-line" style="background:#E63946"></div><div class="mini-title">Título</div></div></div><div class="theme-label"><span class="t">⚡ Impacto</span><span class="check">✓</span></div></div>
-              <div class="theme" data-v="elegancia" data-cri-theme><div class="theme-mini" style="background:linear-gradient(160deg,#2a1045,#7B5EA7)"><div class="mini-stripe" style="background:#C9A84C"></div><div class="mini-body"><div class="mini-line" style="background:#C9A84C"></div><div class="mini-title" style="font-family:Georgia,serif">Título</div></div></div><div class="theme-label"><span class="t">🌸 Elegância</span><span class="check">✓</span></div></div>
-              <div class="theme" data-v="produtividade" data-cri-theme><div class="theme-mini" style="background:linear-gradient(160deg,#083480,#1565C0)"><div class="mini-stripe" style="background:#FF8F00"></div><div class="mini-body"><div class="mini-line" style="background:#FF8F00"></div><div class="mini-title">Título</div></div></div><div class="theme-label"><span class="t">🎯 Foco</span><span class="check">✓</span></div></div>
-              <div class="theme" data-v="bemestar" data-cri-theme><div class="theme-mini" style="background:linear-gradient(160deg,#122808,#2d5a16)"><div class="mini-stripe" style="background:#F06292"></div><div class="mini-body"><div class="mini-line" style="background:#F06292"></div><div class="mini-title">Título</div></div></div><div class="theme-label"><span class="t">🌿 Bem-estar</span><span class="check">✓</span></div></div>
-              <div class="theme" data-v="sabedoria" data-cri-theme><div class="theme-mini" style="background:linear-gradient(160deg,#160b05,#3E2723)"><div class="mini-stripe" style="background:#DAA520"></div><div class="mini-body"><div class="mini-line" style="background:#DAA520"></div><div class="mini-title" style="font-family:Georgia,serif">Título</div></div></div><div class="theme-label"><span class="t">📖 Sabedoria</span><span class="check">✓</span></div></div>
-              <div class="theme" data-v="criatividade" data-cri-theme><div class="theme-mini" style="background:linear-gradient(160deg,#060612,#18183a)"><div class="mini-stripe" style="background:#7C4DFF"></div><div class="mini-body"><div class="mini-line" style="background:#7C4DFF"></div><div class="mini-title">Título</div></div></div><div class="theme-label"><span class="t">✨ Criativo</span><span class="check">✓</span></div></div>
+              <div class="theme active" data-v="impacto" data-cri-theme><div class="theme-mini" style="background:linear-gradient(160deg,#0d0d0d,#1d1d1d)"><div class="mini-stripe" style="background:#E63946"></div><div class="mini-body"><div class="mini-line" style="background:#E63946"></div><div class="mini-title">Título</div><div class="mini-sub">Vermelho · urgência · conversão direta</div></div></div><div class="theme-label"><span class="t">⚡ Impacto</span><span class="check">✓</span></div></div>
+              <div class="theme" data-v="elegancia" data-cri-theme><div class="theme-mini" style="background:linear-gradient(160deg,#2a1045,#7B5EA7)"><div class="mini-stripe" style="background:#C9A84C"></div><div class="mini-body"><div class="mini-line" style="background:#C9A84C"></div><div class="mini-title" style="font-family:Georgia,serif">Título</div><div class="mini-sub">Roxo+ouro · premium · high-ticket</div></div></div><div class="theme-label"><span class="t">🌸 Elegância</span><span class="check">✓</span></div></div>
+              <div class="theme" data-v="produtividade" data-cri-theme><div class="theme-mini" style="background:linear-gradient(160deg,#083480,#1565C0)"><div class="mini-stripe" style="background:#FF8F00"></div><div class="mini-body"><div class="mini-line" style="background:#FF8F00"></div><div class="mini-title">Título</div><div class="mini-sub">Azul+laranja · confiança · performance</div></div></div><div class="theme-label"><span class="t">🎯 Foco</span><span class="check">✓</span></div></div>
+              <div class="theme" data-v="bemestar" data-cri-theme><div class="theme-mini" style="background:linear-gradient(160deg,#122808,#2d5a16)"><div class="mini-stripe" style="background:#F06292"></div><div class="mini-body"><div class="mini-line" style="background:#F06292"></div><div class="mini-title">Título</div><div class="mini-sub">Verde+rosa · saúde · bem-estar</div></div></div><div class="theme-label"><span class="t">🌿 Bem-estar</span><span class="check">✓</span></div></div>
+              <div class="theme" data-v="sabedoria" data-cri-theme><div class="theme-mini" style="background:linear-gradient(160deg,#160b05,#3E2723)"><div class="mini-stripe" style="background:#DAA520"></div><div class="mini-body"><div class="mini-line" style="background:#DAA520"></div><div class="mini-title" style="font-family:Georgia,serif">Título</div><div class="mini-sub">Marrom+dourado · autoridade · nicho</div></div></div><div class="theme-label"><span class="t">📖 Sabedoria</span><span class="check">✓</span></div></div>
+              <div class="theme" data-v="criatividade" data-cri-theme><div class="theme-mini" style="background:linear-gradient(160deg,#060612,#18183a)"><div class="mini-stripe" style="background:#7C4DFF"></div><div class="mini-body"><div class="mini-line" style="background:#7C4DFF"></div><div class="mini-title">Título</div><div class="mini-sub">Dark+roxo · digital · tech · jovem</div></div></div><div class="theme-label"><span class="t">✨ Criativo</span><span class="check">✓</span></div></div>
             </div>
           </div>
 
@@ -796,8 +833,8 @@
       <section class="card" data-showon="ent" data-sec-num="02">
         <h2><span class="n">02</span>Tema Visual<span class="hint">design e paleta do documento gerado</span></h2>
 
-        <div class="stack" style="margin-bottom:18px;display:none" id="legacy-fonte-wrap">
-          <div class="check-row" id="ck-fonte"><span class="chk">✓</span><span>Personalizar fontes</span><span class="meta">tipografia</span></div>
+        <div class="stack" style="margin-bottom:18px" id="legacy-fonte-wrap">
+          <div class="check-row" id="ck-fonte"><span class="chk">✓</span><span>Personalizar fontes</span><span class="meta">tipografia · opcional</span></div>
           <div class="expand-panel" id="panel-fonte">
             <div class="fpick-section">
 
@@ -1012,6 +1049,15 @@
   </footer>
 </main>
 
+<!-- MOBILE CTA BAR — fixo no bottom em telas ≤900px -->
+<div id="mobile-cta-bar">
+  <div style="display:flex;flex-direction:column;gap:1px">
+    <span class="mcta-note" id="mcta-note">~90s · sem marca d'água</span>
+    <span style="font-size:11px;color:var(--text-3);font-family:'DM Mono',monospace" id="mcta-mode">Infoproduto</span>
+  </div>
+  <button class="mcta-btn" id="mcta-btn">🚀 Gerar</button>
+</div>
+
 <!-- PROGRESS OVERLAY -->
 <div class="overlay" id="overlay-prog">
   <div class="overlay-box">
@@ -1086,6 +1132,24 @@
 <div id="err-box"></div>
 
 <script>
+  // ---- DNA toggle (colapsável por padrão) ----
+  (function() {
+    const toggle = document.getElementById('dna-toggle');
+    const stack  = document.getElementById('dna-stack');
+    const chev   = document.getElementById('dna-chev');
+    if (!toggle || !stack) return;
+    // começa colapsado
+    stack.style.maxHeight = '0';
+    stack.style.opacity = '0';
+    let open = false;
+    toggle.addEventListener('click', () => {
+      open = !open;
+      stack.style.maxHeight = open ? stack.scrollHeight + 200 + 'px' : '0';
+      stack.style.opacity   = open ? '1' : '0';
+      if (chev) chev.style.transform = open ? 'rotate(180deg)' : '';
+    });
+  })();
+
   // pvFocused: tracks which preview element is being edited inline
   let pvFocused = null;
 
@@ -1509,6 +1573,31 @@
     setTimeout(() => document.getElementById('inp-titulo').focus(), 400);
   });
 
+  // ---- Mobile CTA bar — espelha o btn-gerar ----
+  const mctaBtn  = document.getElementById('mcta-btn');
+  const mctaNote = document.getElementById('mcta-note');
+  const mctaMode = document.getElementById('mcta-mode');
+  if (mctaBtn) {
+    mctaBtn.addEventListener('click', () => document.getElementById('btn-gerar').click());
+    // sincroniza texto conforme modo
+    const _syncMcta = () => {
+      if (!mctaNote || !mctaMode) return;
+      const map = {
+        ent:  { btn: '🚀 Gerar', note: '~90s · sem marca d\'água', mode: 'Infoproduto' },
+        car:  { btn: '📱 Gerar Carrossel', note: '~60s · slides PNG', mode: 'Carrossel' },
+        cri:  { btn: '🎯 Gerar Criativo', note: '~60s · PNG 1080px', mode: 'Criativo' },
+        conv: { btn: '🔄 Converter', note: 'PDF ↔ Word', mode: 'Conversor' },
+      };
+      const m = map[currentMode] || map.ent;
+      mctaBtn.textContent  = m.btn;
+      mctaNote.textContent = m.note;
+      mctaMode.textContent = m.mode;
+    };
+    document.querySelectorAll('.mode-tab').forEach(tab =>
+      tab.addEventListener('click', () => setTimeout(_syncMcta, 0))
+    );
+  }
+
   // ---- generate ----
   document.getElementById('btn-gerar').addEventListener('click', async () => {
     if (currentMode === 'car') { await gerarCarrossel(); return; }
@@ -1639,14 +1728,21 @@
       _stopDicas();
       document.getElementById('overlay-prog').classList.remove('show');
       document.getElementById('btn-gerar').disabled = false;
-      showErr('⚠ ' + err.message);
+      const rawMsg = err.message || '';
+      const friendlyMsg = rawMsg.includes('500') ? 'Erro no servidor — o conteúdo pode ser muito longo. Tente reduzir o nº de páginas.' :
+        rawMsg.includes('429') ? 'Muitas requisições. Aguarde 30 segundos e tente novamente.' :
+        rawMsg.includes('401') || rawMsg.includes('403') ? 'Sem autorização. Verifique sua chave de API.' :
+        rawMsg.includes('timeout') || rawMsg.includes('15 minutos') ? 'Tempo esgotado — geração demorou demais. Tente um documento menor.' :
+        rawMsg.includes('Conexão perdida') ? 'Conexão perdida com o servidor. Clique em Tentar novamente.' :
+        rawMsg || 'Algo deu errado. Tente novamente.';
+      showErr('⚠ ' + friendlyMsg);
     }
 
     } catch (e) {
       console.error('[btn-gerar]', e);
       document.getElementById('overlay-prog')?.classList.remove('show');
       document.getElementById('btn-gerar').disabled = false;
-      showErr('⚠ Erro inesperado: ' + e.message);
+      showErr('⚠ Erro inesperado: ' + (e.message || 'tente novamente'));
     }
   });
 
@@ -2188,6 +2284,14 @@
     document.getElementById('s-car-assunto').textContent = v.slice(0, 28) + (v.length > 28 ? '…' : '') || '—';
   });
 
+  // ---- criativo: reflete headline no preview title ----
+  document.getElementById('cri-headline')?.addEventListener('input', function() {
+    if (currentMode === 'cri') {
+      document.getElementById('pv-title').textContent = this.value || 'Sua Headline';
+      document.getElementById('pv-brand').textContent = 'Meta Ads · Nexus Forge';
+    }
+  });
+
   // ---- slide dots generator ----
   function updateSlideDots(count) {
     const container = document.getElementById('slide-dots');
@@ -2263,9 +2367,9 @@
       } else if (currentMode === 'conv') {
         // conversor — botão principal fica oculto via CSS, apenas limpa o estado
       } else if (currentMode === 'cri') {
-        btnGerar.textContent = '🎨 Gerar Criativo';
-        genNote.textContent  = '~60s · imagem PNG · sem marca d\'água';
-        if (hintText) hintText.textContent = '✏️ Preencha headline e tema para gerar';
+        btnGerar.textContent = '🎯 Gerar Criativo';
+        genNote.textContent  = '~60s · PNG 1080px · pronto pro Meta Ads';
+        if (hintText) hintText.textContent = '🎯 Criativo para Meta / Google Ads';
       } else {
         btnGerar.textContent = '🚀 Gerar Infoproduto';
         genNote.textContent  = (TYPE_TIME[selectedType] || '~90s') + ' · gerado no servidor · sem marca d\'água';
