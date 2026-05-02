@@ -135,43 +135,47 @@ app.post("/api/criar", (req, res) => {
     }
   }, jobTimeoutMs);
 
-  const { generate } = require("./departments/creative/deliverable_generator");
   const { createClient } = require("@supabase/supabase-js");
   const _supa = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
   const telegramId = req.body.telegram_id || "web";
-  _supa.from("expert_dna").select("*").eq("telegram_id", telegramId).single()
-    .then(({ data: dna }) => {
-      const body = { ...req.body };
-      if (dna) {
-        body.autor  = body.autor  || dna.marca;
-        body.nicho  = body.nicho  || dna.nicho;
-        body.avatar_publico = body.avatar_publico || dna.avatar_publico;
-      }
-      return generate({
-        ...body,
-        onProgress: async (pct, msg) => {
-          const job = criarJobs.get(jobId);
-          if (job) { job.progress = pct; job.message = msg; }
-        },
-      });
+  Promise.resolve()
+    .then(() => {
+      const { generate } = require("./departments/creative/deliverable_generator");
+      return _supa.from("expert_dna").select("*").eq("telegram_id", telegramId).single()
+        .then(({ data: dna }) => {
+          const body = { ...req.body };
+          if (dna) {
+            body.autor  = body.autor  || dna.marca;
+            body.nicho  = body.nicho  || dna.nicho;
+            body.avatar_publico = body.avatar_publico || dna.avatar_publico;
+          }
+          return generate({
+            ...body,
+            onProgress: async (pct, msg) => {
+              const job = criarJobs.get(jobId);
+              if (job) { job.progress = pct; job.message = msg; }
+            },
+          });
+        });
     })
     .then(resultado => {
-    clearTimeout(jobKiller);
-    criarJobs.set(jobId, {
-      status: "done", progress: 100, message: "Pronto!", criadoEm: Date.now(),
-      titulo: resultado.titulo,
-      pdf: resultado.pdf ? resultado.pdf.toString("base64") : null,
-      pdfFilename: resultado.pdfFilename,
-      docx: resultado.docx ? resultado.docx.toString("base64") : null,
-      docxFilename: resultado.docxFilename,
-      gammaUrl: resultado.gammaUrl || null,
+      clearTimeout(jobKiller);
+      criarJobs.set(jobId, {
+        status: "done", progress: 100, message: "Pronto!", criadoEm: Date.now(),
+        titulo: resultado.titulo,
+        pdf: resultado.pdf ? resultado.pdf.toString("base64") : null,
+        pdfFilename: resultado.pdfFilename,
+        docx: resultado.docx ? resultado.docx.toString("base64") : null,
+        docxFilename: resultado.docxFilename,
+        gammaUrl: resultado.gammaUrl || null,
+      });
+    })
+    .catch(e => {
+      clearTimeout(jobKiller);
+      console.error("[/api/criar]", e.message);
+      criarJobs.set(jobId, { status: "error", message: e.message, criadoEm: Date.now() });
     });
-  }).catch(e => {
-    clearTimeout(jobKiller);
-    console.error("[/api/criar]", e.message);
-    criarJobs.set(jobId, { status: "error", message: e.message, criadoEm: Date.now() });
-  });
 });
 
 // GET /api/criar/progress/:jobId → SSE stream de progresso em tempo real
