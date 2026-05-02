@@ -456,6 +456,27 @@ Linguagem direta, sem rodeios. Fale como um estrategista experiente.`;
 });
 
 // ──────────────────────────────────────────
+// Gamma — Diagnóstico da API Key
+// ──────────────────────────────────────────
+app.get("/api/test-gamma", async (req, res) => {
+  try {
+    const key = process.env.GAMMA_API_KEY;
+    if (!key) return res.json({ ok: false, error: "GAMMA_API_KEY não configurada no servidor" });
+    const r = await fetch("https://public-api.gamma.app/v1.0/themes", {
+      headers: { "X-API-KEY": key, "Content-Type": "application/json" },
+    });
+    const body = await r.text();
+    if (r.ok) {
+      res.json({ ok: true, status: r.status, message: "Gamma API key válida", themes: JSON.parse(body).length || 0 });
+    } else {
+      res.json({ ok: false, status: r.status, error: body });
+    }
+  } catch (e) {
+    res.json({ ok: false, error: e.message });
+  }
+});
+
+// ──────────────────────────────────────────
 // Gamma — Geração de Apresentações
 // ──────────────────────────────────────────
 app.post("/api/gamma", async (req, res) => {
