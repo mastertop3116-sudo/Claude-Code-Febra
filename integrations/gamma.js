@@ -29,14 +29,15 @@ async function gerarEntregavel(inputText, { formato = 'document', numCards = 10,
     }),
   })
 
+  // Timeout de 60s: falhar rápido para ativar o fallback PDFKit no deliverable_generator
   const start = Date.now()
-  while (Date.now() - start < 180_000) {
+  while (Date.now() - start < 60_000) {
     const data = await _fetch(`/generations/${generationId}`)
     if (data.status === 'completed') return data
     if (data.status === 'failed') throw new Error('[Gamma] Geração falhou')
     await new Promise(r => setTimeout(r, 5000))
   }
-  throw new Error('[Gamma] Timeout após 3 minutos')
+  throw new Error('[Gamma] Timeout após 60 segundos — usando fallback PDFKit')
 }
 
 // Endpoint /api/gamma — cria apresentação a partir de título + conteúdo livre

@@ -40,8 +40,8 @@ JSON APENAS:
 // Cache em memória para evitar chamadas duplicadas na mesma sessão
 const _cache = new Map()
 
-function _cacheKey(estrategia, estrutura, autor, tipo) {
-  return JSON.stringify({ a: autor, t: tipo, n: estrategia?.nicho_refinado, p: estrategia?.promessa_central, idx: estrutura?.indice?.length })
+function _cacheKey(estrategia, estrutura, autor, tipo, maxSecoes) {
+  return JSON.stringify({ a: autor, t: tipo, n: estrategia?.nicho_refinado, p: estrategia?.promessa_central, idx: estrutura?.indice?.length, ms: maxSecoes })
 }
 
 // Tipos que exigem system prompt mais rico
@@ -66,18 +66,34 @@ async function _callModel(systemPrompt, prompt) {
   }
 }
 
-async function run({ estrategia, estrutura, autor, tipo }) {
-  const key = _cacheKey(estrategia, estrutura, autor, tipo)
+async function run({ estrategia, estrutura, autor, tipo, num_paginas }) {
+  // Limita número de seções para evitar timeouts em ebooks grandes (>15 páginas)
+  // Regra: ~2 páginas por seção; máx 8 seções por chamada única
+  const paginasNum = parseInt(num_paginas) || 0
+  const maxSecoes = paginasNum > 0 ? Math.min(Math.max(3, Math.round(paginasNum / 2)), 8) : 8
+
+  const key = _cacheKey(estrategia, estrutura, autor, tipo, maxSecoes)
   if (_cache.has(key)) {
     console.log('[copywriter] cache hit')
     return _cache.get(key)
   }
 
   const systemPrompt = PRO_TYPES.has(tipo) ? SYSTEM_PRO : SYSTEM_FLASH
-  const prompt = `Autor: ${autor}\nTipo: ${tipo}\nEstratégia: ${JSON.stringify(estrategia)}\nEstrutura: ${JSON.stringify(estrutura)}\nEscreva todas as seções.`
 
-  console.log(`[copywriter] tipo=${tipo} → OpenAI gpt-4o-mini`)
+  // Limita o índice passado ao arquiteto para respeitar maxSecoes
+  const indiceReduzido = estrutura?.indice
+    ? { ...estrutura, indice: estrutura.indice.slice(0, maxSecoes) }
+    : estrutura
+
+  const prompt = `Autor: ${autor}\nTipo: ${tipo}\nNúmero máximo de seções: ${maxSecoes}\nEstratégia: ${JSON.stringify(estrategia)}\nEstrutura: ${JSON.stringify(indiceReduzido)}\nEscreva exatamente ${maxSecoes} seções (não mais que isso).`
+
+  console.log(`[copywriter] tipo=${tipo} maxSecoes=${maxSecoes} → OpenAI gpt-4o-mini`)
   const result = await _callModel(systemPrompt, prompt)
+
+  // Garante que não ultrapassa maxSecoes mesmo se o modelo ignorar a instrução
+  if (result.secoes && result.secoes.length > maxSecoes) {
+    result.secoes = result.secoes.slice(0, maxSecoes)
+  }
 
   _cache.set(key, result)
   return result

@@ -1463,7 +1463,7 @@ async function generate(params) {
   const estrutura = await arquiteto.run({ estrategia, tipo, num_paginas: num_paginas || paginas, num_capitulos });
 
   await progress(45, "Escrevendo copy...");
-  const copy = await copywriter.run({ estrategia, estrutura, autor: autor || "", tipo });
+  const copy = await copywriter.run({ estrategia, estrutura, autor: autor || "", tipo, num_paginas: num_paginas || paginas });
 
   await progress(70, "Gerando capa...");
   let capaBuffer = null;

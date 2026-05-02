@@ -123,14 +123,17 @@ app.post("/api/criar", (req, res) => {
   criarJobs.set(jobId, { status: "running", progress: 0, message: "Iniciando...", criadoEm: Date.now() });
   res.json({ jobId });
 
-  // Killer de segurança: 5 minutos máximo por job (designer review + Nano Banana podem somar ~4 min)
+  // Killer de segurança: 15 minutos para ebooks/infoprodutos (30+ seções + Gamma polling podem somar >5 min)
+  const tipoBody = req.body.tipo || "ebook";
+  const INFOPRODUTOS = new Set(["ebook", "workbook", "script_vsl", "planner", "cheat_sheet", "certificado", "checklist"]);
+  const jobTimeoutMs = INFOPRODUTOS.has(tipoBody) ? 15 * 60 * 1000 : 5 * 60 * 1000;
   const jobKiller = setTimeout(() => {
     const job = criarJobs.get(jobId);
     if (job && job.status === "running") {
-      criarJobs.set(jobId, { status: "error", message: "Timeout: geração demorou mais de 5 minutos.", criadoEm: Date.now() });
-      console.error(`[/api/criar] Job ${jobId} encerrado por timeout`);
+      criarJobs.set(jobId, { status: "error", message: `Timeout: geração demorou mais de ${jobTimeoutMs / 60000} minutos.`, criadoEm: Date.now() });
+      console.error(`[/api/criar] Job ${jobId} encerrado por timeout (${jobTimeoutMs / 1000}s)`);
     }
-  }, 5 * 60 * 1000);
+  }, jobTimeoutMs);
 
   const { generate } = require("./departments/creative/deliverable_generator");
   const { createClient } = require("@supabase/supabase-js");
