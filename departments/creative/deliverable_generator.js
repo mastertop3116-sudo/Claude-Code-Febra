@@ -534,8 +534,8 @@ async function gerarPDF(config, conteudo) {
       doc.restore();
       doc.rect(ML, cy, 5, boxH).fill(C.primary);
       doc.save();
-      doc.fillOpacity(0.16).fillColor(C.primary).font(F.title).fontSize(76)
-        .text("“", ML + 10, cy - 14, { lineBreak: false });
+      doc.fillOpacity(0.16).fillColor(C.primary).font(F.title).fontSize(56)
+        .text(“””, ML + 10, cy + 2, { lineBreak: false });
       doc.restore();
       doc.fillColor("#222222").font(F.subtitle || F.body).fontSize(12.5)
         .text(clean, ML + 46, cy + 17, { width: CW - 62, lineGap: 5 });
@@ -545,12 +545,12 @@ async function gerarPDF(config, conteudo) {
     // ── Chapter banner (abre cada capítulo) ──
     function drawChapterBanner(titulo, numStr) {
       const BH = 196;
-      // Ghost number decorativo
+      // Ghost number decorativo (posicionado abaixo da linha de topo para não vazar no header)
       if (numStr) {
         doc.save();
         doc.fillColor(C.primary).fillOpacity(0.05)
-          .font(F.title).fontSize(210)
-          .text(numStr, W - 215, CT - 26, { width: 240, align: "right", lineBreak: false });
+          .font(F.title).fontSize(160)
+          .text(numStr, W - 185, CT + 14, { width: 200, align: "right", lineBreak: false });
         doc.restore();
       }
       // Linha accent topo
@@ -588,11 +588,11 @@ async function gerarPDF(config, conteudo) {
       doc.fillOpacity(0.10).rect(0, 0, 8, H).fill(tAcc);
       doc.restore();
 
-      // Número fantasma gigante
+      // Número fantasma — reduzido para não cobrir o badge
       if (numStr) {
         doc.save();
-        doc.fillColor(tAcc).fillOpacity(0.07).font(F.title).fontSize(380)
-          .text(numStr, W * 0.18, H * 0.08, { lineBreak: false });
+        doc.fillColor(tAcc).fillOpacity(0.07).font(F.title).fontSize(260)
+          .text(numStr, W * 0.22, H * 0.12, { lineBreak: false });
         doc.restore();
       }
 
@@ -879,10 +879,10 @@ async function gerarPDF(config, conteudo) {
       doc.fillOpacity(0.12).rect(ML, panY, CW, panH).fill("#FFFFFF");
       doc.restore();
       doc.rect(ML, panY, 5, panH).fill(C.accent || C.coverAccent || C.primary);
-      // Aspas decorativas
+      // Aspas decorativas (dentro dos limites do painel)
       doc.save();
-      doc.fillColor("#FFFFFF").fillOpacity(0.06).font(F.title).fontSize(180)
-        .text("“", ML + 14, panY - 28, { lineBreak: false });
+      doc.fillColor(“#FFFFFF”).fillOpacity(0.06).font(F.title).fontSize(130)
+        .text(“””, ML + 14, panY + 8, { lineBreak: false });
       doc.restore();
       // Texto central
       const thanksTitle = "Obrigado por chegar até aqui.";
