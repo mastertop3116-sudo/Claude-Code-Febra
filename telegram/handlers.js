@@ -35,25 +35,45 @@ module.exports = function registerHandlers(bot) {
 
   bot.onText(/\/start/, (msg) => {
     if (!isAuthorized(msg.chat.id)) return deny(bot, msg.chat.id);
+    const url = process.env.RENDER_URL || "http://localhost:3000";
     bot.sendMessage(msg.chat.id,
-      `${process.env.BRAND_NAME ? '*' + process.env.BRAND_NAME + ' — ONLINE*' : '*MAX — ONLINE*'}\n\n` +
-      `Sou o *MAX*, seu COO digital.\n\n` +
-      `*Comandos:*\n` +
-      `/metas — Caderno Preto\n` +
-      `/tarefas — Status dos departamentos\n` +
-      `/report — Stark Report\n` +
-      `/financeiro — Métricas UTMify em tempo real\n` +
-      `/criar — Gerar entregável PDF/Word\n` +
-      `/roteiro — Criar roteiro + edição para Reels/TikTok\n` +
+      `${process.env.BRAND_NAME ? '*' + process.env.BRAND_NAME + ' — ONLINE*' : '*NEXUS MAX — ONLINE*'}\n\n` +
+      `Sou o *MAX*, seu COO digital. Powered by OpenAI GPT-4o Mini + Gamma.\n\n` +
+      `*📦 Produção:*\n` +
+      `/criar — Gerar ebook/workbook/checklist via bot\n` +
+      `/criar-web — Abrir painel completo (recomendado)\n` +
+      `/roteiro — Roteiro Reels/TikTok\n\n` +
+      `*📊 Inteligência:*\n` +
+      `/financeiro — Métricas em tempo real\n` +
       `/conselho [decisão] — Convocar os Titãs\n` +
       `/mentor [contexto] — Análise DISC\n` +
-      `/claude [pergunta] — Falar com Claude\n` +
-      `/yt [url] — Analisar vídeo YouTube\n` +
       `/pesquisa [tema] — Pesquisa de mercado\n` +
       `/copy [texto] — Analisar copy/VSL\n` +
       `/url [link] — Analisar landing page\n` +
+      `/yt [url] — Analisar YouTube\n\n` +
+      `*⚙️ Gestão:*\n` +
+      `/metas — Caderno Preto\n` +
+      `/tarefas — Pendências\n` +
+      `/report — Stark Report\n` +
+      `/produtos — Meus produtos\n` +
+      `/claude [pergunta] — Consultar Claude\n` +
       `/status — Status do sistema\n\n` +
       `Ou me dê uma ordem direta.`,
+      { parse_mode: "Markdown" }
+    );
+  });
+
+  bot.onText(/\/criar-web/, (msg) => {
+    if (!isAuthorized(msg.chat.id)) return deny(bot, msg.chat.id);
+    const url = process.env.RENDER_URL || "http://localhost:3000";
+    bot.sendMessage(msg.chat.id,
+      `*NEXUS FORGE — PAINEL COMPLETO*\n\n` +
+      `Acesse o estúdio completo para criar entregáveis com:\n` +
+      `• Seletor de temas visuais\n` +
+      `• Upload de imagem de capa\n` +
+      `• Preview em tempo real\n` +
+      `• Download PDF + Word\n\n` +
+      `👉 ${url}/criar`,
       { parse_mode: "Markdown" }
     );
   });
@@ -424,10 +444,22 @@ module.exports = function registerHandlers(bot) {
     );
   });
 
-  bot.onText(/\/status/, (msg) => {
+  bot.onText(/\/status/, async (msg) => {
     if (!isAuthorized(msg.chat.id)) return deny(bot, msg.chat.id);
+    const uptime = process.uptime();
+    const h = Math.floor(uptime / 3600);
+    const m = Math.floor((uptime % 3600) / 60);
+    const gammaKey = process.env.GAMMA_API_KEY ? "✅ Configurada" : "❌ Não configurada";
+    const openaiKey = process.env.OPENAI_API_KEY ? "✅ Configurada" : "❌ Não configurada";
     bot.sendMessage(msg.chat.id,
-      `*NEXUS — STATUS*\n\nMAX: Online\nGemini: Ativo\nSupabase: Conectado\nTelegram: Online`,
+      `*NEXUS — STATUS DO SISTEMA*\n\n` +
+      `🟢 MAX: Online\n` +
+      `🤖 OpenAI GPT-4o Mini: Ativo\n` +
+      `✦ Gamma API: ${gammaKey}\n` +
+      `🗄 Supabase: Conectado\n` +
+      `📱 Telegram: Online\n\n` +
+      `⏱ Uptime: ${h}h ${m}m\n` +
+      `🌐 Painel: ${process.env.RENDER_URL || "localhost:3000"}/criar`,
       { parse_mode: "Markdown" }
     );
   });
