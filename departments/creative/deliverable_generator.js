@@ -1448,6 +1448,7 @@ async function generate(params) {
     fonteTitulo, fonteCorpo, cabecalho, rodape,
     temaKey: temaKeyParam, descricao, paginas, avatar,
     produto,
+    gammaThemeId,   // ID do tema Gamma (opcional) — ex: 'alien', 'aurora', etc.
   } = params;
   const relatorio = produto?.relatorio || "";
 
@@ -1530,21 +1531,38 @@ async function generate(params) {
       const { gerarEntregavel } = require("../../integrations/gamma")
       const gammaFormato = ["script_vsl"].includes(tipo) ? "presentation" : "document"
       const inputText = _markdownParaGamma(titulo, subtitulo, autor || "", estrategia, copy)
-      const gammaResult = await gerarEntregavel(inputText, { formato: gammaFormato, numCards: Math.min(copy.secoes?.length + 3 || 10, 30), exportar: "pdf" })
-      const gammaUrl = gammaResult.url || gammaResult.gammaUrl
+      const gammaOpts = {
+        formato: gammaFormato,
+        numCards: Math.min((copy.secoes?.length || 7) + 3, 30),
+        exportar: "pdf",
+      }
+      // Passa o themeId do Gamma se fornecido pelo usuário
+      if (gammaThemeId) gammaOpts.themeId = gammaThemeId
+
+      const gammaResult = await gerarEntregavel(inputText, gammaOpts)
+
+      // gammaResult normalizado: { gammaUrl, exportUrl, url, export_url, credits, creditsUsed }
+      const gammaUrl     = gammaResult.gammaUrl || gammaResult.url
       const gammaExportUrl = gammaResult.exportUrl || gammaResult.export_url
+
       resultado.gammaUrl = gammaUrl
+
       if (gammaExportUrl) {
+        console.log(`[Gamma] Baixando PDF de: ${gammaExportUrl}`)
         const r = await fetch(gammaExportUrl)
         if (r.ok) {
           resultado.pdf = Buffer.from(await r.arrayBuffer())
           resultado.pdfFilename = `${fileSlug}.pdf`
           pdfGerado = true
-          console.log(`[Gamma] PDF gerado: ${gammaUrl}`)
+          console.log(`[Gamma] PDF gerado com sucesso: ${gammaUrl}`)
+        } else {
+          console.warn(`[Gamma] Download do PDF falhou: HTTP ${r.status}`)
         }
+      } else {
+        console.warn("[Gamma] exportUrl não retornado — sem PDF para baixar")
       }
     } catch (e) {
-      console.warn("[Gamma] Falha — usando PDFKit:", e.message)
+      console.warn("[Gamma] Falha — usando PDFKit como fallback:", e.message)
     }
     if (!pdfGerado) {
       await progress(92, "Montando PDF (PDFKit)...");

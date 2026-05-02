@@ -279,6 +279,17 @@
   .check-row.on .chk{background:var(--accent);border-color:var(--accent);color:#fff}
   .check-row .meta{margin-left:auto;color:var(--text-3);font-size:11px;font-family:"JetBrains Mono",monospace}
 
+  .gamma-theme-card{
+    cursor:pointer;border-radius:10px;border:2px solid var(--border);
+    overflow:hidden;background:var(--bg-2);
+    transition:border-color .18s,transform .12s,box-shadow .18s;
+  }
+  .gamma-theme-card:hover{border-color:var(--border-hi);transform:translateY(-2px)}
+  .gamma-theme-card.active{
+    border-color:var(--accent);
+    box-shadow:0 0 0 1px var(--accent),0 8px 20px -8px rgba(217,119,6,.5);
+  }
+
   .formats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
   .fmt{
     display:flex;align-items:center;gap:10px;padding:14px 16px;
@@ -1407,6 +1418,20 @@
           </div>
 
         </div>
+
+        <!-- Tema Gamma (opcional) -->
+        <div class="stack" style="margin-top:18px">
+          <div class="check-row" id="ck-gamma-theme"><span class="chk">✓</span><span>Usar tema Gamma para o PDF</span><span class="meta">via Gamma API</span></div>
+          <div class="expand-panel" id="panel-gamma-theme">
+            <div style="padding:14px 0 4px">
+              <p style="font-size:12px;color:var(--text-3);margin:0 0 12px;line-height:1.5">Selecione um tema visual para o documento gerado pelo Gamma. Deixe em branco para usar o padrão.</p>
+              <div id="gamma-themes-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;max-height:280px;overflow-y:auto;padding-right:4px">
+                <div style="color:var(--text-3);font-size:13px;padding:12px">Carregando temas...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </section>
 
       <!-- 03 cabeçalho & rodapé -->
@@ -1716,6 +1741,48 @@
   let selectedFontTitle    = null;
   let selectedFontSubtitle = null;
   let selectedFontBody     = null;
+  let selectedGammaThemeId = null; // tema Gamma selecionado (opcional)
+
+  // ---- Seletor de tema Gamma ----
+  (async () => {
+    try {
+      const res = await fetch('/api/gamma-themes');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const temas = await res.json();
+      const grid = document.getElementById('gamma-themes-grid');
+      if (!grid || !temas.length) return;
+      grid.innerHTML = '';
+
+      // Opção "Nenhum" (padrão)
+      const noneEl = document.createElement('div');
+      noneEl.className = 'gamma-theme-card active';
+      noneEl.dataset.id = '';
+      noneEl.innerHTML = '<div style="height:52px;display:flex;align-items:center;justify-content:center;font-size:18px">—</div><div style="padding:6px 8px;font-size:11px;font-weight:600;color:var(--text)">Padrão</div>';
+      noneEl.addEventListener('click', () => {
+        document.querySelectorAll('.gamma-theme-card').forEach(c => c.classList.remove('active'));
+        noneEl.classList.add('active');
+        selectedGammaThemeId = null;
+      });
+      grid.appendChild(noneEl);
+
+      temas.forEach(tema => {
+        const el = document.createElement('div');
+        el.className = 'gamma-theme-card';
+        el.dataset.id = tema.id;
+        const palette = tema.cores.slice(0, 3).join(', ') || '—';
+        el.innerHTML = `<div style="height:52px;background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.02));display:flex;align-items:center;justify-content:center;font-size:18px">🎨</div><div style="padding:6px 8px;font-size:11px;font-weight:600;color:var(--text);line-height:1.3">${tema.nome}</div><div style="padding:0 8px 6px;font-size:10px;color:var(--text-3);line-height:1.3">${palette}</div>`;
+        el.addEventListener('click', () => {
+          document.querySelectorAll('.gamma-theme-card').forEach(c => c.classList.remove('active'));
+          el.classList.add('active');
+          selectedGammaThemeId = tema.id;
+        });
+        grid.appendChild(el);
+      });
+    } catch (e) {
+      const grid = document.getElementById('gamma-themes-grid');
+      if (grid) grid.innerHTML = '<div style="color:var(--text-3);font-size:12px;padding:12px">Temas Gamma indisponíveis</div>';
+    }
+  })();
 
   const FONT_FAMILY_MAP = {
     Gagalin:          "'Gagalin', sans-serif",
@@ -1881,6 +1948,11 @@
     this.classList.toggle('on');
     document.getElementById('panel-cor').classList.toggle('open', this.classList.contains('on'));
     updatePreviewColors();
+  });
+
+  document.getElementById('ck-gamma-theme').addEventListener('click', function() {
+    this.classList.toggle('on');
+    document.getElementById('panel-gamma-theme').classList.toggle('open', this.classList.contains('on'));
   });
 
   // ---- slider ----
@@ -2090,6 +2162,7 @@
       ...(selectedFontTitle    && { fonteTitulo:    selectedFontTitle }),
       ...(selectedFontSubtitle && { fonteSubtitulo: selectedFontSubtitle }),
       ...(selectedFontBody     && { fonteCorpo:     selectedFontBody }),
+      ...(selectedGammaThemeId && { gammaThemeId: selectedGammaThemeId }),
       produto: {
         nome:          document.getElementById('dna-nome').value.trim() || titulo,
         nicho:         document.getElementById('dna-nicho').value.trim(),

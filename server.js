@@ -467,7 +467,11 @@ app.get("/api/test-gamma", async (req, res) => {
     });
     const body = await r.text();
     if (r.ok) {
-      res.json({ ok: true, status: r.status, message: "Gamma API key válida", themes: JSON.parse(body).length || 0 });
+      // A API retorna { data: [...], hasMore, nextCursor } — não um array direto
+      const parsed = JSON.parse(body);
+      const temas = parsed.data || parsed;
+      const totalTemas = Array.isArray(temas) ? temas.length : 0;
+      res.json({ ok: true, status: r.status, message: "Gamma API key válida", themes: totalTemas });
     } else {
       res.json({ ok: false, status: r.status, error: body });
     }
@@ -477,17 +481,31 @@ app.get("/api/test-gamma", async (req, res) => {
 });
 
 // ──────────────────────────────────────────
+// Gamma — Lista de temas disponíveis
+// ──────────────────────────────────────────
+app.get("/api/gamma-themes", async (req, res) => {
+  try {
+    const { listarTemasFormatados } = require("./integrations/gamma");
+    const temas = await listarTemasFormatados();
+    res.json(temas);
+  } catch (e) {
+    console.error("[/api/gamma-themes]", e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ──────────────────────────────────────────
 // Gamma — Geração de Apresentações
 // ──────────────────────────────────────────
 app.post("/api/gamma", async (req, res) => {
   try {
-    const { titulo, conteudo, numSlides = 10, exportar = 'pptx' } = req.body;
+    const { titulo, conteudo, numSlides = 10, exportar = 'pptx', themeId } = req.body;
     if (!titulo || !conteudo) return res.status(400).json({ error: "titulo e conteudo obrigatórios" });
     const { criarApresentacao } = require("./integrations/gamma");
-    const resultado = await criarApresentacao({ titulo, conteudo, numSlides, exportar });
+    const resultado = await criarApresentacao({ titulo, conteudo, numSlides, exportar, themeId });
     res.json({
-      url: resultado.url || resultado.gammaUrl,
-      exportUrl: resultado.exportUrl || resultado.export_url,
+      url:         resultado.gammaUrl || resultado.url,
+      exportUrl:   resultado.exportUrl || resultado.export_url,
       creditsUsed: resultado.creditsUsed,
     });
   } catch (e) {
