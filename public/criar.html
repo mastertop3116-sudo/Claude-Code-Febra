@@ -143,6 +143,10 @@
   .generate:hover{filter:brightness(1.08)}
   .generate:active{transform:translateY(1px)}
   .generate:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+  .generate.shake{animation:shake .35s ease}
+  @keyframes ready-pulse{0%,100%{box-shadow:0 1px 0 rgba(255,255,255,.15) inset,0 20px 40px -10px rgba(255,71,87,.4)}60%{box-shadow:0 1px 0 rgba(255,255,255,.15) inset,0 20px 60px -6px rgba(255,71,87,.75)}}
+  .generate.ready{animation:ready-pulse 2s ease-in-out infinite}
   .small-note{margin-top:10px;font-size:11px;color:var(--text-3);text-align:center;font-family:"DM Mono",monospace}
   .mode-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:4px}
   .mode-tab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px 10px;border:2px solid var(--border);border-radius:12px;cursor:pointer;background:rgba(5,8,17,.4);transition:all .15s;text-align:center}
@@ -978,7 +982,7 @@
             <div class="r car-row"><span class="k">Slides</span><span class="v" id="s-car-slides">6</span></div>
             <div class="r car-row"><span class="k">Plataforma</span><span class="v" id="s-car-fmt">Feed 1:1</span></div>
             <!-- shared row -->
-            <div class="r"><span class="k">Tema</span><span class="v" id="s-theme">🌿 Bem-estar &amp; Leveza</span></div>
+            <div class="r"><span class="k">Tema</span><span class="v" id="s-theme">Padrão</span></div>
           </div>
 
           <button class="generate" id="btn-gerar">🚀 Gerar Infoproduto</button>
@@ -1045,7 +1049,7 @@
 
     <div class="dl-row" id="dl-row"></div>
     <div style="margin-top:16px">
-      <button class="dl-btn reset" onclick="resetForm()">← Criar outro</button>
+      <button class="dl-btn reset" onclick="resetForm()">🔁 Criar outro entregável</button>
     </div>
   </div>
 </div>
@@ -1456,6 +1460,8 @@
 
   document.getElementById('inp-titulo').addEventListener('input', function() {
     if (pvFocused !== 'pv-title') document.getElementById('pv-title').textContent = this.value || 'Meu Entregável';
+    const gb = document.getElementById('btn-gerar');
+    if (gb) gb.classList.toggle('ready', this.value.trim().length > 3);
   });
   document.getElementById('inp-subtitulo').addEventListener('input', function() {
     if (pvFocused !== 'pv-sub') document.getElementById('pv-sub').textContent = this.value;
@@ -1508,11 +1514,19 @@
     if (currentMode === 'car') { await gerarCarrossel(); return; }
     if (currentMode === 'cri') { await gerarCriativo(); return; }
 
+    try {
     const titulo = document.getElementById('inp-titulo').value.trim();
-    if (!titulo) { showErr('Informe o título do entregável antes de gerar.'); return; }
+    if (!titulo) {
+      const gb = document.getElementById('btn-gerar');
+      gb.classList.remove('shake'); void gb.offsetWidth;
+      gb.classList.add('shake'); setTimeout(() => gb.classList.remove('shake'), 400);
+      showErr('Informe o título do entregável antes de gerar.');
+      document.getElementById('inp-titulo').focus();
+      return;
+    }
 
-    const useManual = document.getElementById('ck-img').classList.contains('on') && capaBase64;
-    const useCores  = document.getElementById('ck-cor').classList.contains('on');
+    const useManual = document.getElementById('ck-img')?.classList.contains('on') && capaBase64;
+    const useCores  = document.getElementById('ck-cor')?.classList.contains('on');
 
     const numCaps = parseInt(document.getElementById('inp-caps').value);
     const payload = {
@@ -1526,7 +1540,7 @@
       ...(numCaps && { numCapitulos: numCaps }),
       temaKey:   selectedTheme,
       formato:   selectedFmt,
-      capaImagemOpacidade: parseInt(darken.value) / 100,
+      capaImagemOpacidade: darken ? parseInt(darken.value) / 100 : 0,
       cabecalho: {
         ativo: document.getElementById('sw-head').classList.contains('on'),
         texto: document.getElementById('inp-cab').value,
@@ -1539,16 +1553,16 @@
       },
       ...(useCores && {
         cores: {
-          primary:    document.getElementById('c-primary').value,
-          secondary:  document.getElementById('c-secondary').value,
-          accent:     document.getElementById('c-accent').value,
+          primary:    document.getElementById('c-primary')?.value || '#1a1a2e',
+          secondary:  document.getElementById('c-secondary')?.value || '#16213e',
+          accent:     document.getElementById('c-accent')?.value || '#0f3460',
           background: '#FFFFFF',
           text:       '#1A1A1A',
         }
       }),
       ...(useManual && {
         capaImagem: capaBase64,
-        extrairCores: document.getElementById('ck-extract').classList.contains('on'),
+        extrairCores: document.getElementById('ck-extract')?.classList.contains('on'),
         capaGemini: false,
       }),
       ...(selectedFontTitle    && { fonteTitulo:    selectedFontTitle }),
@@ -1565,7 +1579,7 @@
     };
 
     document.getElementById('btn-gerar').disabled = true;
-    setProgress(0, 'Conectando ao servidor…');
+    setProgress(2, 'Conectando ao servidor…');
     document.getElementById('gen-overlay-sub').textContent =
       'Criando seu material personalizado · ' + (TYPE_TIME[selectedType] || '~90s');
     document.getElementById('overlay-prog').classList.add('show');
@@ -1626,6 +1640,13 @@
       document.getElementById('overlay-prog').classList.remove('show');
       document.getElementById('btn-gerar').disabled = false;
       showErr('⚠ ' + err.message);
+    }
+
+    } catch (e) {
+      console.error('[btn-gerar]', e);
+      document.getElementById('overlay-prog')?.classList.remove('show');
+      document.getElementById('btn-gerar').disabled = false;
+      showErr('⚠ Erro inesperado: ' + e.message);
     }
   });
 
