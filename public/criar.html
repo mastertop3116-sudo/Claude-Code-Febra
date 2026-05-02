@@ -144,7 +144,7 @@
   .generate:active{transform:translateY(1px)}
   .generate:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none}
   .small-note{margin-top:10px;font-size:11px;color:var(--text-3);text-align:center;font-family:"DM Mono",monospace}
-  .mode-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px}
+  .mode-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:4px}
   .mode-tab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px 10px;border:2px solid var(--border);border-radius:12px;cursor:pointer;background:rgba(5,8,17,.4);transition:all .15s;text-align:center}
   .mode-tab:hover{border-color:var(--border-hi);background:rgba(14,20,45,.7)}
   .mode-tab.active{border-color:var(--accent);background:linear-gradient(180deg,rgba(200,255,71,.1),rgba(200,255,71,.02));box-shadow:0 0 0 3px rgba(200,255,71,.1)}
@@ -152,9 +152,13 @@
   .mode-tab b{font-size:13px;font-weight:600;color:var(--text);display:block;margin-top:4px}
   .mode-tab small{font-size:11px;color:var(--text-3);font-family:"DM Mono",monospace;display:block;margin-top:2px}
   .post-types{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  [data-showon="car"]{display:none}[data-showon="conv"]{display:none}
+  [data-showon="car"]{display:none}[data-showon="conv"]{display:none}[data-showon="cri"]{display:none}
   body.mode-car [data-showon="ent"]{display:none}body.mode-car [data-showon="car"]{display:block}
   body.mode-conv [data-showon="ent"]{display:none}body.mode-conv [data-showon="car"]{display:none}body.mode-conv [data-showon="conv"]{display:block}
+  body.mode-cri [data-showon="ent"]{display:none}body.mode-cri [data-showon="car"]{display:none}body.mode-cri [data-showon="cri"]{display:block}
+  .cri-formats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .cri-formats .fmt{flex-direction:column;align-items:flex-start;gap:6px;padding:14px}
+  .cri-formats .fmt .ico{font-size:18px;width:32px;height:32px}
   .expand-panel{overflow:hidden;max-height:0;transition:max-height .45s ease,opacity .2s;opacity:0}
   .expand-panel.open{max-height:1000px;opacity:1}
   .cpick-list{display:flex;flex-direction:column;gap:8px;padding-top:14px}
@@ -262,6 +266,7 @@
   .btn-sugerir:hover{background:rgba(200,255,71,.22)}
   .preview-slide{display:none;aspect-ratio:1;border-radius:12px;overflow:hidden;position:relative;background:linear-gradient(160deg,#0E1528,#080D18);border:1px solid rgba(200,255,71,.15);box-shadow:0 1px 0 rgba(255,255,255,.1) inset,0 40px 100px -20px rgba(0,0,0,.9);flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;text-align:center}
   body.mode-car .preview{display:none}body.mode-car .preview-slide{display:flex}
+  body.mode-cri .preview{display:none}body.mode-cri .preview-slide{display:flex}
   body.mode-conv aside{display:none}body.mode-conv .grid{grid-template-columns:1fr}
   body.mode-conv .card:not([data-showon="conv"]):not(#sec-mode){display:none}
   .slide-dots{display:flex;gap:6px;margin-bottom:22px}
@@ -277,6 +282,7 @@
   .pv-elem:hover .drag-handle{opacity:1}
   .pv-elem.dragging{opacity:.75}
   .r.car-row{display:none}body.mode-car .r.ent-row{display:none}body.mode-car .r.car-row{display:flex}
+  body.mode-cri .r.ent-row{display:none}body.mode-cri .r.car-row{display:flex}
   .toast{position:fixed;bottom:24px;right:24px;z-index:300;background:rgba(8,13,24,.97);border:1px solid var(--border-hi);border-radius:12px;padding:13px 18px;font-size:13px;color:var(--text);box-shadow:0 8px 32px rgba(0,0,0,.5);backdrop-filter:blur(12px);transform:translateY(16px);opacity:0;transition:transform .25s ease,opacity .25s ease;max-width:320px;pointer-events:none;display:flex;align-items:center;gap:10px}
   .toast.show{transform:translateY(0);opacity:1}
   .toast .ti{font-size:16px}
@@ -387,6 +393,11 @@
             <span class="mico">🔄</span>
             <b>Conversor</b>
             <small>PDF ↔ Word</small>
+          </div>
+          <div class="mode-tab" data-mode="cri">
+            <span class="mico">🎨</span>
+            <b>Criativo</b>
+            <small>Imagem · Banner · Story</small>
           </div>
         </div>
       </section>
@@ -651,6 +662,56 @@
               <div class="theme" data-v="produtividade" data-car-theme><div class="theme-mini" style="background:linear-gradient(160deg,#083480,#1565C0)"><div class="mini-stripe" style="background:#FF8F00"></div><div class="mini-body"><div class="mini-line" style="background:#FF8F00"></div><div class="mini-title">Título</div></div></div><div class="theme-label"><span class="t">🎯 Foco</span><span class="check">✓</span></div></div>
               <div class="theme" data-v="bemestar" data-car-theme><div class="theme-mini" style="background:linear-gradient(160deg,#122808,#2d5a16)"><div class="mini-stripe" style="background:#F06292"></div><div class="mini-body"><div class="mini-line" style="background:#F06292"></div><div class="mini-title">Título</div></div></div><div class="theme-label"><span class="t">🌿 Bem-estar</span><span class="check">✓</span></div></div>
               <div class="theme" data-v="criatividade" data-car-theme><div class="theme-mini" style="background:linear-gradient(160deg,#060612,#18183a)"><div class="mini-stripe" style="background:#7C4DFF"></div><div class="mini-body"><div class="mini-line" style="background:#7C4DFF"></div><div class="mini-title">Título</div></div></div><div class="theme-label"><span class="t">✨ Criativo</span><span class="check">✓</span></div></div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- CRIATIVO EM IMAGEM -->
+      <section class="card" data-showon="cri">
+        <h2><span class="n">🎨</span>Criativo em Imagem<span class="hint">banner, story ou post para redes sociais</span></h2>
+        <div class="stack">
+
+          <!-- Formato -->
+          <div>
+            <label class="lbl">Formato</label>
+            <div class="cri-formats" id="cri-formats">
+              <div class="fmt active" data-v="instagram_feed"><span class="ico">📸</span><div><b>Feed 1:1</b><span>1080×1080</span></div></div>
+              <div class="fmt" data-v="instagram_feed_4x5"><span class="ico">📱</span><div><b>Feed 4:5</b><span>1080×1350</span></div></div>
+              <div class="fmt" data-v="instagram_story"><span class="ico">⬆</span><div><b>Story</b><span>1080×1920</span></div></div>
+              <div class="fmt" data-v="linkedin"><span class="ico">💼</span><div><b>LinkedIn</b><span>1200×627</span></div></div>
+            </div>
+          </div>
+
+          <!-- Headline -->
+          <div>
+            <label class="lbl">Headline principal</label>
+            <input class="input" id="cri-headline" placeholder="Ex: 3 erros que impedem seu crescimento">
+          </div>
+
+          <!-- Sub -->
+          <div>
+            <label class="lbl">Subtexto <span class="opt">opcional</span></label>
+            <input class="input" id="cri-sub" placeholder="Ex: Descubra o método que top criadores usam">
+          </div>
+
+          <!-- CTA -->
+          <div>
+            <label class="lbl">CTA / Marca</label>
+            <input class="input" id="cri-cta" placeholder="Ex: @suamarca | Siga para mais">
+          </div>
+
+          <!-- Tema -->
+          <div>
+            <label class="lbl">Tema visual</label>
+            <div class="themes" id="themes-cri" style="grid-template-columns:repeat(3,1fr)">
+              <div class="theme active" data-v="impacto" data-cri-theme><div class="theme-mini" style="background:linear-gradient(160deg,#0d0d0d,#1d1d1d)"><div class="mini-stripe" style="background:#E63946"></div><div class="mini-body"><div class="mini-line" style="background:#E63946"></div><div class="mini-title">Título</div></div></div><div class="theme-label"><span class="t">⚡ Impacto</span><span class="check">✓</span></div></div>
+              <div class="theme" data-v="elegancia" data-cri-theme><div class="theme-mini" style="background:linear-gradient(160deg,#2a1045,#7B5EA7)"><div class="mini-stripe" style="background:#C9A84C"></div><div class="mini-body"><div class="mini-line" style="background:#C9A84C"></div><div class="mini-title" style="font-family:Georgia,serif">Título</div></div></div><div class="theme-label"><span class="t">🌸 Elegância</span><span class="check">✓</span></div></div>
+              <div class="theme" data-v="produtividade" data-cri-theme><div class="theme-mini" style="background:linear-gradient(160deg,#083480,#1565C0)"><div class="mini-stripe" style="background:#FF8F00"></div><div class="mini-body"><div class="mini-line" style="background:#FF8F00"></div><div class="mini-title">Título</div></div></div><div class="theme-label"><span class="t">🎯 Foco</span><span class="check">✓</span></div></div>
+              <div class="theme" data-v="bemestar" data-cri-theme><div class="theme-mini" style="background:linear-gradient(160deg,#122808,#2d5a16)"><div class="mini-stripe" style="background:#F06292"></div><div class="mini-body"><div class="mini-line" style="background:#F06292"></div><div class="mini-title">Título</div></div></div><div class="theme-label"><span class="t">🌿 Bem-estar</span><span class="check">✓</span></div></div>
+              <div class="theme" data-v="sabedoria" data-cri-theme><div class="theme-mini" style="background:linear-gradient(160deg,#160b05,#3E2723)"><div class="mini-stripe" style="background:#DAA520"></div><div class="mini-body"><div class="mini-line" style="background:#DAA520"></div><div class="mini-title" style="font-family:Georgia,serif">Título</div></div></div><div class="theme-label"><span class="t">📖 Sabedoria</span><span class="check">✓</span></div></div>
+              <div class="theme" data-v="criatividade" data-cri-theme><div class="theme-mini" style="background:linear-gradient(160deg,#060612,#18183a)"><div class="mini-stripe" style="background:#7C4DFF"></div><div class="mini-body"><div class="mini-line" style="background:#7C4DFF"></div><div class="mini-title">Título</div></div></div><div class="theme-label"><span class="t">✨ Criativo</span><span class="check">✓</span></div></div>
             </div>
           </div>
 
@@ -1180,6 +1241,7 @@
   const typeLabel   = document.getElementById('type-label');
   const typeIco     = document.getElementById('type-ico');
   let selectedType  = 'ebook';
+  let _activeEventSource = null;
 
   // Tempo estimado e dica por tipo
   const TYPE_TIME = {
@@ -1642,6 +1704,7 @@
   // ---- generate ----
   document.getElementById('btn-gerar').addEventListener('click', async () => {
     if (currentMode === 'car') { await gerarCarrossel(); return; }
+    if (currentMode === 'cri') { await gerarCriativo(); return; }
 
     const titulo = document.getElementById('inp-titulo').value.trim();
     if (!titulo) { showErr('Informe o título do entregável antes de gerar.'); return; }
@@ -1740,6 +1803,7 @@
 
       await new Promise((resolve, reject) => {
         const es = new EventSource('/api/criar/progress/' + jobId);
+        _activeEventSource = es;
         es.onmessage = e => {
           const d = JSON.parse(e.data);
           if (d.error) { es.close(); reject(new Error(d.error)); return; }
@@ -1877,6 +1941,7 @@
   }
 
   document.getElementById('btn-cancelar').addEventListener('click', () => {
+    if (_activeEventSource) { _activeEventSource.close(); _activeEventSource = null; }
     document.getElementById('overlay-prog').classList.remove('show');
     document.getElementById('btn-gerar').disabled = false;
   });
@@ -2149,15 +2214,15 @@
         if (el && data[id]) { el.value = data[id]; el.dispatchEvent(new Event('input')); }
       });
       if (data._tipo) {
-        const card = document.querySelector(`.type-card[data-type="${data._tipo}"]`);
+        const card = document.querySelector(`.opt[data-v="${data._tipo}"]`);
         if (card) card.click();
       }
       if (data._tema) {
-        const tc = document.querySelector(`.theme-card[data-theme="${data._tema}"]`);
+        const tc = document.querySelector(`.theme[data-v="${data._tema}"]`);
         if (tc) tc.click();
       }
       if (data._fmt) {
-        const fc = document.querySelector(`.fmt-card[data-fmt="${data._fmt}"]`);
+        const fc = document.querySelector(`#formats .fmt[data-v="${data._fmt}"]`);
         if (fc) fc.click();
       }
       if (data['inp-titulo']) {
@@ -2374,6 +2439,10 @@
         updateSlidePreviewColors();
       } else if (currentMode === 'conv') {
         // conversor — botão principal fica oculto via CSS, apenas limpa o estado
+      } else if (currentMode === 'cri') {
+        btnGerar.textContent = '🎨 Gerar Criativo';
+        genNote.textContent  = '~60s · imagem PNG · sem marca d\'água';
+        if (hintText) hintText.textContent = '✏️ Preencha headline e tema para gerar';
       } else {
         btnGerar.textContent = '🚀 Gerar Infoproduto';
         genNote.textContent  = (TYPE_TIME[selectedType] || '~90s') + ' · gerado no servidor · sem marca d\'água';
@@ -2382,6 +2451,72 @@
       }
     });
   });
+
+  // ---- Criativo — formatos ----
+  let criFmt = 'instagram_feed';
+  document.querySelectorAll('#cri-formats .fmt').forEach(f => {
+    f.addEventListener('click', () => {
+      document.querySelectorAll('#cri-formats .fmt').forEach(x => x.classList.remove('active'));
+      f.classList.add('active');
+      criFmt = f.dataset.v;
+    });
+  });
+
+  // ---- Criativo — temas ----
+  document.querySelectorAll('[data-cri-theme]').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('[data-cri-theme]').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+    });
+  });
+
+  // ---- gerarCriativo ----
+  async function gerarCriativo() {
+    const headline = document.getElementById('cri-headline').value.trim();
+    if (!headline) { showErr('Informe a headline do criativo antes de gerar.'); return; }
+    const temaEl = document.querySelector('[data-cri-theme].active');
+    const temaKey = temaEl ? temaEl.dataset.v : 'impacto';
+    const payload = {
+      tipo:      'carrossel',
+      titulo:    headline,
+      subtitulo: document.getElementById('cri-sub').value.trim(),
+      descricao: document.getElementById('cri-cta').value.trim() || headline,
+      autor:     document.getElementById('dna-nome').value.trim() || 'Nexus Digital',
+      temaKey:   temaKey,
+      formato:   criFmt,
+      maxSlides: 1,
+      formato_conteudo: 'criativo',
+      gancho:    headline,
+    };
+    const btnGerar = document.getElementById('btn-gerar');
+    btnGerar.disabled = true;
+    setCarouselProgress(0, 'Conectando ao servidor…');
+    document.getElementById('overlay-carousel-prog').classList.add('show');
+    hideErr();
+    try {
+      const initRes = await fetch('/api/carousel', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!initRes.ok) throw new Error('Falha ao iniciar (HTTP ' + initRes.status + ')');
+      const { jobId } = await initRes.json();
+      await new Promise((resolve, reject) => {
+        const es = new EventSource('/api/carousel/progress/' + jobId);
+        es.onmessage = e => {
+          const d = JSON.parse(e.data);
+          if (d.error) { es.close(); reject(new Error(d.error)); return; }
+          if (d.progress !== undefined) setCarouselProgress(d.progress, d.message);
+          if (d.done) { es.close(); showCarouselSuccess(d); resolve(d); }
+        };
+        es.onerror = () => { es.close(); reject(new Error('Conexão perdida — tente novamente.')); };
+      });
+    } catch (err) {
+      document.getElementById('overlay-carousel-prog').classList.remove('show');
+      showErr('⚠ ' + err.message);
+    } finally {
+      btnGerar.disabled = false;
+    }
+  }
 
   // ---- btn-gerar handles both modes ----
   async function gerarCarrossel() {
