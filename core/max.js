@@ -1,7 +1,7 @@
 // ============================================
 // MAX — COO & Central Brain da Nexus
 // Orquestra todos os agentes e departamentos
-// Interface: Telegram | Motor: Claude + Gemini
+// Interface: Telegram | Motor: OpenAI GPT-4o Mini + Gamma
 // ============================================
 
 const { openaiFlash, openaiJson } = require("../integrations/openai");
@@ -89,10 +89,11 @@ COMANDOS DISPONÍVEIS NO TELEGRAM
 /metas — Caderno Preto: metas de faturamento, leads, conversão
 /tarefas — Tarefas pendentes por departamento
 /report — Último Stark Report salvo
-/criar [tipo] "título" [tema] — Gera PDF/Word com IA
+/criar [tipo] "título" [tema] — Gera PDF diretamente pelo bot
   Tipos: ebook, checklist, workbook, planner, script_vsl, cheat_sheet, certificado
   Temas: impacto, elegancia, sabedoria, produtividade, bemestar, criatividade
   Ex: /criar ebook "10 Técnicas de Jiu-Jitsu Infantil" impacto
+/criar-web — Abre link para o painel completo (Nexus Forge Studio) com temas, preview e download
 /conselho [decisão] — Elon, Bezos, Hang e Vieira analisam
 /paulo [contexto] — Análise DISC do público ou situação
 /claude [pergunta] — Consulta o Claude (precisa de créditos Anthropic)
