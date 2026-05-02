@@ -491,10 +491,31 @@ app.get("/api/gamma-themes", async (req, res) => {
   try {
     const { listarTemasFormatados } = require("./integrations/gamma");
     const temas = await listarTemasFormatados();
-    res.json(temas);
+    // Reescreve preview_url para usar nosso proxy (evita CORS)
+    const temasyProxy = temas.map(t => ({
+      ...t,
+      preview_url: t.id ? `/api/gamma-theme-img/${encodeURIComponent(t.id)}` : '',
+    }));
+    res.json(temasyProxy);
   } catch (e) {
     console.error("[/api/gamma-themes]", e.message);
     res.status(500).json({ error: e.message });
+  }
+});
+
+// Proxy de imagens de preview dos temas Gamma (evita CORS do assets.gamma.app)
+app.get("/api/gamma-theme-img/:themeId", async (req, res) => {
+  try {
+    const { themeId } = req.params;
+    const url = `https://assets.gamma.app/themes/${encodeURIComponent(themeId)}/preview.png`;
+    const r = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+    if (!r.ok) return res.status(404).end();
+    const buf = await r.arrayBuffer();
+    res.setHeader("Content-Type", "image/png");
+    res.setHeader("Cache-Control", "public, max-age=86400");
+    res.send(Buffer.from(buf));
+  } catch (e) {
+    res.status(502).end();
   }
 });
 

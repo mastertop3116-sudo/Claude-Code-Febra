@@ -287,14 +287,15 @@
   .toast.show{transform:translateY(0);opacity:1}
   .toast .ti{font-size:16px}
   .cformats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-  .gamma-theme-card{border:2px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color .15s,transform .12s,box-shadow .15s;background:var(--bg-2)}
-  .gamma-theme-card:hover{border-color:var(--border-hi);transform:translateY(-2px)}
-  .gamma-theme-card.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 8px 24px -8px rgba(200,255,71,.35)}
-  .gamma-theme-card img{width:100%;height:72px;object-fit:cover;display:block;background:rgba(255,255,255,.04)}
-  .gamma-theme-card .gtc-body{padding:7px 8px 8px}
-  .gamma-theme-card .gtc-name{font-size:11px;font-weight:600;color:var(--text);line-height:1.2;display:block}
-  .gamma-theme-card .gtc-check{float:right;width:14px;height:14px;border-radius:50%;border:1.5px solid rgba(255,255,255,.2);display:inline-flex;align-items:center;justify-content:center;font-size:8px;color:transparent;margin-top:1px;flex-shrink:0}
-  .gamma-theme-card.active .gtc-check{background:var(--accent);border-color:var(--accent);color:#050811}
+  .gamma-theme-card{border:2px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .15s,transform .12s,box-shadow .15s;background:var(--bg-2);position:relative}
+  .gamma-theme-card:hover{border-color:var(--border-hi);transform:translateY(-2px);box-shadow:0 8px 24px -8px rgba(0,0,0,.6)}
+  .gamma-theme-card.active{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent),0 8px 24px -8px rgba(200,255,71,.35)}
+  .gamma-theme-card .gtc-preview{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;background:rgba(255,255,255,.04);border-bottom:1px solid var(--border)}
+  .gamma-theme-card .gtc-body{padding:8px 10px 9px;display:flex;align-items:center;justify-content:space-between;gap:6px}
+  .gamma-theme-card .gtc-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gamma-theme-card .gtc-check{width:16px;height:16px;border-radius:50%;border:1.5px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:9px;color:transparent;flex-shrink:0}
+  .gamma-theme-card.active .gtc-check{background:var(--accent);border-color:var(--accent);color:#050811;content:"✓"}
+  .gamma-theme-card .gtc-none-preview{width:100%;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(200,255,71,.06),rgba(200,255,71,.02));border-bottom:1px solid var(--border);color:var(--text-3);font-size:11px;font-family:"DM Mono",monospace;letter-spacing:.08em}
   .carousel-slides-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
   .slide-thumb-wrap{position:relative;cursor:pointer;border-radius:10px;overflow:hidden;border:1.5px solid var(--border);transition:border-color .15s,transform .12s;aspect-ratio:1}
   .slide-thumb-wrap:hover{border-color:var(--accent);transform:scale(1.02)}
@@ -307,7 +308,7 @@
   .btn-carousel:active{transform:translateY(1px)}
   .btn-carousel:disabled{opacity:.4;cursor:not-allowed;filter:none;transform:none}
   @media(max-width:900px){.grid{grid-template-columns:1fr}.head h1{font-size:38px}nav.top{padding:18px 20px}main{padding:10px 20px 60px}.sticky{position:static}}
-  @media(max-width:640px){.themes{grid-template-columns:1fr 1fr}.formats{grid-template-columns:1fr}.row2,.row2.eq{grid-template-columns:1fr}.nav-mid{display:none}.head{flex-direction:column;gap:12px}.head h1{font-size:28px}.head-right{align-items:flex-start}.head p{font-size:14px}.overlay-box{padding:24px 18px;width:calc(100vw - 24px)}.dl-row{flex-direction:column;align-items:stretch}.dl-btn{justify-content:center}.prog-meta{flex-direction:column;align-items:flex-start;gap:4px}.prog-msg{max-width:100%;text-align:left}.generate{padding:15px;font-size:14px}.card{padding:18px}.summary-list .r .v{max-width:60%}.mode-tabs{grid-template-columns:repeat(2,1fr)}.cformats{grid-template-columns:repeat(2,1fr)}.fpick-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:640px){.themes{grid-template-columns:1fr 1fr}.formats{grid-template-columns:1fr}.row2,.row2.eq{grid-template-columns:1fr}.nav-mid{display:none}.head{flex-direction:column;gap:12px}.head h1{font-size:28px}.head-right{align-items:flex-start}.head p{font-size:14px}.overlay-box{padding:24px 18px;width:calc(100vw - 24px)}.dl-row{flex-direction:column;align-items:stretch}.dl-btn{justify-content:center}.prog-meta{flex-direction:column;align-items:flex-start;gap:4px}.prog-msg{max-width:100%;text-align:left}.generate{padding:15px;font-size:14px}.card{padding:18px}.summary-list .r .v{max-width:60%}.mode-tabs{grid-template-columns:repeat(2,1fr)}.cformats{grid-template-columns:repeat(2,1fr)}.fpick-grid{grid-template-columns:repeat(2,1fr)}#gamma-themes-grid{grid-template-columns:repeat(2,1fr)!important}}
   @media(max-width:480px){.head h1{font-size:22px;line-height:1.1}nav.top{padding:14px 16px}.nav-end a:not(.btn){display:none}.btn{font-size:13px;padding:8px 14px}main{padding:8px 14px 50px}.head-left .pill{font-size:11px}#err-box{bottom:16px;left:12px;right:12px;transform:none;width:auto}.toast{right:12px;left:12px;max-width:none;bottom:16px}}
   .field-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
   .chip{display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;background:rgba(200,255,71,.06);border:1px solid rgba(200,255,71,.15);color:var(--text-2);font-size:12px;cursor:pointer;transition:background .15s,border-color .15s,color .15s;user-select:none;white-space:nowrap}
@@ -789,7 +790,7 @@
 
       <!-- 02 tema visual -->
       <section class="card" data-showon="ent" data-sec-num="02">
-        <h2><span class="n">02</span>Tema Gamma<span class="hint">design visual gerado pela IA do Gamma</span></h2>
+        <h2><span class="n">02</span>Tema Visual<span class="hint">design e paleta do documento gerado</span></h2>
 
         <div class="stack" style="margin-bottom:18px;display:none" id="legacy-fonte-wrap">
           <div class="check-row" id="ck-fonte"><span class="chk">✓</span><span>Personalizar fontes</span><span class="meta">tipografia</span></div>
@@ -865,9 +866,9 @@
           </div>
         </div>
 
-        <p style="font-size:12px;color:var(--text-3);margin:0 0 14px;line-height:1.5">Escolha o visual do documento. Deixe em <b style="color:var(--text-2)">Padrão</b> para o Gamma decidir automaticamente.</p>
-        <div id="gamma-themes-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;max-height:320px;overflow-y:auto;padding-right:4px">
-          <div style="color:var(--text-3);font-size:13px;padding:12px">Carregando temas Gamma...</div>
+        <p style="font-size:12px;color:var(--text-3);margin:0 0 14px;line-height:1.5">Escolha o visual do documento. Deixe em <b style="color:var(--text-2)">Padrão</b> para o sistema decidir automaticamente.</p>
+        <div id="gamma-themes-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;max-height:380px;overflow-y:auto;padding-right:4px">
+          <div style="color:var(--text-3);font-size:13px;padding:12px">Carregando temas...</div>
         </div>
 
       </section>
@@ -970,7 +971,6 @@
             <!-- infoproduto rows -->
             <div class="r ent-row"><span class="k">Tipo</span><span class="v" id="s-type">Ebook / Guia Completo</span></div>
             <div class="r ent-row"><span class="k">Páginas</span><span class="v" id="s-pages">15</span></div>
-            <div class="r ent-row"><span class="k">Capa</span><span class="v" id="s-capa">Capa vetorial</span></div>
             <div class="r ent-row"><span class="k">Formato</span><span class="v" id="s-fmt">PDF</span></div>
             <!-- carrossel rows -->
             <div class="r car-row"><span class="k">Assunto</span><span class="v" id="s-car-assunto">—</span></div>
@@ -1151,52 +1151,55 @@
   };
   function calcCaps(pages) { return Math.min(20, Math.max(8, pages - 3)); }
   function updatePreviewColors() {
-    const useCustom = document.getElementById('ck-cor')?.classList.contains('on');
-    const t = useCustom ? {
-      cover: document.getElementById('c-secondary')?.value || '#1D1D1D',
-      accent: document.getElementById('c-accent')?.value || '#8b5cf6',
-    } : (THEME_PREVIEW[selectedTheme] || THEME_PREVIEW.bemestar);
-    const dk = ((document.getElementById('darken')?.value ?? 25) / 100).toFixed(2);
     const pv = document.querySelector('.preview');
-    pv.style.background = [
-      `radial-gradient(ellipse 70% 22% at 22% 7%, rgba(255,255,255,.10), transparent 55%)`,
-      `radial-gradient(ellipse 80% 55% at 50% 10%, ${t.accent}50, transparent 65%)`,
-      `radial-gradient(ellipse 55% 38% at 95% 95%, ${t.accent}22, transparent 60%)`,
-      `linear-gradient(rgba(0,0,0,${dk}), rgba(0,0,0,${dk}))`,
-      `linear-gradient(170deg, ${t.cover}f5 0%, ${t.cover} 50%, ${t.cover}dd 100%)`
-    ].join(', ');
-    pv.style.borderColor = `${t.accent}70`;
-    pv.style.boxShadow = [
-      `0 1px 0 rgba(255,255,255,.13) inset`,
-      `0 -1px 0 rgba(0,0,0,.5) inset`,
-      `0 0 0 1px ${t.accent}18 inset`,
-      `0 40px 100px -20px rgba(0,0,0,.9)`,
-      `0 0 50px -15px ${t.accent}30`
-    ].join(', ');
-    document.querySelector('.preview .brand').style.color = t.accent;
+    if (_gammaThemePreviewUrl) {
+      pv.style.backgroundImage = `linear-gradient(180deg,rgba(5,8,23,.55) 0%,rgba(5,8,23,.2) 45%,rgba(5,8,23,.7) 100%), url(${_gammaThemePreviewUrl})`;
+      pv.style.backgroundSize = 'cover';
+      pv.style.backgroundPosition = 'center';
+      pv.style.borderColor = 'rgba(200,255,71,.45)';
+      pv.style.boxShadow = '0 1px 0 rgba(255,255,255,.13) inset,0 40px 100px -20px rgba(0,0,0,.9),0 0 40px -10px rgba(200,255,71,.2)';
+      document.querySelector('.preview .brand').style.color = 'var(--accent)';
+    } else {
+      const t = THEME_PREVIEW[selectedTheme] || THEME_PREVIEW.bemestar;
+      pv.style.backgroundImage = [
+        `radial-gradient(ellipse 70% 22% at 22% 7%, rgba(255,255,255,.10), transparent 55%)`,
+        `radial-gradient(ellipse 80% 55% at 50% 10%, ${t.accent}50, transparent 65%)`,
+        `radial-gradient(ellipse 55% 38% at 95% 95%, ${t.accent}22, transparent 60%)`,
+        `linear-gradient(170deg, ${t.cover}f5 0%, ${t.cover} 50%, ${t.cover}dd 100%)`
+      ].join(', ');
+      pv.style.backgroundSize = '';
+      pv.style.backgroundPosition = '';
+      pv.style.borderColor = `${t.accent}70`;
+      pv.style.boxShadow = `0 1px 0 rgba(255,255,255,.13) inset,0 40px 100px -20px rgba(0,0,0,.9),0 0 50px -15px ${t.accent}30`;
+      document.querySelector('.preview .brand').style.color = t.accent;
+    }
   }
 
   let selectedTheme        = 'bemestar';
   let selectedFontTitle    = null;
   let selectedFontSubtitle = null;
   let selectedFontBody     = null;
-  let selectedGammaThemeId = null; // tema Gamma selecionado (opcional)
+  let selectedGammaThemeId  = null;
+  let _gammaThemePreviewUrl = '';
+  let _gammaThemeName       = 'Padrão';
 
   // ---- Seletor de tema Gamma ----
   function makeGammaCard(id, nome, previewUrl, active) {
     const el = document.createElement('div');
     el.className = 'gamma-theme-card' + (active ? ' active' : '');
     el.dataset.id = id;
-    el.innerHTML = `
-      <img src="${previewUrl}" alt="${nome}" loading="lazy" onerror="this.style.display='none'">
-      <div class="gtc-body">
-        <span class="gtc-check">✓</span>
-        <span class="gtc-name">${nome}</span>
-      </div>`;
+    const previewHTML = previewUrl
+      ? `<img class="gtc-preview" src="${previewUrl}" alt="${nome}" loading="lazy" onerror="this.style.display='none'">`
+      : `<div class="gtc-none-preview">PADRÃO</div>`;
+    el.innerHTML = `${previewHTML}<div class="gtc-body"><span class="gtc-name">${nome}</span><span class="gtc-check">✓</span></div>`;
     el.addEventListener('click', () => {
       document.querySelectorAll('.gamma-theme-card').forEach(c => c.classList.remove('active'));
       el.classList.add('active');
       selectedGammaThemeId = id || null;
+      _gammaThemePreviewUrl = previewUrl || '';
+      _gammaThemeName = nome;
+      document.getElementById('s-theme').textContent = nome;
+      updatePreviewColors();
     });
     return el;
   }
@@ -1212,7 +1215,7 @@
       grid.appendChild(makeGammaCard('', 'Padrão', '', true));
       temas.forEach(t => grid.appendChild(makeGammaCard(t.id, t.nome, t.preview_url, false)));
     } catch (e) {
-      if (grid) grid.innerHTML = '<p style="color:var(--text-3);font-size:12px;padding:8px 0">Temas Gamma indisponíveis</p>';
+      if (grid) grid.innerHTML = '<p style="color:var(--text-3);font-size:12px;padding:8px 0">Temas indisponíveis</p>';
     }
   })();
 
@@ -1445,10 +1448,8 @@
   function updateMeta() {
     const pages = parseInt(document.getElementById('inp-paginas').value) || 15;
     const caps  = calcCaps(pages);
-    const theme = document.querySelector('.theme.active')?.querySelector('.t')?.textContent || '';
-    const themeClean = theme.replace(/[^\w\s&À-ɏ]/g,'').trim();
     const nicho = document.getElementById('inp-descricao')?.value?.trim() || '';
-    const metaParts = [nicho || themeClean, pages + 'pg'].filter(Boolean);
+    const metaParts = [nicho || _gammaThemeName, pages + 'pg'].filter(Boolean);
     document.getElementById('pv-meta').textContent = metaParts.join(' · ');
     document.getElementById('s-pages').textContent = pages + ' pg · ~' + caps + ' capítulos';
   }
