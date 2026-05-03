@@ -363,25 +363,20 @@
   /* card 3D tilt */
   .card{will-change:transform;transform-style:preserve-3d;transition:transform .35s ease,border-color .2s,box-shadow .2s}
   .card:hover{box-shadow:0 0 0 1px rgba(168,85,247,.22),0 24px 60px -15px rgba(168,85,247,.18)!important}
-  /* orbital spinner */
-  .ov-orbital{position:relative;width:72px;height:72px;margin:0 auto 26px}
-  .ov-orbital .ring{position:absolute;inset:0;border-radius:50%;border:2px solid transparent}
-  .ov-orbital .ring-1{border-top-color:#a855f7;border-right-color:rgba(168,85,247,.15);animation:orb1 1.2s linear infinite}
-  .ov-orbital .ring-2{inset:9px;border-bottom-color:#facc15;border-left-color:rgba(250,204,21,.15);animation:orb2 1.9s linear infinite reverse}
-  .ov-orbital .ring-3{inset:18px;border-top-color:rgba(168,85,247,.45);animation:orb1 2.6s linear infinite}
-  .ov-orbital .core{position:absolute;inset:24px;border-radius:50%;background:radial-gradient(circle,rgba(168,85,247,.6),transparent);animation:pulse-core 2s ease-in-out infinite}
-  @keyframes orb1{to{transform:rotate(360deg)}}
-  @keyframes orb2{to{transform:rotate(360deg)}}
-  @keyframes pulse-core{0%,100%{transform:scale(.7);opacity:.5}50%{transform:scale(1.4);opacity:1}}
-  /* gen steps */
-  .gen-steps{display:flex;flex-direction:column;gap:7px;margin:14px 0 10px;text-align:left}
-  .gen-step{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;font-size:13px;color:var(--text-3);transition:all .35s;background:rgba(255,255,255,.02);border:1px solid transparent}
-  .gen-step.active{color:var(--text);background:rgba(168,85,247,.09);border-color:rgba(168,85,247,.22)}
-  .gen-step.done{color:#facc15;background:rgba(250,204,21,.06);border-color:rgba(250,204,21,.18)}
-  .gen-step .st-ico{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07);transition:all .35s}
-  .gen-step.active .st-ico{background:rgba(168,85,247,.22);border-color:rgba(168,85,247,.45);animation:step-pulse 1.5s ease-in-out infinite}
-  .gen-step.done .st-ico{background:rgba(250,204,21,.2);border-color:rgba(250,204,21,.4)}
-  @keyframes step-pulse{0%,100%{box-shadow:none}50%{box-shadow:0 0 14px rgba(168,85,247,.55)}}
+  /* ── Loading container (referência) ── */
+  .lc-box{background:#0b0b0f;padding:40px;border-radius:20px;width:420px;max-width:calc(100vw - 32px);margin:auto;text-align:center;box-shadow:0 0 50px rgba(168,85,247,.25),0 0 0 1px rgba(168,85,247,.12)}
+  .lc-loader{width:60px;height:60px;border:4px solid rgba(255,255,255,.08);border-top:4px solid #a855f7;border-radius:50%;margin:0 auto 24px;animation:lc-spin 1s linear infinite}
+  @keyframes lc-spin{100%{transform:rotate(360deg)}}
+  .lc-title{font-size:18px;font-weight:700;color:#fff;margin:0 0 20px;letter-spacing:-.02em;font-family:"Bricolage Grotesque",sans-serif}
+  .lc-steps{text-align:left;margin:0 0 22px;display:flex;flex-direction:column;gap:6px}
+  .lc-step{margin:0;font-size:14px;color:#555;transition:color .3s;line-height:1.5}
+  .lc-step.done{color:#22c55e}
+  .lc-step.active{color:#facc15}
+  .lc-bar-wrap{background:#1a1a22;border-radius:10px;height:8px;overflow:hidden;position:relative;margin-bottom:14px}
+  .lc-bar{height:100%;width:0%;background:linear-gradient(90deg,#a855f7,#facc15);border-radius:10px;transition:width .5s ease;position:relative}
+  .lc-bar::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);animation:lc-shimmer 1.8s ease-in-out infinite}
+  @keyframes lc-shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+  .lc-status{display:block;font-size:13px;color:#888;min-height:20px}
   /* success ring */
   .ov-success-ring{width:68px;height:68px;border-radius:50%;background:conic-gradient(#a855f7,#facc15,#9333ea,#a855f7);padding:2.5px;margin:0 auto 20px;animation:success-spin 4s linear infinite}
   .ov-success-ring-inner{width:100%;height:100%;border-radius:50%;background:var(--bg-1);display:flex;align-items:center;justify-content:center;font-size:26px}
@@ -1099,30 +1094,23 @@
 
 <!-- PROGRESS OVERLAY -->
 <div class="overlay" id="overlay-prog">
-  <div class="overlay-box" style="position:relative;overflow:hidden">
-    <div class="ok-glow-bar"></div>
-    <div class="ov-orbital">
-      <div class="ring ring-1"></div>
-      <div class="ring ring-2"></div>
-      <div class="ring ring-3"></div>
-      <div class="core"></div>
+  <div class="lc-box">
+    <div class="lc-loader"></div>
+    <h2 class="lc-title">Criando seu produto completo...</h2>
+    <div class="lc-steps" id="gen-steps">
+      <p class="lc-step" id="step-oferta">⬜ Analisando sua oferta</p>
+      <p class="lc-step" id="step-conteudo">⬜ Estruturando conteúdo</p>
+      <p class="lc-step" id="step-entregavel">⬜ Criando entregável</p>
+      <p class="lc-step" id="step-bumps">⬜ Gerando order bumps</p>
+      <p class="lc-step" id="step-upsell">⬜ Montando upsell</p>
     </div>
-    <div class="ov-title">Gerando seu entregável…</div>
-    <div class="ov-sub" id="gen-overlay-sub">Motor de IA ativado</div>
-    <div class="prog-bar" style="margin-top:16px"><div class="prog-fill" id="prog-fill"></div></div>
-    <div class="prog-meta" style="margin-top:10px">
-      <div class="prog-pct" id="prog-pct">0%</div>
-      <div class="prog-msg" id="prog-msg">Iniciando…</div>
-    </div>
-    <div class="gen-steps" id="gen-steps">
-      <div class="gen-step active" id="step-ai"><span class="st-ico">🧠</span>IA gerando estratégia e conteúdo</div>
-      <div class="gen-step" id="step-design"><span class="st-ico">🎨</span>Gamma AI aplicando design premium</div>
-      <div class="gen-step" id="step-pdf"><span class="st-ico">📄</span>Montando PDF final</div>
-      <div class="gen-step" id="step-done"><span class="st-ico">✦</span>Entregável pronto para download</div>
-    </div>
-    <div id="gen-tip" style="padding:10px 12px;background:rgba(168,85,247,.05);border:1px solid rgba(168,85,247,.12);border-radius:10px;font-size:12px;color:var(--text-3);line-height:1.55;text-align:left;min-height:40px;transition:opacity .4s"></div>
+    <div class="lc-bar-wrap"><div class="lc-bar" id="prog-fill"></div></div>
+    <span class="lc-status" id="prog-msg">Iniciando…</span>
+    <div id="prog-pct" style="display:none">0%</div>
+    <div id="gen-overlay-sub" style="display:none"></div>
+    <div id="gen-tip" style="display:none"></div>
     <div style="text-align:center;margin-top:20px">
-      <button id="btn-cancelar" style="background:none;border:1px solid var(--border);color:var(--text-3);border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer;transition:border-color .15s,color .15s" onmouseover="this.style.borderColor='rgba(255,255,255,.3)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-3)'">Cancelar e tentar novamente</button>
+      <button id="btn-cancelar" style="background:none;border:1px solid rgba(255,255,255,.12);color:#666;border-radius:8px;padding:7px 18px;font-size:12px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(255,255,255,.3)';this.style.color='#aaa'" onmouseout="this.style.borderColor='rgba(255,255,255,.12)';this.style.color='#666'">Cancelar</button>
     </div>
   </div>
 </div>
@@ -2628,22 +2616,32 @@
     });
   })();
 
-  // ---- gen steps progress sync ----
+  // ---- gen steps progress sync (novo lc-step) ----
   (function(){
-    const steps=['step-ai','step-design','step-pdf','step-done'];
-    const thresholds=[0,45,82,100];
+    const STEPS = [
+      { id:'step-oferta',    label:'Analisando sua oferta',   threshold:0  },
+      { id:'step-conteudo',  label:'Estruturando conteúdo',   threshold:20 },
+      { id:'step-entregavel',label:'Criando entregável',       threshold:45 },
+      { id:'step-bumps',     label:'Gerando order bumps',      threshold:82 },
+      { id:'step-upsell',    label:'Montando upsell',          threshold:95 },
+    ];
     function updateSteps(pct){
-      steps.forEach((id,i)=>{
-        const el=document.getElementById(id); if(!el) return;
-        const ico=el.querySelector('.st-ico');
-        if((i<steps.length-1&&pct>=thresholds[i+1])||(i===steps.length-1&&pct>=100)){
-          el.className='gen-step done'; if(ico) ico.textContent='✓';
-        } else if(pct>=thresholds[i]){ el.className='gen-step active'; }
-        else { el.className='gen-step'; if(ico&&['✓'].indexOf(ico.textContent)>=0) ico.textContent=['🧠','🎨','📄','✦'][i]; }
+      STEPS.forEach((s,i)=>{
+        const el=document.getElementById(s.id); if(!el) return;
+        const nextThresh = i<STEPS.length-1 ? STEPS[i+1].threshold : 101;
+        if(pct>=nextThresh){ el.className='lc-step done'; el.textContent='✔ '+s.label; }
+        else if(pct>=s.threshold){ el.className='lc-step active'; el.textContent='⏳ '+s.label; }
+        else { el.className='lc-step'; el.textContent='⬜ '+s.label; }
       });
     }
-    const progPct=document.getElementById('prog-pct');
-    if(progPct) new MutationObserver(()=>{ const p=parseInt(progPct.textContent)||0; updateSteps(p); }).observe(progPct,{childList:true,characterData:true,subtree:true});
+    // Hook onto prog-fill width changes via prog-pct hidden div
+    // The SSE handler updates prog-fill width + prog-msg — we watch prog-fill
+    const fill=document.getElementById('prog-fill');
+    if(fill){
+      new MutationObserver(()=>{
+        const w=parseFloat(fill.style.width)||0; updateSteps(w);
+      }).observe(fill,{attributes:true,attributeFilter:['style']});
+    }
   })();
 
   // ---- field chips ----
