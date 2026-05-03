@@ -353,9 +353,9 @@
   .conv-progress-fill{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-3));transition:width .4s ease}
   .conv-status-msg{font-size:12px;color:var(--text-3);font-style:italic;text-align:center;margin-top:8px;min-height:18px}
   /* custom cursor */
-  @media(pointer:fine){body{cursor:none}a,button,.btn,.mode-tab,.theme,.fmt,.type-select .trigger,.switch,.check-row,.chip,.gamma-theme-card,.ctype-card,.conv-dir-card,.fpick-card,.dl-btn,.generate{cursor:none}}
-  #c-dot{position:fixed;width:7px;height:7px;border-radius:50%;background:#a855f7;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .15s,height .15s,background .15s;box-shadow:0 0 14px rgba(168,85,247,.9)}
-  #c-ring{position:fixed;width:30px;height:30px;border-radius:50%;border:1.5px solid rgba(168,85,247,.45);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .2s,height .2s,border-color .2s;box-shadow:0 0 18px rgba(168,85,247,.12)}
+  @media(pointer:fine){html,body,body *{cursor:none!important}}
+  #c-dot{position:fixed;width:7px;height:7px;border-radius:50%;background:#a855f7;pointer-events:none;z-index:999999;transform:translate(-50%,-50%);transition:width .15s,height .15s,background .15s;box-shadow:0 0 14px rgba(168,85,247,.9)}
+  #c-ring{position:fixed;width:30px;height:30px;border-radius:50%;border:1.5px solid rgba(168,85,247,.45);pointer-events:none;z-index:999998;transform:translate(-50%,-50%);transition:width .2s,height .2s,border-color .2s;box-shadow:0 0 18px rgba(168,85,247,.12)}
   body.cursor-hover #c-dot{width:5px;height:5px;background:#facc15;box-shadow:0 0 18px rgba(250,204,21,.95)}
   body.cursor-hover #c-ring{width:44px;height:44px;border-color:rgba(250,204,21,.5);box-shadow:0 0 28px rgba(250,204,21,.2)}
   body.cursor-click #c-dot{transform:translate(-50%,-50%) scale(2);background:#facc15}
@@ -368,10 +368,13 @@
   .lc-loader{width:60px;height:60px;border:4px solid rgba(255,255,255,.08);border-top:4px solid #a855f7;border-radius:50%;margin:0 auto 24px;animation:lc-spin 1s linear infinite}
   @keyframes lc-spin{100%{transform:rotate(360deg)}}
   .lc-title{font-size:18px;font-weight:700;color:#fff;margin:0 0 20px;letter-spacing:-.02em;font-family:"Bricolage Grotesque",sans-serif}
-  .lc-steps{text-align:left;margin:0 0 22px;display:flex;flex-direction:column;gap:6px}
-  .lc-step{margin:0;font-size:14px;color:#555;transition:color .3s;line-height:1.5}
-  .lc-step.done{color:#22c55e}
-  .lc-step.active{color:#facc15}
+  .lc-steps{text-align:left;margin:0 0 18px;display:flex;flex-direction:column;gap:8px}
+  .lc-step{margin:0;font-size:14px;color:var(--text);opacity:.25;transition:opacity .35s,color .35s;line-height:1.5;letter-spacing:-.01em}
+  .lc-step.done{opacity:1;color:#22c55e}
+  .lc-step.active{opacity:1;color:#facc15}
+  .gen-preview{margin:0 0 16px;background:rgba(5,8,17,.7);border:1px solid var(--border);border-radius:10px;padding:14px 16px;min-height:52px;font-size:13px;color:#9ca3b8;line-height:1.6;font-family:"DM Mono",monospace;overflow:hidden}
+  .gen-cursor{display:inline-block;width:7px;height:14px;background:#a855f7;margin-left:2px;vertical-align:middle;border-radius:1px;animation:cur-blink .9s step-end infinite}
+  @keyframes cur-blink{50%{opacity:0}}
   .lc-bar-wrap{background:#1a1a22;border-radius:10px;height:8px;overflow:hidden;position:relative;margin-bottom:14px}
   .lc-bar{height:100%;width:0%;background:linear-gradient(90deg,#a855f7,#facc15);border-radius:10px;transition:width .5s ease;position:relative}
   .lc-bar::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);animation:lc-shimmer 1.8s ease-in-out infinite}
@@ -437,6 +440,9 @@ main{position:relative;z-index:auto}
   .wizard-bar{padding:14px 20px 2px;overflow-x:auto}
   .wiz-label{display:none}
   main{padding:8px 20px 60px}
+  .head h1{font-size:28px}
+  .grid{grid-template-columns:1fr!important}
+  .head p{display:none}
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -530,11 +536,7 @@ main{position:relative;z-index:auto}
     <div class="head-left">
       <span class="pill"><span class="dot"></span>Nexus Forge · studio</span>
       <h1>Forge seu <span class="grad">infoproduto premium</span></h1>
-      <p>Ebooks, workbooks, checklists, planners, scripts VSL e certificados — layout profissional automático. Precisão de estúdio, velocidade de IA.</p>
-    </div>
-    <div class="head-right">
-      <div class="row"><span class="led"></span><span>motor pronto · online</span></div>
-      <div class="row"><span>2026</span></div>
+      <p>Ebooks, workbooks, checklists, planners, scripts VSL e certificados — layout profissional automático.</p>
     </div>
   </header>
 
@@ -1214,12 +1216,13 @@ main{position:relative;z-index:auto}
     <div class="lc-loader"></div>
     <h2 class="lc-title">Criando seu produto completo...</h2>
     <div class="lc-steps" id="gen-steps">
-      <p class="lc-step" id="step-oferta">⬜ Analisando sua oferta</p>
-      <p class="lc-step" id="step-conteudo">⬜ Estruturando conteúdo</p>
-      <p class="lc-step" id="step-entregavel">⬜ Criando entregável</p>
-      <p class="lc-step" id="step-bumps">⬜ Gerando order bumps</p>
-      <p class="lc-step" id="step-upsell">⬜ Montando upsell</p>
+      <p class="lc-step" id="step-oferta">Analisando sua oferta</p>
+      <p class="lc-step" id="step-conteudo">Estruturando conteúdo</p>
+      <p class="lc-step" id="step-entregavel">Criando entregável</p>
+      <p class="lc-step" id="step-bumps">Gerando order bumps</p>
+      <p class="lc-step" id="step-upsell">Montando upsell</p>
     </div>
+    <div class="gen-preview" id="gen-preview"></div>
     <div class="lc-bar-wrap"><div class="lc-bar" id="prog-fill"></div></div>
     <span class="lc-status" id="prog-msg">Iniciando…</span>
     <div id="prog-pct" style="display:none">0%</div>
@@ -2023,6 +2026,7 @@ main{position:relative;z-index:auto}
     if (_activeEventSource) { _activeEventSource.close(); _activeEventSource = null; }
     document.getElementById('overlay-prog').classList.remove('show');
     document.getElementById('btn-gerar').disabled = false;
+    if (window._resetGenSteps) window._resetGenSteps();
   });
 
   // ──────────────────────────────────────────
@@ -2732,31 +2736,73 @@ main{position:relative;z-index:auto}
     });
   })();
 
-  // ---- gen steps progress sync (novo lc-step) ----
+  // ---- gen steps progress sync + typing preview ----
   (function(){
     const STEPS = [
-      { id:'step-oferta',    label:'Analisando sua oferta',   threshold:0  },
-      { id:'step-conteudo',  label:'Estruturando conteúdo',   threshold:20 },
-      { id:'step-entregavel',label:'Criando entregável',       threshold:45 },
-      { id:'step-bumps',     label:'Gerando order bumps',      threshold:82 },
-      { id:'step-upsell',    label:'Montando upsell',          threshold:95 },
+      { id:'step-oferta',    label:'Analisando sua oferta',   threshold:0,  preview:'Identificando proposta de valor, avatar e oportunidades de conversão...' },
+      { id:'step-conteudo',  label:'Estruturando conteúdo',   threshold:20, preview:'Definindo capítulos, módulos e fluxo de conteúdo personalizado...' },
+      { id:'step-entregavel',label:'Criando entregável',       threshold:45, preview:'Gerando layout profissional e exportando PDF com design premium...' },
+      { id:'step-bumps',     label:'Gerando order bumps',      threshold:82, preview:'Criando oferta complementar de alto valor percebido...' },
+      { id:'step-upsell',    label:'Montando upsell',          threshold:95, preview:'Configurando upsell para maximizar o LTV do cliente...' },
     ];
-    function updateSteps(pct){
-      STEPS.forEach((s,i)=>{
-        const el=document.getElementById(s.id); if(!el) return;
-        const nextThresh = i<STEPS.length-1 ? STEPS[i+1].threshold : 101;
-        if(pct>=nextThresh){ el.className='lc-step done'; el.textContent='✔ '+s.label; }
-        else if(pct>=s.threshold){ el.className='lc-step active'; el.textContent='⏳ '+s.label; }
-        else { el.className='lc-step'; el.textContent='⬜ '+s.label; }
+    const preview = document.getElementById('gen-preview');
+    let typeTimer = null;
+    let lastActive = -1;
+
+    function typeText(text) {
+      if (!preview) return;
+      clearTimeout(typeTimer);
+      preview.innerHTML = '';
+      let i = 0;
+      function tick() {
+        if (i < text.length) {
+          preview.innerHTML = text.slice(0, i + 1) + '<span class="gen-cursor"></span>';
+          i++;
+          typeTimer = setTimeout(tick, 18);
+        } else {
+          preview.innerHTML = text + '<span class="gen-cursor"></span>';
+        }
+      }
+      tick();
+    }
+
+    function resetSteps() {
+      lastActive = -1;
+      if (preview) preview.innerHTML = '';
+      clearTimeout(typeTimer);
+      STEPS.forEach(s => {
+        const el = document.getElementById(s.id);
+        if (el) { el.className = 'lc-step'; el.textContent = s.label; }
       });
     }
-    // Hook onto prog-fill width changes via prog-pct hidden div
-    // The SSE handler updates prog-fill width + prog-msg — we watch prog-fill
-    const fill=document.getElementById('prog-fill');
-    if(fill){
-      new MutationObserver(()=>{
-        const w=parseFloat(fill.style.width)||0; updateSteps(w);
-      }).observe(fill,{attributes:true,attributeFilter:['style']});
+
+    function updateSteps(pct) {
+      // Reset on new generation start
+      if (pct <= 3 && lastActive > 0) resetSteps();
+      let newActive = -1;
+      STEPS.forEach((s, i) => {
+        const el = document.getElementById(s.id);
+        if (!el) return;
+        const nextThresh = i < STEPS.length - 1 ? STEPS[i+1].threshold : 101;
+        if (pct >= nextThresh)      { el.className = 'lc-step done';   el.textContent = '✔ ' + s.label; }
+        else if (pct >= s.threshold){ el.className = 'lc-step active'; el.textContent = s.label; newActive = i; }
+        else                        { el.className = 'lc-step';        el.textContent = s.label; }
+      });
+      if (newActive !== lastActive && newActive >= 0) {
+        lastActive = newActive;
+        typeText(STEPS[newActive].preview);
+      }
+    }
+
+    // Expose reset so cancel/reset can call it
+    window._resetGenSteps = resetSteps;
+
+    const fill = document.getElementById('prog-fill');
+    if (fill) {
+      new MutationObserver(() => {
+        const w = parseFloat(fill.style.width) || 0;
+        updateSteps(w);
+      }).observe(fill, { attributes: true, attributeFilter: ['style'] });
     }
   })();
 
