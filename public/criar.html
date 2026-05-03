@@ -449,7 +449,8 @@
             </div>
             <div>
               <label class="lbl">Nº de páginas</label>
-              <input class="input" type="number" id="inp-paginas" value="15" min="1" max="80">
+              <input class="input" type="number" id="inp-paginas" value="15" min="1" max="30">
+              <div id="paginas-aviso" style="display:none;margin-top:6px;font-size:12px;color:var(--warn)">⚠ Acima de 20 páginas a geração pode ser lenta</div>
             </div>
           </div>
 
@@ -1534,7 +1535,11 @@
     if (pvFocused !== 'pv-autor') document.getElementById('pv-autor').textContent = this.value || '';
   });
   document.getElementById('inp-descricao').addEventListener('input', updateMeta);
-  document.getElementById('inp-paginas').addEventListener('input', updateMeta);
+  document.getElementById('inp-paginas').addEventListener('input', function() {
+    updateMeta();
+    const aviso = document.getElementById('paginas-aviso');
+    if (aviso) aviso.style.display = parseInt(this.value) > 20 ? 'block' : 'none';
+  });
 
   // ---- toast ----
   let toastTimer;
@@ -1814,7 +1819,7 @@
       a.href = 'data:application/pdf;base64,' + data.pdf;
       a.download = data.pdfFilename || 'entregavel.pdf';
       a.className = 'dl-btn pdf';
-      a.textContent = '⬇ Baixar PDF';
+      a.textContent = data.gammaSource ? '⬇ Baixar PDF (Gamma AI ✨)' : '⬇ Baixar PDF';
       row.appendChild(a);
       renderPDFPreview(data.pdf);
     }

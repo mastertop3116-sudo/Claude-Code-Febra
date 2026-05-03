@@ -169,6 +169,7 @@ app.post("/api/criar", (req, res) => {
         docx: resultado.docx ? resultado.docx.toString("base64") : null,
         docxFilename: resultado.docxFilename,
         gammaUrl: resultado.gammaUrl || null,
+        gammaSource: resultado.gammaSource || false,
       });
     })
     .catch(e => {
@@ -635,5 +636,6 @@ app.get("/", (req, res) => res.json({ status: "NEXUS online", version: "1.0.0" }
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
   console.log(`NEXUS — Servidor rodando na porta ${PORT}`);
+  console.log(`[Gamma] API KEY: ${process.env.GAMMA_API_KEY ? "✅ configurada (" + process.env.GAMMA_API_KEY.slice(0,8) + "...)" : "❌ NÃO CONFIGURADA — geração PDF usará apenas PDFKit"}`);
   await registerWebhook();
 });
