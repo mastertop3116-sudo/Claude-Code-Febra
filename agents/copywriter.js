@@ -37,6 +37,28 @@ JSON APENAS:
   "copy_contracapa": "string (2 parágrafos + CTA)"
 }`
 
+// Usado para pregações prontas — gera sermões completos, não teoria
+const SYSTEM_PREGACOES = `Pregador e escritor cristão brasileiro. Linguagem acessível por faixa etária. Zero jargão acadêmico.
+
+CADA SEÇÃO É UMA PREGAÇÃO COMPLETA E PRONTA PARA USAR. Estrutura obrigatória:
+1. Texto bíblico principal + versículos de apoio
+2. Introdução impactante (2-3 parágrafos que prendem atenção)
+3. **Ponto 1:** [título] — mínimo 3 parágrafos desenvolvidos
+4. **Ponto 2:** [título] — mínimo 3 parágrafos desenvolvidos
+5. **Ponto 3:** [título] — mínimo 3 parágrafos desenvolvidos
+6. Conclusão com desafio prático (1-2 parágrafos)
+7. Aplicação: o que o ouvinte deve fazer esta semana
+
+NÃO gere teoria sobre como pregar. Gere a PREGAÇÃO PRONTA para ler e usar.
+Use linguagem da faixa etária indicada no objetivo de cada seção.
+
+JSON APENAS:
+{
+  "secoes": [{"numero":1,"titulo":"string","gancho":"string (benefício em até 15 palavras)","conteudo":"string markdown mín 400 palavras","ponto_de_acao":"string (desafio desta semana)"}],
+  "copy_capa": "string (máx 10 palavras)",
+  "copy_contracapa": "string (2-3 parágrafos + CTA)"
+}`
+
 // Cache em memória para evitar chamadas duplicadas na mesma sessão
 const _cache = new Map()
 
@@ -78,7 +100,7 @@ async function run({ estrategia, estrutura, autor, tipo, num_paginas }) {
     return _cache.get(key)
   }
 
-  const systemPrompt = PRO_TYPES.has(tipo) ? SYSTEM_PRO : SYSTEM_FLASH
+  const systemPrompt = tipo === 'pregacoes' ? SYSTEM_PREGACOES : PRO_TYPES.has(tipo) ? SYSTEM_PRO : SYSTEM_FLASH
 
   // Limita o índice passado ao arquiteto para respeitar maxSecoes
   const indiceReduzido = estrutura?.indice

@@ -314,6 +314,22 @@
   @media(max-width:900px){.grid{grid-template-columns:1fr}.head h1{font-size:38px}nav.top{padding:18px 20px}main{padding:10px 20px 60px}.sticky{position:static}}
   @media(max-width:640px){.themes{grid-template-columns:1fr 1fr}.formats{grid-template-columns:1fr}.row2,.row2.eq{grid-template-columns:1fr}.nav-mid{display:none}.head{flex-direction:column;gap:12px}.head h1{font-size:28px}.head-right{align-items:flex-start}.head p{font-size:14px}.overlay-box{padding:24px 18px;width:calc(100vw - 24px)}.dl-row{flex-direction:column;align-items:stretch}.dl-btn{justify-content:center}.prog-meta{flex-direction:column;align-items:flex-start;gap:4px}.prog-msg{max-width:100%;text-align:left}.generate{padding:15px;font-size:14px}.card{padding:18px}.summary-list .r .v{max-width:60%}.mode-tabs{grid-template-columns:repeat(2,1fr)}.cformats{grid-template-columns:repeat(2,1fr)}.fpick-grid{grid-template-columns:repeat(2,1fr)}#gamma-themes-grid{grid-template-columns:repeat(2,1fr)!important}}
   @media(max-width:480px){.head h1{font-size:22px;line-height:1.1}nav.top{padding:14px 16px}.nav-end a:not(.btn){display:none}.btn{font-size:13px;padding:8px 14px}main{padding:8px 14px 50px}.head-left .pill{font-size:11px}#err-box{bottom:16px;left:12px;right:12px;transform:none;width:auto}.toast{right:12px;left:12px;max-width:none;bottom:16px}}
+  /* ── WIZARD MODAL ── */
+  .wiz-modal-box{width:540px;max-width:calc(100vw - 32px);background:var(--card);border:1px solid var(--border);border-radius:20px;padding:36px 32px;border-left:2px solid rgba(168,85,247,.25);position:relative}
+  .wiz-modal-box h2{font-size:22px;font-weight:800;font-family:"Bricolage Grotesque",sans-serif;margin:0 0 6px;letter-spacing:-.03em}
+  .wiz-modal-box .sub{font-size:13px;color:var(--text-3);margin-bottom:24px}
+  .wiz-nicho-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+  .wiz-nicho-card{display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid var(--border);border-radius:10px;background:rgba(5,8,17,.45);cursor:pointer;font-size:13px;font-weight:500;color:var(--text);transition:all .15s;user-select:none}
+  .wiz-nicho-card:hover{border-color:var(--border-hi);background:rgba(14,20,45,.7)}
+  .wiz-nicho-card.active{border-color:var(--accent);background:rgba(168,85,247,.1);color:var(--accent)}
+  .wiz-nicho-card .wn-ico{font-size:18px;width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+  .wiz-nicho-card.active .wn-ico{background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.3)}
+  .wiz-step-indicator{display:flex;align-items:center;gap:8px;margin-bottom:22px}
+  .wiz-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .25s}
+  .wiz-dot.active{background:var(--accent);box-shadow:0 0 8px rgba(168,85,247,.5)}
+  .wiz-dot.done{background:rgba(168,85,247,.4)}
+  .wiz-actions{display:flex;gap:10px;margin-top:20px}
+  .wiz-nicho-highlight{display:inline-block;padding:2px 8px;border-radius:6px;background:rgba(168,85,247,.12);color:var(--accent);font-weight:600;font-size:13px}
   /* CTA fixo no mobile — botão sempre visível sem scroll */
   #mobile-cta-bar{display:none}
   @media(max-width:900px){
@@ -536,7 +552,8 @@ main{position:relative;z-index:auto}
       <h1>Forge seu <span class="grad">infoproduto premium</span></h1>
       <p>Ebooks, workbooks, checklists, planners, scripts VSL e certificados — layout profissional automático.</p>
       <div style="display:flex;align-items:center;gap:14px;margin-top:20px;flex-wrap:wrap">
-        <button class="btn primary" id="btn-demo-hero" style="font-size:13px;padding:10px 20px">⚡ Preencher com exemplo</button>
+        <button class="btn primary" id="btn-demo-hero" style="font-size:13px;padding:10px 20px">⚡ Exemplo rápido</button>
+        <button class="btn" id="btn-wizard" style="font-size:13px;padding:10px 20px;border-color:rgba(168,85,247,.35);color:var(--accent);background:rgba(168,85,247,.07)">✨ Gerar com IA</button>
         <span style="font-size:11px;color:var(--text-3);font-family:'DM Mono',monospace;letter-spacing:.04em">Ctrl+Enter para gerar · ~90s</span>
       </div>
     </div>
@@ -594,6 +611,7 @@ main{position:relative;z-index:auto}
                   <div class="opt" data-v="planner" data-ico="📒"><span class="ico">📒</span>Planner / Organizador<span class="meta">30–120 pg</span></div>
                   <div class="opt" data-v="script_vsl" data-ico="🎬"><span class="ico">🎬</span>Script VSL / Vídeo de Vendas<span class="meta">roteiro</span></div>
                   <div class="opt" data-v="cheat_sheet" data-ico="⚡"><span class="ico">⚡</span>Guia de Consulta Rápida<span class="meta">5–15 pg</span></div>
+                  <div class="opt" data-v="pregacoes" data-ico="🙏"><span class="ico">🙏</span>Pack de Pregações Prontas<span class="meta">10–20 pg</span></div>
                   <div class="opt" data-v="certificado" data-ico="🏅"><span class="ico">🏅</span>Certificado de Conclusão<span class="meta">1 pg</span></div>
                 </div>
               </div>
@@ -3342,6 +3360,135 @@ main{position:relative;z-index:auto}
     setStep(1);
   })();
 
+// ── WIZARD — "Gerar com IA" (3 perguntas → auto-preenche formulário) ──
+(function(){
+  const modal  = document.getElementById('wiz-modal');
+  const s1     = document.getElementById('wm-s1');
+  const s2     = document.getElementById('wm-s2');
+  const s3     = document.getElementById('wm-s3');
+  let nicho    = '';
+
+  const WIZ_TIPS = [
+    '💡 Títulos com números ímpares convertem até 36% mais',
+    '🎯 Avatares bem definidos geram conteúdo muito mais específico',
+    '🚀 A IA usa benchmarks de mercado BR 2026 para calibrar o produto',
+    '✏️ Você pode editar qualquer campo após o preenchimento automático',
+  ];
+  let tipIdx = 0;
+
+  function showStep(n) {
+    [s1, s2, s3].forEach((s, i) => { s.style.display = i + 1 === n ? '' : 'none'; });
+    if (n === 3) {
+      const tipEl = document.getElementById('wm-tip');
+      clearInterval(window._wizTipTimer);
+      window._wizTipTimer = setInterval(() => {
+        tipIdx = (tipIdx + 1) % WIZ_TIPS.length;
+        if (tipEl) tipEl.textContent = WIZ_TIPS[tipIdx];
+      }, 3000);
+    }
+  }
+
+  function openWizard() {
+    nicho = '';
+    document.querySelectorAll('.wiz-nicho-card').forEach(c => c.classList.remove('active'));
+    const custom = document.getElementById('wm-nicho-custom');
+    if (custom) custom.value = '';
+    const av = document.getElementById('wm-avatar');
+    const ben = document.getElementById('wm-beneficio');
+    if (av) av.value = '';
+    if (ben) ben.value = '';
+    showStep(1);
+    modal.classList.add('show');
+  }
+
+  function closeWizard() {
+    modal.classList.remove('show');
+    clearInterval(window._wizTipTimer);
+  }
+
+  document.getElementById('btn-wizard')?.addEventListener('click', openWizard);
+  document.getElementById('wm-cancel')?.addEventListener('click', closeWizard);
+  modal?.addEventListener('click', e => { if (e.target === modal) closeWizard(); });
+
+  // Nicho cards
+  document.querySelectorAll('.wiz-nicho-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.wiz-nicho-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      nicho = card.dataset.v;
+      const custom = document.getElementById('wm-nicho-custom');
+      if (custom) custom.value = '';
+    });
+  });
+
+  document.getElementById('wm-nicho-custom')?.addEventListener('input', function() {
+    if (this.value.trim()) {
+      document.querySelectorAll('.wiz-nicho-card').forEach(c => c.classList.remove('active'));
+      nicho = this.value.trim();
+    }
+  });
+
+  // Step 1 → 2
+  document.getElementById('wm-next1')?.addEventListener('click', () => {
+    const custom = document.getElementById('wm-nicho-custom')?.value.trim();
+    if (custom) nicho = custom;
+    if (!nicho) { toast('Escolha ou escreva um nicho', '⚠'); return; }
+    const show = document.getElementById('wm-nicho-show');
+    if (show) show.textContent = nicho.length > 40 ? nicho.slice(0, 37) + '…' : nicho;
+    showStep(2);
+  });
+
+  // Step 2 → 1
+  document.getElementById('wm-back2')?.addEventListener('click', () => showStep(1));
+
+  // Step 2 → 3 (gerar)
+  document.getElementById('wm-gerar')?.addEventListener('click', async () => {
+    const avatar   = document.getElementById('wm-avatar')?.value.trim()   || '';
+    const beneficio = document.getElementById('wm-beneficio')?.value.trim() || '';
+    showStep(3);
+    try {
+      const res = await fetch('/api/wizard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nicho, avatar, beneficio, tipo: selectedType }),
+      });
+      if (!res.ok) throw new Error('status ' + res.status);
+      const d = await res.json();
+
+      // Auto-fill campos básicos
+      const set = (id, v) => {
+        if (!v) return;
+        const el = document.getElementById(id);
+        if (el) { el.value = v; el.dispatchEvent(new Event('input', { bubbles: true })); }
+      };
+      set('inp-titulo',    d.titulo);
+      set('inp-subtitulo', d.subtitulo);
+      set('inp-descricao', d.nicho_refinado);
+      set('inp-avatar',    avatar);
+      if (d.num_paginas)   set('inp-paginas',  d.num_paginas);
+      if (d.num_capitulos) set('inp-caps',      d.num_capitulos);
+
+      // Sync campos DNA
+      set('dna-nicho',   d.nicho_refinado);
+      set('dna-publico', avatar);
+
+      // Tipo sugerido — troca apenas se diferente do atual e o opt existir
+      if (d.tipo_sugerido && d.tipo_sugerido !== selectedType) {
+        const opt = document.querySelector(`#type-menu .opt[data-v="${d.tipo_sugerido}"]`);
+        if (opt) opt.click();
+      }
+
+      closeWizard();
+      updateMeta();
+      toast('Formulário preenchido pela IA ✓', '✨');
+      setTimeout(() => document.getElementById('btn-gerar')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 500);
+    } catch (e) {
+      showStep(2);
+      toast('Erro ao gerar: ' + (e.message || 'tente novamente'), '⚠');
+    }
+  });
+})();
+
 // ── LIVE CANVAS COVER PREVIEW ──
 (function(){
   function hexRgba(hex, a) {
@@ -3483,5 +3630,71 @@ main{position:relative;z-index:auto}
 </script>
 <!-- SPOTLIGHT (background glow only) -->
 <div id="mouse-glow"></div>
+
+<!-- ── WIZARD MODAL ── -->
+<div class="overlay" id="wiz-modal">
+  <div class="wiz-modal-box">
+
+    <!-- Step 1 — Nicho -->
+    <div id="wm-s1">
+      <div class="wiz-step-indicator">
+        <span class="wiz-dot active" id="wd1"></span>
+        <span class="wiz-dot" id="wd2"></span>
+        <span class="wiz-dot" id="wd3"></span>
+        <span style="font-size:11px;color:var(--text-3);font-family:'DM Mono',monospace;margin-left:6px">passo 1 de 3</span>
+      </div>
+      <h2>Qual é o nicho do produto?</h2>
+      <p class="sub">Escolha o tema principal ou escreva um personalizado abaixo</p>
+      <div class="wiz-nicho-grid" id="wm-nicho-grid">
+        <div class="wiz-nicho-card" data-v="Emagrecimento feminino sem academia"><span class="wn-ico">🏃‍♀️</span>Emagrecimento</div>
+        <div class="wiz-nicho-card" data-v="Finanças pessoais e saída de dívidas"><span class="wn-ico">💰</span>Finanças pessoais</div>
+        <div class="wiz-nicho-card" data-v="Espiritualidade cristã e fé"><span class="wn-ico">🙏</span>Espiritualidade</div>
+        <div class="wiz-nicho-card" data-v="Produtividade e foco sem procrastinação"><span class="wn-ico">🎯</span>Produtividade</div>
+        <div class="wiz-nicho-card" data-v="Relacionamentos e reconquista amorosa"><span class="wn-ico">💑</span>Relacionamentos</div>
+        <div class="wiz-nicho-card" data-v="Renda extra e trabalho online"><span class="wn-ico">💻</span>Renda extra</div>
+        <div class="wiz-nicho-card" data-v="Criação de filhos e parentalidade positiva"><span class="wn-ico">👨‍👩‍👧</span>Parentalidade</div>
+        <div class="wiz-nicho-card" data-v="Saúde mental e bem-estar emocional"><span class="wn-ico">🌿</span>Saúde &amp; Bem-estar</div>
+      </div>
+      <input class="input" id="wm-nicho-custom" placeholder="Ou escreva outro nicho…" style="margin-bottom:4px">
+      <div class="wiz-actions">
+        <button class="btn" id="wm-cancel" style="padding:10px 18px">Cancelar</button>
+        <button class="btn primary" id="wm-next1" style="flex:1">Próximo →</button>
+      </div>
+    </div>
+
+    <!-- Step 2 — Avatar + Benefício -->
+    <div id="wm-s2" style="display:none">
+      <div class="wiz-step-indicator">
+        <span class="wiz-dot done" id="wd1b"></span>
+        <span class="wiz-dot active" id="wd2b"></span>
+        <span class="wiz-dot" id="wd3b"></span>
+        <span style="font-size:11px;color:var(--text-3);font-family:'DM Mono',monospace;margin-left:6px">passo 2 de 3</span>
+      </div>
+      <h2>Quem vai comprar?</h2>
+      <p class="sub">Nicho: <span class="wiz-nicho-highlight" id="wm-nicho-show"></span></p>
+      <div style="margin-bottom:14px">
+        <label class="lbl">Avatar — descreva quem vai comprar <span class="opt">recomendado</span></label>
+        <textarea class="textarea" id="wm-avatar" rows="3" placeholder="Ex: Mulheres 28-42 anos que tentaram várias dietas, trabalham muito e têm pouco tempo para academia e cozinhar…"></textarea>
+      </div>
+      <div style="margin-bottom:4px">
+        <label class="lbl">Principal transformação do produto <span class="opt">recomendado</span></label>
+        <textarea class="textarea" id="wm-beneficio" rows="2" placeholder="Ex: Emagrecer 5kg em 30 dias sem cortar o que ama e sem academia…"></textarea>
+      </div>
+      <div class="wiz-actions">
+        <button class="btn" id="wm-back2" style="padding:10px 18px">← Voltar</button>
+        <button class="btn primary" id="wm-gerar" style="flex:1">✨ Gerar formulário</button>
+      </div>
+    </div>
+
+    <!-- Step 3 — Gerando -->
+    <div id="wm-s3" style="display:none;text-align:center;padding:12px 0">
+      <div class="ov-spinner" style="margin:0 auto 22px"></div>
+      <div style="font-size:20px;font-weight:800;font-family:'Bricolage Grotesque',sans-serif;margin-bottom:8px">Criando seu produto…</div>
+      <div style="font-size:13px;color:var(--text-3)">IA analisando nicho, avatar e construindo campos otimizados</div>
+      <div style="margin-top:18px;padding:12px 16px;background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.12);border-radius:10px;font-size:12px;color:var(--text-2);line-height:1.55" id="wm-tip">💡 Títulos com números ímpares convertem até 36% mais</div>
+    </div>
+
+  </div>
+</div>
 </body>
 </html>

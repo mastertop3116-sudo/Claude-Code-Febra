@@ -116,6 +116,31 @@ app.post("/api/produto", async (req, res) => {
   }
 });
 
+// POST /api/wizard → gera campos do formulário via IA (3 perguntas → form preenchido)
+app.post("/api/wizard", async (req, res) => {
+  try {
+    const { nicho, avatar, beneficio, tipo } = req.body;
+    if (!nicho) return res.status(400).json({ error: "nicho obrigatório" });
+    const { openaiJson } = require("./integrations/openai");
+    const SYSTEM = `Você é especialista em criação de infoprodutos brasileiros de baixo ticket (R$17–R$97).
+Gere campos otimizados para formulário de criação de produto digital. APENAS JSON:
+{
+  "titulo": "headline poderosa máx 10 palavras, sem ponto final — ex: 7 Segredos do Emagrecimento sem Sofrimento",
+  "subtitulo": "complemento do título máx 15 palavras — reforça benefício principal",
+  "nicho_refinado": "nicho específico com público e dor, máx 60 chars",
+  "num_paginas": 15,
+  "num_capitulos": 5,
+  "tipo_sugerido": "ebook|workbook|checklist|planner|script_vsl|cheat_sheet|pregacoes"
+}`;
+    const prompt = `Nicho: ${nicho}\nAvatar: ${avatar || "não informado"}\nBenefício principal: ${beneficio || "não informado"}\nTipo preferido: ${tipo || "automático"}`;
+    const resultado = JSON.parse(await openaiJson(prompt, SYSTEM));
+    res.json(resultado);
+  } catch (e) {
+    console.error("[/api/wizard]", e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // POST /api/criar → inicia job, retorna jobId imediatamente
 app.post("/api/criar", (req, res) => {
   limparJobsAntigos();
@@ -125,7 +150,7 @@ app.post("/api/criar", (req, res) => {
 
   // Killer de segurança: 15 minutos para ebooks/infoprodutos (30+ seções + Gamma polling podem somar >5 min)
   const tipoBody = req.body.tipo || "ebook";
-  const INFOPRODUTOS = new Set(["ebook", "workbook", "script_vsl", "planner", "cheat_sheet", "certificado", "checklist"]);
+  const INFOPRODUTOS = new Set(["ebook", "workbook", "script_vsl", "planner", "cheat_sheet", "certificado", "checklist", "pregacoes"]);
   const jobTimeoutMs = INFOPRODUTOS.has(tipoBody) ? 15 * 60 * 1000 : 5 * 60 * 1000;
   const jobKiller = setTimeout(() => {
     const job = criarJobs.get(jobId);
