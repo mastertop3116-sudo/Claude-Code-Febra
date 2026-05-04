@@ -53,10 +53,33 @@ async function gerarEntregavel(inputText, { formato = 'document', numCards = 10,
       console.log(`[Gamma] Geração concluída — resposta completa: ${JSON.stringify(status)}`)
 
       // Tentar extrair exportUrl de múltiplos campos possíveis
-      const exportUrl = status.exportUrl || status.export_url || status.pdfUrl || status.pdf_url || null
+      let exportUrl = status.exportUrl || status.export_url || status.pdfUrl || status.pdf_url || null
 
+      // Se exportUrl não veio na primeira resposta "completed", o Gamma pode estar
+      // ainda gerando o arquivo de exportação de forma assíncrona.
+      // Fazemos até 4 GETs adicionais com intervalo de 7s para aguardar o exportUrl.
       if (!exportUrl) {
-        console.warn('[Gamma] ⚠️ exportUrl ausente na resposta. Campos disponíveis: ' + Object.keys(status).join(', '))
+        console.warn('[Gamma] ⚠️ exportUrl ausente na resposta inicial de completed. Campos: ' + Object.keys(status).join(', '))
+        console.log('[Gamma] Aguardando exportUrl (até 4 tentativas × 7s)...')
+        for (let retry = 1; retry <= 4 && !exportUrl; retry++) {
+          await new Promise(r => setTimeout(r, 7000))
+          try {
+            const retryStatus = await _fetch(`/generations/${generationId}`)
+            exportUrl = retryStatus.exportUrl || retryStatus.export_url || retryStatus.pdfUrl || retryStatus.pdf_url || null
+            if (exportUrl) {
+              console.log(`[Gamma] ✅ exportUrl obtido na tentativa ${retry}: ${exportUrl}`)
+              // Atualiza status com dados mais recentes
+              Object.assign(status, retryStatus)
+            } else {
+              console.log(`[Gamma] Tentativa ${retry}/4 — exportUrl ainda ausente. Campos: ${Object.keys(retryStatus).join(', ')}`)
+            }
+          } catch (retryErr) {
+            console.warn(`[Gamma] Tentativa ${retry}/4 falhou: ${retryErr.message}`)
+          }
+        }
+        if (!exportUrl) {
+          console.warn('[Gamma] ⚠️ exportUrl não disponível após 4 tentativas — conta pode não ter permissão de exportação ou formato não suporta export direto. gammaUrl disponível para acesso online.')
+        }
       }
 
       return {

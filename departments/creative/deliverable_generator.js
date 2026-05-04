@@ -1562,11 +1562,17 @@ async function generate(params) {
             await progress(95, "✅ PDF Gamma pronto!")
           } else {
             console.warn(`[Gamma] ❌ Download do PDF falhou: HTTP ${r.status}`)
-            await progress(92, `⚠️ Gamma não entregou o PDF (HTTP ${r.status}) — gerando com PDFKit...`)
+            await progress(92, `⚠️ Gamma não entregou o PDF (HTTP ${r.status}) — gerando PDF local...`)
           }
         } else {
-          console.warn("[Gamma] ⚠️ exportUrl não retornado — conta pode não ter permissão de exportação")
-          await progress(92, "⚠️ Gamma não retornou PDF — gerando com PDFKit...")
+          // exportUrl ausente após retries — o documento foi gerado no Gamma mas o export
+          // não está disponível (pode ser limitação de plano ou delay da API).
+          // Neste caso: gammaUrl JÁ está em resultado.gammaUrl para o usuário acessar.
+          // Marcamos gammaSource=true para que o frontend saiba que o Gamma gerou o conteúdo,
+          // mesmo que o PDF local venha do PDFKit como cópia de segurança.
+          resultado.gammaSource = true   // Gamma gerou o conteúdo — link disponível no overlay
+          console.warn("[Gamma] ⚠️ exportUrl não retornado após retries — gerando PDF local como backup. gammaUrl disponível para acesso direto.")
+          await progress(92, "✦ Documento no Gamma pronto! Gerando PDF local como backup...")
         }
       } catch (e) {
         console.warn("[Gamma] ❌ Falha:", e.message)

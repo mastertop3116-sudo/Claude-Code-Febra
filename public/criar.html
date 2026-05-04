@@ -1976,7 +1976,15 @@ main{position:relative;z-index:auto}
 
   function showSuccess(data, titulo) {
     document.getElementById('overlay-prog').classList.remove('show');
-    document.getElementById('ok-msg').textContent = '"' + (data.titulo || titulo) + '" gerado com sucesso!';
+    const nomeDoc = data.titulo || titulo;
+    // Mensagem contextual: se só tem Gamma (sem PDF/DOCX local), indica onde está o documento
+    const temArquivoLocal = data.pdf || data.docx;
+    const okMsg = temArquivoLocal
+      ? '"' + nomeDoc + '" gerado com sucesso!'
+      : (data.gammaUrl
+          ? '"' + nomeDoc + '" criado no Gamma AI — clique abaixo para abrir.'
+          : '"' + nomeDoc + '" gerado com sucesso!');
+    document.getElementById('ok-msg').textContent = okMsg;
     _pdfDoc = null; _pdfPage = 1;
     const canvas = document.getElementById('pdf-cover-canvas');
     if (canvas) canvas.style.display = 'none';
@@ -1989,7 +1997,9 @@ main{position:relative;z-index:auto}
       a.href = 'data:application/pdf;base64,' + data.pdf;
       a.download = data.pdfFilename || 'entregavel.pdf';
       a.className = 'dl-btn pdf';
-      a.textContent = data.gammaSource ? '⬇ Baixar PDF (Gamma AI ✨)' : '⬇ Baixar PDF';
+      // gammaSource=true + sem gammaUrl = PDF veio direto do Gamma
+      // gammaSource=true + com gammaUrl = conteúdo gerado no Gamma, PDF é backup local
+      a.textContent = (data.gammaSource && !data.gammaUrl) ? '⬇ Baixar PDF (Gamma AI ✨)' : '⬇ Baixar PDF';
       row.appendChild(a);
       renderPDFPreview(data.pdf);
     }
@@ -2006,10 +2016,21 @@ main{position:relative;z-index:auto}
       a.href = data.gammaUrl;
       a.target = '_blank';
       a.rel = 'noopener';
-      a.className = 'dl-btn';
-      a.style.cssText = 'background:linear-gradient(180deg,#7C3AED,#5B21B6);border-color:rgba(167,139,250,.3)';
+      // Se não há PDF local, o botão Gamma é o principal — destaque máximo
+      const isPrimary = !data.pdf && !data.docx;
+      a.className = isPrimary ? 'dl-btn pdf' : 'dl-btn';
+      a.style.cssText = isPrimary
+        ? 'background:linear-gradient(135deg,#7C3AED,#5B21B6);box-shadow:0 8px 24px -6px rgba(124,58,237,.45);color:#fff;font-size:15px;padding:14px 28px'
+        : 'background:linear-gradient(180deg,#7C3AED,#5B21B6);border-color:rgba(167,139,250,.3);color:#fff';
       a.textContent = '✦ Abrir no Gamma';
       row.appendChild(a);
+      // Nota explicativa quando só tem Gamma (sem download direto)
+      if (isPrimary) {
+        const note = document.createElement('p');
+        note.style.cssText = 'font-size:12px;color:var(--text-3);margin:10px 0 0;line-height:1.5';
+        note.textContent = 'Seu documento está pronto no Gamma. Você pode baixar o PDF diretamente na plataforma (botão Export).';
+        row.appendChild(note);
+      }
     }
     document.getElementById('overlay-ok').classList.add('show');
   }
