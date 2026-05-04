@@ -389,7 +389,7 @@
 
 /* ── APP SHELL LAYOUT ── */
 .app-shell{display:flex;min-height:100vh;position:relative;z-index:2}
-.sidebar{width:220px;min-height:100vh;flex-shrink:0;background:linear-gradient(180deg,rgba(8,8,14,.99),rgba(6,6,10,.99));border-right:1px solid var(--border);position:fixed;top:0;left:0;bottom:0;z-index:20;display:flex;flex-direction:column;overflow:hidden;transition:transform .3s ease}
+.sidebar{width:220px;min-height:100vh;flex-shrink:0;background:linear-gradient(180deg,rgba(8,8,14,.99),rgba(6,6,10,.99));border-right:1px solid var(--border);position:fixed;top:0;left:0;bottom:0;z-index:20;display:flex;flex-direction:column;overflow:hidden;transition:transform .3s ease;pointer-events:auto}
 .sidebar::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 140% 35% at 50% 0%,rgba(168,85,247,.08),transparent 60%);pointer-events:none}
 .sb-logo{padding:20px 18px 18px;border-bottom:1px solid var(--border);position:relative;z-index:1;display:flex;flex-direction:column;gap:4px}
 .sb-logo .logo{font-size:15px;gap:8px;display:flex;align-items:center}
@@ -398,7 +398,7 @@
 .sb-nav{flex:1;padding:14px 10px;overflow-y:auto;position:relative;z-index:1;display:flex;flex-direction:column;gap:1px}
 .sb-section{font-size:10px;font-weight:600;color:var(--text-3);letter-spacing:.12em;text-transform:uppercase;font-family:"DM Mono",monospace;padding:6px 8px 4px;display:block;margin-top:6px}
 .sb-section:first-child{margin-top:0}
-.sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;cursor:pointer;font-size:13.5px;font-weight:500;color:var(--text-2);transition:all .15s;border:1px solid transparent;user-select:none;text-decoration:none}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;cursor:pointer;font-size:13.5px;font-weight:500;color:var(--text-2);transition:all .15s,transform .12s;border:1px solid transparent;user-select:none;text-decoration:none;pointer-events:auto;position:relative;z-index:1}
 .sb-item:hover{color:var(--text);background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.04)}
 .sb-item.active{color:#fff;background:rgba(168,85,247,.12);border-color:rgba(168,85,247,.22)}
 .sb-ico{width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.04);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .15s}
@@ -3080,42 +3080,79 @@ main{position:relative;z-index:auto}
   // ── Sidebar navigation + mode-tab sync ──
   (function(){
     const sbItems = document.querySelectorAll('[data-sb-mode]');
-    const modeTabs = document.querySelectorAll('.mode-tab[data-mode]');
     const sidebar = document.getElementById('sidebar');
-    const toggle = document.getElementById('sb-toggle');
+    const toggle  = document.getElementById('sb-toggle');
     const overlay = document.getElementById('sb-overlay');
 
     function closeSidebar() {
-      if (sidebar) sidebar.classList.remove('open');
-      if (overlay) overlay.classList.remove('visible');
+      sidebar?.classList.remove('open');
+      overlay?.classList.remove('visible');
     }
     function openSidebar() {
-      if (sidebar) sidebar.classList.add('open');
-      if (overlay) overlay.classList.add('visible');
+      sidebar?.classList.add('open');
+      overlay?.classList.add('visible');
     }
 
-    if (toggle) toggle.addEventListener('click', () => {
-      sidebar && sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
-    });
-    if (overlay) overlay.addEventListener('click', closeSidebar);
+    toggle?.addEventListener('click', () =>
+      sidebar?.classList.contains('open') ? closeSidebar() : openSidebar()
+    );
+    overlay?.addEventListener('click', closeSidebar);
 
     function syncSbActive(mode) {
       sbItems.forEach(i => i.classList.toggle('active', i.dataset.sbMode === mode));
     }
 
+    // Troca de modo direto — sem depender de .click() em elementos ocultos
+    function switchMode(mode) {
+      currentMode = mode;
+      document.body.className = 'mode-' + mode;
+
+      // Sincroniza mode tabs visuais (hidden, só para consistência)
+      document.querySelectorAll('.mode-tab').forEach(t =>
+        t.classList.toggle('active', t.dataset.mode === mode)
+      );
+      syncSbActive(mode);
+
+      const MODE_CFG = {
+        ent:  { btn:'🚀 Gerar Infoproduto', note:"~90s · gerado no servidor · sem marca d'água" },
+        car:  { btn:'📱 Gerar Carrossel',   note:"~60s · slides PNG · sem marca d'água" },
+        cri:  { btn:'🎯 Gerar Criativo',    note:'~60s · PNG 1080px · pronto pro Meta Ads' },
+        conv: { btn:'🔄 Converter Arquivo', note:'PDF ↔ Word · upload de até 10MB' },
+      };
+      const cfg = MODE_CFG[mode] || MODE_CFG.ent;
+      const btnGerar = document.getElementById('btn-gerar');
+      const genNote  = document.getElementById('gen-time-note');
+      if (btnGerar) btnGerar.textContent = cfg.btn;
+      if (genNote)  genNote.textContent  = cfg.note;
+
+      if (mode === 'car') updateSlidePreviewColors();
+      else if (mode === 'ent') updatePreviewColors();
+
+      // Rola pro topo do conteúdo para o usuário ver a mudança
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Feedback visual no item clicado
+      const activeItem = document.querySelector(`.sb-item[data-sb-mode="${mode}"]`);
+      if (activeItem) {
+        activeItem.style.transform = 'scale(0.96)';
+        setTimeout(() => { activeItem.style.transform = ''; }, 120);
+      }
+    }
+
     sbItems.forEach(item => {
       item.addEventListener('click', () => {
         const mode = item.dataset.sbMode;
-        const tab = document.querySelector('.mode-tab[data-mode="' + mode + '"]');
-        if (tab) tab.click();
-        syncSbActive(mode);
-        closeSidebar();
+        if (mode) { switchMode(mode); closeSidebar(); }
       });
     });
 
-    modeTabs.forEach(tab => {
+    // Mantém sidebar sincronizado quando mode tabs são clicadas diretamente
+    document.querySelectorAll('.mode-tab[data-mode]').forEach(tab => {
       tab.addEventListener('click', () => syncSbActive(tab.dataset.mode));
     });
+
+    // Expõe switchMode para uso externo (ex: links diretos)
+    window.switchMode = switchMode;
   })();
 
   // ── Barra de progresso de preenchimento do formulário ──
