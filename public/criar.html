@@ -356,28 +356,30 @@
   @media(pointer:fine){html,body,body *{cursor:none!important}}
   #c-dot{
     position:fixed;top:0;left:0;
-    width:8px;height:8px;margin:-4px 0 0 -4px;
-    border-radius:50%;background:#a855f7;
+    width:10px;height:10px;margin:-5px 0 0 -5px;
+    border-radius:50%;
+    /* branco puro para alto contraste contra o design roxo */
+    background:#ffffff;
     pointer-events:none;
     z-index:2147483647;
     will-change:transform;
-    box-shadow:0 0 14px rgba(168,85,247,.95);
+    box-shadow:0 0 0 1.5px rgba(168,85,247,.8),0 0 16px rgba(255,255,255,.9),0 0 28px rgba(168,85,247,.7);
     transition:width .15s,height .15s,background .15s,margin .15s,box-shadow .15s;
   }
   #c-ring{
     position:fixed;top:0;left:0;
-    width:30px;height:30px;margin:-15px 0 0 -15px;
-    border-radius:50%;border:1.5px solid rgba(168,85,247,.5);
+    width:34px;height:34px;margin:-17px 0 0 -17px;
+    border-radius:50%;border:1.5px solid rgba(255,255,255,.55);
     pointer-events:none;
     z-index:2147483646;
     will-change:transform;
-    box-shadow:0 0 18px rgba(168,85,247,.12);
+    box-shadow:0 0 12px rgba(168,85,247,.35);
     transition:width .2s,height .2s,border-color .2s,margin .2s,box-shadow .2s;
   }
-  body.cursor-hover #c-dot{width:6px;height:6px;margin:-3px 0 0 -3px;background:#facc15;box-shadow:0 0 20px rgba(250,204,21,1)}
-  body.cursor-hover #c-ring{width:46px;height:46px;margin:-23px 0 0 -23px;border-color:rgba(250,204,21,.45);box-shadow:0 0 30px rgba(250,204,21,.18)}
-  body.cursor-click #c-dot{width:12px;height:12px;margin:-6px 0 0 -6px;background:#facc15;box-shadow:0 0 28px rgba(250,204,21,1)}
-  body.cursor-click #c-ring{width:14px;height:14px;margin:-7px 0 0 -7px;opacity:.5}
+  body.cursor-hover #c-dot{width:7px;height:7px;margin:-3.5px 0 0 -3.5px;background:#facc15;box-shadow:0 0 0 1.5px rgba(250,204,21,.6),0 0 22px rgba(250,204,21,1)}
+  body.cursor-hover #c-ring{width:50px;height:50px;margin:-25px 0 0 -25px;border-color:rgba(250,204,21,.5);box-shadow:0 0 30px rgba(250,204,21,.2)}
+  body.cursor-click #c-dot{width:13px;height:13px;margin:-6.5px 0 0 -6.5px;background:#facc15;box-shadow:0 0 28px rgba(250,204,21,1)}
+  body.cursor-click #c-ring{width:16px;height:16px;margin:-8px 0 0 -8px;opacity:.5}
   /* click ripple */
   .c-ripple{position:fixed;top:0;left:0;pointer-events:none;z-index:2147483645;border-radius:50%;
     width:80px;height:80px;margin:-40px 0 0 -40px;
@@ -2763,8 +2765,9 @@ main{position:relative;z-index:auto}
     const glow = document.getElementById('mouse-glow');
     if(!dot||!ring) return;
 
-    // Start at center so there's no jump on first move
+    // Inicializar no centro para não ficar preso no canto (0,0)
     let mx=innerWidth/2, my=innerHeight/2, rx=mx, ry=my;
+    dot.style.transform='translate3d('+mx+'px,'+my+'px,0)';
 
     // Dot follows cursor instantly via GPU transform
     document.addEventListener('mousemove', e=>{

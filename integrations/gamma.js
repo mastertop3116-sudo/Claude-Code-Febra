@@ -49,15 +49,23 @@ async function gerarEntregavel(inputText, { formato = 'document', numCards = 10,
     const status = await _fetch(`/generations/${generationId}`)
 
     if (status.status === 'completed') {
-      console.log(`[Gamma] Geração concluída — gammaUrl: ${status.gammaUrl} | créditos usados: ${status.credits?.deducted}`)
-      // Normaliza campos para uso consistente
+      // Log completo para diagnóstico — verificar no Render se exportUrl está presente
+      console.log(`[Gamma] Geração concluída — resposta completa: ${JSON.stringify(status)}`)
+
+      // Tentar extrair exportUrl de múltiplos campos possíveis
+      const exportUrl = status.exportUrl || status.export_url || status.pdfUrl || status.pdf_url || null
+
+      if (!exportUrl) {
+        console.warn('[Gamma] ⚠️ exportUrl ausente na resposta. Campos disponíveis: ' + Object.keys(status).join(', '))
+      }
+
       return {
         generationId: status.generationId,
         gammaId:      status.gammaId,
         gammaUrl:     status.gammaUrl,
-        exportUrl:    status.exportUrl,
-        url:          status.gammaUrl,        // alias de conveniência
-        export_url:   status.exportUrl,       // alias de conveniência
+        exportUrl,
+        url:          status.gammaUrl,
+        export_url:   exportUrl,
         credits:      status.credits,
         creditsUsed:  status.credits?.deducted,
       }
