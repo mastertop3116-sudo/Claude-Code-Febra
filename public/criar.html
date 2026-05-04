@@ -535,6 +535,10 @@ main{position:relative;z-index:auto}
       <span class="pill"><span class="dot"></span>Nexus Forge · studio</span>
       <h1>Forge seu <span class="grad">infoproduto premium</span></h1>
       <p>Ebooks, workbooks, checklists, planners, scripts VSL e certificados — layout profissional automático.</p>
+      <div style="display:flex;align-items:center;gap:14px;margin-top:20px;flex-wrap:wrap">
+        <button class="btn primary" id="btn-demo-hero" style="font-size:13px;padding:10px 20px">⚡ Preencher com exemplo</button>
+        <span style="font-size:11px;color:var(--text-3);font-family:'DM Mono',monospace;letter-spacing:.04em">Ctrl+Enter para gerar · ~90s</span>
+      </div>
     </div>
   </header>
 
@@ -1174,13 +1178,19 @@ main{position:relative;z-index:auto}
           <div class="small-note" id="gen-time-note">~ 90s · gerado no servidor · sem marca d'água</div>
         </section>
 
-        <section class="card" style="margin-top:22px;padding:18px">
+        <section class="card" style="margin-top:22px;padding:18px" id="tip-card">
           <div style="display:flex;gap:10px;align-items:center">
-            <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,rgba(168,85,247,.25),rgba(168,85,247,.08));border:1px solid rgba(168,85,247,.2);display:flex;align-items:center;justify-content:center;font-size:16px">💡</div>
-            <div>
+            <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,rgba(168,85,247,.25),rgba(168,85,247,.08));border:1px solid rgba(168,85,247,.2);display:flex;align-items:center;justify-content:center;font-size:16px" id="tip-ico">💡</div>
+            <div style="flex:1;min-width:0">
               <div style="font-size:13px;font-weight:600">Dica do MAX</div>
-              <div style="font-size:12px;color:var(--text-3);margin-top:2px;line-height:1.5">Descrições de público mais específicas melhoram muito a qualidade do conteúdo gerado.</div>
+              <div style="font-size:12px;color:var(--text-3);margin-top:2px;line-height:1.5" id="tip-text">Descrições de público mais específicas melhoram muito a qualidade do conteúdo gerado.</div>
             </div>
+          </div>
+          <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px">
+            <div style="flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.06);overflow:hidden">
+              <div id="form-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent-3));border-radius:2px;transition:width .4s ease"></div>
+            </div>
+            <span id="form-progress-label" style="font-size:10px;color:var(--text-3);font-family:'DM Mono',monospace;white-space:nowrap">0% preenchido</span>
           </div>
         </section>
       </div>
@@ -1214,11 +1224,11 @@ main{position:relative;z-index:auto}
     <div class="lc-loader"></div>
     <h2 class="lc-title">Criando seu produto completo...</h2>
     <div class="lc-steps" id="gen-steps">
-      <p class="lc-step" id="step-oferta">Analisando sua oferta</p>
-      <p class="lc-step" id="step-conteudo">Estruturando conteúdo</p>
-      <p class="lc-step" id="step-entregavel">Criando entregável</p>
-      <p class="lc-step" id="step-bumps">Gerando order bumps</p>
-      <p class="lc-step" id="step-upsell">Montando upsell</p>
+      <p class="lc-step" id="step-oferta">Analisando tema e público-alvo</p>
+      <p class="lc-step" id="step-conteudo">Estruturando capítulos com IA</p>
+      <p class="lc-step" id="step-entregavel">Redigindo conteúdo personalizado</p>
+      <p class="lc-step" id="step-bumps">Montando layout e design</p>
+      <p class="lc-step" id="step-upsell">Exportando arquivo final</p>
     </div>
     <div class="gen-preview" id="gen-preview"></div>
     <div class="lc-bar-wrap"><div class="lc-bar" id="prog-fill"></div></div>
@@ -2749,11 +2759,11 @@ main{position:relative;z-index:auto}
   // ---- gen steps progress sync + typing preview ----
   (function(){
     const STEPS = [
-      { id:'step-oferta',    label:'Analisando sua oferta',   threshold:0,  preview:'Identificando proposta de valor, avatar e oportunidades de conversão...' },
-      { id:'step-conteudo',  label:'Estruturando conteúdo',   threshold:20, preview:'Definindo capítulos, módulos e fluxo de conteúdo personalizado...' },
-      { id:'step-entregavel',label:'Criando entregável',       threshold:45, preview:'Gerando layout profissional e exportando PDF com design premium...' },
-      { id:'step-bumps',     label:'Gerando order bumps',      threshold:82, preview:'Criando oferta complementar de alto valor percebido...' },
-      { id:'step-upsell',    label:'Montando upsell',          threshold:95, preview:'Configurando upsell para maximizar o LTV do cliente...' },
+      { id:'step-oferta',    label:'Analisando tema e público-alvo',   threshold:0,  preview:'Compreendendo nicho, avatar e proposta de valor do produto...' },
+      { id:'step-conteudo',  label:'Estruturando capítulos com IA',    threshold:20, preview:'Definindo índice, módulos e fluxo de aprendizado personalizado...' },
+      { id:'step-entregavel',label:'Redigindo conteúdo personalizado',  threshold:45, preview:'Criando cada seção com profundidade, tom e linguagem adequados...' },
+      { id:'step-bumps',     label:'Montando layout e design',          threshold:82, preview:'Aplicando tema visual, tipografia e diagramando o documento...' },
+      { id:'step-upsell',    label:'Exportando arquivo final',          threshold:95, preview:'Gerando PDF profissional pronto para distribuição...' },
     ];
     const preview = document.getElementById('gen-preview');
     let typeTimer = null;
@@ -3106,6 +3116,116 @@ main{position:relative;z-index:auto}
     modeTabs.forEach(tab => {
       tab.addEventListener('click', () => syncSbActive(tab.dataset.mode));
     });
+  })();
+
+  // ── Barra de progresso de preenchimento do formulário ──
+  (function(){
+    const TIPS = [
+      { ico:'💡', text:'Descrições de público mais específicas melhoram muito a qualidade do conteúdo gerado.' },
+      { ico:'🎯', text:'Títulos com números ímpares (3, 7, 9) convertem até 36% mais — o MAX já considera isso.' },
+      { ico:'✏️', text:'O conteúdo gerado é seu ponto de partida. Edite, personalize e injete sua voz antes de publicar.' },
+      { ico:'🚀', text:'Entregáveis bem estruturados aumentam o valor percebido do seu produto em até 3×.' },
+      { ico:'🔁', text:'Gere versões diferentes variando o tema visual ou o número de páginas para A/B testar.' },
+      { ico:'📐', text:'Cada seção é dimensionada para leitura em tela e impressão A4 sem cortes.' },
+    ];
+    let tipIdx = 0;
+    const icoEl  = document.getElementById('tip-ico');
+    const txtEl  = document.getElementById('tip-text');
+    const bar    = document.getElementById('form-progress-bar');
+    const label  = document.getElementById('form-progress-label');
+    const fields = ['inp-titulo','inp-subtitulo','inp-autor','inp-descricao','inp-avatar'];
+
+    function updateFormProgress() {
+      if (!bar || !label) return;
+      const filled = fields.filter(id => (document.getElementById(id)?.value||'').trim()).length;
+      const pct = Math.round((filled / fields.length) * 100);
+      bar.style.width = pct + '%';
+      label.textContent = pct + '% preenchido';
+      if (pct === 100) label.style.color = '#22c55e';
+      else label.style.color = '';
+    }
+
+    fields.forEach(id => document.getElementById(id)?.addEventListener('input', updateFormProgress));
+    updateFormProgress();
+
+    setInterval(() => {
+      tipIdx = (tipIdx + 1) % TIPS.length;
+      const t = TIPS[tipIdx];
+      if (icoEl) icoEl.textContent = t.ico;
+      if (txtEl) { txtEl.style.opacity = '0'; setTimeout(() => { txtEl.textContent = t.text; txtEl.style.opacity = '1'; }, 200); }
+    }, 8000);
+    if (txtEl) txtEl.style.transition = 'opacity .3s';
+  })();
+
+  // ── Keyboard shortcut: Ctrl/Cmd+Enter = gerar ──
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      document.getElementById('btn-gerar')?.click();
+    }
+  });
+
+  // ── Animated placeholder cycling no título ──
+  (function(){
+    const inp = document.getElementById('inp-titulo');
+    if (!inp) return;
+    const bases = [
+      'Ex: 7 Segredos do Emagrecimento sem Sofrimento',
+      'Ex: Do Zero às 6 Figuras no Marketing Digital',
+      'Ex: O Guia Definitivo de Finanças Pessoais',
+      'Ex: Método Sleep Fit — Perca Peso Dormindo',
+      'Ex: 30 Dias para uma Mente de Alta Performance',
+      'Ex: O Mapa da Riqueza para Quem Começa do Zero',
+    ];
+    let idx = 0, timer;
+    const cycle = () => { if(!inp.value) inp.setAttribute('placeholder', bases[idx = (idx+1) % bases.length]); };
+    timer = setInterval(cycle, 3200);
+    inp.addEventListener('focus', () => clearInterval(timer));
+    inp.addEventListener('blur',  () => { if(!inp.value) timer = setInterval(cycle, 3200); });
+  })();
+
+  // ── Demo rápido: preenche o formulário com exemplo realista ──
+  (function(){
+    const DEMOS = {
+      ent: {
+        titulo:    '7 Segredos do Emagrecimento Feminino sem Sofrimento',
+        subtitulo: 'Como perder peso de forma definitiva sem dietas radicais nem academia',
+        autor:     'Dra. Ana Paula Martins',
+        descricao: 'Emagrecimento feminino, saúde e bem-estar',
+        avatar:    'Mulheres 28-42 anos que tentaram várias dietas sem sucesso e querem solução definitiva',
+        paginas:   15,
+      },
+      car: {
+        assunto: '5 erros fatais que sabotam o emagrecimento (e como corrigir hoje)',
+        gancho:  'Você comete esses 5 erros sem perceber — e eles travam seus resultados',
+      },
+      cri: {
+        headline: 'Perca Peso sem Sofrimento',
+        sub:      '+3.200 mulheres transformadas · acesso imediato',
+        cta:      'Quero começar agora',
+      },
+    };
+
+    function fillDemo() {
+      const d = DEMOS[currentMode] || DEMOS.ent;
+      const set = (id, v) => {
+        const el = document.getElementById(id);
+        if (el && v !== undefined) { el.value = v; el.dispatchEvent(new Event('input',{bubbles:true})); }
+      };
+      if (currentMode === 'ent') {
+        set('inp-titulo', d.titulo); set('inp-subtitulo', d.subtitulo);
+        set('inp-autor', d.autor);   set('inp-descricao', d.descricao);
+        set('inp-avatar', d.avatar); set('inp-paginas', d.paginas);
+      } else if (currentMode === 'car') {
+        set('inp-assunto', d.assunto); set('inp-gancho', d.gancho);
+      } else if (currentMode === 'cri') {
+        set('cri-headline', d.headline); set('cri-sub', d.sub); set('cri-cta', d.cta);
+      }
+      toast('Exemplo carregado! Clique em Gerar para ver o resultado.', '⚡');
+      setTimeout(() => document.getElementById('btn-gerar')?.scrollIntoView({behavior:'smooth',block:'center'}), 450);
+    }
+
+    document.getElementById('btn-demo-hero')?.addEventListener('click', fillDemo);
   })();
 
   // ── Wizard step tracker (scroll-based) ──
