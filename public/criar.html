@@ -352,14 +352,48 @@
   .conv-progress{margin:16px 0;background:rgba(255,255,255,.07);border-radius:999px;height:6px;overflow:hidden}
   .conv-progress-fill{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-3));transition:width .4s ease}
   .conv-status-msg{font-size:12px;color:var(--text-3);font-style:italic;text-align:center;margin-top:8px;min-height:18px}
-  /* custom cursor */
+  /* ── CUSTOM CURSOR (GPU-composited, works everywhere) ── */
   @media(pointer:fine){html,body,body *{cursor:none!important}}
-  #c-dot{position:fixed;width:7px;height:7px;border-radius:50%;background:#a855f7;pointer-events:none;z-index:999999;transform:translate(-50%,-50%);transition:width .15s,height .15s,background .15s;box-shadow:0 0 14px rgba(168,85,247,.9)}
-  #c-ring{position:fixed;width:30px;height:30px;border-radius:50%;border:1.5px solid rgba(168,85,247,.45);pointer-events:none;z-index:999998;transform:translate(-50%,-50%);transition:width .2s,height .2s,border-color .2s;box-shadow:0 0 18px rgba(168,85,247,.12)}
-  body.cursor-hover #c-dot{width:5px;height:5px;background:#facc15;box-shadow:0 0 18px rgba(250,204,21,.95)}
-  body.cursor-hover #c-ring{width:44px;height:44px;border-color:rgba(250,204,21,.5);box-shadow:0 0 28px rgba(250,204,21,.2)}
-  body.cursor-click #c-dot{transform:translate(-50%,-50%) scale(2);background:#facc15}
-  body.cursor-click #c-ring{width:14px;height:14px;opacity:.6}
+  #c-dot{
+    position:fixed;top:0;left:0;
+    width:8px;height:8px;margin:-4px 0 0 -4px;
+    border-radius:50%;background:#a855f7;
+    pointer-events:none;
+    z-index:2147483647;
+    will-change:transform;
+    box-shadow:0 0 14px rgba(168,85,247,.95);
+    transition:width .15s,height .15s,background .15s,margin .15s,box-shadow .15s;
+  }
+  #c-ring{
+    position:fixed;top:0;left:0;
+    width:30px;height:30px;margin:-15px 0 0 -15px;
+    border-radius:50%;border:1.5px solid rgba(168,85,247,.5);
+    pointer-events:none;
+    z-index:2147483646;
+    will-change:transform;
+    box-shadow:0 0 18px rgba(168,85,247,.12);
+    transition:width .2s,height .2s,border-color .2s,margin .2s,box-shadow .2s;
+  }
+  body.cursor-hover #c-dot{width:6px;height:6px;margin:-3px 0 0 -3px;background:#facc15;box-shadow:0 0 20px rgba(250,204,21,1)}
+  body.cursor-hover #c-ring{width:46px;height:46px;margin:-23px 0 0 -23px;border-color:rgba(250,204,21,.45);box-shadow:0 0 30px rgba(250,204,21,.18)}
+  body.cursor-click #c-dot{width:12px;height:12px;margin:-6px 0 0 -6px;background:#facc15;box-shadow:0 0 28px rgba(250,204,21,1)}
+  body.cursor-click #c-ring{width:14px;height:14px;margin:-7px 0 0 -7px;opacity:.5}
+  /* click ripple */
+  .c-ripple{position:fixed;top:0;left:0;pointer-events:none;z-index:2147483645;border-radius:50%;
+    width:80px;height:80px;margin:-40px 0 0 -40px;
+    border:1.5px solid rgba(168,85,247,.6);
+    animation:c-rpl .7s ease-out forwards}
+  @keyframes c-rpl{
+    0%{transform:var(--crt) scale(.05);opacity:1;border-width:5px;border-color:rgba(168,85,247,.6)}
+    60%{border-width:1.5px}
+    100%{transform:var(--crt) scale(1);opacity:0;border-color:rgba(168,85,247,0)}
+  }
+  /* spotlight — background reacts to mouse */
+  #mouse-glow{
+    position:fixed;inset:0;pointer-events:none;z-index:3;
+    background:radial-gradient(600px circle at var(--cx,50%) var(--cy,50%),rgba(168,85,247,.055),transparent 65%);
+    transition:background .12s;
+  }
   /* card 3D tilt */
   .card{will-change:transform;transform-style:preserve-3d;transition:transform .35s ease,border-color .2s,box-shadow .2s}
   .card:hover{box-shadow:0 0 0 1px rgba(168,85,247,.22),0 24px 60px -15px rgba(168,85,247,.18)!important}
@@ -452,8 +486,6 @@ main{position:relative;z-index:auto}
 
 <button class="sb-toggle" id="sb-toggle" aria-label="Abrir menu">☰</button>
 <div id="sb-overlay" class="sb-overlay"></div>
-<div id="c-dot"></div>
-<div id="c-ring"></div>
 <canvas id="particles-canvas"></canvas>
 <div class="bg"></div>
 <div class="noise"></div>
@@ -2676,9 +2708,15 @@ main{position:relative;z-index:auto}
       }
       update(){
         const dx=this.x-mouse.x, dy=this.y-mouse.y, d2=dx*dx+dy*dy;
-        if(d2<16000){ const f=(16000-d2)/16000*.35, s=Math.sqrt(d2+1); this.vx+=dx/s*f; this.vy+=dy/s*f; }
-        this.vx*=.984; this.vy*=.984; this.x+=this.vx; this.y+=this.vy; this.ph+=this.ps;
-        if(this.x<-20||this.x>W+20||this.y<-20||this.y>H+20) this.reset(false);
+        // Stronger repulsion zone (130px) + attraction toward burst point
+        if(d2<16900){ const f=(16900-d2)/16900*.55, s=Math.sqrt(d2+1); this.vx+=dx/s*f; this.vy+=dy/s*f; }
+        // Extra glow when near mouse — gold shift
+        this._nearMouse = d2 < 25000;
+        // Subtle drift toward screen center (keeps particles in view)
+        this.vx += (W/2-this.x)*0.00008;
+        this.vy += (H/2-this.y)*0.00008;
+        this.vx*=.982; this.vy*=.982; this.x+=this.vx; this.y+=this.vy; this.ph+=this.ps;
+        if(this.x<-30||this.x>W+30||this.y<-30||this.y>H+30) this.reset(false);
         return this.a*(0.7+0.3*Math.sin(this.ph));
       }
     }
@@ -2686,6 +2724,13 @@ main{position:relative;z-index:auto}
     window.addEventListener('resize',resize);
     window.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});
     window.addEventListener('mouseleave',()=>{mouse.x=-999;mouse.y=-999;});
+    // Click burst: scatter nearby particles outward
+    window.addEventListener('click',e=>{
+      for(const p of particles){
+        const dx=p.x-e.clientX, dy=p.y-e.clientY, d=Math.sqrt(dx*dx+dy*dy);
+        if(d<200){ const f=(200-d)/200*2.8, s=d+1; p.vx+=dx/s*f; p.vy+=dy/s*f; }
+      }
+    });
     let last=0;
     function loop(ts){
       if(ts-last>1000/28){ last=ts;
@@ -2698,8 +2743,11 @@ main{position:relative;z-index:auto}
         for(const p of particles){
           const a=p.update();
           ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-          ctx.fillStyle=p.gold?'rgba(250,204,21,'+a+')':'rgba(168,85,247,'+a+')';
+          const glow = p._nearMouse || p.gold;
+          ctx.fillStyle = glow ? 'rgba(250,204,21,'+a+')' : 'rgba(168,85,247,'+a+')';
+          if(p._nearMouse){ ctx.shadowBlur=8; ctx.shadowColor='rgba(250,204,21,.6)'; }
           ctx.fill();
+          ctx.shadowBlur=0;
         }
       }
       requestAnimationFrame(loop);
@@ -2707,20 +2755,74 @@ main{position:relative;z-index:auto}
     requestAnimationFrame(loop);
   })();
 
-  // ---- custom cursor ----
+  // ---- custom cursor (GPU translate3d — works everywhere) ----
   (function(){
     if(!window.matchMedia('(pointer:fine)').matches) return;
-    const dot=document.getElementById('c-dot'), ring=document.getElementById('c-ring');
+    const dot  = document.getElementById('c-dot');
+    const ring = document.getElementById('c-ring');
+    const glow = document.getElementById('mouse-glow');
     if(!dot||!ring) return;
-    let mx=0,my=0,rx=0,ry=0;
-    document.addEventListener('mousemove',e=>{ mx=e.clientX; my=e.clientY; dot.style.left=mx+'px'; dot.style.top=my+'px'; });
-    (function tick(){ rx+=(mx-rx)*.12; ry+=(my-ry)*.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(tick); })();
-    document.querySelectorAll('a,button,.btn,.mode-tab,.theme,.fmt,.type-select .trigger,.switch,.check-row,.chip,.gamma-theme-card,.ctype-card,.conv-dir-card,.fpick-card,.dl-btn,.generate,.btn-carousel,.toggle-row').forEach(el=>{
+
+    // Start at center so there's no jump on first move
+    let mx=innerWidth/2, my=innerHeight/2, rx=mx, ry=my;
+
+    // Dot follows cursor instantly via GPU transform
+    document.addEventListener('mousemove', e=>{
+      mx=e.clientX; my=e.clientY;
+      dot.style.transform='translate3d('+mx+'px,'+my+'px,0)';
+      // Update spotlight
+      if(glow){
+        glow.style.setProperty('--cx', mx+'px');
+        glow.style.setProperty('--cy', my+'px');
+        glow.style.background='radial-gradient(600px circle at '+mx+'px '+my+'px,rgba(168,85,247,.055),transparent 65%)';
+      }
+    },{passive:true});
+
+    // Ring lerps behind via rAF
+    (function tick(){
+      rx+=(mx-rx)*.11; ry+=(my-ry)*.11;
+      ring.style.transform='translate3d('+rx+'px,'+ry+'px,0)';
+      requestAnimationFrame(tick);
+    })();
+
+    // Hover state on all interactive elements
+    const HOVER_SEL='a,button,.btn,.mode-tab,.theme,.fmt,.type-select .trigger,.switch,.check-row,.chip,.gamma-theme-card,.ctype-card,.conv-dir-card,.fpick-card,.dl-btn,.generate,.btn-carousel,.toggle-row,.sb-item,.wiz-step,.dna-save-btn,.btn-sugerir';
+    document.querySelectorAll(HOVER_SEL).forEach(el=>{
       el.addEventListener('mouseenter',()=>document.body.classList.add('cursor-hover'));
       el.addEventListener('mouseleave',()=>document.body.classList.remove('cursor-hover'));
     });
+
+    // Click ripple (premium feel)
+    document.addEventListener('click',e=>{
+      const r=document.createElement('div');
+      r.className='c-ripple';
+      const ct='translate3d('+e.clientX+'px,'+e.clientY+'px,0)';
+      r.style.setProperty('--crt',ct);
+      r.style.transform=ct+' scale(.05)';
+      document.body.appendChild(r);
+      r.addEventListener('animationend',()=>r.remove(),{once:true});
+    });
+
+    // Click shrink/expand state
     document.addEventListener('mousedown',()=>document.body.classList.add('cursor-click'));
     document.addEventListener('mouseup',()=>document.body.classList.remove('cursor-click'));
+
+    // Magnetic effect — primary CTAs pull cursor slightly
+    document.querySelectorAll('.generate,.btn.primary,.dl-btn.pdf').forEach(btn=>{
+      btn.addEventListener('mouseenter',()=>{ btn._magT='transform .05s ease'; });
+      btn.addEventListener('mousemove',e=>{
+        const r=btn.getBoundingClientRect();
+        const x=(e.clientX-r.left-r.width/2)*.18;
+        const y=(e.clientY-r.top-r.height/2)*.14;
+        btn.style.transition=btn._magT||'';
+        btn.style.transform='translate('+x+'px,'+y+'px)';
+      });
+      btn.addEventListener('mouseleave',()=>{
+        btn.style.transition='transform .5s cubic-bezier(.2,.8,.4,1)';
+        btn.style.transform='';
+        setTimeout(()=>{ btn.style.transition=''; },520);
+      });
+    });
   })();
 
   // ---- card 3D tilt ----
@@ -3154,5 +3256,9 @@ main{position:relative;z-index:auto}
   })();
 
 </script>
+<!-- CURSOR + SPOTLIGHT (fixed layers, always on top) -->
+<div id="c-dot"></div>
+<div id="c-ring"></div>
+<div id="mouse-glow"></div>
 </body>
 </html>
