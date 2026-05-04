@@ -197,7 +197,7 @@ app.get("/api/criar/progress/:jobId", (req, res) => {
 
     if (job.status === "done") {
       enviar({ done: true, titulo: job.titulo, pdf: job.pdf, pdfFilename: job.pdfFilename,
-        docx: job.docx, docxFilename: job.docxFilename, gammaUrl: job.gammaUrl });
+        docx: job.docx, docxFilename: job.docxFilename, gammaUrl: job.gammaUrl, gammaSource: job.gammaSource });
       clearInterval(tick);
       criarJobs.delete(jobId);
       res.end();
