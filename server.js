@@ -129,9 +129,10 @@ Gere campos otimizados para formulário de criação de produto digital. APENAS 
   "subtitulo": "complemento do título máx 15 palavras — reforça benefício principal",
   "nicho_refinado": "nicho específico com público e dor, máx 60 chars",
   "num_paginas": 15,
-  "num_capitulos": 5,
+  "num_capitulos": 7,
   "tipo_sugerido": "ebook|workbook|checklist|planner|script_vsl|cheat_sheet|pregacoes"
-}`;
+}
+IMPORTANTE: num_paginas deve ser entre 10 e 15 (máx 20). num_capitulos entre 5 e 8 (máx 10).`;
     const prompt = `Nicho: ${nicho}\nAvatar: ${avatar || "não informado"}\nBenefício principal: ${beneficio || "não informado"}\nTipo preferido: ${tipo || "automático"}`;
     const resultado = JSON.parse(await openaiJson(prompt, SYSTEM));
     res.json(resultado);

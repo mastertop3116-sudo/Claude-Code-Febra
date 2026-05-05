@@ -32,14 +32,21 @@ function _parse(raw) {
   }
 }
 
+// Limite global: Gamma AI suporta max 12 cards → max 10 capítulos de conteúdo
+const GAMMA_MAX_CAPS = 10
+
 async function run({ estrategia, tipo, num_paginas, num_capitulos }) {
   if (tipo === 'pregacoes') {
-    const prompt = `Tipo: pregações prontas\nNúmero de pregações: ${num_capitulos || 6}\nPáginas: ${num_paginas || 20}\nEstratégia: ${JSON.stringify(estrategia)}`
+    const numPrg = Math.min(num_capitulos || 6, GAMMA_MAX_CAPS)
+    const prompt = `Tipo: pregações prontas\nNúmero de pregações: ${numPrg}\nPáginas: ${Math.min(parseInt(num_paginas) || 20, 20)}\nEstratégia: ${JSON.stringify(estrategia)}`
     return _parse(await openaiJson(prompt, SYSTEM_PREGACOES))
   }
-  const pags = parseInt(num_paginas) || 15
-  // Cada capítulo ocupa ~2 páginas; ajusta limites conforme tamanho solicitado
-  const capsCalc = num_capitulos || Math.min(Math.max(3, Math.round(pags / 2)), 14)
+  // Server-side cap: max 20 páginas alinhado ao Gamma
+  const pags = Math.min(parseInt(num_paginas) || 15, 20)
+  // Cada capítulo ≈ 2 páginas; cap em GAMMA_MAX_CAPS
+  const capsCalc = num_capitulos
+    ? Math.min(parseInt(num_capitulos), GAMMA_MAX_CAPS)
+    : Math.min(Math.max(3, Math.round(pags / 2)), GAMMA_MAX_CAPS)
   const prompt = `Tipo: ${tipo}\nPáginas solicitadas: ${pags}\nNúmero EXATO de capítulos: ${capsCalc}\nGere EXATAMENTE ${capsCalc} entradas no índice — nem mais, nem menos.\nEstratégia: ${JSON.stringify(estrategia)}`
   return _parse(await openaiJson(prompt, SYSTEM))
 }

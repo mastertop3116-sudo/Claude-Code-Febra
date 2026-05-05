@@ -88,12 +88,14 @@ async function _callModel(systemPrompt, prompt) {
   }
 }
 
+// Limite global: Gamma AI suporta max 12 cards → max 10 seções de conteúdo
+const GAMMA_MAX_SECOES = 10
+
 async function run({ estrategia, estrutura, autor, tipo, num_paginas }) {
-  // Limita número de seções para evitar timeouts em ebooks grandes (>15 páginas)
-  // Regra: ~2 páginas por seção; máx 8 seções por chamada única
-  const paginasNum = parseInt(num_paginas) || 0
-  // ~2 páginas por seção; mín 3, máx 14 (30 pg → 14 seções vs cap antigo de 8)
-  const maxSecoes = paginasNum > 0 ? Math.min(Math.max(3, Math.round(paginasNum / 2)), 14) : 8
+  // Server-side cap: max 20 páginas alinhado ao Gamma
+  const paginasNum = Math.min(parseInt(num_paginas) || 0, 20)
+  // ~2 páginas por seção; mín 3, máx GAMMA_MAX_SECOES
+  const maxSecoes = paginasNum > 0 ? Math.min(Math.max(3, Math.round(paginasNum / 2)), GAMMA_MAX_SECOES) : 7
 
   const key = _cacheKey(estrategia, estrutura, autor, tipo, maxSecoes)
   if (_cache.has(key)) {

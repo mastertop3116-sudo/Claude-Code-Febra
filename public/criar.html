@@ -634,9 +634,9 @@ main{position:relative;z-index:auto}
               </div>
             </div>
             <div>
-              <label class="lbl">Nº de páginas</label>
-              <input class="input" type="number" id="inp-paginas" value="15" min="1" max="30">
-              <div id="paginas-aviso" style="display:none;margin-top:6px;font-size:12px;color:var(--warn)">⚠ Acima de 20 páginas a geração pode ser lenta</div>
+              <label class="lbl">Nº de páginas <span style="font-size:10px;color:var(--text-3);font-weight:400">máx 20 · Gamma AI</span></label>
+              <input class="input" type="number" id="inp-paginas" value="15" min="1" max="20">
+              <div id="paginas-aviso" style="display:none;margin-top:6px;font-size:11px;color:var(--text-3)">⏱ 16–20 páginas levam ~5 min para gerar</div>
             </div>
           </div>
 
@@ -693,8 +693,8 @@ main{position:relative;z-index:auto}
 
           <div class="row2 eq">
             <div>
-              <label class="lbl">Nº de capítulos <span class="opt">opcional</span></label>
-              <input class="input" type="number" id="inp-caps" placeholder="automático" min="1" max="20">
+              <label class="lbl">Nº de capítulos <span style="font-size:10px;color:var(--text-3);font-weight:400">máx 10 · Gamma AI</span></label>
+              <input class="input" type="number" id="inp-caps" placeholder="automático" min="1" max="10">
             </div>
             <div style="display:flex;flex-direction:column;justify-content:flex-end">
               <div style="font-size:12px;color:var(--text-3);line-height:1.5;padding-bottom:13px" id="caps-hint">Deixe vazio para o MAX calcular pelo nº de páginas</div>
@@ -1419,16 +1419,25 @@ main{position:relative;z-index:auto}
   let _activeEventSource = null;
 
   // Tempo estimado e dica por tipo
+  // Tempos reais observados com Gamma AI (2026-05-05: ebook 15pg = 4m 16s)
   const TYPE_TIME = {
-    ebook: '~120s', workbook: '~100s', checklist: '~45s',
-    planner: '~60s', script_vsl: '~60s', cheat_sheet: '~40s', certificado: '~20s',
-    pregacoes: '~90s',
+    ebook:      '~4-5min',
+    workbook:   '~4min',
+    checklist:  '~2min',
+    planner:    '~3min',
+    script_vsl: '~3min',
+    cheat_sheet:'~2min',
+    certificado:'~1min',
+    pregacoes:  '~4-5min',
   };
   const TYPE_CAPS_HINT = {
-    ebook: 'Sugestão: 8–15 capítulos', workbook: 'Sugestão: 6–12 capítulos',
-    checklist: 'Sugestão: 5–8 categorias', planner: 'Sugestão: 4–8 módulos',
-    script_vsl: 'Fixo: 7 etapas', cheat_sheet: 'Sugestão: 4–8 tópicos',
-    certificado: 'Fixo: 1 seção',
+    ebook:      'Sugestão: 7–10 capítulos (máx 10 · Gamma AI)',
+    workbook:   'Sugestão: 6–8 capítulos (máx 10)',
+    checklist:  'Sugestão: 4–6 categorias',
+    planner:    'Sugestão: 4–7 módulos',
+    script_vsl: 'Fixo: 7 etapas',
+    cheat_sheet:'Sugestão: 4–6 tópicos',
+    certificado:'Fixo: 1 seção',
   };
 
   function updateTypeUI(v) {
@@ -1838,7 +1847,7 @@ main{position:relative;z-index:auto}
   document.getElementById('inp-paginas').addEventListener('input', function() {
     updateMeta();
     const aviso = document.getElementById('paginas-aviso');
-    if (aviso) aviso.style.display = parseInt(this.value) > 20 ? 'block' : 'none';
+    if (aviso) aviso.style.display = parseInt(this.value) >= 16 ? 'block' : 'none';
   });
 
   // ---- toast ----

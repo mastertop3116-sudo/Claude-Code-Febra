@@ -1478,14 +1478,18 @@ async function generate(params) {
   const temaBase = THEMES[temaKey] || THEMES.produtividade;
   const nichoFinal = nicho || descricao || titulo;
 
+  // Cap server-side: Gamma suporta max 12 cards → max 20 páginas / 10 capítulos
+  const paginasCapadas    = Math.min(parseInt(num_paginas || paginas) || 15, 20);
+  const capitulosCapados  = num_capitulos ? Math.min(parseInt(num_capitulos), 10) : undefined;
+
   await progress(5, "Mapeando mercado...");
   const estrategia = await estrategista.run({ titulo, subtitulo, nicho: nichoFinal, avatar_publico: avatar_publico || avatar, tipo, relatorio });
 
   await progress(20, "Estruturando conteúdo...");
-  const estrutura = await arquiteto.run({ estrategia, tipo, num_paginas: num_paginas || paginas, num_capitulos });
+  const estrutura = await arquiteto.run({ estrategia, tipo, num_paginas: paginasCapadas, num_capitulos: capitulosCapados });
 
   await progress(45, "Escrevendo copy...");
-  const copy = await copywriter.run({ estrategia, estrutura, autor: autor || "", tipo, num_paginas: num_paginas || paginas });
+  const copy = await copywriter.run({ estrategia, estrutura, autor: autor || "", tipo, num_paginas: paginasCapadas });
 
   await progress(70, "Gerando capa...");
   let capaBuffer = null;
