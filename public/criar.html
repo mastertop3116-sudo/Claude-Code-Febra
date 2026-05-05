@@ -1333,6 +1333,55 @@ main{position:relative;z-index:auto}
 <!-- ERROR TOAST -->
 <div id="err-box"></div>
 
+<!-- CHIP HANDLER — script isolado, executa independente do script principal -->
+<script>
+(function() {
+  function _chipClick(e) {
+    var chip = e.target.closest ? e.target.closest('.chip') : null;
+    if (!chip) return;
+    var group = chip.closest ? chip.closest('[data-target]') : null;
+    if (!group) return;
+    var el = document.getElementById(group.getAttribute('data-target'));
+    if (!el) return;
+    var val = (chip.textContent || chip.innerText || '').trim();
+    // "usar nome do DNA" → lê o campo DNA se preenchido
+    if (val === 'usar nome do DNA' || val === 'usar nome do autor') {
+      val = (document.getElementById('dna-nome') || {}).value || val;
+    }
+    if (el.tagName === 'TEXTAREA') {
+      el.value = el.value ? el.value + ' ' + val : val;
+    } else {
+      el.value = val;
+    }
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.focus();
+    // Feedback visual no campo
+    el.style.boxShadow = '0 0 0 3px rgba(168,85,247,.6)';
+    el.style.borderColor = 'rgba(168,85,247,.8)';
+    setTimeout(function() { el.style.boxShadow = ''; el.style.borderColor = ''; }, 800);
+    // Feedback visual no chip
+    chip.style.background = 'rgba(168,85,247,.4)';
+    chip.style.color = '#fff';
+    chip.style.transform = 'scale(0.93)';
+    setTimeout(function() { chip.style.background = ''; chip.style.color = ''; chip.style.transform = ''; }, 400);
+    // Toast de confirmação
+    var t = document.getElementById('_chip_toast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = '_chip_toast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;background:#1a1040;color:#c084fc;border:1px solid rgba(168,85,247,.4);border-radius:10px;padding:10px 16px;font-size:13px;font-family:sans-serif;pointer-events:none;transition:opacity .3s;opacity:0';
+      document.body.appendChild(t);
+    }
+    t.textContent = '✓ ' + val;
+    t.style.opacity = '1';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(function() { t.style.opacity = '0'; }, 2000);
+  }
+  document.addEventListener('click', _chipClick);
+  document.addEventListener('touchend', _chipClick);
+})();
+</script>
+
 <script>
   // ---- DNA toggle (colapsável por padrão) ----
   (function() {
@@ -1815,11 +1864,16 @@ main{position:relative;z-index:auto}
     try {
     const titulo = document.getElementById('inp-titulo').value.trim();
     if (!titulo) {
+      const inp = document.getElementById('inp-titulo');
+      inp.focus();
+      inp.style.borderColor = '#FF4757';
+      inp.style.boxShadow = '0 0 0 3px rgba(255,71,87,.4)';
+      setTimeout(() => { inp.style.borderColor = ''; inp.style.boxShadow = ''; }, 1500);
+      inp.scrollIntoView({ behavior: 'smooth', block: 'center' });
       const gb = document.getElementById('btn-gerar');
       gb.classList.remove('shake'); void gb.offsetWidth;
       gb.classList.add('shake'); setTimeout(() => gb.classList.remove('shake'), 400);
-      showErr('Informe o título do entregável antes de gerar.');
-      document.getElementById('inp-titulo').focus();
+      showErr('⚠ Preencha o título do entregável antes de gerar. Use uma das sugestões acima ou escreva o seu.');
       return;
     }
 
@@ -2936,34 +2990,7 @@ main{position:relative;z-index:auto}
     }
   })();
 
-  // ---- field chips (event delegation — robusto contra erros JS anteriores) ----
-  document.addEventListener('click', function(e) {
-    const chip = e.target.closest('.chip');
-    if (!chip) return;
-    const group = chip.closest('[data-target]');
-    if (!group) return;
-    const el = document.getElementById(group.dataset.target);
-    if (!el) return;
-    let val = chip.textContent.trim();
-    if (val === 'usar nome do DNA' || val === 'usar nome do autor' || val === 'usar nome DNA') {
-      val = document.getElementById('dna-nome')?.value.trim() || document.getElementById('inp-autor')?.value.trim() || val;
-    }
-    if (el.tagName === 'TEXTAREA') {
-      el.value = el.value ? el.value + ' ' + val : val;
-    } else {
-      el.value = val;
-    }
-    el.dispatchEvent(new Event('input', { bubbles: true }));
-    el.focus();
-    el.style.boxShadow = '0 0 0 3px rgba(168,85,247,.55)';
-    el.style.borderColor = 'var(--accent)';
-    setTimeout(() => { el.style.boxShadow = ''; el.style.borderColor = ''; }, 800);
-    chip.style.background = 'rgba(168,85,247,.35)';
-    chip.style.color = '#fff';
-    chip.style.transform = 'scale(0.93)';
-    setTimeout(() => { chip.style.background = ''; chip.style.color = ''; chip.style.transform = ''; }, 400);
-    toast('✓ ' + val, '✅');
-  });
+  // chips tratados pelo script isolado acima do main script
 
   // ---- carousel theme selector ----
   document.querySelectorAll('[data-car-theme]').forEach(el => {
