@@ -33,6 +33,11 @@
   .logo .nexus{color:var(--accent);font-weight:800}
   .logo .forge{color:var(--text-2);font-weight:400}
   .logo small{font-family:"DM Mono",monospace;font-weight:400;font-size:11px;color:var(--text-3);margin-left:2px;letter-spacing:0}
+  .max-logo{gap:0!important}
+  .max-divider{width:1px;height:26px;background:rgba(255,255,255,.18);margin:0 10px;flex-shrink:0}
+  .max-text{display:flex;flex-direction:column;gap:2px}
+  .max-name{font-size:16px;font-weight:800;color:#f0f0f0;letter-spacing:.04em;font-family:"Bricolage Grotesque",sans-serif;line-height:1}
+  .max-by{font-size:9px;font-weight:500;color:rgba(255,255,255,.38);letter-spacing:.16em;text-transform:uppercase;font-family:"DM Mono",monospace;line-height:1}
   .nav-mid{display:flex;gap:28px}
   .nav-mid a{color:var(--text-2);text-decoration:none;font-size:14px;font-weight:500;transition:color .15s}
   .nav-mid a:hover{color:var(--accent)}
@@ -475,11 +480,23 @@ main{position:relative;z-index:auto}
 <div class="app-shell">
 <aside class="sidebar" id="sidebar">
   <div class="sb-logo">
-    <div class="logo">
-      <div class="mark"></div>
-      <span><span class="nexus">NEXUS</span><span class="forge">&nbsp;FORGE</span></span>
+    <div class="logo max-logo">
+      <svg width="26" height="26" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+        <defs>
+          <linearGradient id="max-grad" x1="15" y1="2" x2="15" y2="28" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#F2F2F2"/>
+            <stop offset="55%" stop-color="#ABABAB"/>
+            <stop offset="100%" stop-color="#6A6A6A"/>
+          </linearGradient>
+        </defs>
+        <path d="M3 24V9L12 18L15 5L18 18L27 9V24" stroke="url(#max-grad)" stroke-width="2.6" stroke-linejoin="miter" stroke-linecap="square" fill="none"/>
+      </svg>
+      <div class="max-divider"></div>
+      <div class="max-text">
+        <span class="max-name">MAX</span>
+        <span class="max-by">BY NEXUS</span>
+      </div>
     </div>
-    <div class="sb-tag">studio · 2026</div>
   </div>
   <nav class="sb-nav">
     <span class="sb-section">Criar</span>
