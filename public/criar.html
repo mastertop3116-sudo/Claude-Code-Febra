@@ -3689,84 +3689,86 @@ main{position:relative;z-index:auto}
       : THEME_PREVIEW[thm] || {cover:'#142B1A', accent:'#F06292'};
     const ML = Math.round(W*0.09);
 
+    // ── fundo + gradientes de atmosfera ──
     ctx.fillStyle = t.cover; ctx.fillRect(0,0,W,H);
 
-    const rg = ctx.createLinearGradient(W*0.55,0,W,0);
-    rg.addColorStop(0,'rgba(0,0,0,0)'); rg.addColorStop(1,hexRgba(t.accent,0.12));
-    ctx.fillStyle=rg; ctx.fillRect(0,0,W,H);
+    // glow diagonal no canto superior esquerdo
+    const gl = ctx.createRadialGradient(0, 0, 0, 0, 0, W*0.75);
+    gl.addColorStop(0, hexRgba(t.accent,0.18)); gl.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=gl; ctx.fillRect(0,0,W,H);
 
-    const sg = ctx.createRadialGradient(ML*1.5,H*0.1,0,ML*1.5,H*0.1,W*0.8);
-    sg.addColorStop(0,hexRgba(t.accent,0.16)); sg.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=sg; ctx.fillRect(0,0,W,H);
+    // escurecimento sutil no canto inferior direito
+    const dr = ctx.createRadialGradient(W,H,0,W,H,W*0.7);
+    dr.addColorStop(0,'rgba(0,0,0,0.35)'); dr.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=dr; ctx.fillRect(0,0,W,H);
 
-    ctx.fillStyle=t.accent; ctx.fillRect(0,0,W,4);
-
-    ctx.fillStyle=t.accent; ctx.fillRect(ML-2, H*0.20, 3, H*0.32);
-
-    ctx.save(); ctx.globalAlpha=0.04;
-    ctx.font='bold '+Math.round(H*0.65)+'px sans-serif';
-    ctx.fillStyle='#fff'; ctx.textAlign='right';
-    ctx.fillText('1', W-ML/2, H*0.84);
-    ctx.textAlign='left'; ctx.restore();
-
-    const bFS=Math.max(8,Math.round(W*0.034));
-    ctx.font='600 '+bFS+'px "DM Mono",monospace,sans-serif';
-    const bTW=ctx.measureText(tipo).width, bPad=W*0.04, bH=bFS*2;
-    const bY=H*0.175;
+    // ── badge tipo (topo esquerdo) ──
+    const bFS=Math.max(8,Math.round(W*0.032));
+    ctx.font='700 '+bFS+'px "DM Mono",monospace,sans-serif';
+    const bTW=ctx.measureText(tipo).width, bPad=W*0.038, bH=bFS*2.1, bY=H*0.055, bR=4;
     ctx.fillStyle=t.accent;
-    if(ctx.roundRect){ctx.beginPath();ctx.roundRect(ML,bY,bTW+bPad*2,bH,3);ctx.fill();}
+    if(ctx.roundRect){ctx.beginPath();ctx.roundRect(ML,bY,bTW+bPad*2,bH,bR);ctx.fill();}
     else{ctx.fillRect(ML,bY,bTW+bPad*2,bH);}
-    ctx.fillStyle='#050811'; ctx.fillText(tipo,ML+bPad,bY+bH*0.73);
+    ctx.fillStyle='#050811'; ctx.fillText(tipo,ML+bPad,bY+bH*0.71);
 
-    const pbFS=Math.max(7,Math.round(W*0.028)), pbTxt=paginas+' pg';
+    // ── página (topo direito) ──
+    const pbFS=Math.max(7,Math.round(W*0.026)), pbTxt=paginas+' pg';
     ctx.font='600 '+pbFS+'px "DM Mono",monospace,sans-serif';
-    const pbW=ctx.measureText(pbTxt).width+W*0.046, pbH2=pbFS*2.2;
-    const pbX=W-ML/2-pbW, pbY2=H*0.028;
-    ctx.fillStyle=hexRgba(t.accent,0.15);
-    if(ctx.roundRect){ctx.beginPath();ctx.roundRect(pbX,pbY2,pbW,pbH2,3);ctx.fill();}
+    const pbW=ctx.measureText(pbTxt).width+W*0.044, pbH2=pbFS*2.1;
+    const pbX=W-ML-pbW, pbY2=H*0.055;
+    ctx.fillStyle=hexRgba(t.accent,0.18);
+    if(ctx.roundRect){ctx.beginPath();ctx.roundRect(pbX,pbY2,pbW,pbH2,bR);ctx.fill();}
     else{ctx.fillRect(pbX,pbY2,pbW,pbH2);}
-    ctx.fillStyle=t.accent; ctx.globalAlpha=0.85; ctx.textAlign='center';
-    ctx.fillText(pbTxt, pbX+pbW/2, pbY2+pbH2*0.73);
+    ctx.fillStyle=t.accent; ctx.globalAlpha=0.9; ctx.textAlign='center';
+    ctx.fillText(pbTxt, pbX+pbW/2, pbY2+pbH2*0.71);
     ctx.textAlign='left'; ctx.globalAlpha=1;
 
-    const tFS=Math.max(14,Math.round(W*0.092));
-    const tFont='700 '+tFS+'px "Bricolage Grotesque","Arial Black",sans-serif';
-    const tLines=wrapLines(ctx,titulo,tFont,W*0.65);
-    const tLH=tFS*1.2;
-    let tY=H*0.275;
+    // ── título ──
+    const tFS=Math.max(14,Math.round(W*0.094));
+    const tFont='800 '+tFS+'px "Bricolage Grotesque","Arial Black",sans-serif';
+    const tLines=wrapLines(ctx,titulo,tFont,W*0.82);
+    const tLH=tFS*1.18;
+    let tY=H*0.24;
     ctx.fillStyle='#fff';
-    tLines.slice(0,3).forEach(l=>{ ctx.font=tFont; ctx.fillText(l,ML,tY); tY+=tLH; });
+    tLines.slice(0,4).forEach(l=>{ ctx.font=tFont; ctx.fillText(l,ML,tY); tY+=tLH; });
 
-    ctx.fillStyle=t.accent; ctx.fillRect(ML,tY+2,W*0.16,3);
+    // linha separadora curta sob o título
+    ctx.fillStyle=t.accent; ctx.globalAlpha=0.7;
+    ctx.fillRect(ML,tY+6,W*0.12,2);
+    ctx.globalAlpha=1;
 
+    // ── subtítulo ──
     if(subtitulo){
-      const sFS=Math.max(9,Math.round(W*0.042));
-      const sFont=sFS+'px "DM Sans",Arial,sans-serif';
-      const sLines=wrapLines(ctx,subtitulo,sFont,W*0.68);
-      let sY=tY+tFS*0.85;
-      ctx.globalAlpha=0.65; ctx.fillStyle='#fff';
-      sLines.slice(0,3).forEach(l=>{ ctx.font=sFont; ctx.fillText(l,ML,sY); sY+=sFS*1.55; });
+      const sFS=Math.max(9,Math.round(W*0.038));
+      const sFont='400 '+sFS+'px "DM Sans",Arial,sans-serif';
+      const sLines=wrapLines(ctx,subtitulo,sFont,W*0.80);
+      let sY=tY+tFS*0.9;
+      ctx.globalAlpha=0.6; ctx.fillStyle='#fff';
+      sLines.slice(0,2).forEach(l=>{ ctx.font=sFont; ctx.fillText(l,ML,sY); sY+=sFS*1.5; });
       ctx.globalAlpha=1;
     }
 
-    const footY=H*0.82;
+    // ── rodapé ──
+    const footY=H*0.80;
     const fg=ctx.createLinearGradient(0,footY,0,H);
-    fg.addColorStop(0,'rgba(0,0,0,0)'); fg.addColorStop(0.4,'rgba(0,0,0,0.55)'); fg.addColorStop(1,'rgba(0,0,0,0.75)');
+    fg.addColorStop(0,'rgba(0,0,0,0)'); fg.addColorStop(0.5,'rgba(0,0,0,0.6)'); fg.addColorStop(1,'rgba(0,0,0,0.85)');
     ctx.fillStyle=fg; ctx.fillRect(0,footY,W,H-footY);
 
     if(autor){
-      const aFS=Math.max(8,Math.round(W*0.037));
+      const aFS=Math.max(8,Math.round(W*0.034));
       ctx.font='600 '+aFS+'px "DM Sans",Arial,sans-serif';
-      ctx.fillStyle=t.accent; ctx.textAlign='center';
-      ctx.fillText(autor,W/2,footY+(H-footY)*0.55);
-      ctx.textAlign='left';
+      ctx.fillStyle='#fff'; ctx.globalAlpha=0.9; ctx.textAlign='center';
+      ctx.fillText(autor,W/2,footY+(H-footY)*0.52);
+      ctx.textAlign='left'; ctx.globalAlpha=1;
     }
 
+    // barra inferior accent
     ctx.fillStyle=t.accent; ctx.fillRect(0,H-3,W,3);
 
-    ctx.globalAlpha=0.38; ctx.fillStyle='#fff';
-    ctx.font=Math.max(6,Math.round(W*0.025))+'px "DM Mono",monospace,sans-serif';
-    ctx.fillText('NEXUS FORGE',ML,H-Math.round(H*0.014));
+    // branding
+    ctx.globalAlpha=0.3; ctx.fillStyle='#fff';
+    ctx.font=Math.max(6,Math.round(W*0.024))+'px "DM Mono",monospace,sans-serif';
+    ctx.fillText('NEXUS FORGE',ML,H-Math.round(H*0.013));
     ctx.globalAlpha=1;
   }
 
