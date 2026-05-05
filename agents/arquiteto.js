@@ -37,7 +37,10 @@ async function run({ estrategia, tipo, num_paginas, num_capitulos }) {
     const prompt = `Tipo: pregações prontas\nNúmero de pregações: ${num_capitulos || 6}\nPáginas: ${num_paginas || 20}\nEstratégia: ${JSON.stringify(estrategia)}`
     return _parse(await openaiJson(prompt, SYSTEM_PREGACOES))
   }
-  const prompt = `Tipo: ${tipo}\nPáginas: ${num_paginas || 'auto'}\nCapítulos: ${num_capitulos || 'auto'}\nEstratégia: ${JSON.stringify(estrategia)}`
+  const pags = parseInt(num_paginas) || 15
+  // Cada capítulo ocupa ~2 páginas; ajusta limites conforme tamanho solicitado
+  const capsCalc = num_capitulos || Math.min(Math.max(3, Math.round(pags / 2)), 14)
+  const prompt = `Tipo: ${tipo}\nPáginas solicitadas: ${pags}\nNúmero EXATO de capítulos: ${capsCalc}\nGere EXATAMENTE ${capsCalc} entradas no índice — nem mais, nem menos.\nEstratégia: ${JSON.stringify(estrategia)}`
   return _parse(await openaiJson(prompt, SYSTEM))
 }
 

@@ -305,6 +305,7 @@
   .gamma-theme-card .gtc-check{width:16px;height:16px;border-radius:50%;border:1.5px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:9px;color:transparent;flex-shrink:0}
   .gamma-theme-card.active .gtc-check{background:var(--accent);border-color:var(--accent);color:#050811;content:"✓"}
   .gamma-theme-card .gtc-none-preview{width:100%;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(168,85,247,.06),rgba(168,85,247,.02));border-bottom:1px solid var(--border);color:var(--text-3);font-size:11px;font-family:"DM Mono",monospace;letter-spacing:.08em}
+  .gamma-theme-card .gtc-css-preview{width:100%;aspect-ratio:16/10;display:flex;flex-direction:column;padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.06);box-sizing:border-box;overflow:hidden}
   .carousel-slides-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
   .slide-thumb-wrap{position:relative;cursor:pointer;border-radius:10px;overflow:hidden;border:1.5px solid var(--border);transition:border-color .15s,transform .12s;aspect-ratio:1}
   .slide-thumb-wrap:hover{border-color:var(--accent);transform:scale(1.02)}
@@ -1503,14 +1504,148 @@ main{position:relative;z-index:auto}
   let _gammaThemeName       = 'Padrão';
 
   // ---- Seletor de tema Gamma ----
+  // Paleta CSS de fallback por nome de tema (quando preview_url está vazio)
+  const _GAMMA_PALETTES = {
+    'padrão':       { bg:'#0d0d14', stripe:'#a855f7' },
+    'alien':        { bg:'#050f05', stripe:'#39ff14' },
+    'ash':          { bg:'#111111', stripe:'#9ca3af' },
+    'ashrose':      { bg:'#150a0d', stripe:'#e07b9b' },
+    'atacama':      { bg:'#120900', stripe:'#e8a83e' },
+    'atmosphere':   { bg:'#030b1a', stripe:'#4a9eff' },
+    'aurora':       { bg:'#041208', stripe:'#00e882' },
+    'aurum':        { bg:'#0f0b00', stripe:'#ffd700' },
+    'basic dark':   { bg:'#0a0a0a', stripe:'#ffffff' },
+    'basic light':  { bg:'#f2f2f2', stripe:'#1a1a1a' },
+    'bloom':        { bg:'#130a10', stripe:'#f472b6' },
+    'blueprint':    { bg:'#020d1a', stripe:'#3b82f6' },
+    'bold':         { bg:'#0a0a0a', stripe:'#ef4444' },
+    'brand':        { bg:'#06020f', stripe:'#c084fc' },
+    'celestial':    { bg:'#04071a', stripe:'#818cf8' },
+    'cinematic':    { bg:'#080808', stripe:'#f59e0b' },
+    'clean':        { bg:'#ffffff', stripe:'#374151' },
+    'cloud':        { bg:'#e8f0fe', stripe:'#4285f4' },
+    'code':         { bg:'#0d1117', stripe:'#58a6ff' },
+    'cosmos':       { bg:'#020413', stripe:'#a78bfa' },
+    'cream':        { bg:'#fdf6e3', stripe:'#92400e' },
+    'crimson':      { bg:'#120004', stripe:'#dc2626' },
+    'cyber':        { bg:'#000a1a', stripe:'#00fff5' },
+    'dark':         { bg:'#0a0a0a', stripe:'#6b7280' },
+    'dawn':         { bg:'#fff7ed', stripe:'#ea580c' },
+    'dusk':         { bg:'#1e1b4b', stripe:'#f97316' },
+    'earth':        { bg:'#1a1008', stripe:'#a16207' },
+    'eclipse':      { bg:'#0a0010', stripe:'#7c3aed' },
+    'ember':        { bg:'#130400', stripe:'#f97316' },
+    'emerald':      { bg:'#042b1a', stripe:'#10b981' },
+    'fresh':        { bg:'#f0fdf4', stripe:'#16a34a' },
+    'frost':        { bg:'#f0f9ff', stripe:'#0284c7' },
+    'galaxy':       { bg:'#010213', stripe:'#6366f1' },
+    'glow':         { bg:'#050510', stripe:'#e879f9' },
+    'gold':         { bg:'#0f0a00', stripe:'#ca8a04' },
+    'gradient':     { bg:'#0f0f1a', stripe:'#a855f7' },
+    'green':        { bg:'#052e10', stripe:'#22c55e' },
+    'grove':        { bg:'#0a1a08', stripe:'#4ade80' },
+    'haze':         { bg:'#f8f9fa', stripe:'#6b7280' },
+    'ice':          { bg:'#f0f8ff', stripe:'#38bdf8' },
+    'indigo':       { bg:'#030620', stripe:'#6366f1' },
+    'jade':         { bg:'#022615', stripe:'#34d399' },
+    'lava':         { bg:'#150200', stripe:'#f87171' },
+    'lemon':        { bg:'#fefce8', stripe:'#ca8a04' },
+    'light':        { bg:'#f9fafb', stripe:'#374151' },
+    'lime':         { bg:'#f7fee7', stripe:'#65a30d' },
+    'mango':        { bg:'#fff7ed', stripe:'#f97316' },
+    'marble':       { bg:'#f5f5f4', stripe:'#57534e' },
+    'midnight':     { bg:'#000510', stripe:'#818cf8' },
+    'minimal':      { bg:'#fafafa', stripe:'#1f2937' },
+    'mint':         { bg:'#f0fdf4', stripe:'#059669' },
+    'mist':         { bg:'#f1f5f9', stripe:'#64748b' },
+    'mocha':        { bg:'#1a0e08', stripe:'#a16207' },
+    'mono':         { bg:'#111111', stripe:'#ffffff' },
+    'moonlight':    { bg:'#0a0a1a', stripe:'#c7d2fe' },
+    'moss':         { bg:'#0d1a08', stripe:'#84cc16' },
+    'navy':         { bg:'#020b1a', stripe:'#60a5fa' },
+    'neon':         { bg:'#020202', stripe:'#00ff88' },
+    'night':        { bg:'#050510', stripe:'#94a3b8' },
+    'noir':         { bg:'#080808', stripe:'#d1d5db' },
+    'ocean':        { bg:'#031a2e', stripe:'#0ea5e9' },
+    'olive':        { bg:'#0f150a', stripe:'#84cc16' },
+    'onyx':         { bg:'#0a0a0a', stripe:'#6b7280' },
+    'orchid':       { bg:'#150515', stripe:'#c026d3' },
+    'pastel':       { bg:'#fdf2f8', stripe:'#ec4899' },
+    'pearl':        { bg:'#fafaf9', stripe:'#a8a29e' },
+    'pine':         { bg:'#071a08', stripe:'#16a34a' },
+    'pink':         { bg:'#1a0010', stripe:'#f472b6' },
+    'plum':         { bg:'#0f0318', stripe:'#a21caf' },
+    'powder':       { bg:'#eff6ff', stripe:'#3b82f6' },
+    'prism':        { bg:'#06020f', stripe:'#e879f9' },
+    'professional': { bg:'#0a0f1a', stripe:'#3b82f6' },
+    'purple':       { bg:'#0a0118', stripe:'#9333ea' },
+    'quartz':       { bg:'#fdf2f8', stripe:'#db2777' },
+    'red':          { bg:'#150002', stripe:'#ef4444' },
+    'rose':         { bg:'#150008', stripe:'#f43f5e' },
+    'royal':        { bg:'#02041a', stripe:'#7c3aed' },
+    'ruby':         { bg:'#150003', stripe:'#e11d48' },
+    'sage':         { bg:'#0f1a0f', stripe:'#86efac' },
+    'sand':         { bg:'#1a1208', stripe:'#d97706' },
+    'sapphire':     { bg:'#02031a', stripe:'#2563eb' },
+    'sea':          { bg:'#021a15', stripe:'#0d9488' },
+    'shadow':       { bg:'#080808', stripe:'#6b7280' },
+    'silver':       { bg:'#1a1a1a', stripe:'#d1d5db' },
+    'sky':          { bg:'#f0f9ff', stripe:'#0ea5e9' },
+    'slate':        { bg:'#0f172a', stripe:'#94a3b8' },
+    'smoke':        { bg:'#f9fafb', stripe:'#9ca3af' },
+    'snow':         { bg:'#f8fafc', stripe:'#cbd5e1' },
+    'solar':        { bg:'#1a0f00', stripe:'#fbbf24' },
+    'space':        { bg:'#020412', stripe:'#6366f1' },
+    'spring':       { bg:'#f0fdf4', stripe:'#22c55e' },
+    'steel':        { bg:'#0f172a', stripe:'#94a3b8' },
+    'storm':        { bg:'#060c18', stripe:'#60a5fa' },
+    'summer':       { bg:'#fff7ed', stripe:'#f59e0b' },
+    'sunset':       { bg:'#1a0a00', stripe:'#fb923c' },
+    'teal':         { bg:'#021a18', stripe:'#14b8a6' },
+    'terra':        { bg:'#1a0c05', stripe:'#b45309' },
+    'titanium':     { bg:'#0d0d0d', stripe:'#9ca3af' },
+    'topaz':        { bg:'#061a1a', stripe:'#06b6d4' },
+    'twilight':     { bg:'#0f0a1a', stripe:'#818cf8' },
+    'ultra':        { bg:'#050510', stripe:'#a855f7' },
+    'velvet':       { bg:'#120018', stripe:'#9333ea' },
+    'violet':       { bg:'#0a0018', stripe:'#8b5cf6' },
+    'vivid':        { bg:'#0a0010', stripe:'#f0abfc' },
+    'warm':         { bg:'#1a1008', stripe:'#fbbf24' },
+    'white':        { bg:'#ffffff', stripe:'#1f2937' },
+    'wine':         { bg:'#150004', stripe:'#be123c' },
+    'winter':       { bg:'#f0f9ff', stripe:'#38bdf8' },
+    'wood':         { bg:'#1a0e04', stripe:'#92400e' },
+    'zinc':         { bg:'#111111', stripe:'#a1a1aa' },
+  };
+
+  function _gammaPalette(nome) {
+    const key = (nome || '').toLowerCase().trim();
+    return _GAMMA_PALETTES[key] || { bg:'#0d0d1a', stripe:'#a855f7' };
+  }
+
   function makeGammaCard(id, nome, previewUrl, active) {
     const el = document.createElement('div');
     el.className = 'gamma-theme-card' + (active ? ' active' : '');
     el.dataset.id = id;
+    const pal = _gammaPalette(nome);
+    const isLight = parseInt(pal.bg.slice(1, 3), 16) > 180;
+    const textColor = isLight ? '#1a1a1a' : '#f0f0f0';
     const previewHTML = previewUrl
-      ? `<img class="gtc-preview" src="${previewUrl}" alt="${nome}" loading="lazy" onerror="this.style.display='none'">`
-      : `<div class="gtc-none-preview">PADRÃO</div>`;
-    el.innerHTML = `${previewHTML}<div class="gtc-body"><span class="gtc-name">${nome}</span><span class="gtc-check">✓</span></div>`;
+      ? `<img class="gtc-preview" src="${previewUrl}" alt="${nome}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling&&(this.nextElementSibling.style.display='flex')">`
+      : '';
+    const cssPreview = `<div class="gtc-css-preview" style="background:${pal.bg};color:${textColor}">
+        <div style="width:100%;height:3px;background:${pal.stripe};border-radius:2px;margin-bottom:6px"></div>
+        <div style="width:70%;height:5px;background:${pal.stripe};opacity:.7;border-radius:2px;margin-bottom:4px"></div>
+        <div style="width:50%;height:3px;background:${textColor};opacity:.2;border-radius:2px;margin-bottom:8px"></div>
+        <div style="display:flex;gap:3px">
+          <div style="flex:1;height:18px;background:${pal.stripe};opacity:.12;border-radius:2px"></div>
+          <div style="flex:1;height:18px;background:${pal.stripe};opacity:.12;border-radius:2px"></div>
+        </div>
+        <div style="margin-top:auto;width:35%;height:8px;background:${pal.stripe};border-radius:3px;align-self:flex-start"></div>
+      </div>`;
+    el.innerHTML = `${previewHTML}${cssPreview}<div class="gtc-body"><span class="gtc-name">${nome}</span><span class="gtc-check">✓</span></div>`;
+    // Se tiver imagem real, ocultar o CSS preview por padrão
+    if (previewUrl) el.querySelector('.gtc-css-preview').style.display = 'none';
     el.addEventListener('click', () => {
       document.querySelectorAll('.gamma-theme-card').forEach(c => c.classList.remove('active'));
       el.classList.add('active');
@@ -1972,16 +2107,25 @@ main{position:relative;z-index:auto}
       await new Promise((resolve, reject) => {
         const es = new EventSource('/api/criar/progress/' + jobId);
         _activeEventSource = es;
-        es.onmessage = e => {
+        es.onmessage = async e => {
           const d = JSON.parse(e.data);
           if (d.error) { es.close(); reject(new Error(d.error)); return; }
           if (d.progress !== undefined) setProgress(d.progress, d.message);
           if (d.done) {
             es.close();
             _stopDicas();
-            setProgress(100, 'Pronto!');
-            showSuccess(d, payload.titulo);
-            resolve(d);
+            setProgress(100, 'Baixando resultado…');
+            // Busca payload pesado (pdf/docx) separado — evita SSE com 80KB+ que pode ser descartado
+            try {
+              const r = await fetch('/api/criar/result/' + jobId);
+              if (!r.ok) throw new Error('resultado HTTP ' + r.status);
+              const resultado = await r.json();
+              setProgress(100, 'Pronto!');
+              showSuccess(resultado, payload.titulo);
+              resolve(resultado);
+            } catch (fetchErr) {
+              reject(new Error('Geração concluída mas falha ao baixar resultado: ' + fetchErr.message));
+            }
           }
         };
         es.onerror = () => { es.close(); _stopDicas(); reject(new Error('Conexão perdida — tente novamente.')); };

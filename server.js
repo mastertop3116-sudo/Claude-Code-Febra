@@ -61,7 +61,7 @@ app.get("/criar", (req, res) => {
 // Jobs em memória: jobId → { status, progress, message, result, error }
 const criarJobs = new Map();
 function limparJobsAntigos() {
-  const limite = Date.now() - 10 * 60 * 1000; // 10 min
+  const limite = Date.now() - 30 * 60 * 1000; // 30 min (pdf fica disponível para fetch)
   for (const [id, job] of criarJobs.entries()) {
     if (job.criadoEm < limite) criarJobs.delete(id);
   }
@@ -222,12 +222,11 @@ app.get("/api/criar/progress/:jobId", (req, res) => {
     enviar({ progress: job.progress, message: job.message, status: job.status });
 
     if (job.status === "done") {
-      enviar({ done: true, titulo: job.titulo, pdf: job.pdf, pdfFilename: job.pdfFilename,
-        docx: job.docx, docxFilename: job.docxFilename, gammaUrl: job.gammaUrl, gammaSource: job.gammaSource,
-        copyContracapa: job.copyContracapa || "" });
+      // Envia só o sinal leve — payload pesado (pdf/docx base64) fica no job para fetch separado
+      enviar({ done: true, titulo: job.titulo });
       clearInterval(tick);
-      criarJobs.delete(jobId);
       res.end();
+      // NÃO deleta o job aqui — frontend busca via GET /api/criar/result/:jobId
     } else if (job.status === "error") {
       enviar({ error: job.message });
       clearInterval(tick);
@@ -237,6 +236,25 @@ app.get("/api/criar/progress/:jobId", (req, res) => {
   }, 600);
 
   req.on("close", () => clearInterval(tick));
+});
+
+// GET /api/criar/result/:jobId → retorna payload completo (pdf, docx, gammaUrl) após conclusão
+app.get("/api/criar/result/:jobId", (req, res) => {
+  const job = criarJobs.get(req.params.jobId);
+  if (!job) return res.status(404).json({ error: "Resultado não encontrado ou expirado" });
+  if (job.status !== "done") return res.status(202).json({ status: job.status, progress: job.progress });
+  const result = {
+    titulo: job.titulo,
+    pdf: job.pdf,
+    pdfFilename: job.pdfFilename,
+    docx: job.docx,
+    docxFilename: job.docxFilename,
+    gammaUrl: job.gammaUrl,
+    gammaSource: job.gammaSource,
+    copyContracapa: job.copyContracapa || "",
+  };
+  criarJobs.delete(req.params.jobId);
+  res.json(result);
 });
 
 // ──────────────────────────────────────────

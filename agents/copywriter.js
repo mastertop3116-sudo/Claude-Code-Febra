@@ -92,7 +92,8 @@ async function run({ estrategia, estrutura, autor, tipo, num_paginas }) {
   // Limita número de seções para evitar timeouts em ebooks grandes (>15 páginas)
   // Regra: ~2 páginas por seção; máx 8 seções por chamada única
   const paginasNum = parseInt(num_paginas) || 0
-  const maxSecoes = paginasNum > 0 ? Math.min(Math.max(3, Math.round(paginasNum / 2)), 8) : 8
+  // ~2 páginas por seção; mín 3, máx 14 (30 pg → 14 seções vs cap antigo de 8)
+  const maxSecoes = paginasNum > 0 ? Math.min(Math.max(3, Math.round(paginasNum / 2)), 14) : 8
 
   const key = _cacheKey(estrategia, estrutura, autor, tipo, maxSecoes)
   if (_cache.has(key)) {
