@@ -1825,7 +1825,7 @@ main{position:relative;z-index:auto}
     if (el) el.addEventListener('click', e => { e.preventDefault(); toast(msg, ico); });
   });
 
-  document.getElementById('nav-novo').addEventListener('click', e => {
+  document.getElementById('nav-novo')?.addEventListener('click', e => {
     e.preventDefault();
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => document.getElementById('inp-titulo').focus(), 400);
@@ -3464,7 +3464,7 @@ main{position:relative;z-index:auto}
 
 // ── WIZARD — "Gerar com IA" (3 perguntas → auto-preenche formulário) ──
 (function(){
-  const modal  = document.getElementById('wiz-modal');
+  function _modal() { return document.getElementById('wiz-modal'); }
   const s1     = document.getElementById('wm-s1');
   const s2     = document.getElementById('wm-s2');
   const s3     = document.getElementById('wm-s3');
@@ -3500,17 +3500,17 @@ main{position:relative;z-index:auto}
     if (av) av.value = '';
     if (ben) ben.value = '';
     showStep(1);
-    modal.classList.add('show');
+    _modal()?.classList.add('show');
   }
 
   function closeWizard() {
-    modal.classList.remove('show');
+    _modal()?.classList.remove('show');
     clearInterval(window._wizTipTimer);
   }
 
   document.getElementById('btn-wizard')?.addEventListener('click', openWizard);
   document.getElementById('wm-cancel')?.addEventListener('click', closeWizard);
-  modal?.addEventListener('click', e => { if (e.target === modal) closeWizard(); });
+  document.addEventListener('click', e => { if (e.target === _modal()) closeWizard(); });
 
   // Nicho cards
   document.querySelectorAll('.wiz-nicho-card').forEach(card => {
