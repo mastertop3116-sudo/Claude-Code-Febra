@@ -1,4 +1,5 @@
 const { openaiJson } = require('../integrations/openai')
+const { jsonrepair } = require('jsonrepair')
 
 const SYSTEM = `Você é um arquiteto de conteúdo para entregáveis digitais.
 Recebe estratégia e tipo. Responda APENAS em JSON válido:
@@ -23,13 +24,21 @@ Responda APENAS em JSON válido:
   "cta_principal": "string"
 }`
 
+function _parse(raw) {
+  try {
+    return JSON.parse(raw)
+  } catch (_) {
+    return JSON.parse(jsonrepair(raw))
+  }
+}
+
 async function run({ estrategia, tipo, num_paginas, num_capitulos }) {
   if (tipo === 'pregacoes') {
     const prompt = `Tipo: pregações prontas\nNúmero de pregações: ${num_capitulos || 6}\nPáginas: ${num_paginas || 20}\nEstratégia: ${JSON.stringify(estrategia)}`
-    return JSON.parse(await openaiJson(prompt, SYSTEM_PREGACOES))
+    return _parse(await openaiJson(prompt, SYSTEM_PREGACOES))
   }
   const prompt = `Tipo: ${tipo}\nPáginas: ${num_paginas || 'auto'}\nCapítulos: ${num_capitulos || 'auto'}\nEstratégia: ${JSON.stringify(estrategia)}`
-  return JSON.parse(await openaiJson(prompt, SYSTEM))
+  return _parse(await openaiJson(prompt, SYSTEM))
 }
 
 module.exports = { run }

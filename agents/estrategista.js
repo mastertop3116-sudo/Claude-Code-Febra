@@ -1,4 +1,5 @@
 const { openaiJson } = require('../integrations/openai')
+const { jsonrepair } = require('jsonrepair')
 
 const SYSTEM = `Você é um estrategista de marketing de infoprodutos brasileiros.
 Analise nicho, título e avatar. Responda APENAS em JSON válido:
@@ -20,7 +21,12 @@ async function run({ titulo, subtitulo, nicho, avatar_publico, tipo, relatorio =
     ? `\nRelatório de mercado:\n${relatorio.slice(0, 3000)}`
     : "";
   const prompt = `Tipo: ${tipo}\nTítulo: ${titulo}\nSubtítulo: ${subtitulo || ''}\nNicho: ${nicho}\nAvatar: ${avatar_publico || ''}${contexto}`
-  return JSON.parse(await openaiJson(prompt, SYSTEM))
+  const raw = await openaiJson(prompt, SYSTEM)
+  try {
+    return JSON.parse(raw)
+  } catch (_) {
+    return JSON.parse(jsonrepair(raw))
+  }
 }
 
 module.exports = { run }

@@ -1552,17 +1552,25 @@ async function generate(params) {
 
         if (gammaExportUrl) {
           await progress(92, "⬇️ Baixando PDF do Gamma...")
-          const r = await fetch(gammaExportUrl)
-          if (r.ok) {
-            resultado.pdf = Buffer.from(await r.arrayBuffer())
-            resultado.pdfFilename = `${fileSlug}.pdf`
-            pdfGerado = true
-            resultado.gammaSource = true
-            console.log(`[Gamma] ✅ PDF baixado com sucesso (${resultado.pdf.length} bytes)`)
-            await progress(95, "✅ PDF Gamma pronto!")
-          } else {
-            console.warn(`[Gamma] ❌ Download do PDF falhou: HTTP ${r.status}`)
-            await progress(92, `⚠️ Gamma não entregou o PDF (HTTP ${r.status}) — gerando PDF local...`)
+          try {
+            const ctrl = new AbortController()
+            const timer = setTimeout(() => ctrl.abort(), 45000)
+            const r = await fetch(gammaExportUrl, { signal: ctrl.signal })
+            clearTimeout(timer)
+            if (r.ok) {
+              resultado.pdf = Buffer.from(await r.arrayBuffer())
+              resultado.pdfFilename = `${fileSlug}.pdf`
+              pdfGerado = true
+              resultado.gammaSource = true
+              console.log(`[Gamma] ✅ PDF baixado com sucesso (${resultado.pdf.length} bytes)`)
+              await progress(95, "✅ PDF Gamma pronto!")
+            } else {
+              console.warn(`[Gamma] ❌ Download do PDF falhou: HTTP ${r.status}`)
+              await progress(92, `⚠️ Gamma não entregou o PDF (HTTP ${r.status}) — gerando PDF local...`)
+            }
+          } catch (fetchErr) {
+            console.warn(`[Gamma] ❌ Timeout/erro no download do PDF: ${fetchErr.message}`)
+            await progress(92, "⚠️ Timeout no download Gamma — gerando PDF local...")
           }
         } else {
           // exportUrl ausente após retries — o documento foi gerado no Gamma mas o export
@@ -1585,8 +1593,13 @@ async function generate(params) {
 
     if (!pdfGerado) {
       if (!gammaKey) await progress(90, "Montando PDF (PDFKit)...")
-      resultado.pdf = await gerarPDF(finalConfig, conteudo)
-      resultado.pdfFilename = `${fileSlug}.pdf`
+      try {
+        resultado.pdf = await gerarPDF(finalConfig, conteudo)
+        resultado.pdfFilename = `${fileSlug}.pdf`
+      } catch (pdfErr) {
+        console.error("[PDFKit] Falha na geração:", pdfErr.message)
+        throw new Error(`Falha ao gerar PDF: ${pdfErr.message}`)
+      }
     }
   }
 
