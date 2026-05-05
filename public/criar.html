@@ -1518,24 +1518,26 @@ main{position:relative;z-index:auto}
   // Retorna { cover, accent } compatível com THEME_PREVIEW
   function _gammaPalette(nome) {
     const key = (nome || '').toLowerCase().replace(/\s+/g,'');
-    // Overrides para temas claros (fundo não é escuro)
-    const light = { 'basiclight':1,'white':1,'clean':1,'fresh':1,'frost':1,'haze':1,'ice':1,
+    const lightSet = { 'basiclight':1,'white':1,'clean':1,'fresh':1,'frost':1,'haze':1,'ice':1,
       'lemon':1,'light':1,'lime':1,'mango':1,'marble':1,'minimal':1,'mint':1,'mist':1,
       'pastel':1,'pearl':1,'powder':1,'sky':1,'smoke':1,'snow':1,'spring':1,'summer':1,'winter':1 };
-    // Hash djb2 → hue único por nome
     let h = 5381;
     for (let i = 0; i < key.length; i++) h = Math.imul(h, 31) + key.charCodeAt(i) | 0;
     h = Math.abs(h);
-    const hue   = h % 360;
-    const sat   = 55 + (h >> 8) % 35;        // 55–90%
-    const isLight = !!light[key];
-    const cover  = isLight
-      ? `hsl(${hue},${(h>>6)%20+5}%,${88+(h>>14)%8}%)`
-      : `hsl(${hue},${(h>>6)%18+8}%,${5+(h>>14)%7}%)`;
-    const accent = isLight
-      ? `hsl(${hue},${sat}%,32%)`
-      : `hsl(${hue},${sat}%,58%)`;
-    return { cover, accent };
+    const hue = h % 360;
+    const sat  = 55 + (h >> 8) % 35;
+    const isLight = !!lightSet[key];
+    function _hsl2hex(hDeg, sSat, lLum) {
+      const s = sSat / 100, l = lLum / 100;
+      const k = n => (n + hDeg / 30) % 12;
+      const a = s * Math.min(l, 1 - l);
+      const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+      return '#' + [f(0), f(8), f(4)].map(x => Math.round(255 * x).toString(16).padStart(2, '0')).join('');
+    }
+    const coverS = isLight ? (h>>6)%20+5  : (h>>6)%18+8;
+    const coverL = isLight ? 88+(h>>14)%8 : 5+(h>>14)%7;
+    const accentL = isLight ? 32 : 58;
+    return { cover: _hsl2hex(hue, coverS, coverL), accent: _hsl2hex(hue, sat, accentL) };
   }
 
   function makeGammaCard(id, nome, previewUrl, active) {
