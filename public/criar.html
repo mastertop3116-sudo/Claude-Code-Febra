@@ -373,6 +373,8 @@
   .conv-result p{font-size:13px;color:var(--text-3);margin:0 0 20px}
   .conv-progress{margin:16px 0;background:rgba(255,255,255,.07);border-radius:999px;height:6px;overflow:hidden}
   .conv-progress-fill{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-3));transition:width .4s ease}
+  .btn-ghost{display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid var(--border);color:var(--text-2);border-radius:8px;padding:6px 14px;font-size:13px;cursor:pointer;margin-bottom:18px;transition:all .15s}
+  .btn-ghost:hover{border-color:var(--border-hi);color:var(--text)}
   .conv-status-msg{font-size:12px;color:var(--text-3);font-style:italic;text-align:center;margin-top:8px;min-height:18px}
   /* spotlight — background reacts to mouse */
   #mouse-glow{
@@ -947,7 +949,7 @@ main{position:relative;z-index:auto}
 
       <!-- CONVERSOR PDF ↔ DOCX -->
       <section class="card" data-showon="conv">
-        <button onclick="window.switchMode('ent')" style="display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid var(--border);color:var(--text-2);border-radius:8px;padding:6px 14px;font-size:13px;cursor:pointer;margin-bottom:18px;transition:all .15s" onmouseover="this.style.borderColor='var(--border-hi)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-2)'">← Voltar</button>
+        <button class="btn-ghost" onclick="window.switchMode('ent')">← Voltar</button>
         <h2><span class="n">🔄</span>Conversor de Documentos<span class="hint">mantém texto · formatos complexos simplificados</span></h2>
 
         <!-- Upload zone -->
@@ -1250,7 +1252,7 @@ main{position:relative;z-index:auto}
     <div id="gen-overlay-sub" class="gen-overlay-sub"></div>
     <div id="gen-tip" class="gen-tip"></div>
     <div style="text-align:center;margin-top:20px">
-      <button id="btn-cancelar" style="background:none;border:1px solid rgba(255,255,255,.12);color:#666;border-radius:8px;padding:7px 18px;font-size:12px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(255,255,255,.3)';this.style.color='#aaa'" onmouseout="this.style.borderColor='rgba(255,255,255,.12)';this.style.color='#666'">Cancelar</button>
+      <button id="btn-cancelar" class="btn-ghost" style="padding:7px 18px;font-size:12px;margin-bottom:0;border-color:rgba(255,255,255,.12);color:#666">Cancelar</button>
     </div>
   </div>
 </div>
@@ -1477,33 +1479,22 @@ main{position:relative;z-index:auto}
       pv.style.borderColor = 'rgba(168,85,247,.45)';
       pv.style.boxShadow = '0 1px 0 rgba(255,255,255,.13) inset,0 40px 100px -20px rgba(0,0,0,.9),0 0 40px -10px rgba(168,85,247,.2)';
       document.querySelector('.preview .brand').style.color = 'var(--accent)';
-    } else if (selectedGammaThemeId) {
-      const t = _gammaPalette(_gammaThemeName);
-      pv.style.backgroundImage = [
-        `radial-gradient(ellipse 70% 22% at 22% 7%, rgba(255,255,255,.10), transparent 55%)`,
-        `radial-gradient(ellipse 80% 55% at 50% 10%, ${t.accent}50, transparent 65%)`,
-        `radial-gradient(ellipse 55% 38% at 95% 95%, ${t.accent}22, transparent 60%)`,
-        `linear-gradient(170deg, ${t.cover}f5 0%, ${t.cover} 50%, ${t.cover}dd 100%)`
-      ].join(', ');
-      pv.style.backgroundSize = '';
-      pv.style.backgroundPosition = '';
-      pv.style.borderColor = `${t.accent}70`;
-      pv.style.boxShadow = `0 1px 0 rgba(255,255,255,.13) inset,0 40px 100px -20px rgba(0,0,0,.9),0 0 50px -15px ${t.accent}30`;
-      document.querySelector('.preview .brand').style.color = t.accent;
-    } else {
-      const t = THEME_PREVIEW[selectedTheme] || THEME_PREVIEW.bemestar;
-      pv.style.backgroundImage = [
-        `radial-gradient(ellipse 70% 22% at 22% 7%, rgba(255,255,255,.10), transparent 55%)`,
-        `radial-gradient(ellipse 80% 55% at 50% 10%, ${t.accent}50, transparent 65%)`,
-        `radial-gradient(ellipse 55% 38% at 95% 95%, ${t.accent}22, transparent 60%)`,
-        `linear-gradient(170deg, ${t.cover}f5 0%, ${t.cover} 50%, ${t.cover}dd 100%)`
-      ].join(', ');
-      pv.style.backgroundSize = '';
-      pv.style.backgroundPosition = '';
-      pv.style.borderColor = `${t.accent}70`;
-      pv.style.boxShadow = `0 1px 0 rgba(255,255,255,.13) inset,0 40px 100px -20px rgba(0,0,0,.9),0 0 50px -15px ${t.accent}30`;
-      document.querySelector('.preview .brand').style.color = t.accent;
+      return;
     }
+    const t = selectedGammaThemeId
+      ? _gammaPalette(_gammaThemeName)
+      : THEME_PREVIEW[selectedTheme] || THEME_PREVIEW.bemestar;
+    pv.style.backgroundImage = [
+      `radial-gradient(ellipse 70% 22% at 22% 7%, rgba(255,255,255,.10), transparent 55%)`,
+      `radial-gradient(ellipse 80% 55% at 50% 10%, ${t.accent}50, transparent 65%)`,
+      `radial-gradient(ellipse 55% 38% at 95% 95%, ${t.accent}22, transparent 60%)`,
+      `linear-gradient(170deg, ${t.cover}f5 0%, ${t.cover} 50%, ${t.cover}dd 100%)`
+    ].join(', ');
+    pv.style.backgroundSize = '';
+    pv.style.backgroundPosition = '';
+    pv.style.borderColor = `${t.accent}70`;
+    pv.style.boxShadow = `0 1px 0 rgba(255,255,255,.13) inset,0 40px 100px -20px rgba(0,0,0,.9),0 0 50px -15px ${t.accent}30`;
+    document.querySelector('.preview .brand').style.color = t.accent;
   }
 
   let selectedTheme        = 'bemestar';
@@ -1515,10 +1506,17 @@ main{position:relative;z-index:auto}
   let _gammaThemeName       = 'Padrão';
 
   // ---- Seletor de tema Gamma ----
-  // Paleta de tema Gamma — gerador determinístico por nome (hash → hue único)
-  // Retorna { cover, accent } compatível com THEME_PREVIEW
+  function _hsl2hex(hDeg, sSat, lLum) {
+    const s = sSat / 100, l = lLum / 100;
+    const k = n => (n + hDeg / 30) % 12;
+    const a = s * Math.min(l, 1 - l);
+    const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    return '#' + [f(0), f(8), f(4)].map(x => Math.round(255 * x).toString(16).padStart(2, '0')).join('');
+  }
+  let _gpCache = { key: null, val: null };
   function _gammaPalette(nome) {
     const key = (nome || '').toLowerCase().replace(/\s+/g,'');
+    if (_gpCache.key === key) return _gpCache.val;
     const lightSet = { 'basiclight':1,'white':1,'clean':1,'fresh':1,'frost':1,'haze':1,'ice':1,
       'lemon':1,'light':1,'lime':1,'mango':1,'marble':1,'minimal':1,'mint':1,'mist':1,
       'pastel':1,'pearl':1,'powder':1,'sky':1,'smoke':1,'snow':1,'spring':1,'summer':1,'winter':1 };
@@ -1528,27 +1526,19 @@ main{position:relative;z-index:auto}
     const hue = h % 360;
     const sat  = 55 + (h >> 8) % 35;
     const isLight = !!lightSet[key];
-    function _hsl2hex(hDeg, sSat, lLum) {
-      const s = sSat / 100, l = lLum / 100;
-      const k = n => (n + hDeg / 30) % 12;
-      const a = s * Math.min(l, 1 - l);
-      const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
-      return '#' + [f(0), f(8), f(4)].map(x => Math.round(255 * x).toString(16).padStart(2, '0')).join('');
-    }
     const coverS = isLight ? (h>>6)%20+5  : (h>>6)%18+8;
     const coverL = isLight ? 88+(h>>14)%8 : 5+(h>>14)%7;
-    const accentL = isLight ? 32 : 58;
-    return { cover: _hsl2hex(hue, coverS, coverL), accent: _hsl2hex(hue, sat, accentL) };
+    const val = { cover: _hsl2hex(hue, coverS, coverL), accent: _hsl2hex(hue, sat, isLight ? 32 : 58), isLight };
+    _gpCache = { key, val };
+    return val;
   }
 
   function makeGammaCard(id, nome, previewUrl, active) {
     const el = document.createElement('div');
     el.className = 'gamma-theme-card' + (active ? ' active' : '');
     el.dataset.id = id;
-    const pal = _gammaPalette(nome); // { cover, accent }
-    // Detecta tema claro pelo cover (hsl high lightness ou hex claro)
-    const coverLum = pal.cover.startsWith('hsl') ? parseInt(pal.cover.match(/,(\d+)%\)$/)?.[1]||'10') : parseInt(pal.cover.slice(1,3),16);
-    const isLight = coverLum > 70;
+    const pal = _gammaPalette(nome);
+    const isLight = pal.isLight;
     const textColor = isLight ? '#1a1a1a' : '#f0f0f0';
     const previewHTML = previewUrl
       ? `<img class="gtc-preview" src="${previewUrl}" alt="${nome}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling&&(this.nextElementSibling.style.display='flex')">`
@@ -1573,7 +1563,6 @@ main{position:relative;z-index:auto}
       _gammaThemeName = nome;
       document.getElementById('s-theme').textContent = nome;
       updatePreviewColors();
-      if (window._renderCoverCanvas) window._renderCoverCanvas();
     });
     return el;
   }
@@ -2741,7 +2730,9 @@ main{position:relative;z-index:auto}
 
   // ---- slide preview colors follow theme ----
   function updateSlidePreviewColors() {
-    const t = THEME_PREVIEW[selectedTheme] || THEME_PREVIEW.bemestar;
+    const t = selectedGammaThemeId
+      ? _gammaPalette(_gammaThemeName)
+      : THEME_PREVIEW[selectedTheme] || THEME_PREVIEW.bemestar;
     const ps = document.getElementById('preview-slide');
     if (!ps) return;
     ps.style.background = [
@@ -3692,10 +3683,10 @@ main{position:relative;z-index:auto}
     const paginas   = (document.getElementById('inp-paginas')?.value)||'15';
     const tipoRaw   = (document.getElementById('type-label')?.textContent)||'Ebook';
     const tipo      = tipoRaw.split('/')[0].trim().toUpperCase();
-    const thm       = (typeof selectedTheme!=='undefined'?selectedTheme:'bemestar');
-    const t         = (typeof selectedGammaThemeId!=='undefined'&&selectedGammaThemeId&&typeof _gammaPalette==='function')
-      ? _gammaPalette(typeof _gammaThemeName!=='undefined'?_gammaThemeName:'')
-      : (typeof THEME_PREVIEW!=='undefined'?THEME_PREVIEW[thm]:null)||{cover:'#142B1A',accent:'#F06292'};
+    const thm       = selectedTheme;
+    const t         = selectedGammaThemeId
+      ? _gammaPalette(_gammaThemeName)
+      : THEME_PREVIEW[thm] || {cover:'#142B1A', accent:'#F06292'};
     const ML = Math.round(W*0.09);
 
     ctx.fillStyle = t.cover; ctx.fillRect(0,0,W,H);
