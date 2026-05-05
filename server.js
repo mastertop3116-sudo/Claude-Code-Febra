@@ -195,6 +195,7 @@ app.post("/api/criar", (req, res) => {
         docxFilename: resultado.docxFilename,
         gammaUrl: resultado.gammaUrl || null,
         gammaSource: resultado.gammaSource || false,
+        copyContracapa: resultado.copyContracapa || "",
       });
     })
     .catch(e => {
@@ -222,7 +223,8 @@ app.get("/api/criar/progress/:jobId", (req, res) => {
 
     if (job.status === "done") {
       enviar({ done: true, titulo: job.titulo, pdf: job.pdf, pdfFilename: job.pdfFilename,
-        docx: job.docx, docxFilename: job.docxFilename, gammaUrl: job.gammaUrl, gammaSource: job.gammaSource });
+        docx: job.docx, docxFilename: job.docxFilename, gammaUrl: job.gammaUrl, gammaSource: job.gammaSource,
+        copyContracapa: job.copyContracapa || "" });
       clearInterval(tick);
       criarJobs.delete(jobId);
       res.end();
@@ -654,6 +656,54 @@ app.post("/api/github/webhook", async (req, res) => {
 // Health check
 // ──────────────────────────────────────────
 app.get("/", (req, res) => res.json({ status: "NEXUS online", version: "1.0.0" }));
+
+// ──────────────────────────────────────────
+// ElevenLabs — Narração de texto
+// ──────────────────────────────────────────
+const ELEVEN_VOICES = {
+  rodrigo: "onwK4e9ZLuTAKqWW3bGI", // Adam — voz masculina padrão PT-BR
+  feminino: "21m00Tcm4TlvDq8ikWAM", // Rachel — voz feminina
+  profissional: "AZnzlk1XvdvUeBnXmlld", // Domi
+};
+
+app.post("/api/narrar", async (req, res) => {
+  const { texto, voz = "rodrigo" } = req.body;
+  if (!texto || !texto.trim()) return res.status(400).json({ error: "texto obrigatório" });
+
+  const apiKey = process.env.ELEVENLABS_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: "ELEVENLABS_API_KEY não configurado no servidor" });
+
+  const voiceId = ELEVEN_VOICES[voz] || ELEVEN_VOICES.rodrigo;
+  const textoLimpo = texto.replace(/[*#_`~]/g, "").trim().slice(0, 5000);
+
+  try {
+    const r = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+      method: "POST",
+      headers: {
+        "xi-api-key": apiKey,
+        "Content-Type": "application/json",
+        "Accept": "audio/mpeg",
+      },
+      body: JSON.stringify({
+        text: textoLimpo,
+        model_id: "eleven_multilingual_v2",
+        voice_settings: { stability: 0.45, similarity_boost: 0.80, style: 0.2, use_speaker_boost: true },
+      }),
+    });
+
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      console.error("[/api/narrar] ElevenLabs error:", err);
+      return res.status(r.status).json({ error: err?.detail?.message || "Erro na ElevenLabs" });
+    }
+
+    const buffer = Buffer.from(await r.arrayBuffer());
+    res.json({ audio: buffer.toString("base64"), formato: "mp3" });
+  } catch (e) {
+    console.error("[/api/narrar]", e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
 
 // ──────────────────────────────────────────
 // Inicia servidor

@@ -1280,6 +1280,27 @@ main{position:relative;z-index:auto}
     </div>
 
     <div class="dl-row" id="dl-row"></div>
+
+    <!-- Narração ElevenLabs -->
+    <div id="narr-section" style="display:none;margin-top:20px;padding:16px;background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.18);border-radius:12px;text-align:left">
+      <div style="font-size:13px;color:var(--text-2);margin-bottom:10px;font-weight:600;letter-spacing:.03em">🎙 NARRAÇÃO DE IA</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <select id="narr-voz" style="background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text-1);border-radius:8px;padding:7px 12px;font-size:12px;flex:1;min-width:140px">
+          <option value="rodrigo">Adam — Masculino</option>
+          <option value="feminino">Rachel — Feminino</option>
+          <option value="profissional">Domi — Profissional</option>
+        </select>
+        <button id="btn-narrar" onclick="gerarNarracao()" style="background:linear-gradient(135deg,rgba(168,85,247,.25),rgba(168,85,247,.12));border:1px solid rgba(168,85,247,.4);color:var(--accent);border-radius:8px;padding:8px 16px;font-size:12px;cursor:pointer;white-space:nowrap;transition:all .2s">
+          🎙 Gerar Narração
+        </button>
+      </div>
+      <div id="narr-status" style="font-size:11px;color:var(--text-3);margin-top:6px;min-height:16px"></div>
+      <audio id="narr-audio" controls style="display:none;width:100%;margin-top:10px;border-radius:8px;accent-color:var(--accent)"></audio>
+      <div id="narr-dl" style="display:none;margin-top:8px">
+        <a id="narr-dl-link" class="dl-btn" style="font-size:12px;padding:7px 14px;display:inline-block">⬇ Baixar MP3</a>
+      </div>
+    </div>
+
     <div style="margin-top:16px">
       <button class="dl-btn reset" onclick="resetForm()">🔁 Criar outro entregável</button>
     </div>
@@ -1992,6 +2013,45 @@ main{position:relative;z-index:auto}
     } catch(e) { console.warn('[PDF preview]', e.message); }
   }
 
+  // Texto disponível para narração (preenchido após geração)
+  let _narrTexto = '';
+
+  async function gerarNarracao() {
+    if (!_narrTexto) return;
+    const btn = document.getElementById('btn-narrar');
+    const status = document.getElementById('narr-status');
+    const audio = document.getElementById('narr-audio');
+    const dlWrap = document.getElementById('narr-dl');
+    const voz = document.getElementById('narr-voz').value;
+    btn.disabled = true;
+    btn.textContent = '⏳ Gerando…';
+    status.textContent = 'Conectando ao ElevenLabs…';
+    audio.style.display = 'none';
+    dlWrap.style.display = 'none';
+    try {
+      const r = await fetch('/api/narrar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ texto: _narrTexto, voz }),
+      });
+      const json = await r.json();
+      if (!r.ok) throw new Error(json.error || 'Erro na narração');
+      const src = 'data:audio/mpeg;base64,' + json.audio;
+      audio.src = src;
+      audio.style.display = 'block';
+      const link = document.getElementById('narr-dl-link');
+      link.href = src;
+      link.download = 'narracao.mp3';
+      dlWrap.style.display = 'block';
+      status.textContent = '✅ Narração pronta! Ouça abaixo ou baixe o MP3.';
+    } catch (e) {
+      status.textContent = '⚠ ' + e.message;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '🎙 Gerar Narração';
+    }
+  }
+
   function showSuccess(data, titulo) {
     document.getElementById('overlay-prog').classList.remove('show');
     const nomeDoc = data.titulo || titulo;
@@ -2049,6 +2109,21 @@ main{position:relative;z-index:auto}
         note.textContent = 'Seu documento está pronto no Gamma. Você pode baixar o PDF diretamente na plataforma (botão Export).';
         row.appendChild(note);
       }
+    }
+    // Narração — usa texto da contracapa se disponível
+    const narrSection = document.getElementById('narr-section');
+    const narrStatus = document.getElementById('narr-status');
+    const narrAudio = document.getElementById('narr-audio');
+    const narrDl = document.getElementById('narr-dl');
+    if (data.copyContracapa) {
+      _narrTexto = data.copyContracapa;
+      narrSection.style.display = 'block';
+      narrStatus.textContent = '';
+      narrAudio.style.display = 'none';
+      if (narrDl) narrDl.style.display = 'none';
+    } else {
+      _narrTexto = '';
+      narrSection.style.display = 'none';
     }
     document.getElementById('overlay-ok').classList.add('show');
   }

@@ -1597,7 +1597,7 @@ async function generate(params) {
   }
 
   await progress(100, "Pronto.");
-  return { ...resultado, slides };
+  return { ...resultado, slides, copyContracapa: copy.copy_contracapa || "", copyCapa: copy.copy_capa || "" };
 }
 
 // ──────────────────────────────────────────
