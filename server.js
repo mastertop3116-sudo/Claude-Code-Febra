@@ -673,6 +673,29 @@ app.post("/api/github/webhook", async (req, res) => {
 });
 
 // ──────────────────────────────────────────
+// Gamma — diagnóstico rápido sem geração completa
+// GET /api/gamma-test → lista temas e verifica conectividade
+// ──────────────────────────────────────────
+app.get("/api/gamma-test", async (req, res) => {
+  const apiKey = process.env.GAMMA_API_KEY;
+  if (!apiKey) return res.status(500).json({ ok: false, error: "GAMMA_API_KEY não configurada" });
+  try {
+    const r = await fetch("https://public-api.gamma.app/v1.0/themes", {
+      headers: { "X-API-KEY": apiKey, "Content-Type": "application/json" },
+    });
+    if (!r.ok) {
+      const body = await r.text();
+      return res.status(r.status).json({ ok: false, status: r.status, error: body.slice(0, 300) });
+    }
+    const data = await r.json();
+    const temas = (data.data || []).slice(0, 5).map(t => ({ id: t.id, nome: t.name }));
+    res.json({ ok: true, key_prefix: apiKey.slice(0, 8) + "…", temas_sample: temas, total_temas: (data.data || []).length });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// ──────────────────────────────────────────
 // Health check
 // ──────────────────────────────────────────
 app.get("/", (req, res) => res.json({ status: "NEXUS online", version: "1.0.0" }));

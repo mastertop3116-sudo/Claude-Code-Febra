@@ -43,9 +43,9 @@ async function gerarEntregavel(inputText, { formato = 'document', numCards = 10,
   if (data.warnings) console.log(`[Gamma] Avisos da API: ${data.warnings}`)
   console.log(`[Gamma] Geração iniciada — ID: ${generationId}`)
 
-  // Timeout de 120s para aguardar geração (documentos podem demorar mais)
+  // Timeout de 180s — documentos grandes precisam de mais tempo
   const start = Date.now()
-  while (Date.now() - start < 120_000) {
+  while (Date.now() - start < 180_000) {
     const status = await _fetch(`/generations/${generationId}`)
 
     if (status.status === 'completed') {
@@ -95,14 +95,15 @@ async function gerarEntregavel(inputText, { formato = 'document', numCards = 10,
     }
 
     if (status.status === 'failed') {
-      throw new Error(`[Gamma] Geração falhou — ID: ${generationId}`)
+      const motivo = status.error || status.errorMessage || status.failureReason || status.reason || ''
+      throw new Error(`[Gamma] Geração falhou — ID: ${generationId}${motivo ? ' · ' + motivo : ''}`)
     }
 
     console.log(`[Gamma] Status: ${status.status} — aguardando...`)
     await new Promise(r => setTimeout(r, 5000))
   }
 
-  throw new Error('[Gamma] Timeout após 120 segundos aguardando geração')
+  throw new Error('[Gamma] Timeout após 180 segundos aguardando geração')
 }
 
 // Endpoint /api/gamma — cria apresentação a partir de título + conteúdo livre

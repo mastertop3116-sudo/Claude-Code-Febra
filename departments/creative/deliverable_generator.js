@@ -1416,24 +1416,45 @@ async function gerarDOCX(config, conteudo) {
 }
 
 // ──────────────────────────────────────────
-// Formata o conteúdo gerado como Markdown para o Gamma
+// Formata conteúdo como Markdown para Gamma
+// IMPORTANTE: inputText tem limite de ~8.000 chars na API Gamma.
+// Envia estrutura condensada (títulos + ganchos + bullet points).
+// Conteúdo completo vai no PDF local via PDFKit — Gamma gera o design visual.
 // ──────────────────────────────────────────
 function _markdownParaGamma(titulo, subtitulo, autor, estrategia, copy) {
   const l = [`# ${titulo}`]
   if (subtitulo) l.push(`### ${subtitulo}`)
   if (copy.copy_capa) l.push('', `> ${copy.copy_capa}`)
+
   if (estrategia.promessa_central) {
-    l.push('', '## Introdução', '', estrategia.promessa_central)
+    // Introdução: apenas primeiros 400 chars
+    l.push('', '## Introdução', '', estrategia.promessa_central.slice(0, 400))
   }
+
   for (const s of (copy.secoes || [])) {
     l.push('', `## ${s.titulo}`)
+    // Gancho como subtítulo em itálico
     if (s.gancho) l.push('', `*${s.gancho}*`)
-    if (s.conteudo) l.push('', s.conteudo)
-    if (s.ponto_de_acao) l.push('', `**Próximo passo:** ${s.ponto_de_acao}`)
+    // Conteúdo: extrai até 3 bullet points ou primeiros 300 chars
+    if (s.conteudo) {
+      const linhas = s.conteudo.split('\n').filter(Boolean)
+      const bullets = linhas.filter(ln => /^[-*•]|\d+\./.test(ln.trim())).slice(0, 3)
+      if (bullets.length >= 2) {
+        bullets.forEach(b => l.push(b.trim()))
+      } else {
+        l.push('', s.conteudo.slice(0, 300) + (s.conteudo.length > 300 ? '…' : ''))
+      }
+    }
+    // Ação
+    if (s.ponto_de_acao) l.push('', `> **Ação:** ${s.ponto_de_acao.slice(0, 120)}`)
   }
-  if (copy.copy_contracapa) l.push('', '## Conclusão', '', copy.copy_contracapa)
+
+  if (copy.copy_contracapa) l.push('', '## Conclusão', '', copy.copy_contracapa.slice(0, 300))
   if (autor) l.push('', '---', `*Por ${autor}*`)
-  return l.join('\n')
+
+  const result = l.join('\n')
+  // Hard cap: 8.000 chars — API Gamma retorna 400 se exceder
+  return result.length > 8000 ? result.slice(0, 7900) + '\n\n*...*' : result
 }
 
 // ──────────────────────────────────────────
@@ -1534,14 +1555,17 @@ async function generate(params) {
         const { gerarEntregavel } = require("../../integrations/gamma")
         const gammaFormato = ["script_vsl"].includes(tipo) ? "presentation" : "document"
         const inputText = _markdownParaGamma(titulo, subtitulo, autor || "", estrategia, copy)
+        const inputLen = inputText.length
+        // Limita numCards: cada card precisa de ~500 chars no input; cap 12 para evitar timeout
+        const cardsIdeal = Math.min((copy.secoes?.length || 7) + 2, 12)
         const gammaOpts = {
           formato: gammaFormato,
-          numCards: Math.min((copy.secoes?.length || 7) + 3, 30),
+          numCards: cardsIdeal,
           exportar: "pdf",
         }
         if (gammaThemeId) gammaOpts.themeId = gammaThemeId
 
-        console.log(`[Gamma] Iniciando — tema: ${gammaThemeId || "padrão"}, cards: ${gammaOpts.numCards}`)
+        console.log(`[Gamma] Iniciando — tema: ${gammaThemeId || "padrão"}, cards: ${gammaOpts.numCards}, inputLen: ${inputLen}`)
         const gammaResult = await gerarEntregavel(inputText, gammaOpts)
 
         const gammaUrl       = gammaResult.gammaUrl || gammaResult.url
