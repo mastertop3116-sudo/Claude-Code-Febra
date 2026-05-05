@@ -711,6 +711,6 @@ app.post("/api/narrar", async (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
   console.log(`NEXUS — Servidor rodando na porta ${PORT}`);
-  console.log(`[Gamma] API KEY: ${process.env.GAMMA_API_KEY ? "✅ configurada (" + process.env.GAMMA_API_KEY.slice(0,8) + "...)" : "❌ NÃO CONFIGURADA — geração PDF usará apenas PDFKit"}`);
+  console.log(`[Gamma] API KEY: ${process.env.GAMMA_API_KEY ? "✅ configurada" : "❌ NÃO CONFIGURADA — geração PDF usará apenas PDFKit"}`);
   await registerWebhook();
 });
