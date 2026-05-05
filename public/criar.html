@@ -397,10 +397,10 @@
   .gen-preview{margin:0 0 16px;background:rgba(5,8,17,.7);border:1px solid var(--border);border-radius:10px;padding:14px 16px;min-height:52px;font-size:13px;color:#9ca3b8;line-height:1.6;font-family:"DM Mono",monospace;overflow:hidden}
   .gen-cursor{display:inline-block;width:7px;height:14px;background:#a855f7;margin-left:2px;vertical-align:middle;border-radius:1px;animation:cur-blink .9s step-end infinite}
   @keyframes cur-blink{50%{opacity:0}}
-  .lc-bar-wrap{background:#1a1a22;border-radius:10px;height:8px;overflow:hidden;position:relative;margin-bottom:14px}
-  .lc-bar{height:100%;width:0%;background:linear-gradient(90deg,#a855f7,#facc15);border-radius:10px;transition:width .5s ease;position:relative}
-  .lc-bar::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);animation:lc-shimmer 1.8s ease-in-out infinite}
-  @keyframes lc-shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+  .lc-bar-wrap{background:#1a1a22;border-radius:10px;height:10px;overflow:hidden;position:relative;margin-bottom:14px}
+  .lc-bar-wrap::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.18) 50%,transparent 100%);animation:lc-shimmer 2s linear infinite;pointer-events:none}
+  .lc-bar{height:100%;width:0%;background:linear-gradient(90deg,#a855f7,#ec4899,#facc15);border-radius:10px;transition:width .6s ease;box-shadow:0 0 10px rgba(168,85,247,.5)}
+  @keyframes lc-shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
   .lc-status{display:block;font-size:13px;color:#888;min-height:20px}
   .gen-overlay-sub{font-size:12px;color:var(--text-3);margin-top:4px;font-family:"DM Mono",monospace;letter-spacing:.02em;min-height:16px}
   .gen-tip{margin-top:14px;background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.12);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--text-2);line-height:1.55;min-height:38px;transition:opacity .4s}
@@ -1976,9 +1976,8 @@ main{position:relative;z-index:auto}
 
     document.getElementById('btn-gerar').disabled = true;
     setProgress(2, 'Conectando ao servidor…');
-    document.getElementById('gen-overlay-sub').textContent =
-      'Criando seu material personalizado · ' + (TYPE_TIME[selectedType] || '~90s');
     document.getElementById('overlay-prog').classList.add('show');
+    _startElapsed();
 
     // Dicas cíclicas durante a espera
     const _DICAS = [
@@ -2022,7 +2021,7 @@ main{position:relative;z-index:auto}
           if (d.progress !== undefined) setProgress(d.progress, d.message);
           if (d.done) {
             es.close();
-            _stopDicas();
+            _stopDicas(); _stopElapsed();
             setProgress(100, 'Baixando resultado…');
             // Busca payload pesado (pdf/docx) separado — evita SSE com 80KB+ que pode ser descartado
             try {
@@ -2037,11 +2036,11 @@ main{position:relative;z-index:auto}
             }
           }
         };
-        es.onerror = () => { es.close(); _stopDicas(); reject(new Error('Conexão perdida — tente novamente.')); };
+        es.onerror = () => { es.close(); _stopDicas(); _stopElapsed(); reject(new Error('Conexão perdida — tente novamente.')); };
       });
 
     } catch (err) {
-      _stopDicas();
+      _stopDicas(); _stopElapsed();
       document.getElementById('overlay-prog').classList.remove('show');
       document.getElementById('btn-gerar').disabled = false;
       const rawMsg = err.message || '';
@@ -2056,16 +2055,40 @@ main{position:relative;z-index:auto}
 
     } catch (e) {
       console.error('[btn-gerar]', e);
+      _stopElapsed();
       document.getElementById('overlay-prog')?.classList.remove('show');
       document.getElementById('btn-gerar').disabled = false;
       showErr('⚠ Erro inesperado: ' + (e.message || 'tente novamente'));
     }
   });
 
+  let _realPct = 0, _fakeTimer = null, _elapsedTimer = null, _elapsedStart = 0;
+  function _startElapsed() {
+    _elapsedStart = Date.now();
+    clearInterval(_elapsedTimer);
+    _elapsedTimer = setInterval(() => {
+      const s = Math.floor((Date.now() - _elapsedStart) / 1000);
+      const m = Math.floor(s / 60), ss = String(s % 60).padStart(2,'0');
+      const el = document.getElementById('gen-overlay-sub');
+      if (el) el.textContent = (m ? m+'m '+ss+'s' : ss+'s') + ' decorridos · ' + (TYPE_TIME[selectedType]||'~90s') + ' estimado';
+    }, 1000);
+  }
+  function _stopElapsed() { clearInterval(_elapsedTimer); _elapsedTimer = null; }
   function setProgress(pct, msg) {
-    document.getElementById('prog-fill').style.width = pct + '%';
+    _realPct = pct;
+    const bar = document.getElementById('prog-fill');
+    bar.style.width = pct + '%';
     document.getElementById('prog-pct').textContent = pct + '%';
     document.getElementById('prog-msg').textContent = msg || '';
+    clearTimeout(_fakeTimer);
+    if (pct < 92) {
+      (function creep() {
+        _fakeTimer = setTimeout(() => {
+          const cur = parseFloat(bar.style.width) || 0;
+          if (cur < 92 && cur < _realPct + 10) { bar.style.width = (cur + 0.4) + '%'; creep(); }
+        }, 1800);
+      })();
+    }
   }
 
   let _pdfDoc = null, _pdfPage = 1;

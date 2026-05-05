@@ -108,6 +108,23 @@ Implementado nos commits do Carlinhos (`6e039d8`, `a03f38b`):
 - Ajustar prompts de estrategista/arquiteto para gerar pregações completas
   (texto bíblico + intro + 3 pontos + aplicação + conclusão)
 
+### 17. Preview real do PDF gerado (pós-geração)
+- O preview atual é maquete CSS — não representa o resultado final do Gamma
+- Após geração, renderizar a capa do PDF real usando pdf.js (já importado na página)
+- Mostrar o PDF como imagem real no overlay de sucesso em vez do preview genérico
+- pdf.js já está no projeto (CDN linha 469 de criar.html) — só precisa de conexão com o buffer recebido
+
+### 18. UX — Densidade da tela de criação
+- Muitos campos e chips visíveis ao mesmo tempo sobrecarregam o usuário
+- Solução proposta: wizard por etapas (passo 1: tipo + título → passo 2: nicho + avatar → passo 3: design)
+- Alternativa mais simples: recolher automaticamente campos opcionais até o usuário focar neles
+
+### 19. Meus Entregáveis + Histórico + Modelos (SaaS)
+- 3 botões no sidebar atualmente mostram toast "em breve"
+- Implementar: GET /api/deliverables (lista gerados) + GET /api/historico
+- Necessário para o modelo de assinatura SaaS planejado
+- Depende de: salvar registro no Supabase a cada geração bem-sucedida
+
 ### 7. Dashboard/Studio (sessão dedicada)
 - Seletor de produto cadastrado
 - Histórico de criativos gerados por produto
