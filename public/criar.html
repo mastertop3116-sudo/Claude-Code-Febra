@@ -2936,39 +2936,33 @@ main{position:relative;z-index:auto}
     }
   })();
 
-  // ---- field chips ----
-  document.querySelectorAll('.field-chips').forEach(group => {
-    const targetId = group.dataset.target;
-    group.querySelectorAll('.chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        const el = document.getElementById(targetId);
-        if (!el) return;
-        let val = chip.textContent.trim();
-        if (val === 'usar nome do DNA' || val === 'usar nome do autor' || val === 'usar nome DNA') {
-          val = document.getElementById('dna-nome')?.value.trim() || document.getElementById('inp-autor')?.value.trim() || val;
-        }
-        // Remove "…" do final para não deixar texto incompleto no campo
-        val = val.replace(/[…\.]{1,3}$/, '').trim();
-        if (el.tagName === 'TEXTAREA') {
-          el.value = el.value ? el.value + ' ' + val : val;
-        } else {
-          el.value = val;
-        }
-        el.dispatchEvent(new Event('input', { bubbles: true }));
-        // Scrola o input pra view e pisca a borda para feedback visual
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.focus();
-        el.style.boxShadow = '0 0 0 3px rgba(168,85,247,.55)';
-        el.style.borderColor = 'var(--accent)';
-        setTimeout(() => { el.style.boxShadow = ''; el.style.borderColor = ''; }, 900);
-        chip.style.background = 'rgba(168,85,247,.35)';
-        chip.style.color = '#fff';
-        chip.style.borderColor = 'rgba(168,85,247,.6)';
-        chip.style.transform = 'scale(0.95)';
-        setTimeout(() => { chip.style.background = ''; chip.style.color = ''; chip.style.borderColor = ''; chip.style.transform = ''; }, 600);
-        toast('✓ Aplicado', '✅');
-      });
-    });
+  // ---- field chips (event delegation — robusto contra erros JS anteriores) ----
+  document.addEventListener('click', function(e) {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    const group = chip.closest('[data-target]');
+    if (!group) return;
+    const el = document.getElementById(group.dataset.target);
+    if (!el) return;
+    let val = chip.textContent.trim();
+    if (val === 'usar nome do DNA' || val === 'usar nome do autor' || val === 'usar nome DNA') {
+      val = document.getElementById('dna-nome')?.value.trim() || document.getElementById('inp-autor')?.value.trim() || val;
+    }
+    if (el.tagName === 'TEXTAREA') {
+      el.value = el.value ? el.value + ' ' + val : val;
+    } else {
+      el.value = val;
+    }
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.focus();
+    el.style.boxShadow = '0 0 0 3px rgba(168,85,247,.55)';
+    el.style.borderColor = 'var(--accent)';
+    setTimeout(() => { el.style.boxShadow = ''; el.style.borderColor = ''; }, 800);
+    chip.style.background = 'rgba(168,85,247,.35)';
+    chip.style.color = '#fff';
+    chip.style.transform = 'scale(0.93)';
+    setTimeout(() => { chip.style.background = ''; chip.style.color = ''; chip.style.transform = ''; }, 400);
+    toast('✓ ' + val, '✅');
   });
 
   // ---- carousel theme selector ----
