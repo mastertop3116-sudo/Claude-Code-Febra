@@ -1584,11 +1584,15 @@ async function generate(params) {
         }
       } catch (e) {
         console.warn("[Gamma] ❌ Falha:", e.message)
-        await progress(92, "⚠️ Gamma indisponível — gerando com PDFKit...")
+        // Expõe razão do erro ao usuário (truncado) para diagnóstico
+        const motivo = e.message.length > 100 ? e.message.slice(0, 100) + '…' : e.message
+        resultado.gammaError = motivo
+        await progress(92, `⚠️ Gamma falhou (${motivo}) — gerando com PDFKit...`)
       }
     } else {
       console.warn("[Gamma] ⚠️ GAMMA_API_KEY não configurada — usando PDFKit direto")
-      await progress(88, "Montando PDF...")
+      resultado.gammaError = 'GAMMA_API_KEY não configurada no Render'
+      await progress(88, "Montando PDF (Gamma sem chave)...")
     }
 
     if (!pdfGerado) {

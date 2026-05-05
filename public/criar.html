@@ -1249,6 +1249,11 @@ main{position:relative;z-index:auto}
     <div class="lc-bar-wrap"><div class="lc-bar" id="prog-fill"></div></div>
     <span class="lc-status" id="prog-msg">Iniciando…</span>
     <div id="prog-pct" style="display:none">0%</div>
+    <!-- Timer proeminente -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin:10px 0 4px">
+      <div id="gen-elapsed-display" style="font-size:28px;font-family:'DM Mono',monospace;font-weight:700;color:var(--accent);letter-spacing:.04em;opacity:0;transition:opacity .5s">0s</div>
+      <div style="font-size:11px;color:var(--text-3);line-height:1.4;text-align:left">tempo<br>decorrido</div>
+    </div>
     <div id="gen-overlay-sub" class="gen-overlay-sub"></div>
     <div id="gen-tip" class="gen-tip"></div>
     <div style="text-align:center;margin-top:20px">
@@ -1281,10 +1286,10 @@ main{position:relative;z-index:auto}
     <div id="narr-section" style="display:none;margin-top:20px;padding:16px;background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.18);border-radius:12px;text-align:left">
       <div style="font-size:13px;color:var(--text-2);margin-bottom:10px;font-weight:600;letter-spacing:.03em">🎙 NARRAÇÃO DE IA</div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <select id="narr-voz" style="background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text-1);border-radius:8px;padding:7px 12px;font-size:12px;flex:1;min-width:140px">
-          <option value="rodrigo">Adam — Masculino</option>
-          <option value="feminino">Rachel — Feminino</option>
-          <option value="profissional">Domi — Profissional</option>
+        <select id="narr-voz" style="background:#12121e;border:1px solid var(--border);color:var(--text-1);border-radius:8px;padding:7px 12px;font-size:12px;flex:1;min-width:140px">
+          <option value="rodrigo" style="background:#12121e;color:#e2e8f0">Liam — Masculino</option>
+          <option value="feminino" style="background:#12121e;color:#e2e8f0">Rachel — Feminino</option>
+          <option value="profissional" style="background:#12121e;color:#e2e8f0">George — Profissional</option>
         </select>
         <button id="btn-narrar" onclick="gerarNarracao()" style="background:linear-gradient(135deg,rgba(168,85,247,.25),rgba(168,85,247,.12));border:1px solid rgba(168,85,247,.4);color:var(--accent);border-radius:8px;padding:8px 16px;font-size:12px;cursor:pointer;white-space:nowrap;transition:all .2s">
           🎙 Gerar Narração
@@ -1417,6 +1422,7 @@ main{position:relative;z-index:auto}
   const TYPE_TIME = {
     ebook: '~120s', workbook: '~100s', checklist: '~45s',
     planner: '~60s', script_vsl: '~60s', cheat_sheet: '~40s', certificado: '~20s',
+    pregacoes: '~90s',
   };
   const TYPE_CAPS_HINT = {
     ebook: 'Sugestão: 8–15 capítulos', workbook: 'Sugestão: 6–12 capítulos',
@@ -2062,18 +2068,34 @@ main{position:relative;z-index:auto}
     }
   });
 
-  let _realPct = 0, _fakeTimer = null, _elapsedTimer = null, _elapsedStart = 0;
+  let _realPct = 0, _fakeTimer = null, _elapsedTimer = null, _elapsedStart = 0, _elapsedFinal = 0;
+
+  function _fmtSeconds(s) {
+    const m = Math.floor(s / 60), ss = String(s % 60).padStart(2,'0');
+    return m ? m + 'm ' + ss + 's' : ss + 's';
+  }
+
   function _startElapsed() {
     _elapsedStart = Date.now();
+    _elapsedFinal = 0;
     clearInterval(_elapsedTimer);
     _elapsedTimer = setInterval(() => {
       const s = Math.floor((Date.now() - _elapsedStart) / 1000);
-      const m = Math.floor(s / 60), ss = String(s % 60).padStart(2,'0');
       const el = document.getElementById('gen-overlay-sub');
-      if (el) el.textContent = (m ? m+'m '+ss+'s' : ss+'s') + ' decorridos · ' + (TYPE_TIME[selectedType]||'~90s') + ' estimado';
+      const timer = document.getElementById('gen-elapsed-display');
+      const est = TYPE_TIME[selectedType] || '~90s';
+      if (el) el.textContent = '⏱ ' + _fmtSeconds(s) + ' decorridos · estimado ' + est;
+      if (timer) {
+        timer.textContent = _fmtSeconds(s);
+        timer.style.opacity = '1';
+      }
     }, 1000);
   }
-  function _stopElapsed() { clearInterval(_elapsedTimer); _elapsedTimer = null; }
+  function _stopElapsed() {
+    _elapsedFinal = Math.floor((Date.now() - _elapsedStart) / 1000);
+    clearInterval(_elapsedTimer);
+    _elapsedTimer = null;
+  }
   function setProgress(pct, msg) {
     _realPct = pct;
     const bar = document.getElementById('prog-fill');
@@ -2180,7 +2202,6 @@ main{position:relative;z-index:auto}
   function showSuccess(data, titulo) {
     document.getElementById('overlay-prog').classList.remove('show');
     const nomeDoc = data.titulo || titulo;
-    // Mensagem contextual: se só tem Gamma (sem PDF/DOCX local), indica onde está o documento
     const temArquivoLocal = data.pdf || data.docx;
     const okMsg = temArquivoLocal
       ? '"' + nomeDoc + '" gerado com sucesso!'
@@ -2188,6 +2209,33 @@ main{position:relative;z-index:auto}
           ? '"' + nomeDoc + '" criado no Gamma AI — clique abaixo para abrir.'
           : '"' + nomeDoc + '" gerado com sucesso!');
     document.getElementById('ok-msg').textContent = okMsg;
+
+    // Badge de origem: Gamma AI ou PDFKit fallback
+    let badge = document.getElementById('gen-source-badge');
+    if (!badge) {
+      badge = document.createElement('div');
+      badge.id = 'gen-source-badge';
+      badge.style.cssText = 'display:inline-flex;align-items:center;gap:6px;margin:8px auto 0;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.04em';
+      document.getElementById('ok-msg').insertAdjacentElement('afterend', badge);
+    }
+    const tempoStr = _elapsedFinal > 0 ? ' · ' + _fmtSeconds(_elapsedFinal) : '';
+    if (data.gammaSource) {
+      badge.style.background = 'linear-gradient(135deg,rgba(124,58,237,.25),rgba(91,33,182,.15))';
+      badge.style.border = '1px solid rgba(167,139,250,.35)';
+      badge.style.color = '#c4b5fd';
+      badge.textContent = '✦ Gerado com Gamma AI' + tempoStr;
+    } else if (data.gammaError) {
+      badge.style.background = 'rgba(245,158,11,.08)';
+      badge.style.border = '1px solid rgba(245,158,11,.25)';
+      badge.style.color = '#fbbf24';
+      badge.title = data.gammaError;
+      badge.textContent = '⚠ PDFKit (Gamma indisponível)' + tempoStr;
+    } else {
+      badge.style.background = 'rgba(99,102,241,.08)';
+      badge.style.border = '1px solid rgba(99,102,241,.2)';
+      badge.style.color = '#a5b4fc';
+      badge.textContent = '📄 Gerado com PDFKit' + tempoStr;
+    }
     _pdfDoc = null; _pdfPage = 1;
     const canvas = document.getElementById('pdf-cover-canvas');
     if (canvas) canvas.style.display = 'none';

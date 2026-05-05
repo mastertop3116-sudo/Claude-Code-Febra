@@ -195,6 +195,7 @@ app.post("/api/criar", (req, res) => {
         docxFilename: resultado.docxFilename,
         gammaUrl: resultado.gammaUrl || null,
         gammaSource: resultado.gammaSource || false,
+        gammaError: resultado.gammaError || null,
         copyContracapa: resultado.copyContracapa || "",
       });
     })
@@ -251,6 +252,7 @@ app.get("/api/criar/result/:jobId", (req, res) => {
     docxFilename: job.docxFilename,
     gammaUrl: job.gammaUrl,
     gammaSource: job.gammaSource,
+    gammaError: job.gammaError || null,
     copyContracapa: job.copyContracapa || "",
   };
   criarJobs.delete(req.params.jobId);
@@ -679,9 +681,9 @@ app.get("/", (req, res) => res.json({ status: "NEXUS online", version: "1.0.0" }
 // ElevenLabs — Narração de texto
 // ──────────────────────────────────────────
 const ELEVEN_VOICES = {
-  rodrigo: "onwK4e9ZLuTAKqWW3bGI", // Adam — voz masculina padrão PT-BR
-  feminino: "21m00Tcm4TlvDq8ikWAM", // Rachel — voz feminina
-  profissional: "AZnzlk1XvdvUeBnXmlld", // Domi
+  rodrigo:      "TX3LPaxmHKxFdv7VOQHJ", // Liam — masculino (estável)
+  feminino:     "21m00Tcm4TlvDq8ikWAM", // Rachel — feminino (estável)
+  profissional: "JBFqnCBsd6RMkjVDRZzb", // George — profissional (estável)
 };
 
 app.post("/api/narrar", async (req, res) => {
