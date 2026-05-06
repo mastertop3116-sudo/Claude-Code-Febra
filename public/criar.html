@@ -376,10 +376,7 @@
   .vsl-tag-btn:hover{border-color:var(--accent);color:var(--accent)}
   .vsl-tag-btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
   .vsl-tag-btn.primary:hover{filter:brightness(1.1)}
-  /* ── VSL mode: troca aside — preview off, narração on ── */
-  body.type-vsl #preview-card{display:none!important}
-  body.type-vsl .aside-el-note{display:none!important}
-  body.type-vsl #vsl-narr-card{display:flex!important}
+  /* ── VSL mode: aside trocada via JS direto (ver handler tipo script_vsl) ── */
   /* form elements */
   .el-label{font-size:10px;color:var(--text-3);font-family:'DM Mono',monospace;letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px}
   .el-field{position:relative}
@@ -1656,12 +1653,21 @@ main{position:relative;z-index:auto}
       document.getElementById('pv-brand').textContent = 'Nexus Forge · ' + typeLabel.textContent.split('/')[0].trim();
       typeMenu.style.display = 'none';
 
-      // VSL → ativa modo chat
+      // VSL → ativa modo chat, troca aside diretamente
+      const previewCard  = document.getElementById('preview-card');
+      const vslNarrCard  = document.getElementById('vsl-narr-card');
+      const elNote       = document.querySelector('.aside-el-note');
       if (selectedType === 'script_vsl') {
         document.body.classList.add('type-vsl');
+        if (previewCard)  previewCard.style.display  = 'none';
+        if (vslNarrCard)  vslNarrCard.style.display  = 'flex';
+        if (elNote)       elNote.style.display        = 'none';
         if (typeof window._vslInit === 'function') window._vslInit();
       } else {
         document.body.classList.remove('type-vsl');
+        if (previewCard)  previewCard.style.display  = '';
+        if (vslNarrCard)  vslNarrCard.style.display  = 'none';
+        if (elNote)       elNote.style.display        = '';
       }
 
       updateTypeUI(selectedType);
