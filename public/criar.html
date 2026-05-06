@@ -3145,13 +3145,19 @@ main{position:relative;z-index:auto}
     }
 
     function _addElevenLabsTags(text) {
-      // Adiciona tags de aceleração em frases-chave: CTAs e ênfases
       return text
-        .replace(/(Clica no link|Clique aqui|Acesse agora|Garanta agora|Clique no botão)[^.!?]*/gi,
-          m => `<prosody rate="x-fast">${m}</prosody>`)
-        .replace(/(APENAS|SOMENTE|HOJE|AGORA|GRÁTIS)[^\s,;]*/gi,
-          m => `<emphasis level="strong">${m}</emphasis>`)
-        .replace(/([.!?])\s+/g, '$1\n<break time="0.15s"/>\n');
+        // CTAs → entrega acelerada e urgente
+        .replace(/(Clica no (link|botão)|Clique aqui|Acesse agora|Garanta agora|Clique no botão)[^.!?\n]*/gi,
+          m => `[rushed] ${m.trim()}`)
+        // Seções de urgência → tom urgente
+        .replace(/\b(Mas (atenção|cuidado)|Só (até|por)|Última chance|Vagas limitadas|Oferta por tempo)[^.!?\n]*/gi,
+          m => `[urgent] ${m.trim()}`)
+        // Revelações e viradas → tom empolgado
+        .replace(/\b(Mas aí eu descobri|Existe um jeito|Imagina|Olha que incrível|Sabe qual)[^.!?\n]*/gi,
+          m => `[excited] ${m.trim()}`)
+        // Pausas dramáticas após pontuação forte
+        .replace(/([!?])\s{2,}/g, '$1 [dramatic pause] ')
+        .replace(/([.!?])\s+/g, '$1 [pause] ');
     }
 
     async function _send() {
