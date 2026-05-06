@@ -376,7 +376,10 @@
   .vsl-tag-btn:hover{border-color:var(--accent);color:var(--accent)}
   .vsl-tag-btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
   .vsl-tag-btn.primary:hover{filter:brightness(1.1)}
-  /* ── VSL mode: aside trocada via JS direto (ver handler tipo script_vsl) ── */
+  /* VSL mode: esconde aside inteira, mostra estúdio de narração na coluna direita do grid */
+  #vsl-narr-card{display:none}
+  body.type-vsl aside.col{display:none!important}
+  body.type-vsl #vsl-narr-card{display:flex!important}
   /* form elements */
   .el-label{font-size:10px;color:var(--text-3);font-family:'DM Mono',monospace;letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px}
   .el-field{position:relative}
@@ -1260,24 +1263,12 @@ main{position:relative;z-index:auto}
     <!-- ===== RIGHT RAIL ===== -->
     <aside class="col">
       <div class="sticky">
-
-        <!-- CARD A: Preview (infoprodutos / carrossel) — oculto em VSL mode -->
-        <section id="preview-card" class="card" style="padding:22px">
+        <section class="card" style="padding:22px">
           <h2 style="margin-bottom:16px"><span class="n">→</span>Pré-visualização</h2>
           <div class="preview">
-            <div class="pv-elem" id="pve-brand">
-              <div class="brand" id="pv-brand">Nexus Forge · Ebook</div>
-            </div>
-            <div class="pv-elem" id="pve-title">
-              <div class="ttl" id="pv-title">Meu Entregável</div>
-              <div class="sub" id="pv-sub"></div>
-            </div>
-            <div class="pv-elem" id="pve-foot" style="width:100%">
-              <div class="foot" style="width:100%">
-                <span id="pv-autor"></span>
-                <span id="pv-meta">Bem-estar · 15 pg</span>
-              </div>
-            </div>
+            <div class="pv-elem" id="pve-brand"><div class="brand" id="pv-brand">Nexus Forge · Ebook</div></div>
+            <div class="pv-elem" id="pve-title"><div class="ttl" id="pv-title">Meu Entregável</div><div class="sub" id="pv-sub"></div></div>
+            <div class="pv-elem" id="pve-foot" style="width:100%"><div class="foot" style="width:100%"><span id="pv-autor"></span><span id="pv-meta">Bem-estar · 15 pg</span></div></div>
             <canvas id="preview-canvas" style="position:absolute;inset:0;width:100%;height:100%;border-radius:11px;z-index:5"></canvas>
           </div>
           <div class="preview-slide" id="preview-slide">
@@ -1306,94 +1297,83 @@ main{position:relative;z-index:auto}
           <button class="generate" id="btn-gerar">🚀 Gerar Infoproduto</button>
           <div class="small-note" id="gen-time-note">~ 90s · gerado no servidor · sem marca d'água</div>
         </section>
-
-        <!-- CARD B: Estúdio de Narração — visível APENAS em VSL mode -->
-        <section id="vsl-narr-card" class="card" style="padding:22px;display:none;flex-direction:column;gap:16px">
-
-          <!-- Header -->
-          <div style="display:flex;align-items:center;gap:12px">
-            <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,rgba(168,85,247,.25),rgba(168,85,247,.06));border:1px solid rgba(168,85,247,.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🎙</div>
-            <div>
-              <div style="font-size:14px;font-weight:700;font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.01em">Estúdio de Narração</div>
-              <div style="font-size:10px;color:var(--text-3);font-family:'DM Mono',monospace">ElevenLabs · voz profissional com IA</div>
-            </div>
-          </div>
-
-          <!-- API Key -->
-          <div>
-            <div class="el-label">API Key do ElevenLabs</div>
-            <div class="el-field">
-              <input class="el-input" type="password" id="el-api-key" placeholder="sk_xxxxxxxxxxxxxxxx" autocomplete="off" oninput="_elCheckReady()" style="padding-right:36px">
-              <button class="el-eye" id="el-eye-btn" onclick="_elToggleKey()" title="Mostrar/ocultar">👁</button>
-            </div>
-            <div style="font-size:10px;color:var(--text-3);margin-top:5px;font-family:'DM Mono',monospace">
-              <a href="https://elevenlabs.io/app/settings/api-keys" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">Pegar minha API key →</a>
-            </div>
-          </div>
-
-          <!-- Texto da VSL -->
-          <div>
-            <div class="el-label" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
-              <span>Texto da VSL</span>
-              <span id="el-vsl-badge" style="display:none;font-size:9px;background:rgba(168,85,247,.2);color:var(--accent);border-radius:4px;padding:2px 7px;letter-spacing:.06em;font-family:'DM Mono',monospace">✦ AUTO-PREENCHIDO</span>
-            </div>
-            <textarea class="el-input" id="el-vsl-text" rows="6"
-              placeholder="Cole aqui o texto da sua VSL — pode ser gerado pelo chat ao lado ou copiado de qualquer IA..."
-              oninput="_elCheckReady()"
-              style="resize:vertical;min-height:120px;max-height:260px;font-size:11px;line-height:1.6"></textarea>
-          </div>
-
-          <!-- Voz -->
-          <div>
-            <div class="el-label">Voz</div>
-            <select class="el-select" id="el-voice-select" onchange="_elVoiceChange()">
-              <option value="EXAVITQu4vr4xnSDxMaL">Rachel — Feminino (EN/PT)</option>
-              <option value="21m00Tcm4TlvDq8ikWAM">Sarah — Feminino (EN/PT)</option>
-              <option value="pNInz6obpgDQGcFmaJgB">Adam — Masculino (EN)</option>
-              <option value="TxGEqnHWrfWFTfGW9XjX">Josh — Masculino (EN)</option>
-              <option value="custom">Colar ID de voz…</option>
-            </select>
-            <input class="el-input" id="el-voice-custom" placeholder="ID da voz ElevenLabs" style="display:none;margin-top:6px">
-          </div>
-
-          <!-- Gerar -->
-          <button class="el-btn-narrar" id="el-btn-gerar" onclick="_elGerar()" disabled>🎙 Gerar Narração</button>
-          <div class="el-status" id="el-status">Informe a API Key e o texto da VSL</div>
-          <audio class="el-audio" id="el-audio" controls style="display:none;width:100%;border-radius:8px;margin-top:4px"></audio>
-          <div id="el-dl" style="display:none">
-            <a id="el-dl-link" class="vsl-tag-btn" style="display:block;text-align:center;text-decoration:none">⬇ Baixar MP3</a>
-          </div>
-
-          <!-- Separador: sem VSL ainda? -->
-          <div style="border-top:1px solid var(--border);padding-top:14px;display:flex;align-items:center;gap:10px">
-            <div style="font-size:18px">💬</div>
-            <div style="font-size:11px;color:var(--text-3);line-height:1.5">
-              Ainda não tem a VSL? <b style="color:var(--text-2)">Use o chat ao lado</b> — ao terminar, o texto é preenchido automaticamente aqui.
-            </div>
-          </div>
-
-          <!-- Nexus Pro compact -->
-          <div style="background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.15);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px">
-            <div style="display:flex;align-items:center;justify-content:space-between">
-              <div>
-                <div style="font-size:12px;font-weight:700;font-family:'Bricolage Grotesque',sans-serif;color:var(--text)">✦ Nexus Pro</div>
-                <div style="font-size:10px;color:var(--text-3);font-family:'DM Mono',monospace;margin-top:2px">Narração sem precisar de API key</div>
-              </div>
-              <div style="font-size:11px;background:rgba(168,85,247,.18);color:var(--accent);border-radius:6px;padding:3px 8px;font-family:'DM Mono',monospace;white-space:nowrap;font-weight:600">Em breve</div>
-            </div>
-            <div style="font-size:11px;color:var(--text-3);line-height:1.5">Vozes brasileiras nativas · créditos inclusos · R$29/mês</div>
-            <button class="el-waitlist-btn" onclick="_elWaitlist()">📩 Entrar na lista de espera</button>
-          </div>
-
-        </section>
-
-        <!-- Nota ElevenLabs (infoprodutos) — oculta em VSL mode -->
         <div class="aside-el-note" style="margin-top:14px;padding:12px 14px;background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.1);border-radius:10px;display:flex;align-items:center;gap:10px">
           <span style="font-size:14px">🎙</span>
           <span style="font-size:12px;color:var(--text-3);line-height:1.4">Após gerar, você poderá criar a <b style="color:var(--text-2)">narração em áudio</b> do produto com IA (ElevenLabs).</span>
         </div>
       </div>
     </aside>
+
+    <!-- ===== ESTÚDIO DE NARRAÇÃO (VSL mode — 3º filho do grid, ocupa coluna direita) ===== -->
+    <section id="vsl-narr-card" class="card" style="padding:22px;align-self:start;flex-direction:column;gap:16px">
+
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,rgba(168,85,247,.25),rgba(168,85,247,.06));border:1px solid rgba(168,85,247,.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🎙</div>
+        <div>
+          <div style="font-size:14px;font-weight:700;font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.01em">Estúdio de Narração</div>
+          <div style="font-size:10px;color:var(--text-3);font-family:'DM Mono',monospace">ElevenLabs · voz profissional com IA</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="el-label">API Key do ElevenLabs</div>
+        <div class="el-field">
+          <input class="el-input" type="password" id="el-api-key" placeholder="sk_xxxxxxxxxxxxxxxx" autocomplete="off" oninput="_elCheckReady()" style="padding-right:36px">
+          <button class="el-eye" id="el-eye-btn" onclick="_elToggleKey()" title="Mostrar/ocultar">👁</button>
+        </div>
+        <div style="font-size:10px;color:var(--text-3);margin-top:5px;font-family:'DM Mono',monospace">
+          <a href="https://elevenlabs.io/app/settings/api-keys" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">Pegar minha API key →</a>
+        </div>
+      </div>
+
+      <div>
+        <div class="el-label" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+          <span>Texto da VSL</span>
+          <span id="el-vsl-badge" style="display:none;font-size:9px;background:rgba(168,85,247,.2);color:var(--accent);border-radius:4px;padding:2px 7px;letter-spacing:.06em;font-family:'DM Mono',monospace">✦ AUTO-PREENCHIDO</span>
+        </div>
+        <textarea class="el-input" id="el-vsl-text" rows="6"
+          placeholder="Cole aqui o texto da VSL — gerado pelo chat ao lado ou de qualquer outra IA..."
+          oninput="_elCheckReady()"
+          style="resize:vertical;min-height:120px;max-height:260px;font-size:11px;line-height:1.6"></textarea>
+      </div>
+
+      <div>
+        <div class="el-label">Voz</div>
+        <select class="el-select" id="el-voice-select" onchange="_elVoiceChange()">
+          <option value="EXAVITQu4vr4xnSDxMaL">Rachel — Feminino (EN/PT)</option>
+          <option value="21m00Tcm4TlvDq8ikWAM">Sarah — Feminino (EN/PT)</option>
+          <option value="pNInz6obpgDQGcFmaJgB">Adam — Masculino (EN)</option>
+          <option value="TxGEqnHWrfWFTfGW9XjX">Josh — Masculino (EN)</option>
+          <option value="custom">Colar ID de voz…</option>
+        </select>
+        <input class="el-input" id="el-voice-custom" placeholder="ID da voz ElevenLabs" style="display:none;margin-top:6px">
+      </div>
+
+      <button class="el-btn-narrar" id="el-btn-gerar" onclick="_elGerar()" disabled>🎙 Gerar Narração</button>
+      <div class="el-status" id="el-status">Informe a API Key e o texto da VSL</div>
+      <audio class="el-audio" id="el-audio" controls style="display:none;width:100%;border-radius:8px;margin-top:4px"></audio>
+      <div id="el-dl" style="display:none">
+        <a id="el-dl-link" class="vsl-tag-btn" style="display:block;text-align:center;text-decoration:none">⬇ Baixar MP3</a>
+      </div>
+
+      <div style="border-top:1px solid var(--border);padding-top:14px;display:flex;align-items:center;gap:10px">
+        <div style="font-size:16px">💬</div>
+        <div style="font-size:11px;color:var(--text-3);line-height:1.5">Sem VSL? <b style="color:var(--text-2)">Use o chat ao lado</b> — o texto é preenchido aqui automaticamente.</div>
+      </div>
+
+      <div style="background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.15);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:12px;font-weight:700;font-family:'Bricolage Grotesque',sans-serif;color:var(--text)">✦ Nexus Pro</div>
+            <div style="font-size:10px;color:var(--text-3);font-family:'DM Mono',monospace;margin-top:2px">Narração sem precisar de API key</div>
+          </div>
+          <div style="font-size:11px;background:rgba(168,85,247,.18);color:var(--accent);border-radius:6px;padding:3px 8px;font-family:'DM Mono',monospace;font-weight:600">Em breve</div>
+        </div>
+        <div style="font-size:11px;color:var(--text-3);line-height:1.5">Vozes brasileiras nativas · créditos inclusos · R$29/mês</div>
+        <button class="el-waitlist-btn" onclick="_elWaitlist()">📩 Entrar na lista de espera</button>
+      </div>
+
+    </section>
 
   </div>
 
@@ -1653,18 +1633,12 @@ main{position:relative;z-index:auto}
       document.getElementById('pv-brand').textContent = 'Nexus Forge · ' + typeLabel.textContent.split('/')[0].trim();
       typeMenu.style.display = 'none';
 
-      // VSL → ativa modo chat; _init() cuida da troca da aside
+      // VSL mode — CSS cuida da aside (aside.col some, #vsl-narr-card aparece)
       if (selectedType === 'script_vsl') {
         document.body.classList.add('type-vsl');
         if (typeof window._vslInit === 'function') window._vslInit();
       } else {
         document.body.classList.remove('type-vsl');
-        // Restaura aside: mostra todos os cards, esconde narr-card
-        document.querySelectorAll('aside.col .card').forEach(c => {
-          c.style.display = c.id === 'vsl-narr-card' ? 'none' : '';
-        });
-        const elNote = document.querySelector('.aside-el-note');
-        if (elNote) elNote.style.display = '';
       }
 
       updateTypeUI(selectedType);
@@ -3311,13 +3285,6 @@ main{position:relative;z-index:auto}
       inputEl.disabled = false;
       sendBtn.disabled = false;
       inputEl.placeholder = 'Digite sua resposta...';
-
-      // Troca aside: esconde preview, mostra estúdio de narração
-      document.querySelectorAll('aside.col .card').forEach(c => {
-        c.style.display = c.id === 'vsl-narr-card' ? 'flex' : 'none';
-      });
-      const elNote = document.querySelector('.aside-el-note');
-      if (elNote) elNote.style.display = 'none';
 
       // Mensagem de abertura
       const abertura = 'Olá! Sou o especialista em VSL da Nexus.\n\nVou criar o roteiro completo de narração para o seu produto — pronto para usar em qualquer IA de voz (ElevenLabs, HeyGen, Descript).\n\nPrimeira pergunta: qual é o nome do seu produto e qual problema principal ele resolve?';
