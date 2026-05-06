@@ -1296,35 +1296,22 @@ main{position:relative;z-index:auto}
         </div>
       </div>
 
-      <!-- ElevenLabs — teste com sua própria chave -->
+      <!-- ElevenLabs — servidor usa a chave configurada, sem input de key -->
       <div style="display:flex;flex-direction:column;gap:10px">
 
         <div>
-          <div class="el-label">API Key ElevenLabs</div>
-          <div style="display:flex;gap:6px">
-            <input class="el-input" type="password" id="el-api-key" autocomplete="off"
-                   placeholder="sk_..." oninput="_elCheckReady()">
-            <button id="el-eye-btn" onclick="_elToggleKey()"
-                    style="padding:0 10px;background:none;border:1px solid var(--border);border-radius:8px;color:var(--text-3);cursor:pointer;font-size:14px;flex-shrink:0">👁</button>
-          </div>
-        </div>
-
-        <div>
-          <div class="el-label">Script de vendas <span id="el-vsl-badge" style="display:none;background:rgba(168,85,247,.2);color:var(--accent);border-radius:4px;padding:1px 6px;font-size:9px;vertical-align:middle">● preenchido</span></div>
-          <textarea class="el-input" id="el-vsl-text" rows="4"
+          <div class="el-label">Script de vendas <span id="el-vsl-badge" style="display:none;background:rgba(168,85,247,.2);color:var(--accent);border-radius:4px;padding:1px 6px;font-size:9px;vertical-align:middle">● auto-preenchido</span></div>
+          <textarea class="el-input" id="el-vsl-text" rows="5"
                     placeholder="Cole o script aqui ou gere pelo chat ao lado..." oninput="_elCheckReady()"></textarea>
         </div>
 
         <div>
           <div class="el-label">Voz</div>
-          <select class="el-select" id="el-voice-select" onchange="_elVoiceChange()">
-            <option value="TX3LPaxmHKxFdv7VOQHJ">Liam (masculino)</option>
-            <option value="21m00Tcm4TlvDq8ikWAM">Rachel (feminino)</option>
-            <option value="JBFqnCBsd6RMkjVDRZzb">George (masculino)</option>
-            <option value="custom">Custom (cole o ID da voz)</option>
+          <select class="el-select" id="el-voice-select">
+            <option value="rodrigo">Liam — masculino</option>
+            <option value="feminino">Rachel — feminino</option>
+            <option value="profissional">George — profissional</option>
           </select>
-          <input class="el-input" id="el-voice-custom" placeholder="Voice ID do ElevenLabs"
-                 style="display:none;margin-top:6px">
         </div>
 
         <div id="el-status" style="font-size:11px;color:var(--text-3);font-family:'DM Mono',monospace;min-height:14px"></div>
@@ -3321,33 +3308,24 @@ main{position:relative;z-index:auto}
     window._vslInit = _init;
   })();
 
-  // ── ElevenLabs panel controls ──────────────────────────────────
-  function _elToggleKey() {
-    const inp = document.getElementById('el-api-key');
-    const btn = document.getElementById('el-eye-btn');
-    if (!inp) return;
-    inp.type = inp.type === 'password' ? 'text' : 'password';
-    btn.textContent = inp.type === 'password' ? '👁' : '🙈';
-  }
-
+  // ── ElevenLabs panel controls — usa /api/narrar (chave no servidor) ──────
   function _elCheckReady() {
-    const hasKey  = document.getElementById('el-api-key')?.value.trim();
     const hasText = document.getElementById('el-vsl-text')?.value.trim();
     const btn     = document.getElementById('el-btn-gerar');
     const status  = document.getElementById('el-status');
     if (!btn) return;
-    if (hasKey && hasText) {
+    if (hasText) {
       btn.disabled = false;
       status.textContent = 'Pronto — clique para gerar narração';
       status.style.color = 'var(--accent)';
     } else {
       btn.disabled = true;
-      status.textContent = !hasKey ? 'Informe a API Key do ElevenLabs' : 'Cole ou gere o script de vendas acima';
+      status.textContent = 'Cole ou gere o script de vendas acima';
       status.style.color = '';
     }
   }
 
-  // preenche o textarea quando a VSL é gerada pelo chat (chamado de _showVSL)
+  // preenche o textarea quando o script é gerado pelo chat (chamado de _showVSL)
   window._elFillText = function(text) {
     const ta    = document.getElementById('el-vsl-text');
     const badge = document.getElementById('el-vsl-badge');
@@ -3356,25 +3334,11 @@ main{position:relative;z-index:auto}
     _elCheckReady();
   };
 
-  function _elVoiceChange() {
-    const sel    = document.getElementById('el-voice-select');
-    const custom = document.getElementById('el-voice-custom');
-    if (custom) custom.style.display = sel?.value === 'custom' ? 'block' : 'none';
-  }
-
   async function _elGerar() {
-    const apiKey  = document.getElementById('el-api-key')?.value.trim();
-    if (!apiKey) { alert('Informe a API Key do ElevenLabs.'); return; }
-
-    const sel     = document.getElementById('el-voice-select');
-    const voiceId = sel?.value === 'custom'
-      ? (document.getElementById('el-voice-custom')?.value.trim() || '')
-      : sel?.value;
-    if (!voiceId || voiceId === 'custom') { alert('Selecione ou informe o ID de uma voz.'); return; }
-
     const text = document.getElementById('el-vsl-text')?.value.trim() || '';
     if (!text) { alert('Cole ou gere o script de vendas antes de narrar.'); return; }
 
+    const voz    = document.getElementById('el-voice-select')?.value || 'rodrigo';
     const btn    = document.getElementById('el-btn-gerar');
     const status = document.getElementById('el-status');
     const audio  = document.getElementById('el-audio');
@@ -3382,41 +3346,29 @@ main{position:relative;z-index:auto}
 
     btn.disabled = true;
     status.style.color = '';
-    status.textContent = 'Conectando ao ElevenLabs…';
+    status.textContent = 'Gerando narração…';
     audio.style.display = 'none';
     if (dlBox) dlBox.style.display = 'none';
 
     try {
-      const resp = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+      const resp = await fetch('/api/narrar', {
         method: 'POST',
-        headers: {
-          'xi-api-key': apiKey,
-          'Content-Type': 'application/json',
-          'Accept': 'audio/mpeg',
-        },
-        body: JSON.stringify({
-          text: text,
-          model_id: 'eleven_turbo_v2_5',
-          voice_settings: { stability: 0.45, similarity_boost: 0.75, style: 0.15 },
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ texto: text, voz }),
       });
 
-      if (!resp.ok) {
-        const err = await resp.json().catch(() => ({}));
-        throw new Error(err?.detail?.message || `HTTP ${resp.status}`);
-      }
+      const data = await resp.json();
+      if (!resp.ok || data.error) throw new Error(data.error || 'Erro ao gerar narração');
 
-      const blob = await resp.blob();
-      const url  = URL.createObjectURL(blob);
-      audio.src  = url;
+      const url = 'data:audio/mpeg;base64,' + data.audio;
+      audio.src = url;
       audio.style.display = 'block';
-      status.textContent  = '✓ Narração gerada com sucesso!';
-      status.style.color  = 'var(--accent)';
+      status.textContent = '✓ Narração gerada com sucesso!';
+      status.style.color = 'var(--accent)';
 
-      // link de download
       if (dlBox) {
         const link = document.getElementById('el-dl-link');
-        if (link) { link.href = url; link.download = 'vsl_narracao.mp3'; }
+        if (link) { link.href = url; link.download = 'script_narracao.mp3'; }
         dlBox.style.display = 'block';
       }
     } catch(e) {
