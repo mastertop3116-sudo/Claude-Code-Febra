@@ -376,6 +376,39 @@
   .vsl-tag-btn:hover{border-color:var(--accent);color:var(--accent)}
   .vsl-tag-btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
   .vsl-tag-btn.primary:hover{filter:brightness(1.1)}
+  /* ── VSL: oculta preview, mostra painel ElevenLabs ── */
+  body.type-vsl .aside-preview-title{display:none}
+  body.type-vsl .preview-slide{display:none}
+  body.type-vsl .summary-list .car-row{display:none}
+  body.type-vsl .aside-el-note{display:none}
+  body.type-vsl #aside-gerar-note{display:none}
+  #vsl-el-panel{display:none;flex-direction:column;gap:16px}
+  body.type-vsl #vsl-el-panel{display:flex}
+  /* tabs */
+  .el-tabs{display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:rgba(5,8,17,.4)}
+  .el-tab{flex:1;padding:9px 8px;font-size:11px;font-weight:700;font-family:'DM Mono',monospace;letter-spacing:.04em;border:none;background:none;color:var(--text-3);cursor:pointer;transition:all .15s;text-align:center}
+  .el-tab.active{background:rgba(168,85,247,.18);color:var(--accent)}
+  .el-pane{display:none;flex-direction:column;gap:12px}
+  .el-pane.show{display:flex}
+  /* form elements */
+  .el-label{font-size:10px;color:var(--text-3);font-family:'DM Mono',monospace;letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px}
+  .el-field{position:relative}
+  .el-input{width:100%;background:rgba(5,8,17,.7);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 12px;font-size:12px;font-family:'DM Mono',monospace;outline:none;box-sizing:border-box;transition:border-color .15s}
+  .el-input:focus{border-color:rgba(168,85,247,.5)}
+  .el-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-3);cursor:pointer;font-size:14px;padding:2px}
+  .el-select{width:100%;background:rgba(5,8,17,.7);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 12px;font-size:12px;font-family:'DM Mono',monospace;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+  .el-btn-narrar{width:100%;padding:11px;border-radius:9px;background:linear-gradient(135deg,rgba(168,85,247,.3),rgba(168,85,247,.12));border:1px solid rgba(168,85,247,.4);color:var(--accent);font-size:13px;font-weight:700;font-family:'Bricolage Grotesque',sans-serif;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+  .el-btn-narrar:hover:not(:disabled){background:linear-gradient(135deg,rgba(168,85,247,.45),rgba(168,85,247,.2));border-color:rgba(168,85,247,.6)}
+  .el-btn-narrar:disabled{opacity:.35;cursor:not-allowed}
+  .el-status{font-size:11px;color:var(--text-3);font-family:'DM Mono',monospace;min-height:14px;text-align:center}
+  .el-audio{width:100%;border-radius:8px;accent-color:var(--accent);display:none}
+  /* pro badge panel */
+  .el-pro-box{background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center}
+  .el-pro-badge{background:linear-gradient(135deg,rgba(168,85,247,.3),rgba(168,85,247,.1));border:1px solid rgba(168,85,247,.3);border-radius:20px;padding:4px 12px;font-size:10px;font-weight:700;font-family:'DM Mono',monospace;color:var(--accent);letter-spacing:.1em}
+  .el-pro-price{font-size:22px;font-weight:800;font-family:'Bricolage Grotesque',sans-serif;color:var(--text);letter-spacing:-.02em}
+  .el-pro-price span{font-size:13px;font-weight:400;color:var(--text-3)}
+  .el-waitlist-btn{width:100%;padding:10px;border-radius:9px;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.3);color:var(--accent);font-size:12px;font-weight:700;font-family:'DM Mono',monospace;cursor:pointer;transition:all .2s;letter-spacing:.04em}
+  .el-waitlist-btn:hover{background:rgba(168,85,247,.22)}
   /* CTA fixo no mobile — botão sempre visível sem scroll */
   #mobile-cta-bar{display:none}
   @media(max-width:900px){
@@ -1241,7 +1274,76 @@ main{position:relative;z-index:auto}
     <aside class="col">
       <div class="sticky">
         <section class="card" style="padding:22px">
-          <h2 style="margin-bottom:16px"><span class="n">→</span>Pré-visualização</h2>
+          <h2 class="aside-preview-title" style="margin-bottom:16px"><span class="n">→</span>Pré-visualização</h2>
+
+          <!-- ── PAINEL ELEVENLABS (VSL mode) ── -->
+          <div id="vsl-el-panel">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:2px">
+              <div style="width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,rgba(168,85,247,.25),rgba(168,85,247,.06));border:1px solid rgba(168,85,247,.25);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🎙</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.01em">Narração com IA</div>
+                <div style="font-size:10px;color:var(--text-3);font-family:'DM Mono',monospace">ElevenLabs · voz profissional</div>
+              </div>
+            </div>
+
+            <!-- tabs -->
+            <div class="el-tabs">
+              <button class="el-tab active" id="el-tab-api" onclick="_elTab('api')">🔑 Minha API</button>
+              <button class="el-tab" id="el-tab-pro" onclick="_elTab('pro')">✦ Nexus Pro</button>
+            </div>
+
+            <!-- pane: minha API -->
+            <div class="el-pane show" id="el-pane-api">
+              <div>
+                <div class="el-label">API Key do ElevenLabs</div>
+                <div class="el-field">
+                  <input class="el-input" type="password" id="el-api-key" placeholder="sk_xxxxxxxxxxxxxxxx" autocomplete="off" oninput="_elKeyChange()" style="padding-right:36px">
+                  <button class="el-eye" id="el-eye-btn" onclick="_elToggleKey()" title="Mostrar/ocultar">👁</button>
+                </div>
+                <div style="font-size:10px;color:var(--text-3);margin-top:4px;font-family:'DM Mono',monospace">
+                  <a href="https://elevenlabs.io/app/settings/api-keys" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">Pegar minha API key →</a>
+                </div>
+              </div>
+
+              <div>
+                <div class="el-label">Voz</div>
+                <select class="el-select" id="el-voice-select">
+                  <option value="EXAVITQu4vr4xnSDxMaL">Rachel — Feminino (EN)</option>
+                  <option value="21m00Tcm4TlvDq8ikWAM">Sarah — Feminino PT/EN</option>
+                  <option value="pNInz6obpgDQGcFmaJgB">Adam — Masculino (EN)</option>
+                  <option value="TxGEqnHWrfWFTfGW9XjX">Josh — Masculino (EN)</option>
+                  <option value="custom">Colar ID de voz manualmente…</option>
+                </select>
+                <input class="el-input" id="el-voice-custom" placeholder="ID da voz (ex: 21m00Tcm4TlvDq8ikWAM)" style="display:none;margin-top:6px" oninput="_elCustomVoice()">
+              </div>
+
+              <button class="el-btn-narrar" id="el-btn-gerar" onclick="_elGerar()" disabled>🎙 Gerar Narração</button>
+              <div class="el-status" id="el-status">Gere a VSL primeiro para habilitar</div>
+              <audio class="el-audio" id="el-audio" controls></audio>
+              <div id="el-dl" style="display:none">
+                <a id="el-dl-link" class="vsl-tag-btn" style="display:block;text-align:center;text-decoration:none;padding:8px 16px">⬇ Baixar MP3</a>
+              </div>
+            </div>
+
+            <!-- pane: nexus pro -->
+            <div class="el-pane" id="el-pane-pro">
+              <div class="el-pro-box">
+                <div class="el-pro-badge">EM BREVE · NEXUS PRO</div>
+                <div style="font-size:13px;color:var(--text-2);line-height:1.5">
+                  Gere narrações profissionais sem precisar de conta no ElevenLabs. Créditos inclusos no plano.
+                </div>
+                <div class="el-pro-price">R$29<span>/mês</span></div>
+                <ul style="list-style:none;padding:0;margin:0;font-size:11px;color:var(--text-3);text-align:left;display:flex;flex-direction:column;gap:5px;width:100%">
+                  <li>✦ &nbsp;Vozes brasileiras nativas</li>
+                  <li>✦ &nbsp;Tags ElevenLabs v3 aplicadas</li>
+                  <li>✦ &nbsp;Download MP3 direto</li>
+                  <li>✦ &nbsp;Ilimitado no plano Pro</li>
+                </ul>
+                <button class="el-waitlist-btn" onclick="_elWaitlist()">📩 Entrar na lista de espera</button>
+              </div>
+            </div>
+          </div>
+          <!-- /PAINEL ELEVENLABS -->
 
           <div class="preview">
             <div class="pv-elem" id="pve-brand">
@@ -1294,7 +1396,7 @@ main{position:relative;z-index:auto}
           <div class="small-note" id="gen-time-note">~ 90s · gerado no servidor · sem marca d'água</div>
         </section>
 
-        <div style="margin-top:14px;padding:12px 14px;background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.1);border-radius:10px;display:flex;align-items:center;gap:10px">
+        <div class="aside-el-note" style="margin-top:14px;padding:12px 14px;background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.1);border-radius:10px;display:flex;align-items:center;gap:10px">
           <span style="font-size:14px">🎙</span>
           <span style="font-size:12px;color:var(--text-3);line-height:1.4">Após gerar, você poderá criar a <b style="color:var(--text-2)">narração em áudio</b> do produto com IA (ElevenLabs).</span>
         </div>
@@ -3138,10 +3240,13 @@ main{position:relative;z-index:auto}
       const vslBody = durac ? lines.slice(0, -1).join('\n').trim() : text.trim();
 
       _vslText = vslBody;
+      window._vslTextGlobal = vslBody;  // expõe para painel ElevenLabs
       textEl.textContent = vslBody;
       if (durac) duracEl.textContent = durac;
       resultEl.classList.add('show');
       resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      // habilita botão de narração se API key já preenchida
+      if (typeof window._elUnlockAfterVSL === 'function') window._elUnlockAfterVSL();
     }
 
     function _addElevenLabsTags(text) {
@@ -3256,9 +3361,128 @@ main{position:relative;z-index:auto}
       a.click();
     });
 
+    // Habilita botão de narração quando VSL está pronta
+    function _elUnlock() {
+      const btn = document.getElementById('el-btn-gerar');
+      const status = document.getElementById('el-status');
+      if (!btn) return;
+      const hasKey = document.getElementById('el-api-key')?.value.trim();
+      if (hasKey) {
+        btn.disabled = false;
+        status.textContent = 'Pronto para gerar narração';
+        status.style.color = 'var(--accent)';
+      } else {
+        btn.disabled = true;
+        status.textContent = 'Informe sua API Key do ElevenLabs';
+        status.style.color = '';
+      }
+    }
+
     // Inicializa quando tipo script_vsl é selecionado
     window._vslInit = _init;
+    // expõe unlock para _showVSL chamar após gerar
+    window._elUnlockAfterVSL = _elUnlock;
   })();
+
+  // ── ElevenLabs panel controls ──────────────────────────────────
+  function _elTab(tab) {
+    ['api','pro'].forEach(t => {
+      document.getElementById('el-tab-' + t)?.classList.toggle('active', t === tab);
+      document.getElementById('el-pane-' + t)?.classList.toggle('show', t === tab);
+    });
+  }
+
+  function _elToggleKey() {
+    const inp = document.getElementById('el-api-key');
+    const btn = document.getElementById('el-eye-btn');
+    if (!inp) return;
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+  }
+
+  function _elKeyChange() {
+    if (typeof window._elUnlockAfterVSL === 'function') window._elUnlockAfterVSL();
+  }
+
+  document.getElementById('el-voice-select')?.addEventListener('change', function() {
+    const custom = document.getElementById('el-voice-custom');
+    if (custom) custom.style.display = this.value === 'custom' ? 'block' : 'none';
+  });
+
+  function _elCustomVoice() { /* voice ID typed manually — no action needed */ }
+
+  async function _elGerar() {
+    const keyInp  = document.getElementById('el-api-key');
+    const apiKey  = keyInp?.value.trim();
+    if (!apiKey) { alert('Informe a API Key do ElevenLabs.'); return; }
+
+    const sel     = document.getElementById('el-voice-select');
+    const voiceId = sel?.value === 'custom'
+      ? (document.getElementById('el-voice-custom')?.value.trim() || sel.value)
+      : sel?.value;
+    if (!voiceId || voiceId === 'custom') { alert('Selecione ou informe o ID de uma voz.'); return; }
+
+    const text = window._vslTextGlobal || '';
+    if (!text) { alert('Gere a VSL primeiro.'); return; }
+
+    const btn    = document.getElementById('el-btn-gerar');
+    const status = document.getElementById('el-status');
+    const audio  = document.getElementById('el-audio');
+    const dlBox  = document.getElementById('el-dl');
+
+    btn.disabled = true;
+    status.style.color = '';
+    status.textContent = 'Conectando ao ElevenLabs…';
+    audio.style.display = 'none';
+    if (dlBox) dlBox.style.display = 'none';
+
+    try {
+      const resp = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+        method: 'POST',
+        headers: {
+          'xi-api-key': apiKey,
+          'Content-Type': 'application/json',
+          'Accept': 'audio/mpeg',
+        },
+        body: JSON.stringify({
+          text: text,
+          model_id: 'eleven_turbo_v2_5',
+          voice_settings: { stability: 0.45, similarity_boost: 0.75, style: 0.15 },
+        }),
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err?.detail?.message || `HTTP ${resp.status}`);
+      }
+
+      const blob = await resp.blob();
+      const url  = URL.createObjectURL(blob);
+      audio.src  = url;
+      audio.style.display = 'block';
+      status.textContent  = '✓ Narração gerada com sucesso!';
+      status.style.color  = 'var(--accent)';
+
+      // link de download
+      if (dlBox) {
+        const link = document.getElementById('el-dl-link');
+        if (link) { link.href = url; link.download = 'vsl_narracao.mp3'; }
+        dlBox.style.display = 'block';
+      }
+    } catch(e) {
+      status.textContent = '✗ Erro: ' + e.message;
+      status.style.color = 'var(--err, #ff4757)';
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function _elWaitlist() {
+    const email = prompt('Informe seu e-mail para a lista de espera do Nexus Pro:');
+    if (!email || !email.includes('@')) return;
+    // Apenas feedback por enquanto — futuramente integrará ao backend
+    alert('✓ E-mail registrado! Você será notificado quando o Nexus Pro estiver disponível.');
+  }
 
   // ---- btn-gerar handles both modes ----
   async function gerarCarrossel() {
