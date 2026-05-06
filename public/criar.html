@@ -1296,50 +1296,23 @@ main{position:relative;z-index:auto}
         </div>
       </div>
 
-      <div>
-        <div class="el-label">API Key do ElevenLabs</div>
-        <div class="el-field">
-          <input class="el-input" type="password" id="el-api-key" placeholder="sk_xxxxxxxxxxxxxxxx" autocomplete="off" oninput="_elCheckReady()" style="padding-right:36px">
-          <button class="el-eye" id="el-eye-btn" onclick="_elToggleKey()" title="Mostrar/ocultar">👁</button>
-        </div>
-        <div style="font-size:10px;color:var(--text-3);margin-top:5px;font-family:'DM Mono',monospace">
-          <a href="https://elevenlabs.io/app/settings/api-keys" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">Pegar minha API key →</a>
-        </div>
-      </div>
-
-      <div>
-        <div class="el-label" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
-          <span>Script de vendas</span>
-          <span id="el-vsl-badge" style="display:none;font-size:9px;background:rgba(168,85,247,.2);color:var(--accent);border-radius:4px;padding:2px 7px;letter-spacing:.06em;font-family:'DM Mono',monospace">✦ AUTO-PREENCHIDO</span>
-        </div>
-        <textarea class="el-input" id="el-vsl-text" rows="6"
-          placeholder="Cole aqui o script de vendas — gerado pelo chat ao lado ou de qualquer IA..."
-          oninput="_elCheckReady()"
-          style="resize:vertical;min-height:120px;max-height:260px;font-size:11px;line-height:1.6"></textarea>
-      </div>
-
-      <div>
-        <div class="el-label">Voz</div>
+      <!-- ElevenLabs direto: reservado para versão futura -->
+      <div style="display:none">
+        <input class="el-input" type="password" id="el-api-key" autocomplete="off" oninput="_elCheckReady()">
+        <span id="el-vsl-badge"></span>
+        <textarea class="el-input" id="el-vsl-text" oninput="_elCheckReady()"></textarea>
         <select class="el-select" id="el-voice-select" onchange="_elVoiceChange()">
-          <option value="EXAVITQu4vr4xnSDxMaL">Rachel — Feminino (EN/PT)</option>
-          <option value="21m00Tcm4TlvDq8ikWAM">Sarah — Feminino (EN/PT)</option>
-          <option value="pNInz6obpgDQGcFmaJgB">Adam — Masculino (EN)</option>
-          <option value="TxGEqnHWrfWFTfGW9XjX">Josh — Masculino (EN)</option>
-          <option value="custom">Colar ID de voz…</option>
+          <option value="EXAVITQu4vr4xnSDxMaL">Rachel</option>
+          <option value="21m00Tcm4TlvDq8ikWAM">Sarah</option>
+          <option value="pNInz6obpgDQGcFmaJgB">Adam</option>
+          <option value="TxGEqnHWrfWFTfGW9XjX">Josh</option>
+          <option value="custom">Custom</option>
         </select>
-        <input class="el-input" id="el-voice-custom" placeholder="ID da voz ElevenLabs" style="display:none;margin-top:6px">
-      </div>
-
-      <button class="el-btn-narrar" id="el-btn-gerar" onclick="_elGerar()" disabled>🎙 Gerar Narração</button>
-      <div class="el-status" id="el-status">Informe a API Key e o script de vendas</div>
-      <audio class="el-audio" id="el-audio" controls style="display:none;width:100%;border-radius:8px;margin-top:4px"></audio>
-      <div id="el-dl" style="display:none">
-        <a id="el-dl-link" class="vsl-tag-btn" style="display:block;text-align:center;text-decoration:none">⬇ Baixar MP3</a>
-      </div>
-
-      <div style="border-top:1px solid var(--border);padding-top:14px;display:flex;align-items:center;gap:10px">
-        <div style="font-size:16px">💬</div>
-        <div style="font-size:11px;color:var(--text-3);line-height:1.5">Sem script? <b style="color:var(--text-2)">Use o chat ao lado</b> — o texto é preenchido aqui automaticamente.</div>
+        <input class="el-input" id="el-voice-custom">
+        <button id="el-btn-gerar" onclick="_elGerar()" disabled></button>
+        <div id="el-status"></div>
+        <audio id="el-audio" controls></audio>
+        <div id="el-dl"><a id="el-dl-link"></a></div>
       </div>
 
       <div style="background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.15);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px">
