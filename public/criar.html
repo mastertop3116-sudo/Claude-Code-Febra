@@ -336,6 +336,46 @@
   .wiz-dot.done{background:rgba(168,85,247,.4)}
   .wiz-actions{display:flex;gap:10px;margin-top:20px}
   .wiz-nicho-highlight{display:inline-block;padding:2px 8px;border-radius:6px;background:rgba(168,85,247,.12);color:var(--accent);font-weight:600;font-size:13px}
+  /* ── VSL CHAT PANEL ── */
+  #vsl-chat-panel{display:none}
+  body.type-vsl .card[data-sec-num]{display:none}
+  body.type-vsl #vsl-chat-panel{display:flex;flex-direction:column;gap:0}
+  body.type-vsl #btn-gerar{display:none}
+  body.type-vsl #gen-time-note{display:none}
+  body.type-vsl .pv-edit-bar{display:none}
+  body.type-vsl .preview{display:none}
+  body.type-vsl .summary-list .ent-row{display:none}
+  .vsl-chat-msgs{display:flex;flex-direction:column;gap:12px;min-height:200px;max-height:460px;overflow-y:auto;padding:20px;scroll-behavior:smooth}
+  .vsl-msg{display:flex;gap:10px;align-items:flex-start}
+  .vsl-msg.user{flex-direction:row-reverse}
+  .vsl-msg .avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px}
+  .vsl-msg.agent .avatar{background:linear-gradient(135deg,rgba(168,85,247,.3),rgba(168,85,247,.1));border:1px solid rgba(168,85,247,.3)}
+  .vsl-msg.user .avatar{background:rgba(255,71,87,.15);border:1px solid rgba(255,71,87,.2)}
+  .vsl-msg .bubble{max-width:85%;padding:12px 16px;border-radius:14px;font-size:14px;line-height:1.55;color:var(--text)}
+  .vsl-msg.agent .bubble{background:rgba(168,85,247,.07);border:1px solid rgba(168,85,247,.12);border-radius:4px 14px 14px 14px}
+  .vsl-msg.user .bubble{background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.12);border-radius:14px 4px 14px 14px;text-align:right}
+  .vsl-typing{display:flex;gap:4px;align-items:center;padding:8px 16px}
+  .vsl-typing span{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:vslDot .9s ease-in-out infinite}
+  .vsl-typing span:nth-child(2){animation-delay:.2s}
+  .vsl-typing span:nth-child(3){animation-delay:.4s}
+  @keyframes vslDot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+  .vsl-input-row{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border);background:rgba(5,8,17,.5)}
+  .vsl-input{flex:1;background:rgba(5,8,17,.7);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:11px 14px;font-size:14px;font-family:"DM Sans",sans-serif;outline:none;resize:none;min-height:42px;max-height:120px;line-height:1.5;transition:border-color .15s}
+  .vsl-input:focus{border-color:rgba(168,85,247,.5)}
+  .vsl-send{width:42px;height:42px;border-radius:10px;background:var(--accent);border:none;color:#fff;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:filter .15s,transform .1s}
+  .vsl-send:hover{filter:brightness(1.15)}
+  .vsl-send:active{transform:scale(.95)}
+  .vsl-send:disabled{opacity:.4;cursor:not-allowed;filter:none}
+  .vsl-result{display:none;flex-direction:column;gap:14px;padding:20px;border-top:1px solid var(--border)}
+  .vsl-result.show{display:flex}
+  .vsl-result-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .vsl-result-label{font-size:12px;font-weight:600;color:var(--accent);letter-spacing:.05em;text-transform:uppercase;font-family:"DM Mono",monospace}
+  .vsl-result-text{background:rgba(5,8,17,.7);border:1px solid var(--border);border-radius:10px;padding:16px;font-size:13px;line-height:1.7;color:var(--text-2);max-height:400px;overflow-y:auto;white-space:pre-wrap;font-family:"DM Mono",monospace}
+  .vsl-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .vsl-tag-btn{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:rgba(5,8,17,.6);color:var(--text-2);transition:all .15s;font-family:"DM Mono",monospace}
+  .vsl-tag-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .vsl-tag-btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  .vsl-tag-btn.primary:hover{filter:brightness(1.1)}
   /* CTA fixo no mobile — botão sempre visível sem scroll */
   #mobile-cta-bar{display:none}
   @media(max-width:900px){
@@ -1145,6 +1185,56 @@ main{position:relative;z-index:auto}
         </div>
       </section>
 
+    <!-- ===== VSL CHAT PANEL ===== -->
+    <div id="vsl-chat-panel">
+      <section class="card" style="padding:0;overflow:hidden">
+        <div style="padding:20px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+          <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,rgba(168,85,247,.25),rgba(168,85,247,.05));border:1px solid rgba(168,85,247,.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🎬</div>
+          <div>
+            <div style="font-size:15px;font-weight:700;font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em">VSL Studio</div>
+            <div style="font-size:11px;color:var(--text-3);font-family:'DM Mono',monospace">Copywriter especializado · responde em segundos</div>
+          </div>
+          <button id="vsl-reset" style="margin-left:auto;padding:6px 12px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text-3);font-size:12px;cursor:pointer;font-family:'DM Mono',monospace">↺ recomeçar</button>
+        </div>
+
+        <!-- mensagens -->
+        <div class="vsl-chat-msgs" id="vsl-msgs"></div>
+
+        <!-- typing indicator (oculto por padrão) -->
+        <div id="vsl-typing-indicator" style="display:none;padding:4px 20px 8px">
+          <div class="vsl-msg agent">
+            <div class="avatar">🤖</div>
+            <div class="bubble" style="padding:10px 14px">
+              <div class="vsl-typing"><span></span><span></span><span></span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- resultado da VSL -->
+        <div class="vsl-result" id="vsl-result">
+          <div class="vsl-result-header">
+            <span class="vsl-result-label">✦ VSL gerada</span>
+            <span id="vsl-duracao" style="font-size:11px;color:var(--text-3);font-family:'DM Mono',monospace"></span>
+          </div>
+          <div class="vsl-result-text" id="vsl-text"></div>
+          <div class="vsl-actions">
+            <button class="vsl-tag-btn primary" id="vsl-copy-btn">📋 Copiar texto</button>
+            <button class="vsl-tag-btn" id="vsl-tags-btn">⚡ Copiar com tags ElevenLabs</button>
+            <button class="vsl-tag-btn" id="vsl-download-btn">⬇ Baixar .txt</button>
+          </div>
+          <div style="margin-top:6px;padding:10px 14px;background:rgba(168,85,247,.05);border:1px solid rgba(168,85,247,.1);border-radius:8px;font-size:11px;color:var(--text-3);line-height:1.5">
+            💡 Cole no ElevenLabs, Descript, HeyGen ou qualquer IA de voz. Use a versão com tags para narração mais dinâmica.
+          </div>
+        </div>
+
+        <!-- input -->
+        <div class="vsl-input-row">
+          <textarea class="vsl-input" id="vsl-input" placeholder="Digite sua resposta..." rows="1"></textarea>
+          <button class="vsl-send" id="vsl-send" title="Enviar (Enter)">➤</button>
+        </div>
+      </section>
+    </div>
+
     </div>
 
     <!-- ===== RIGHT RAIL ===== -->
@@ -1468,6 +1558,15 @@ main{position:relative;z-index:auto}
       document.getElementById('s-type').textContent = typeLabel.textContent;
       document.getElementById('pv-brand').textContent = 'Nexus Forge · ' + typeLabel.textContent.split('/')[0].trim();
       typeMenu.style.display = 'none';
+
+      // VSL → ativa modo chat
+      if (selectedType === 'script_vsl') {
+        document.body.classList.add('type-vsl');
+        if (typeof window._vslInit === 'function') window._vslInit();
+      } else {
+        document.body.classList.remove('type-vsl');
+      }
+
       updateTypeUI(selectedType);
     });
   });
@@ -2990,6 +3089,170 @@ main{position:relative;z-index:auto}
     if (data.error) throw new Error(data.error);
     return data; // { pdf, pdfFilename, titulo, roteiro }
   }
+
+  // ════════════════════════════════════════
+  // VSL CHAT — motor do chat com o agente VSL
+  // ════════════════════════════════════════
+  (function() {
+    const msgsEl   = document.getElementById('vsl-msgs');
+    const inputEl  = document.getElementById('vsl-input');
+    const sendBtn  = document.getElementById('vsl-send');
+    const resetBtn = document.getElementById('vsl-reset');
+    const typingEl = document.getElementById('vsl-typing-indicator');
+    const resultEl = document.getElementById('vsl-result');
+    const textEl   = document.getElementById('vsl-text');
+    const duracEl  = document.getElementById('vsl-duracao');
+
+    if (!msgsEl) return; // elemento não existe ainda
+
+    let vslMessages = [];  // histórico de chat
+    let vslDone     = false;
+    let _vslText    = '';  // VSL gerada
+
+    function _addMsg(role, content) {
+      const wrap = document.createElement('div');
+      wrap.className = 'vsl-msg ' + (role === 'user' ? 'user' : 'agent');
+      wrap.innerHTML = `
+        <div class="avatar">${role === 'user' ? '👤' : '🤖'}</div>
+        <div class="bubble">${content.replace(/\n/g, '<br>')}</div>`;
+      msgsEl.appendChild(wrap);
+      msgsEl.scrollTop = msgsEl.scrollHeight;
+    }
+
+    function _setTyping(show) {
+      typingEl.style.display = show ? 'block' : 'none';
+      if (show) msgsEl.scrollTop = msgsEl.scrollHeight;
+    }
+
+    function _setLoading(on) {
+      sendBtn.disabled = on;
+      inputEl.disabled = on;
+      _setTyping(on);
+    }
+
+    function _showVSL(text) {
+      // Extrai duração estimada da última linha
+      const lines = text.trim().split('\n');
+      const lastLine = lines[lines.length - 1];
+      const durac = lastLine.startsWith('DURAÇÃO') ? lastLine : '';
+      const vslBody = durac ? lines.slice(0, -1).join('\n').trim() : text.trim();
+
+      _vslText = vslBody;
+      textEl.textContent = vslBody;
+      if (durac) duracEl.textContent = durac;
+      resultEl.classList.add('show');
+      resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function _addElevenLabsTags(text) {
+      // Adiciona tags de aceleração em frases-chave: CTAs e ênfases
+      return text
+        .replace(/(Clica no link|Clique aqui|Acesse agora|Garanta agora|Clique no botão)[^.!?]*/gi,
+          m => `<prosody rate="x-fast">${m}</prosody>`)
+        .replace(/(APENAS|SOMENTE|HOJE|AGORA|GRÁTIS)[^\s,;]*/gi,
+          m => `<emphasis level="strong">${m}</emphasis>`)
+        .replace(/([.!?])\s+/g, '$1\n<break time="0.15s"/>\n');
+    }
+
+    async function _send() {
+      const text = inputEl.value.trim();
+      if (!text || vslDone) return;
+
+      inputEl.value = '';
+      inputEl.style.height = 'auto';
+      _addMsg('user', text);
+      vslMessages.push({ role: 'user', content: text });
+      _setLoading(true);
+
+      try {
+        const res = await fetch('/api/vsl/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: vslMessages }),
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        _setLoading(false);
+        _addMsg('agent', data.reply);
+        vslMessages.push({ role: 'assistant', content: data.reply });
+
+        if (data.done && data.vsl_text) {
+          vslDone = true;
+          sendBtn.disabled = true;
+          inputEl.disabled = true;
+          inputEl.placeholder = 'VSL gerada! ↓ veja abaixo';
+          setTimeout(() => _showVSL(data.vsl_text), 600);
+        }
+      } catch (err) {
+        _setLoading(false);
+        _addMsg('agent', '⚠️ Erro: ' + err.message + ' — tente novamente.');
+      }
+    }
+
+    function _init() {
+      vslMessages = [];
+      vslDone = false;
+      _vslText = '';
+      msgsEl.innerHTML = '';
+      resultEl.classList.remove('show');
+      textEl.textContent = '';
+      duracEl.textContent = '';
+      inputEl.disabled = false;
+      sendBtn.disabled = false;
+      inputEl.placeholder = 'Digite sua resposta...';
+
+      // Mensagem de abertura do agente
+      const abertura = 'Olá! Sou o especialista em VSL da Nexus.\n\nVou criar uma carta de vendas em vídeo que converte de verdade para o seu produto.\n\nPrimeira pergunta: qual é o nome do seu produto e qual problema principal ele resolve?';
+      _addMsg('agent', abertura);
+      vslMessages.push({ role: 'assistant', content: abertura });
+    }
+
+    sendBtn?.addEventListener('click', _send);
+    resetBtn?.addEventListener('click', _init);
+
+    inputEl?.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); _send(); }
+    });
+
+    // Auto-resize do textarea
+    inputEl?.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+
+    // Botões de ação pós-geração
+    document.getElementById('vsl-copy-btn')?.addEventListener('click', () => {
+      navigator.clipboard.writeText(_vslText).then(() => {
+        const b = document.getElementById('vsl-copy-btn');
+        const orig = b.textContent;
+        b.textContent = '✓ Copiado!';
+        setTimeout(() => b.textContent = orig, 2000);
+      });
+    });
+
+    document.getElementById('vsl-tags-btn')?.addEventListener('click', () => {
+      const tagged = _addElevenLabsTags(_vslText);
+      navigator.clipboard.writeText(tagged).then(() => {
+        const b = document.getElementById('vsl-tags-btn');
+        const orig = b.textContent;
+        b.textContent = '✓ Copiado com tags!';
+        setTimeout(() => b.textContent = orig, 2000);
+      });
+    });
+
+    document.getElementById('vsl-download-btn')?.addEventListener('click', () => {
+      const blob = new Blob([_vslText], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'vsl_roteiro.txt';
+      a.click();
+    });
+
+    // Inicializa quando tipo script_vsl é selecionado
+    window._vslInit = _init;
+  })();
 
   // ---- btn-gerar handles both modes ----
   async function gerarCarrossel() {

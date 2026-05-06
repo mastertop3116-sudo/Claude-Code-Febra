@@ -480,6 +480,41 @@ app.get("/api/roteiro/progress/:jobId", (req, res) => {
 });
 
 // ──────────────────────────────────────────
+// VSL Chat — coleta contexto e gera VSL long-form
+// ──────────────────────────────────────────
+app.post("/api/vsl/chat", async (req, res) => {
+  try {
+    const { messages } = req.body;
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: "messages[] obrigatório" });
+    }
+
+    const { collectContext, generateVSL } = require("./agents/vsl");
+    const result = await collectContext(messages);
+
+    if (result.pronto && result.contexto) {
+      // Contexto suficiente — gera a VSL
+      const vslText = await generateVSL(result.contexto);
+      return res.json({
+        reply:      result.resposta || "VSL gerada com sucesso!",
+        done:       true,
+        vsl_text:   vslText,
+        contexto:   result.contexto,
+      });
+    }
+
+    // Ainda coletando — devolve próxima pergunta
+    res.json({
+      reply: result.resposta || result.pergunta || "Pode continuar.",
+      done:  false,
+    });
+  } catch (e) {
+    console.error("[/api/vsl/chat]", e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ──────────────────────────────────────────
 // Gerador de Criativo (imagem PNG para Meta Ads)
 // ──────────────────────────────────────────
 app.post("/api/criativo", async (req, res) => {
