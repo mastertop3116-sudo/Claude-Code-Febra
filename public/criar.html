@@ -1989,6 +1989,27 @@ main{position:relative;z-index:auto}
       },
     };
 
+    // Script VSL → pipeline dedicado (roteirista.js → PDF de roteiro escrito)
+    if (selectedType === 'script_vsl') {
+      document.getElementById('btn-gerar').disabled = true;
+      setProgress(10, 'Iniciando roteirista VSL…');
+      document.getElementById('overlay-prog').classList.add('show');
+      _startElapsed();
+      try {
+        const vslData = await gerarScriptVSL(payload);
+        _stopElapsed();
+        setProgress(100, 'Roteiro VSL pronto!');
+        showSuccess({ ...vslData, gammaSource: false, copyContracapa: '' }, payload.titulo);
+      } catch (err) {
+        _stopElapsed();
+        document.getElementById('overlay-prog').classList.remove('show');
+        showErr('⚠ ' + err.message);
+      } finally {
+        document.getElementById('btn-gerar').disabled = false;
+      }
+      return;
+    }
+
     document.getElementById('btn-gerar').disabled = true;
     setProgress(2, 'Conectando ao servidor…');
     document.getElementById('overlay-prog').classList.add('show');
@@ -2871,52 +2892,103 @@ main{position:relative;z-index:auto}
     });
   });
 
-  // ---- gerarCriativo ----
+  // ---- gerarCriativo ---- chama /api/criativo → retorna PNG 1080px direto
   async function gerarCriativo() {
     const headline = document.getElementById('cri-headline').value.trim();
     if (!headline) { showErr('Informe a headline do criativo antes de gerar.'); return; }
     const temaEl = document.querySelector('[data-cri-theme].active');
     const temaKey = temaEl ? temaEl.dataset.v : 'impacto';
     const payload = {
-      tipo:      'carrossel',
-      titulo:    headline,
-      subtitulo: document.getElementById('cri-sub').value.trim(),
-      descricao: document.getElementById('cri-cta').value.trim() || headline,
-      autor:     document.getElementById('dna-nome').value.trim() || 'Nexus Digital',
-      temaKey:   temaKey,
-      formato:   criFmt,
-      maxSlides: 1,
-      formato_conteudo: 'criativo',
-      gancho:    headline,
+      headline,
+      sub:    document.getElementById('cri-sub').value.trim(),
+      cta:    document.getElementById('cri-cta').value.trim() || 'Clique aqui',
+      marca:  document.getElementById('dna-nome').value.trim() || 'NEXUS',
+      temaKey,
+      formato: criFmt,
     };
     const btnGerar = document.getElementById('btn-gerar');
     btnGerar.disabled = true;
-    setCarouselProgress(0, 'Conectando ao servidor…');
+    setCarouselProgress(0, 'Gerando imagem…');
     document.getElementById('overlay-carousel-prog').classList.add('show');
     hideErr();
     try {
-      const initRes = await fetch('/api/carousel', {
+      const res = await fetch('/api/criativo', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      if (!initRes.ok) throw new Error('Falha ao iniciar (HTTP ' + initRes.status + ')');
-      const { jobId } = await initRes.json();
-      await new Promise((resolve, reject) => {
-        const es = new EventSource('/api/carousel/progress/' + jobId);
-        es.onmessage = e => {
-          const d = JSON.parse(e.data);
-          if (d.error) { es.close(); reject(new Error(d.error)); return; }
-          if (d.progress !== undefined) setCarouselProgress(d.progress, d.message);
-          if (d.done) { es.close(); showCarouselSuccess(d); resolve(d); }
-        };
-        es.onerror = () => { es.close(); reject(new Error('Conexão perdida — tente novamente.')); };
-      });
+      if (!res.ok) throw new Error('Erro ao gerar criativo (HTTP ' + res.status + ')');
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      document.getElementById('overlay-carousel-prog').classList.remove('show');
+      _showCriativoSuccess(data);
     } catch (err) {
       document.getElementById('overlay-carousel-prog').classList.remove('show');
       showErr('⚠ ' + err.message);
     } finally {
       btnGerar.disabled = false;
     }
+  }
+
+  // Exibe overlay de sucesso com preview e download do criativo PNG
+  function _showCriativoSuccess(data) {
+    const overlay = document.getElementById('overlay-carousel-ok');
+    const wrap    = overlay.querySelector('.slide-thumbs') || overlay.querySelector('.ok-body');
+    if (!wrap) { _downloadCriativoDirectly(data); return; }
+
+    wrap.innerHTML = '';
+
+    // Preview da imagem
+    const img = document.createElement('img');
+    img.src = 'data:image/png;base64,' + data.image;
+    img.style.cssText = 'max-width:340px;width:100%;border-radius:12px;box-shadow:0 16px 48px rgba(0,0,0,.6);margin:0 auto;display:block;';
+    wrap.appendChild(img);
+
+    // Botão de download
+    const btn = document.createElement('a');
+    btn.href     = 'data:image/png;base64,' + data.image;
+    btn.download = data.filename || 'criativo.png';
+    btn.className = 'dl-btn pdf';
+    btn.style.cssText = 'margin-top:16px;display:flex;align-items:center;justify-content:center;gap:8px;';
+    btn.innerHTML = '⬇ Baixar PNG — Meta Ads';
+    wrap.appendChild(btn);
+
+    overlay.classList.add('show');
+  }
+
+  function _downloadCriativoDirectly(data) {
+    const a = document.createElement('a');
+    a.href = 'data:image/png;base64,' + data.image;
+    a.download = data.filename || 'criativo.png';
+    a.click();
+  }
+
+  // ---- gerarScriptVSL ---- chama /api/script-vsl → retorna PDF de roteiro
+  async function gerarScriptVSL(payload) {
+    const progress = (pct, msg) => {
+      const job = { progress: pct, message: msg };
+      const bar = document.getElementById('gen-bar');
+      const pct2 = document.getElementById('gen-pct');
+      const msg2 = document.getElementById('gen-msg');
+      if (bar)  bar.style.width = pct + '%';
+      if (pct2) pct2.textContent = pct + '%';
+      if (msg2) msg2.textContent = msg;
+    };
+    progress(20, 'Iniciando roteirista VSL…');
+    const res = await fetch('/api/script-vsl', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        titulo:    payload.titulo,
+        descricao: payload.descricao,
+        avatar:    payload.avatar,
+        autor:     payload.autor,
+        modo:      'vsl',
+        plataforma: 'youtube',
+      }),
+    });
+    if (!res.ok) throw new Error('Erro ao gerar script VSL (HTTP ' + res.status + ')');
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    return data; // { pdf, pdfFilename, titulo, roteiro }
   }
 
   // ---- btn-gerar handles both modes ----

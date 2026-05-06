@@ -119,6 +119,17 @@ Implementado nos commits do Carlinhos (`6e039d8`, `a03f38b`):
 - Solução proposta: wizard por etapas (passo 1: tipo + título → passo 2: nicho + avatar → passo 3: design)
 - Alternativa mais simples: recolher automaticamente campos opcionais até o usuário focar neles
 
+### 21. Responsividade Mobile — polish completo (próxima sessão)
+- Base funcional (breakpoints 900/640/480px existem, sidebar com hamburger, mobile CTA bar)
+- Pontos a corrigir: wizard bar trunca em telas <480px, select narração com min-width pode estourar, overlay de sucesso com canvas PDF pode ser largo demais antes do scroll
+- Testar em 375px (iPhone) e 360px (Android) e corrigir os 5 pontos listados no diagnóstico de 2026-05-05
+
+### 20. Criativos e Carrossel — revisão completa (próxima sessão)
+- Tela de geração mostra "Gerando carrossel… Nexus AI estruturando o conteúdo · Satori renderizando os slides" mas o resultado são propostas totalmente diferentes das esperadas
+- Criativos: revisar pipeline `departments/creative/` — output não corresponde ao esperado
+- Carrossel: revisar agente `agents/carrossel.js` + renderer Satori — slides gerados desalinhados com o briefing
+- Prioridade: alinhar expectativa visual vs resultado entregue
+
 ### 19. Meus Entregáveis + Histórico + Modelos (SaaS)
 - 3 botões no sidebar atualmente mostram toast "em breve"
 - Implementar: GET /api/deliverables (lista gerados) + GET /api/historico

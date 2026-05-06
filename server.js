@@ -480,6 +480,151 @@ app.get("/api/roteiro/progress/:jobId", (req, res) => {
 });
 
 // ──────────────────────────────────────────
+// Gerador de Criativo (imagem PNG para Meta Ads)
+// ──────────────────────────────────────────
+app.post("/api/criativo", async (req, res) => {
+  try {
+    const { headline, sub, cta, marca, temaKey = "impacto", formato = "instagram_feed" } = req.body;
+    if (!headline) return res.status(400).json({ error: "headline obrigatória" });
+
+    const { criarCriativoHTML, getDimensoes } = require("./departments/creative/criativo_template");
+    const { renderSlide } = require("./departments/creative/render_engine");
+
+    const htmlStr = criarCriativoHTML({ headline, sub, cta, marca, temaKey, formato });
+    const [w, h]  = getDimensoes(formato);
+    const buffer  = await renderSlide(htmlStr, w, h);
+
+    res.json({
+      image:    buffer.toString("base64"),
+      formato,
+      filename: headline.replace(/[^a-zA-Z0-9]/g, "_").slice(0, 40) + "_criativo.png",
+    });
+  } catch (e) {
+    console.error("[/api/criativo]", e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ──────────────────────────────────────────
+// Gerador de Script VSL (roteiro escrito em PDF)
+// ──────────────────────────────────────────
+app.post("/api/script-vsl", async (req, res) => {
+  try {
+    const { titulo, descricao, avatar, autor, modo = "vsl", plataforma = "youtube" } = req.body;
+    if (!titulo) return res.status(400).json({ error: "titulo obrigatório" });
+
+    const { run: runRoteirista } = require("./agents/roteirista");
+    const PDFDocument = require("pdfkit");
+
+    const roteiro = await runRoteirista({
+      produto: {
+        nome: titulo,
+        tipo: "vsl",
+        nicho: descricao || titulo,
+        publico_alvo: avatar || descricao || "",
+        beneficio_principal: descricao || titulo,
+        preco: "",
+      },
+      modo,
+      plataforma,
+      duracao: "vsl",
+    });
+
+    // Gera PDF do roteiro com PDFKit
+    const doc = new PDFDocument({ size: "A4", margin: 50 });
+    const chunks = [];
+    doc.on("data", c => chunks.push(c));
+    await new Promise(resolve => {
+      doc.on("end", resolve);
+
+      // Capa
+      doc.rect(0, 0, doc.page.width, 8).fill("#E63946");
+      doc.moveDown(1);
+      doc.fontSize(10).fillColor("#888888").text("ROTEIRO VSL — NEXUS FORGE", { align: "center" });
+      doc.moveDown(0.5);
+      doc.fontSize(26).fillColor("#111111").text(roteiro.titulo || titulo, { align: "center" });
+      doc.moveDown(0.5);
+      doc.fontSize(12).fillColor("#666666").text(
+        `Formato: ${roteiro.formato || "VSL"}  ·  Duração estimada: ${roteiro.duracao_estimada || "3–5 min"}  ·  ${roteiro.framework || "AIDA"}`,
+        { align: "center" }
+      );
+      doc.moveDown(0.5);
+      doc.moveTo(50, doc.y).lineTo(doc.page.width - 50, doc.y).stroke("#DDDDDD");
+      doc.moveDown(1.5);
+
+      // Blocos do roteiro
+      for (const bloco of (roteiro.blocos || [])) {
+        if (!bloco.fala) continue;
+
+        // Cabeçalho do bloco
+        doc.rect(50, doc.y, doc.page.width - 100, 28).fill("#F5F5F5");
+        doc.fontSize(11).fillColor("#E63946")
+          .text(`BLOCO ${bloco.id} — ${bloco.nome}`, 58, doc.y - 22, { continued: true });
+        doc.fillColor("#999999").text(`  (${bloco.tempo})`, { continued: false });
+        doc.moveDown(0.8);
+
+        // Narração
+        doc.fontSize(10).fillColor("#333333").text("🎙 NARRAÇÃO:", { continued: false });
+        doc.fontSize(12).fillColor("#111111").text(bloco.fala, { indent: 16, lineGap: 4 });
+        doc.moveDown(0.5);
+
+        // Tela (texto na tela)
+        if (bloco.tela) {
+          doc.fontSize(10).fillColor("#333333").text("📺 TELA:", { continued: false });
+          doc.fontSize(11).fillColor("#555555").text(bloco.tela, { indent: 16, lineGap: 3 });
+          doc.moveDown(0.5);
+        }
+
+        // Câmera
+        if (bloco.camera) {
+          doc.fontSize(10).fillColor("#333333").text("🎬 CÂMERA:", { continued: false });
+          doc.fontSize(11).fillColor("#555555").text(bloco.camera, { indent: 16, lineGap: 3 });
+          doc.moveDown(0.5);
+        }
+
+        doc.moveDown(0.5);
+        doc.moveTo(50, doc.y).lineTo(doc.page.width - 50, doc.y).stroke("#EEEEEE");
+        doc.moveDown(1);
+      }
+
+      // Legenda
+      if (roteiro.legenda) {
+        doc.addPage();
+        doc.rect(0, 0, doc.page.width, 8).fill("#E63946");
+        doc.moveDown(1);
+        doc.fontSize(14).fillColor("#111111").text("LEGENDA / COPY DO VÍDEO", { align: "center" });
+        doc.moveDown(1);
+        doc.fontSize(11).fillColor("#333333").text(roteiro.legenda, { lineGap: 5 });
+      }
+
+      // Palavra gatilho
+      if (roteiro.palavra_gatilho) {
+        doc.moveDown(1.5);
+        doc.fontSize(13).fillColor("#E63946").text(`Palavra gatilho: ${roteiro.palavra_gatilho}`);
+        if (roteiro.resposta_automatica) {
+          doc.moveDown(0.5);
+          doc.fontSize(11).fillColor("#555555").text(`Resposta automática: ${roteiro.resposta_automatica}`);
+        }
+      }
+
+      doc.end();
+    });
+
+    const pdfBuffer = Buffer.concat(chunks);
+    const slug = titulo.replace(/[^a-zA-Z0-9]/g, "_").slice(0, 40);
+    res.json({
+      pdf:         pdfBuffer.toString("base64"),
+      pdfFilename: `${slug}_roteiro_vsl.pdf`,
+      titulo:      roteiro.titulo || titulo,
+      roteiro,
+    });
+  } catch (e) {
+    console.error("[/api/script-vsl]", e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ──────────────────────────────────────────
 // Gerador de Relatório de Pesquisa de Mercado
 // ──────────────────────────────────────────
 app.post("/api/relatorio", async (req, res) => {
