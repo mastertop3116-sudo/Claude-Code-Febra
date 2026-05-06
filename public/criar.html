@@ -677,7 +677,7 @@ main{position:relative;z-index:auto}
       <section class="card" id="sec-mode">
         <h2><span class="n">⚡</span>O que você quer criar?</h2>
         <div class="mode-tabs" id="mode-tabs">
-          <div class="mode-tab active" data-mode="ent">
+          <div class="mode-tab" data-mode="ent">
             <span class="mico">🚀</span>
             <b>Infoproduto</b>
             <small>PDF · Word</small>
@@ -702,10 +702,10 @@ main{position:relative;z-index:auto}
             <b>Ilustrações</b>
             <small>Colorir · Desenhos · Materiais</small>
           </div>
-          <div class="mode-tab" data-mode="chat" style="border-color:rgba(168,85,247,.3);background:rgba(168,85,247,.04)">
+          <div class="mode-tab active" data-mode="chat" style="border-color:rgba(168,85,247,.5);background:rgba(168,85,247,.08)">
             <span class="mico">💬</span>
             <b>Chat com MAX</b>
-            <small>Descreva · MAX cria</small>
+            <small>✦ recomendado</small>
           </div>
         </div>
       </section>
@@ -736,7 +736,7 @@ main{position:relative;z-index:auto}
 
       <!-- 01 informações básicas - PRIMEIRO para o usuário digitar o título imediatamente -->
       <section class="card" data-showon="ent" data-sec-num="01">
-        <h2><span class="n">01</span>Informações básicas<span class="hint">o essencial para montar o conteúdo</span></h2>
+        <h2><span class="n">01</span>Informações básicas<span class="hint">modo manual — ou use o <b style="color:var(--accent);cursor:pointer" onclick="document.querySelector('.mode-tab[data-mode=chat]').click()">Chat com MAX</b></span></h2>
         <div class="stack">
           <div class="row2">
             <div>
@@ -3122,7 +3122,8 @@ main{position:relative;z-index:auto}
   }
 
   // ---- mode tabs switching ----
-  let currentMode = 'ent';
+  let currentMode = 'chat';
+  document.body.classList.add('mode-chat');
   document.querySelectorAll('.mode-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
@@ -3436,6 +3437,7 @@ main{position:relative;z-index:auto}
     });
 
     window._fcInit = _init;
+    _init(); // abre com o chat já iniciado na tela principal
   })();
 
   // ════════════════════════════════════════
