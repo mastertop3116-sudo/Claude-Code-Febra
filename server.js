@@ -515,6 +515,29 @@ app.post("/api/vsl/chat", async (req, res) => {
 });
 
 // ──────────────────────────────────────────
+// Forge Chat Universal — coleta contexto via chat
+// ──────────────────────────────────────────
+app.post("/api/forge-chat", async (req, res) => {
+  try {
+    const { messages } = req.body;
+    if (!messages || !Array.isArray(messages) || messages.length === 0)
+      return res.status(400).json({ error: "messages obrigatório" });
+
+    const { collectContext, buildPayload } = require('./agents/forge_chat');
+    const result = await collectContext(messages);
+
+    if (result.pronto && result.contexto) {
+      result.payload = buildPayload(result.contexto);
+    }
+
+    res.json(result);
+  } catch (e) {
+    console.error("[/api/forge-chat]", e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ──────────────────────────────────────────
 // Gerador de Ilustrações via DALL-E 3
 // ──────────────────────────────────────────
 const ESTILOS_PROMPT = {

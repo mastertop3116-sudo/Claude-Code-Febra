@@ -166,6 +166,27 @@
   body.mode-conv [data-showon="ent"]{display:none}body.mode-conv [data-showon="car"]{display:none}body.mode-conv [data-showon="conv"]{display:block}
   body.mode-cri [data-showon="ent"]{display:none}body.mode-cri [data-showon="car"]{display:none}body.mode-cri [data-showon="cri"]{display:block}
   body.mode-ilu [data-showon="ent"]{display:none}body.mode-ilu [data-showon="car"]{display:none}body.mode-ilu [data-showon="ilu"]{display:block}
+  [data-showon="chat"]{display:none}
+  body.mode-chat [data-showon="ent"]{display:none}body.mode-chat [data-showon="chat"]{display:block}
+  body.mode-chat #btn-gerar{display:none}body.mode-chat #gen-time-note{display:none}
+  .fc-msg{display:flex;gap:10px;align-items:flex-start}
+  .fc-msg.user{flex-direction:row-reverse}
+  .fc-msg .fc-avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px}
+  .fc-msg.max .fc-avatar{background:linear-gradient(135deg,rgba(168,85,247,.3),rgba(168,85,247,.1));border:1px solid rgba(168,85,247,.3)}
+  .fc-msg.user .fc-avatar{background:rgba(255,71,87,.15);border:1px solid rgba(255,71,87,.2)}
+  .fc-msg .fc-bubble{max-width:88%;padding:12px 16px;border-radius:14px;font-size:14px;line-height:1.6;color:var(--text)}
+  .fc-msg.max .fc-bubble{background:rgba(168,85,247,.07);border:1px solid rgba(168,85,247,.12);border-radius:4px 14px 14px 14px}
+  .fc-msg.user .fc-bubble{background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.12);border-radius:14px 4px 14px 14px;text-align:right}
+  .fc-summary{background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+  .fc-summary-row{display:flex;gap:8px;font-size:13px}
+  .fc-summary-key{color:var(--text-3);min-width:80px;font-family:'DM Mono',monospace;font-size:11px;padding-top:2px}
+  .fc-summary-val{color:var(--text);font-weight:500;flex:1}
+  .fc-gerar-btn{width:100%;padding:14px;border-radius:10px;background:linear-gradient(135deg,var(--accent),rgba(168,85,247,.7));border:none;color:#fff;font-size:15px;font-weight:700;font-family:'Bricolage Grotesque',sans-serif;cursor:pointer;letter-spacing:-.01em;transition:filter .2s}
+  .fc-gerar-btn:hover{filter:brightness(1.12)}
+  .fc-typing{display:flex;gap:5px;padding:4px 2px}
+  .fc-typing span{width:7px;height:7px;border-radius:50%;background:rgba(168,85,247,.5);animation:fc-bounce 1.2s ease-in-out infinite}
+  .fc-typing span:nth-child(2){animation-delay:.2s}.fc-typing span:nth-child(3){animation-delay:.4s}
+  @keyframes fc-bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
   .ilu-qtd-btn{padding:7px 16px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text-2);font-size:12px;cursor:pointer;transition:all .15s;font-family:'DM Mono',monospace}
   .ilu-qtd-btn.active{background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.5);color:var(--accent)}
   .ilu-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;gap:0;width:calc(50% - 8px);min-width:260px}
@@ -681,6 +702,35 @@ main{position:relative;z-index:auto}
             <b>Ilustrações</b>
             <small>Colorir · Desenhos · Materiais</small>
           </div>
+          <div class="mode-tab" data-mode="chat" style="border-color:rgba(168,85,247,.3);background:rgba(168,85,247,.04)">
+            <span class="mico">💬</span>
+            <b>Chat com MAX</b>
+            <small>Descreva · MAX cria</small>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== FORGE CHAT PANEL ===== -->
+      <section class="card" data-showon="chat" style="padding:0;overflow:hidden">
+        <div style="padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+          <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,rgba(168,85,247,.25),rgba(168,85,247,.05));border:1px solid rgba(168,85,247,.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">💬</div>
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:700;font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em">MAX — Criador de Infoprodutos</div>
+            <div style="font-size:11px;color:var(--text-3);font-family:'DM Mono',monospace">Descreva o que quer criar · MAX faz o resto</div>
+          </div>
+          <button id="fc-reset" style="padding:6px 12px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text-3);font-size:12px;cursor:pointer;font-family:'DM Mono',monospace;flex-shrink:0">↺ recomeçar</button>
+        </div>
+        <div class="vsl-chat-msgs" id="fc-msgs" style="min-height:240px;max-height:500px"></div>
+        <div id="fc-typing" style="display:none;padding:4px 20px 8px">
+          <div class="fc-msg max">
+            <div class="fc-avatar">🤖</div>
+            <div class="fc-bubble" style="padding:10px 14px"><div class="fc-typing"><span></span><span></span><span></span></div></div>
+          </div>
+        </div>
+        <div id="fc-summary-wrap" style="display:none;padding:16px 20px;border-top:1px solid var(--border)"></div>
+        <div class="vsl-input-row" id="fc-input-row">
+          <textarea class="vsl-input" id="fc-input" placeholder="Descreva o produto que quer criar..." rows="1"></textarea>
+          <button class="vsl-send" id="fc-send" title="Enviar (Enter)">➤</button>
         </div>
       </section>
 
@@ -1614,6 +1664,21 @@ main{position:relative;z-index:auto}
   const typeIco     = document.getElementById('type-ico');
   let selectedType  = 'ebook';
   let _activeEventSource = null;
+
+  // Expõe setter para o Forge Chat preencher o tipo sem quebrar o escopo
+  window._fcSetType = function(tipo) {
+    selectedType = tipo;
+    const opt = document.querySelector(`.opt[data-v="${tipo}"]`);
+    if (opt) {
+      document.querySelectorAll('.opt').forEach(x => x.classList.remove('active'));
+      opt.classList.add('active');
+      const label = document.getElementById('type-label');
+      const ico   = document.getElementById('type-ico');
+      if (label) label.textContent = opt.textContent.replace(/\d+[–-]\d+ pg|roteiro|1 pg/g, '').trim();
+      if (ico)   ico.textContent   = opt.dataset.ico;
+      document.getElementById('s-type').textContent = label?.textContent || '';
+    }
+  };
 
   // Tempo estimado e dica por tipo
   // Tempos reais observados com Gamma AI (2026-05-05: ebook 15pg = 4m 16s)
@@ -3081,6 +3146,13 @@ main{position:relative;z-index:auto}
       } else if (currentMode === 'ilu') {
         btnGerar.style.display = 'none';
         genNote.style.display  = 'none';
+      } else if (currentMode === 'chat') {
+        btnGerar.style.display = 'none';
+        genNote.style.display  = 'none';
+        if (typeof window._fcInit === 'function') {
+          const hasMsgs = document.getElementById('fc-msgs')?.children.length > 0;
+          if (!hasMsgs) window._fcInit();
+        }
       } else {
         btnGerar.style.display = '';
         genNote.style.display  = '';
@@ -3208,6 +3280,163 @@ main{position:relative;z-index:auto}
     if (data.error) throw new Error(data.error);
     return data; // { pdf, pdfFilename, titulo, roteiro }
   }
+
+  // ════════════════════════════════════════
+  // FORGE CHAT UNIVERSAL — coleta contexto e gera
+  // ════════════════════════════════════════
+  (function() {
+    const msgsEl   = document.getElementById('fc-msgs');
+    const inputEl  = document.getElementById('fc-input');
+    const sendBtn  = document.getElementById('fc-send');
+    const resetBtn = document.getElementById('fc-reset');
+    const typingEl = document.getElementById('fc-typing');
+    const summaryWrap = document.getElementById('fc-summary-wrap');
+    const inputRow = document.getElementById('fc-input-row');
+
+    if (!msgsEl) return;
+
+    let fcMessages = [];
+    let fcDone = false;
+
+    const TIPO_LABELS = {
+      ebook: 'Ebook / Guia Completo', workbook: 'Workbook', checklist: 'Checklist',
+      planner: 'Planner', cheat_sheet: 'Guia Rápido', pregacoes: 'Pack de Pregações',
+      script_vsl: 'Script de Vendas',
+    };
+
+    function _addMsg(role, text) {
+      const el = document.createElement('div');
+      el.className = 'fc-msg ' + (role === 'user' ? 'user' : 'max');
+      el.innerHTML = `<div class="fc-avatar">${role === 'user' ? '👤' : '🤖'}</div>
+        <div class="fc-bubble">${text.replace(/\n/g, '<br>')}</div>`;
+      msgsEl.appendChild(el);
+      msgsEl.scrollTop = msgsEl.scrollHeight;
+    }
+
+    function _setTyping(on) {
+      if (typingEl) typingEl.style.display = on ? 'block' : 'none';
+      if (on) msgsEl.scrollTop = msgsEl.scrollHeight;
+    }
+
+    function _showSummary(payload) {
+      summaryWrap.style.display = 'block';
+      inputRow.style.display = 'none';
+      const tipo = TIPO_LABELS[payload.tipo] || payload.tipo;
+      summaryWrap.innerHTML = `
+        <div class="fc-summary">
+          <div style="font-size:12px;font-weight:700;color:var(--accent);font-family:'DM Mono',monospace;letter-spacing:.05em;margin-bottom:4px">✦ RESUMO DO PRODUTO</div>
+          <div class="fc-summary-row"><span class="fc-summary-key">Tipo</span><span class="fc-summary-val">${tipo}</span></div>
+          <div class="fc-summary-row"><span class="fc-summary-key">Título</span><span class="fc-summary-val">${payload.titulo}</span></div>
+          ${payload.subtitulo ? `<div class="fc-summary-row"><span class="fc-summary-key">Subtítulo</span><span class="fc-summary-val">${payload.subtitulo}</span></div>` : ''}
+          <div class="fc-summary-row"><span class="fc-summary-key">Público</span><span class="fc-summary-val">${payload.publico || '—'}</span></div>
+          <div class="fc-summary-row"><span class="fc-summary-key">Páginas</span><span class="fc-summary-val">${payload.paginas || '—'}</span></div>
+          <button class="fc-gerar-btn" id="fc-gerar-btn" style="margin-top:6px">🚀 Gerar agora</button>
+          <button onclick="_fcReset()" style="width:100%;padding:8px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text-3);font-size:12px;cursor:pointer;font-family:'DM Mono',monospace">✏️ Quero ajustar</button>
+        </div>`;
+
+      document.getElementById('fc-gerar-btn')?.addEventListener('click', () => _gerarComPayload(payload));
+    }
+
+    function _gerarComPayload(payload) {
+      // Preenche os campos hidden do formulário
+      const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+      set('inp-titulo',    payload.titulo);
+      set('inp-subtitulo', payload.subtitulo);
+      set('inp-autor',     payload.autor);
+      set('inp-descricao', payload.dor + (payload.transformacao ? ' → ' + payload.transformacao : ''));
+      set('inp-avatar',    payload.publico);
+      set('inp-paginas',   payload.paginas);
+      set('dna-nome',      payload.titulo);
+      set('dna-nicho',     payload.tema);
+      set('dna-publico',   payload.publico);
+      set('dna-preco',     payload.preco);
+
+      // Atualiza selectedType e label na UI
+      if (typeof window._fcSetType === 'function') window._fcSetType(payload.tipo);
+
+      // Muda para modo ent e dispara geração
+      document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+      document.querySelector('.mode-tab[data-mode="ent"]')?.classList.add('active');
+      document.body.className = 'mode-ent';
+
+      setTimeout(() => {
+        const btn = document.getElementById('btn-gerar');
+        if (btn) btn.click();
+      }, 100);
+    }
+
+    async function _send() {
+      const text = inputEl.value.trim();
+      if (!text || fcDone) return;
+      inputEl.value = '';
+      inputEl.style.height = 'auto';
+      _addMsg('user', text);
+      fcMessages.push({ role: 'user', content: text });
+
+      sendBtn.disabled = true;
+      inputEl.disabled = true;
+      _setTyping(true);
+
+      try {
+        const resp = await fetch('/api/forge-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: fcMessages }),
+        });
+        const data = await resp.json();
+        if (data.error) throw new Error(data.error);
+
+        _setTyping(false);
+        _addMsg('max', data.resposta);
+        fcMessages.push({ role: 'assistant', content: data.resposta });
+
+        if (data.pronto && data.payload) {
+          fcDone = true;
+          setTimeout(() => _showSummary(data.payload), 400);
+        }
+      } catch(e) {
+        _setTyping(false);
+        _addMsg('max', '⚠️ Erro: ' + e.message + ' — tente novamente.');
+      } finally {
+        if (!fcDone) {
+          sendBtn.disabled = false;
+          inputEl.disabled = false;
+          inputEl.focus();
+        }
+      }
+    }
+
+    function _fcReset() {
+      fcMessages = [];
+      fcDone = false;
+      msgsEl.innerHTML = '';
+      summaryWrap.style.display = 'none';
+      summaryWrap.innerHTML = '';
+      inputRow.style.display = '';
+      sendBtn.disabled = false;
+      inputEl.disabled = false;
+      _init();
+    }
+    window._fcReset = _fcReset;
+
+    function _init() {
+      const abertura = 'Olá! Sou o MAX, seu criador de infoprodutos.\n\nMe conta: qual é o tema ou nicho do produto que você quer criar? (ex: emagrecimento, jiu-jitsu infantil, finanças pessoais, fé cristã…)';
+      _addMsg('max', abertura);
+      fcMessages.push({ role: 'assistant', content: abertura });
+    }
+
+    sendBtn?.addEventListener('click', _send);
+    resetBtn?.addEventListener('click', _fcReset);
+    inputEl?.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); _send(); }
+    });
+    inputEl?.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+
+    window._fcInit = _init;
+  })();
 
   // ════════════════════════════════════════
   // ILUSTRAÇÕES — painel de geração DALL-E 3
