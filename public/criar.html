@@ -1611,7 +1611,7 @@ main{position:relative;z-index:auto}
       typeLabel.textContent = o.textContent.replace(/\d+[–-]\d+ pg|roteiro|1 pg/g, '').trim();
       typeIco.textContent = o.dataset.ico;
       document.getElementById('s-type').textContent = typeLabel.textContent;
-      document.getElementById('pv-brand').textContent = 'Nexus Forge · ' + typeLabel.textContent.split('/')[0].trim();
+      const _pvb = document.getElementById('pv-brand'); if (_pvb) _pvb.textContent = 'Nexus Forge · ' + typeLabel.textContent.split('/')[0].trim();
       typeMenu.style.display = 'none';
 
       // VSL mode — CSS cuida da aside (aside.col some, #vsl-narr-card aparece)
@@ -2599,12 +2599,12 @@ main{position:relative;z-index:auto}
   if (pvHookEl) pvHookEl.addEventListener('focus', () => { pvFocused = 'pv-hook'; pvActiveElem = 'pv-hook'; });
 
   // A+ / A- on active element
-  document.getElementById('pv-font-up').addEventListener('click', () => {
+  document.getElementById('pv-font-up')?.addEventListener('click', () => {
     pvFontSizes[pvActiveElem] = Math.min((pvFontSizes[pvActiveElem] || 16) + 2, 60);
     const el = document.getElementById(pvActiveElem);
     if (el) el.style.fontSize = pvFontSizes[pvActiveElem] + 'px';
   });
-  document.getElementById('pv-font-down').addEventListener('click', () => {
+  document.getElementById('pv-font-down')?.addEventListener('click', () => {
     pvFontSizes[pvActiveElem] = Math.max((pvFontSizes[pvActiveElem] || 16) - 2, 9);
     const el = document.getElementById(pvActiveElem);
     if (el) el.style.fontSize = pvFontSizes[pvActiveElem] + 'px';
@@ -2887,10 +2887,10 @@ main{position:relative;z-index:auto}
   });
 
   // pv-hook (preview slide) → gancho input sync
-  document.getElementById('pv-hook').addEventListener('blur', function() {
+  document.getElementById('pv-hook')?.addEventListener('blur', function() {
     document.getElementById('inp-gancho').value = this.textContent.trim();
   });
-  document.getElementById('pv-hook').addEventListener('keydown', e => {
+  document.getElementById('pv-hook')?.addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); }
   });
 
