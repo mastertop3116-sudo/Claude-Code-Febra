@@ -1983,7 +1983,7 @@ main{position:relative;z-index:auto}
     const caps  = calcCaps(pages);
     const nicho = document.getElementById('inp-descricao')?.value?.trim() || '';
     const metaParts = [nicho || _gammaThemeName, pages + 'pg'].filter(Boolean);
-    document.getElementById('pv-meta').textContent = metaParts.join(' · ');
+    const _pvMeta = document.getElementById('pv-meta'); if (_pvMeta) _pvMeta.textContent = metaParts.join(' · ');
     document.getElementById('s-pages').textContent = pages + ' pg · ~' + caps + ' capítulos';
   }
 
@@ -2583,6 +2583,7 @@ main{position:relative;z-index:auto}
   // contenteditable setup
   ['pv-title', 'pv-sub', 'pv-autor'].forEach(id => {
     const el = document.getElementById(id);
+    if (!el) return;
     el.contentEditable = 'true';
     el.spellcheck = false;
     el.addEventListener('focus', () => { pvFocused = id; pvActiveElem = id; });
@@ -2793,13 +2794,13 @@ main{position:relative;z-index:auto}
         if (fc) fc.click();
       }
       if (data['inp-titulo']) {
-        document.getElementById('pv-title').textContent = data['inp-titulo'];
+        const _t = document.getElementById('pv-title'); if (_t) _t.textContent = data['inp-titulo'];
       }
       if (data['inp-subtitulo']) {
-        document.getElementById('pv-sub').textContent = data['inp-subtitulo'];
+        const _s = document.getElementById('pv-sub'); if (_s) _s.textContent = data['inp-subtitulo'];
       }
       if (data['inp-autor']) {
-        document.getElementById('pv-autor').textContent = data['inp-autor'];
+        const _a = document.getElementById('pv-autor'); if (_a) _a.textContent = data['inp-autor'];
       }
     } catch (_) {}
   }
@@ -2923,7 +2924,7 @@ main{position:relative;z-index:auto}
     let sugestao   = list[Math.floor(Math.random() * list.length)];
     if (assunto) sugestao = sugestao.replace('[assunto]', assunto).replace('[erro]', assunto);
     document.getElementById('inp-gancho').value = sugestao;
-    document.getElementById('pv-hook').textContent = sugestao;
+    const _pvHk = document.getElementById('pv-hook'); if (_pvHk) _pvHk.textContent = sugestao;
   });
 
   // ---- assunto → summary ----
@@ -2935,8 +2936,8 @@ main{position:relative;z-index:auto}
   // ---- criativo: reflete headline no preview title ----
   document.getElementById('cri-headline')?.addEventListener('input', function() {
     if (currentMode === 'cri') {
-      document.getElementById('pv-title').textContent = this.value || 'Sua Headline';
-      document.getElementById('pv-brand').textContent = 'Meta Ads · Nexus Forge';
+      const _pvT2 = document.getElementById('pv-title'); if (_pvT2) _pvT2.textContent = this.value || 'Sua Headline';
+      const _pvB2 = document.getElementById('pv-brand'); if (_pvB2) _pvB2.textContent = 'Meta Ads · Nexus Forge';
     }
   });
 
