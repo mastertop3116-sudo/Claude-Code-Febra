@@ -1653,21 +1653,18 @@ main{position:relative;z-index:auto}
       document.getElementById('pv-brand').textContent = 'Nexus Forge · ' + typeLabel.textContent.split('/')[0].trim();
       typeMenu.style.display = 'none';
 
-      // VSL → ativa modo chat, troca aside diretamente
-      const previewCard  = document.getElementById('preview-card');
-      const vslNarrCard  = document.getElementById('vsl-narr-card');
-      const elNote       = document.querySelector('.aside-el-note');
+      // VSL → ativa modo chat; _init() cuida da troca da aside
       if (selectedType === 'script_vsl') {
         document.body.classList.add('type-vsl');
-        if (previewCard)  previewCard.style.display  = 'none';
-        if (vslNarrCard)  vslNarrCard.style.display  = 'flex';
-        if (elNote)       elNote.style.display        = 'none';
         if (typeof window._vslInit === 'function') window._vslInit();
       } else {
         document.body.classList.remove('type-vsl');
-        if (previewCard)  previewCard.style.display  = '';
-        if (vslNarrCard)  vslNarrCard.style.display  = 'none';
-        if (elNote)       elNote.style.display        = '';
+        // Restaura aside: mostra todos os cards, esconde narr-card
+        document.querySelectorAll('aside.col .card').forEach(c => {
+          c.style.display = c.id === 'vsl-narr-card' ? 'none' : '';
+        });
+        const elNote = document.querySelector('.aside-el-note');
+        if (elNote) elNote.style.display = '';
       }
 
       updateTypeUI(selectedType);
@@ -3315,8 +3312,15 @@ main{position:relative;z-index:auto}
       sendBtn.disabled = false;
       inputEl.placeholder = 'Digite sua resposta...';
 
-      // Mensagem de abertura do agente
-      const abertura = 'Olá! Sou o especialista em VSL da Nexus.\n\nVou criar uma carta de vendas em vídeo que converte de verdade para o seu produto.\n\nPrimeira pergunta: qual é o nome do seu produto e qual problema principal ele resolve?';
+      // Troca aside: esconde preview, mostra estúdio de narração
+      document.querySelectorAll('aside.col .card').forEach(c => {
+        c.style.display = c.id === 'vsl-narr-card' ? 'flex' : 'none';
+      });
+      const elNote = document.querySelector('.aside-el-note');
+      if (elNote) elNote.style.display = 'none';
+
+      // Mensagem de abertura
+      const abertura = 'Olá! Sou o especialista em VSL da Nexus.\n\nVou criar o roteiro completo de narração para o seu produto — pronto para usar em qualquer IA de voz (ElevenLabs, HeyGen, Descript).\n\nPrimeira pergunta: qual é o nome do seu produto e qual problema principal ele resolve?';
       _addMsg('agent', abertura);
       vslMessages.push({ role: 'assistant', content: abertura });
     }
