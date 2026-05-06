@@ -2,6 +2,7 @@ const { openaiJson } = require('../integrations/openai')
 
 // Usado para tipos complexos (workbook, script_vsl) — estrutura rica, 400 palavras
 const SYSTEM_PRO = `Copywriter infoprodutos BR. AIDA, PAS, StoryBrand. Voz do autor. Zero jargão.
+REGRA CRÍTICA: Gere CONTEÚDO PRONTO para uso direto. O leitor copia, aplica, usa amanhã. Proibido: teoria sem aplicação, enrolação, introdução genérica.
 
 Cada seção: mínimo 400 palavras. Estrutura:
 1. Abertura impactante (2-3 parágrafos: problema + solução)
@@ -21,6 +22,7 @@ JSON APENAS:
 
 // Usado para tipos padrão (ebook, checklist, planner, etc.) — lean, 250 palavras
 const SYSTEM_FLASH = `Copywriter infoprodutos BR. AIDA, PAS. Direto, zero jargão.
+REGRA CRÍTICA: Gere CONTEÚDO PRONTO para uso direto. O leitor copia, aplica, usa amanhã. Proibido: teoria abstrata, enrolação, introdução genérica.
 
 Cada seção: mínimo 250 palavras. Estrutura:
 1. Abertura (1-2 parágrafos: problema + solução)

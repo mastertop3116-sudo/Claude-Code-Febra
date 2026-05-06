@@ -1,15 +1,15 @@
 // ============================================
-// NEXUS — Agente VSL (Video Sales Letter)
+// NEXUS — Agente Script de Vendas (narração em áudio)
 // Especialista em copy long-form low-ticket BR
 // Fase 1: coleta contexto via chat
-// Fase 2: gera VSL 800-1200 palavras para narração
+// Fase 2: gera script 800-1200 palavras para narração
 // ============================================
 
 const { openaiJson, openaiFlash } = require('../integrations/openai')
 const { jsonrepair }              = require('jsonrepair')
 
 // ── Fase 1: coleta contexto via chat ──────────
-const SYSTEM_COLLECT = `Você é um especialista em VSL (Video Sales Letter) para infoprodutos low-ticket brasileiros.
+const SYSTEM_COLLECT = `Você é um especialista em scripts de vendas para narração em áudio (formato long-form) para infoprodutos low-ticket brasileiros.
 Sua missão: coletar contexto do produto via conversa natural e objetiva. Máximo 6 perguntas, uma por vez.
 
 SEQUÊNCIA DE PERGUNTAS (siga esta ordem, adapte o tom):
@@ -31,15 +31,15 @@ RESPONDA SEMPRE EM JSON VÁLIDO — nunca em texto puro:
 Se ainda precisar de mais informações:
 { "pronto": false, "resposta": "confirmação curta + próxima pergunta" }
 
-Se tiver contexto suficiente para gerar a VSL:
-{ "pronto": true, "resposta": "Perfeito! Tenho tudo que preciso. Gerando sua VSL agora...", "contexto": { "nome": "", "problema": "", "avatar": "", "dor": "", "transformacao": "", "conteudo": "", "preco": "", "garantia": "", "prova_social": "" } }`
+Se tiver contexto suficiente para gerar o script:
+{ "pronto": true, "resposta": "Perfeito! Tenho tudo que preciso. Gerando o script de vendas agora...", "contexto": { "nome": "", "problema": "", "avatar": "", "dor": "", "transformacao": "", "conteudo": "", "preco": "", "garantia": "", "prova_social": "" } }`
 
-// ── Fase 2: gera a VSL completa ───────────────
-const SYSTEM_GENERATE = `Você é o melhor copywriter de VSL para infoprodutos low-ticket no Brasil.
+// ── Fase 2: gera o script completo ───────────
+const SYSTEM_GENERATE = `Você é o melhor copywriter de scripts de vendas para narração em áudio no Brasil.
 
-Escreva uma VSL completa de 800 a 1200 palavras em português brasileiro coloquial e natural.
-O texto é para ser FALADO em narração de vídeo ou IA de voz — sem markdown, sem títulos, sem bullet points, sem asteriscos.
-Escreva como se uma pessoa estivesse falando direto para a câmera, de forma fluida e natural.
+Escreva um script de vendas completo de 800 a 1200 palavras em português brasileiro coloquial e natural.
+O texto é para ser NARRADO por IA de voz (ElevenLabs, HeyGen, Descript) — sem markdown, sem títulos, sem bullet points, sem asteriscos.
+Escreva como se uma pessoa estivesse falando direto ao ouvinte, de forma fluida e natural.
 
 ESTRUTURA OBRIGATÓRIA (não cite os nomes das seções — flua naturalmente entre elas):
 
@@ -97,7 +97,7 @@ REGRAS INVIOLÁVEIS:
 - Tom íntimo: como amigo que descobriu algo incrível e quer compartilhar
 - Comece diretamente no gancho — zero introdução, zero "olá"
 
-Retorne APENAS o texto corrido da VSL, sem nenhuma formatação.
+Retorne APENAS o texto corrido do script, sem nenhuma formatação.
 Na última linha: DURAÇÃO ESTIMADA: X min (calcule ~130 palavras por minuto).`
 
 function _parseJson(raw) {
@@ -118,7 +118,7 @@ async function collectContext(messages) {
 
 // contexto: objeto com dados do produto coletados pelo chat
 async function generateVSL(contexto) {
-  const prompt = `Dados do produto:\n${JSON.stringify(contexto, null, 2)}\n\nEscreva a VSL completa agora.`
+  const prompt = `Dados do produto:\n${JSON.stringify(contexto, null, 2)}\n\nEscreva o script de vendas completo agora.`
   return openaiFlash(prompt, SYSTEM_GENERATE)
 }
 

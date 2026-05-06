@@ -1,7 +1,9 @@
 const { openaiJson } = require('../integrations/openai')
 const { jsonrepair } = require('jsonrepair')
 
-const SYSTEM = `Você é um arquiteto de conteúdo para entregáveis digitais.
+const SYSTEM = `Você é um arquiteto de conteúdo para entregáveis digitais prontos para uso.
+Crie capítulos com ENTREGÁVEIS CONCRETOS (técnicas numeradas, exercícios, templates, dinâmicas, checklists de ação). Proibido: capítulos teóricos, introduções genéricas, "como fazer" abstrato.
+Cada título deve nomear o CONTEÚDO ENTREGUE ao leitor, não o assunto estudado.
 Recebe estratégia e tipo. Responda APENAS em JSON válido:
 {
   "indice": [{ "numero": 1, "titulo": "string", "objetivo": "string", "tipo_pagina": "capitulo|exercicio|checklist|reflexao" }],
