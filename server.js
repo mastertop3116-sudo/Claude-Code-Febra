@@ -515,6 +515,58 @@ app.post("/api/vsl/chat", async (req, res) => {
 });
 
 // ──────────────────────────────────────────
+// Gerador de Ilustrações via DALL-E 3
+// ──────────────────────────────────────────
+const ESTILOS_PROMPT = {
+  colorir:    'black and white coloring book page, thick clean outlines, no shading, no gray, pure white background, simple and cute cartoon style, ready to print and color',
+  cartoon:    'colorful cartoon illustration, vibrant colors, friendly and cute style, clean lines, white background, child-friendly',
+  aquarela:   'watercolor illustration, soft pastel colors, gentle brushstrokes, white background, artistic and delicate style',
+  realista:   'detailed digital illustration, professional artwork, clean white background, high quality, educational',
+};
+
+const FAIXA_PROMPT = {
+  infantil_3:  'very simple shapes, extra large features, friendly animals or characters, age 3-6 children',
+  infantil_7:  'moderate complexity, engaging details, age 7-12 children, educational style',
+  teen:        'more detailed, modern style, age 12-16 teenagers',
+  adulto:      'adult complexity, refined details, professional quality',
+};
+
+app.post("/api/gerar-imagens", async (req, res) => {
+  try {
+    const { tema, estilo = 'colorir', faixa = 'infantil_7', quantidade = 1, descricao = '' } = req.body;
+    if (!tema) return res.status(400).json({ error: "tema obrigatório" });
+
+    const { openaiImage } = require('./integrations/openai');
+    const qtd = Math.min(Math.max(parseInt(quantidade) || 1, 1), 4);
+
+    const estiloDesc = ESTILOS_PROMPT[estilo] || ESTILOS_PROMPT.colorir;
+    const faixaDesc  = FAIXA_PROMPT[faixa]   || FAIXA_PROMPT.infantil_7;
+
+    // Gera variações do mesmo tema para cada imagem
+    const variacoes = [
+      `${tema} — cena principal`,
+      `${tema} — personagem em destaque`,
+      `${tema} — ambiente e cenário`,
+      `${tema} — ação e movimento`,
+    ];
+
+    const imagens = [];
+    for (let i = 0; i < qtd; i++) {
+      const variacao = variacoes[i % variacoes.length];
+      const extraDesc = descricao ? `, ${descricao}` : '';
+      const prompt = `${estiloDesc}, ${faixaDesc}, subject: ${variacao}${extraDesc}, single illustration, centered composition`;
+      const b64 = await openaiImage(prompt, '1024x1024');
+      imagens.push({ index: i + 1, variacao, b64 });
+    }
+
+    res.json({ imagens, tema, estilo, quantidade: qtd });
+  } catch (e) {
+    console.error("[/api/gerar-imagens]", e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ──────────────────────────────────────────
 // Gerador de Criativo (imagem PNG para Meta Ads)
 // ──────────────────────────────────────────
 app.post("/api/criativo", async (req, res) => {

@@ -161,10 +161,18 @@
   .mode-tab b{font-size:13px;font-weight:600;color:var(--text);display:block;margin-top:4px}
   .mode-tab small{font-size:11px;color:var(--text-3);font-family:"DM Mono",monospace;display:block;margin-top:2px}
   .post-types{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  [data-showon="car"]{display:none}[data-showon="conv"]{display:none}[data-showon="cri"]{display:none}
+  [data-showon="car"]{display:none}[data-showon="conv"]{display:none}[data-showon="cri"]{display:none}[data-showon="ilu"]{display:none}
   body.mode-car [data-showon="ent"]{display:none}body.mode-car [data-showon="car"]{display:block}
   body.mode-conv [data-showon="ent"]{display:none}body.mode-conv [data-showon="car"]{display:none}body.mode-conv [data-showon="conv"]{display:block}
   body.mode-cri [data-showon="ent"]{display:none}body.mode-cri [data-showon="car"]{display:none}body.mode-cri [data-showon="cri"]{display:block}
+  body.mode-ilu [data-showon="ent"]{display:none}body.mode-ilu [data-showon="car"]{display:none}body.mode-ilu [data-showon="ilu"]{display:block}
+  .ilu-qtd-btn{padding:7px 16px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text-2);font-size:12px;cursor:pointer;transition:all .15s;font-family:'DM Mono',monospace}
+  .ilu-qtd-btn.active{background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.5);color:var(--accent)}
+  .ilu-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;gap:0;width:calc(50% - 8px);min-width:260px}
+  .ilu-card img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+  .ilu-card-footer{padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .ilu-dl{padding:6px 14px;border-radius:7px;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.3);color:var(--accent);font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;text-decoration:none;font-weight:600;transition:background .15s}
+  .ilu-dl:hover{background:rgba(168,85,247,.25)}
   .cri-formats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
   .cri-formats .fmt{flex-direction:column;align-items:flex-start;gap:6px;padding:14px}
   .cri-formats .fmt .ico{font-size:18px;width:32px;height:32px}
@@ -667,6 +675,11 @@ main{position:relative;z-index:auto}
             <span class="mico">🎨</span>
             <b>Criativo</b>
             <small>Imagem · Banner · Story</small>
+          </div>
+          <div class="mode-tab" data-mode="ilu">
+            <span class="mico">🖼️</span>
+            <b>Ilustrações</b>
+            <small>Colorir · Desenhos · Materiais</small>
           </div>
         </div>
       </section>
@@ -1207,6 +1220,62 @@ main{position:relative;z-index:auto}
           <div class="fmt" data-v="ambos"><span class="ico">🎁</span><div><b>Ambos</b><span>bundle completo</span></div></div>
         </div>
       </section>
+
+    <!-- ===== ILUSTRAÇÕES PANEL ===== -->
+    <section class="card" data-showon="ilu" style="display:none">
+      <h2><span class="n">🖼️</span>Gerador de Ilustrações<span class="hint">DALL-E 3 · pronto para imprimir</span></h2>
+      <div class="stack">
+
+        <div>
+          <label class="lbl">Tema das ilustrações <span style="color:var(--brand);font-size:11px">obrigatório</span></label>
+          <input class="input" id="ilu-tema" placeholder="Ex: animais da fazenda, dinossauros, frutas, princesas, veículos…">
+        </div>
+
+        <div>
+          <label class="lbl">Detalhes adicionais <span class="opt">opcional</span></label>
+          <input class="input" id="ilu-desc" placeholder="Ex: fundo simples, estilo fofo, com nomes escritos abaixo…">
+        </div>
+
+        <div class="row2">
+          <div>
+            <label class="lbl">Estilo</label>
+            <select class="input" id="ilu-estilo">
+              <option value="colorir">🖊 Para colorir (contornos P&B)</option>
+              <option value="cartoon">🎨 Cartoon colorido</option>
+              <option value="aquarela">🎨 Aquarela suave</option>
+              <option value="realista">📐 Ilustração detalhada</option>
+            </select>
+          </div>
+          <div>
+            <label class="lbl">Faixa etária</label>
+            <select class="input" id="ilu-faixa">
+              <option value="infantil_3">Infantil (3–6 anos)</option>
+              <option value="infantil_7" selected>Infantil (7–12 anos)</option>
+              <option value="teen">Adolescente</option>
+              <option value="adulto">Adulto</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="lbl">Quantidade de imagens</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap" id="ilu-qtd-btns">
+            <button class="ilu-qtd-btn active" data-qtd="1">1 imagem</button>
+            <button class="ilu-qtd-btn" data-qtd="2">2 imagens</button>
+            <button class="ilu-qtd-btn" data-qtd="3">3 imagens</button>
+            <button class="ilu-qtd-btn" data-qtd="4">4 imagens</button>
+          </div>
+          <div style="margin-top:6px;font-size:11px;color:var(--text-3)">⏱ ~15s por imagem · cada uma é única</div>
+        </div>
+
+        <button class="generate" id="ilu-btn-gerar" style="margin-top:4px">🖼️ Gerar Ilustrações</button>
+
+        <div id="ilu-status" style="display:none;font-size:12px;color:var(--text-3);font-family:'DM Mono',monospace;text-align:center;padding:8px 0"></div>
+
+        <div id="ilu-gallery" style="display:none;display:none;flex-wrap:wrap;gap:16px;justify-content:center;margin-top:8px"></div>
+
+      </div>
+    </section>
 
     <!-- ===== VSL CHAT PANEL ===== -->
     <div id="vsl-chat-panel">
@@ -3009,7 +3078,12 @@ main{position:relative;z-index:auto}
         btnGerar.textContent = '🎯 Gerar Criativo';
         genNote.textContent  = '~60s · PNG 1080px · pronto pro Meta Ads';
         if (hintText) hintText.textContent = '🎯 Criativo para Meta / Google Ads';
+      } else if (currentMode === 'ilu') {
+        btnGerar.style.display = 'none';
+        genNote.style.display  = 'none';
       } else {
+        btnGerar.style.display = '';
+        genNote.style.display  = '';
         btnGerar.textContent = '🚀 Gerar Infoproduto';
         genNote.textContent  = (TYPE_TIME[selectedType] || '~90s') + ' · gerado no servidor · sem marca d\'água';
         hintText.textContent = '✏️ Clique no título ou subtítulo para editar';
@@ -3134,6 +3208,74 @@ main{position:relative;z-index:auto}
     if (data.error) throw new Error(data.error);
     return data; // { pdf, pdfFilename, titulo, roteiro }
   }
+
+  // ════════════════════════════════════════
+  // ILUSTRAÇÕES — painel de geração DALL-E 3
+  // ════════════════════════════════════════
+  (function() {
+    let iluQtd = 1;
+
+    document.querySelectorAll('.ilu-qtd-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.ilu-qtd-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        iluQtd = parseInt(btn.dataset.qtd);
+      });
+    });
+
+    document.getElementById('ilu-btn-gerar')?.addEventListener('click', async () => {
+      const tema  = document.getElementById('ilu-tema')?.value.trim();
+      const desc  = document.getElementById('ilu-desc')?.value.trim() || '';
+      const estilo = document.getElementById('ilu-estilo')?.value || 'colorir';
+      const faixa  = document.getElementById('ilu-faixa')?.value  || 'infantil_7';
+
+      if (!tema) { alert('Informe o tema das ilustrações.'); return; }
+
+      const btn     = document.getElementById('ilu-btn-gerar');
+      const status  = document.getElementById('ilu-status');
+      const gallery = document.getElementById('ilu-gallery');
+
+      btn.disabled = true;
+      btn.textContent = '⏳ Gerando…';
+      status.style.display = 'block';
+      status.textContent   = `Gerando ${iluQtd} ilustração${iluQtd > 1 ? 'ões' : ''}… ~${iluQtd * 15}s`;
+      gallery.style.display = 'none';
+      gallery.innerHTML = '';
+
+      try {
+        const resp = await fetch('/api/gerar-imagens', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tema, descricao: desc, estilo, faixa, quantidade: iluQtd }),
+        });
+        const data = await resp.json();
+        if (!resp.ok || data.error) throw new Error(data.error || 'Erro ao gerar');
+
+        gallery.style.display = 'flex';
+        data.imagens.forEach(img => {
+          const src = 'data:image/png;base64,' + img.b64;
+          const card = document.createElement('div');
+          card.className = 'ilu-card';
+          card.innerHTML = `
+            <img src="${src}" alt="${img.variacao}" loading="lazy">
+            <div class="ilu-card-footer">
+              <span style="font-size:11px;color:var(--text-3);font-family:'DM Mono',monospace">${img.variacao}</span>
+              <a class="ilu-dl" href="${src}" download="ilustracao_${img.index}.png">⬇ Baixar</a>
+            </div>`;
+          gallery.appendChild(card);
+        });
+
+        status.textContent = `✓ ${data.imagens.length} ilustração${data.imagens.length > 1 ? 'ões' : ''} gerada${data.imagens.length > 1 ? 's' : ''}!`;
+        status.style.color = 'var(--accent)';
+      } catch(e) {
+        status.textContent = '✗ Erro: ' + e.message;
+        status.style.color = 'var(--err, #ff4757)';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🖼️ Gerar Ilustrações';
+      }
+    });
+  })();
 
   // ════════════════════════════════════════
   // VSL CHAT — motor do chat com o agente VSL

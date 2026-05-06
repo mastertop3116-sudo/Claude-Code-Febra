@@ -27,4 +27,17 @@ async function openaiJson(prompt, systemInstruction = null) {
   return r.choices[0].message.content
 }
 
-module.exports = { openaiFlash, openaiJson }
+// Gera uma imagem via DALL-E 3 e retorna base64
+async function openaiImage(prompt, size = '1024x1024') {
+  const r = await _getClient().images.generate({
+    model: 'dall-e-3',
+    prompt,
+    n: 1,
+    size,
+    response_format: 'b64_json',
+    quality: 'standard',
+  })
+  return r.data[0].b64_json
+}
+
+module.exports = { openaiFlash, openaiJson, openaiImage }
