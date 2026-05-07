@@ -595,7 +595,11 @@ main{position:relative;z-index:auto}
   </div>
   <nav class="sb-nav">
     <span class="sb-section">Criar</span>
-    <div class="sb-item active" data-sb-mode="ent" id="sb-ent">
+    <div class="sb-item active" data-sb-mode="chat" id="sb-chat">
+      <span class="sb-ico">💬</span>
+      <span>Chat com MAX</span>
+    </div>
+    <div class="sb-item" data-sb-mode="ent" id="sb-ent">
       <span class="sb-ico">🚀</span>
       <span>Infoproduto</span>
     </div>
@@ -4242,6 +4246,22 @@ main{position:relative;z-index:auto}
       if (btnGerar) btnGerar.textContent = cfg.btn;
       if (genNote)  genNote.textContent  = cfg.note;
 
+      if (mode === 'chat') {
+        if (btnGerar) btnGerar.style.display = 'none';
+        if (genNote)  genNote.style.display  = 'none';
+        if (typeof window._fcInit === 'function') {
+          const hasMsgs = document.getElementById('fc-msgs')?.children.length > 0;
+          if (!hasMsgs) window._fcInit();
+        }
+        return;
+      } else if (mode === 'ilu') {
+        if (btnGerar) btnGerar.style.display = 'none';
+        if (genNote)  genNote.style.display  = 'none';
+        return;
+      } else {
+        if (btnGerar) btnGerar.style.display = '';
+        if (genNote)  genNote.style.display  = '';
+      }
       if (mode === 'car') updateSlidePreviewColors();
       else if (mode === 'ent') updatePreviewColors();
 
