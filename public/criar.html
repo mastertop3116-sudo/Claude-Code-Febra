@@ -169,24 +169,56 @@
   [data-showon="chat"]{display:none}
   body.mode-chat [data-showon="ent"]{display:none}body.mode-chat [data-showon="chat"]{display:block}
   body.mode-chat #btn-gerar{display:none}body.mode-chat #gen-time-note{display:none}body.mode-chat #wizard-bar{display:none}body.mode-chat .head{display:none}body.mode-chat #sec-mode{display:none}
-  .fc-msg{display:flex;gap:10px;align-items:flex-start}
+  body.mode-chat .grid{grid-template-columns:1fr}
+  body.mode-chat aside{display:none}
+  body.mode-chat .col:first-child{align-self:stretch}
+
+  /* ─── Forge Chat UX ─── */
+  .fc-card{display:flex;flex-direction:column;min-height:calc(100vh - 200px);max-height:calc(100vh - 160px)}
+  .fc-card-header{padding:16px 22px;border-bottom:1px solid rgba(168,85,247,.1);display:flex;align-items:center;gap:13px;flex-shrink:0;background:linear-gradient(180deg,rgba(168,85,247,.05) 0%,transparent 100%)}
+  .fc-card-avatar{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,rgba(168,85,247,.22),rgba(168,85,247,.05));border:1px solid rgba(168,85,247,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 18px -6px rgba(168,85,247,.35)}
+  .fc-card-title{font-size:14px;font-weight:700;font-family:"Bricolage Grotesque",sans-serif;letter-spacing:-.02em;color:var(--text);line-height:1.2}
+  .fc-card-sub{font-size:11px;color:var(--text-3);font-family:"DM Mono",monospace;letter-spacing:.03em;margin-top:3px}
+  .fc-card-reset{padding:5px 13px;border-radius:7px;background:none;border:1px solid rgba(168,85,247,.14);color:var(--text-3);font-size:11px;cursor:pointer;font-family:"DM Mono",monospace;flex-shrink:0;transition:all .18s;letter-spacing:.04em}
+  .fc-card-reset:hover{border-color:rgba(168,85,247,.35);color:rgba(168,85,247,.7);background:rgba(168,85,247,.05)}
+
+  .fc-msgs{flex:1;overflow-y:auto;padding:22px 22px 10px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth}
+  .fc-msgs::-webkit-scrollbar{width:3px}.fc-msgs::-webkit-scrollbar-track{background:transparent}.fc-msgs::-webkit-scrollbar-thumb{background:rgba(168,85,247,.18);border-radius:2px}
+
+  @keyframes fcIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+  .fc-msg{display:flex;gap:10px;align-items:flex-end;animation:fcIn .22s ease forwards}
   .fc-msg.user{flex-direction:row-reverse}
-  .fc-msg .fc-avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px}
-  .fc-msg.max .fc-avatar{background:linear-gradient(135deg,rgba(168,85,247,.3),rgba(168,85,247,.1));border:1px solid rgba(168,85,247,.3)}
-  .fc-msg.user .fc-avatar{background:rgba(255,71,87,.15);border:1px solid rgba(255,71,87,.2)}
-  .fc-msg .fc-bubble{max-width:88%;padding:12px 16px;border-radius:14px;font-size:14px;line-height:1.6;color:var(--text)}
-  .fc-msg.max .fc-bubble{background:rgba(168,85,247,.07);border:1px solid rgba(168,85,247,.12);border-radius:4px 14px 14px 14px}
-  .fc-msg.user .fc-bubble{background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.12);border-radius:14px 4px 14px 14px;text-align:right}
-  .fc-summary{background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
-  .fc-summary-row{display:flex;gap:8px;font-size:13px}
-  .fc-summary-key{color:var(--text-3);min-width:80px;font-family:'DM Mono',monospace;font-size:11px;padding-top:2px}
-  .fc-summary-val{color:var(--text);font-weight:500;flex:1}
-  .fc-gerar-btn{width:100%;padding:14px;border-radius:10px;background:linear-gradient(135deg,var(--accent),rgba(168,85,247,.7));border:none;color:#fff;font-size:15px;font-weight:700;font-family:'Bricolage Grotesque',sans-serif;cursor:pointer;letter-spacing:-.01em;transition:filter .2s}
-  .fc-gerar-btn:hover{filter:brightness(1.12)}
-  .fc-typing{display:flex;gap:5px;padding:4px 2px}
-  .fc-typing span{width:7px;height:7px;border-radius:50%;background:rgba(168,85,247,.5);animation:fc-bounce 1.2s ease-in-out infinite}
+  .fc-avatar{width:28px;height:28px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;font-family:"Bricolage Grotesque",sans-serif;letter-spacing:0;line-height:1}
+  .fc-msg.max .fc-avatar{background:linear-gradient(135deg,rgba(168,85,247,.22),rgba(168,85,247,.06));border:1px solid rgba(168,85,247,.2);color:rgba(168,85,247,.85)}
+  .fc-msg.user .fc-avatar{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.28)}
+  .fc-bubble{max-width:82%;padding:11px 16px;font-size:14px;line-height:1.68;color:var(--text)}
+  .fc-msg.max .fc-bubble{background:rgba(168,85,247,.055);border:1px solid rgba(168,85,247,.11);border-left:2px solid rgba(168,85,247,.38);border-radius:4px 14px 14px 14px}
+  .fc-msg.user .fc-bubble{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:14px 4px 14px 14px;color:var(--text-2)}
+
+  .fc-typing-row{display:flex;gap:10px;align-items:flex-end;animation:fcIn .2s ease forwards;padding:0 0 6px}
+  .fc-typing-bub{background:rgba(168,85,247,.055);border:1px solid rgba(168,85,247,.11);border-left:2px solid rgba(168,85,247,.38);border-radius:4px 14px 14px 14px;padding:12px 16px;display:flex;gap:5px;align-items:center}
+  .fc-typing{display:flex;gap:5px;align-items:center}
+  .fc-typing span{width:6px;height:6px;border-radius:50%;background:rgba(168,85,247,.55);animation:fc-bounce 1.4s ease-in-out infinite}
   .fc-typing span:nth-child(2){animation-delay:.2s}.fc-typing span:nth-child(3){animation-delay:.4s}
-  @keyframes fc-bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+  @keyframes fc-bounce{0%,60%,100%{transform:translateY(0);opacity:.35}30%{transform:translateY(-5px);opacity:1}}
+
+  .fc-input-wrap{border-top:1px solid rgba(168,85,247,.09);padding:14px 18px;background:rgba(4,4,12,.5);flex-shrink:0;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  .fc-input-bar{display:flex;gap:10px;align-items:flex-end;background:rgba(255,255,255,.03);border:1px solid rgba(168,85,247,.16);border-radius:14px;padding:10px 10px 10px 16px;transition:border-color .2s,box-shadow .2s}
+  .fc-input-bar:focus-within{border-color:rgba(168,85,247,.42);box-shadow:0 0 0 3px rgba(168,85,247,.07),0 0 14px -6px rgba(168,85,247,.2)}
+  .fc-input{flex:1;background:none;border:none;color:var(--text);font-size:14px;font-family:"DM Sans",sans-serif;outline:none;resize:none;min-height:24px;max-height:100px;line-height:1.55;padding:0;align-self:center}
+  .fc-input::placeholder{color:var(--text-3)}
+  .fc-send{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--accent),rgba(147,51,234,.9));border:none;color:#fff;font-size:14px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:filter .15s,transform .1s,box-shadow .2s;align-self:flex-end;box-shadow:0 4px 12px -4px rgba(168,85,247,.4)}
+  .fc-send:hover{filter:brightness(1.14);box-shadow:0 6px 18px -4px rgba(168,85,247,.5)}
+  .fc-send:active{transform:scale(.93)}
+  .fc-send:disabled{background:rgba(168,85,247,.15);box-shadow:none;cursor:not-allowed;filter:none}
+
+  .fc-summary{background:linear-gradient(135deg,rgba(168,85,247,.08),rgba(168,85,247,.02) 70%);border:1px solid rgba(168,85,247,.22);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px;animation:fcIn .3s ease forwards}
+  .fc-summary-row{display:flex;gap:10px;font-size:13px;align-items:baseline}
+  .fc-summary-key{color:var(--text-3);min-width:76px;font-family:"DM Mono",monospace;font-size:10px;padding-top:1px;letter-spacing:.05em;text-transform:uppercase;flex-shrink:0}
+  .fc-summary-val{color:var(--text);font-weight:500;flex:1;line-height:1.4}
+  .fc-gerar-btn{width:100%;padding:15px;border-radius:11px;background:linear-gradient(135deg,var(--accent),rgba(147,51,234,.9));border:none;color:#fff;font-size:15px;font-weight:700;font-family:"Bricolage Grotesque",sans-serif;cursor:pointer;letter-spacing:-.01em;transition:filter .2s,transform .1s,box-shadow .2s;box-shadow:0 8px 28px -8px rgba(168,85,247,.5)}
+  .fc-gerar-btn:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:0 12px 32px -8px rgba(168,85,247,.55)}
+  .fc-gerar-btn:active{transform:scale(.99)}
   .ilu-qtd-btn{padding:7px 16px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text-2);font-size:12px;cursor:pointer;transition:all .15s;font-family:'DM Mono',monospace}
   .ilu-qtd-btn.active{background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.5);color:var(--accent)}
   .ilu-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;gap:0;width:calc(50% - 8px);min-width:260px}
@@ -715,26 +747,38 @@ main{position:relative;z-index:auto}
       </section>
 
       <!-- ===== FORGE CHAT PANEL ===== -->
-      <section class="card" data-showon="chat" style="padding:0;overflow:hidden">
-        <div style="padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
-          <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,rgba(168,85,247,.25),rgba(168,85,247,.05));border:1px solid rgba(168,85,247,.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">💬</div>
+      <section class="card fc-card" data-showon="chat" style="padding:0;overflow:hidden">
+        <div class="fc-card-header">
+          <div class="fc-card-avatar">
+            <svg width="19" height="19" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 24V9L12 18L15 5L18 18L27 9V24" stroke="rgba(168,85,247,0.85)" stroke-width="2.7" stroke-linejoin="miter" stroke-linecap="square" fill="none"/>
+            </svg>
+          </div>
           <div style="flex:1">
-            <div style="font-size:15px;font-weight:700;font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em">MAX — Criador de Infoprodutos</div>
-            <div style="font-size:11px;color:var(--text-3);font-family:'DM Mono',monospace">Descreva o que quer criar · MAX faz o resto</div>
+            <div class="fc-card-title">MAX — Criador de Infoprodutos</div>
+            <div class="fc-card-sub">Descreva o que quer criar · MAX faz o resto</div>
           </div>
-          <button id="fc-reset" style="padding:6px 12px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text-3);font-size:12px;cursor:pointer;font-family:'DM Mono',monospace;flex-shrink:0">↺ recomeçar</button>
+          <button id="fc-reset" class="fc-card-reset">↺ novo</button>
         </div>
-        <div class="vsl-chat-msgs" id="fc-msgs" style="min-height:240px;max-height:500px"></div>
-        <div id="fc-typing" style="display:none;padding:4px 20px 8px">
-          <div class="fc-msg max">
-            <div class="fc-avatar">🤖</div>
-            <div class="fc-bubble" style="padding:10px 14px"><div class="fc-typing"><span></span><span></span><span></span></div></div>
+
+        <div class="fc-msgs" id="fc-msgs"></div>
+
+        <div id="fc-typing" style="display:none;padding:0 22px 8px">
+          <div class="fc-typing-row">
+            <div class="fc-avatar" style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,rgba(168,85,247,.22),rgba(168,85,247,.06));border:1px solid rgba(168,85,247,.2);color:rgba(168,85,247,.85)">M</div>
+            <div class="fc-typing-bub"><div class="fc-typing"><span></span><span></span><span></span></div></div>
           </div>
         </div>
-        <div id="fc-summary-wrap" style="display:none;padding:16px 20px;border-top:1px solid var(--border)"></div>
-        <div class="vsl-input-row" id="fc-input-row">
-          <textarea class="vsl-input" id="fc-input" placeholder="Descreva o produto que quer criar..." rows="1"></textarea>
-          <button class="vsl-send" id="fc-send" title="Enviar (Enter)">➤</button>
+
+        <div id="fc-summary-wrap" style="display:none;padding:0 22px 18px;border-top:1px solid rgba(168,85,247,.08);padding-top:18px"></div>
+
+        <div class="fc-input-wrap" id="fc-input-row">
+          <div class="fc-input-bar">
+            <textarea class="fc-input" id="fc-input" placeholder="Descreva o produto que quer criar..." rows="1"></textarea>
+            <button class="fc-send" id="fc-send" title="Enviar (Enter)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
         </div>
       </section>
 
@@ -3312,8 +3356,7 @@ main{position:relative;z-index:auto}
     function _addMsg(role, text) {
       const el = document.createElement('div');
       el.className = 'fc-msg ' + (role === 'user' ? 'user' : 'max');
-      el.innerHTML = `<div class="fc-avatar">${role === 'user' ? '👤' : '🤖'}</div>
-        <div class="fc-bubble">${text.replace(/\n/g, '<br>')}</div>`;
+      el.innerHTML = `<div class="fc-avatar">${role === 'user' ? 'V' : 'M'}</div><div class="fc-bubble">${text.replace(/\n/g, '<br>')}</div>`;
       msgsEl.appendChild(el);
       msgsEl.scrollTop = msgsEl.scrollHeight;
     }
