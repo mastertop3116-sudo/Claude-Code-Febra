@@ -523,6 +523,7 @@
   /* card 3D tilt */
   .card{will-change:transform;transform-style:preserve-3d;transition:transform .35s ease,border-color .2s,box-shadow .2s}
   .card:hover{box-shadow:0 0 0 1px rgba(168,85,247,.22),0 24px 60px -15px rgba(168,85,247,.18)!important}
+  .fc-card{will-change:auto;transform-style:flat;transform:none!important}
   /* ── Loading container (referência) ── */
   .lc-box{background:#0b0b0f;padding:40px;border-radius:20px;width:420px;max-width:calc(100vw - 32px);margin:auto;text-align:center;box-shadow:0 0 50px rgba(168,85,247,.25),0 0 0 1px rgba(168,85,247,.12)}
   .lc-loader{width:60px;height:60px;border:4px solid rgba(255,255,255,.08);border-top:4px solid #a855f7;border-radius:50%;margin:0 auto 24px;animation:lc-spin 1s linear infinite}
@@ -4008,7 +4009,7 @@ main{position:relative;z-index:auto}
   // ---- card 3D tilt ----
   (function(){
     if(window.matchMedia('(max-width:900px)').matches) return;
-    document.querySelectorAll('.card').forEach(card=>{
+    document.querySelectorAll('.card:not(.fc-card)').forEach(card=>{
       card.addEventListener('mousemove',e=>{
         const r=card.getBoundingClientRect(), x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5;
         card.style.transform='perspective(900px) rotateY('+(x*7)+'deg) rotateX('+(-y*5)+'deg) translateZ(6px)';
