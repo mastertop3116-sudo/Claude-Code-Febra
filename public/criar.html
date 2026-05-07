@@ -22,7 +22,7 @@
   *{box-sizing:border-box}html,body{margin:0;padding:0}
   body{min-height:100vh;background:var(--bg-0);color:var(--text);font-family:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-feature-settings:"ss01","cv11";-webkit-font-smoothing:antialiased;letter-spacing:-.01em;overflow-x:hidden}
   ::selection{background:var(--accent);color:#fff}
-  #particles-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:1}
+  #particles-canvas{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:1}
   .bg{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
   .bg::before{content:"";position:absolute;inset:-20%;background:radial-gradient(50% 40% at 20% 10%, rgba(168,85,247,.10), transparent 70%),radial-gradient(60% 50% at 85% 0%, rgba(250,204,21,.06), transparent 70%),radial-gradient(50% 50% at 50% 100%, rgba(168,85,247,.05), transparent 70%);filter:blur(20px)}
   .bg::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(168,85,247,.03) 1px, transparent 1px),linear-gradient(90deg, rgba(168,85,247,.03) 1px, transparent 1px);background-size:56px 56px;mask-image:radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 80%)}
@@ -805,8 +805,8 @@ main{position:relative;z-index:auto}
 
         <div class="fc-input-wrap" id="fc-input-row">
           <div class="fc-input-bar">
-            <textarea class="fc-input" id="fc-input" placeholder="Descreva o produto que quer criar..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();window._fcSend&&window._fcSend();}"></textarea>
-            <button class="fc-send" id="fc-send" title="Enviar (Enter)" onclick="window._fcSend&&window._fcSend()">
+            <textarea class="fc-input" id="fc-input" placeholder="Descreva o produto que quer criar..." rows="1" onkeydown="if(event.key==='Enter'){if(!event.shiftKey){event.preventDefault();if(window._fcSend)window._fcSend();}}"></textarea>
+            <button class="fc-send" id="fc-send" title="Enviar (Enter)" onclick="if(window._fcSend)window._fcSend()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
           </div>
@@ -3421,7 +3421,7 @@ main{position:relative;z-index:auto}
           <div class="fc-summary-row"><span class="fc-summary-key">Público</span><span class="fc-summary-val">${payload.publico || '—'}</span></div>
           <div class="fc-summary-row"><span class="fc-summary-key">Páginas</span><span class="fc-summary-val">${payload.paginas || '—'}</span></div>
           <button class="fc-gerar-btn" id="fc-gerar-btn" style="margin-top:6px">🚀 Gerar agora</button>
-          <button onclick="_fcReset()" style="width:100%;padding:8px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text-3);font-size:12px;cursor:pointer;font-family:'DM Mono',monospace">✏️ Quero ajustar</button>
+          <button onclick="if(window._fcReset)window._fcReset()" style="width:100%;padding:8px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text-3);font-size:12px;cursor:pointer;font-family:'DM Mono',monospace">✏️ Quero ajustar</button>
         </div>`;
 
       document.getElementById('fc-gerar-btn')?.addEventListener('click', () => _gerarComPayload(payload));
@@ -3981,8 +3981,8 @@ main{position:relative;z-index:auto}
         const dx=d.x-mouse.x, dy=d.y-mouse.y;
         const t=Math.max(0,1-Math.sqrt(dx*dx+dy*dy)/R);
         ctx.beginPath();
-        ctx.arc(d.x,d.y, 1.3+t*4, 0, 6.28);
-        ctx.fillStyle=`rgba(168,85,247,${0.08+t*0.68})`;
+        ctx.arc(d.x,d.y, 1.5+t*3.5, 0, 6.28);
+        ctx.fillStyle=`rgba(168,85,247,${0.14+t*0.62})`;
         ctx.fill();
       }
       raf = requestAnimationFrame(draw);
