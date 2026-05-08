@@ -2174,35 +2174,71 @@ window._enterSend = ()=>CFG.enterSend;
 
 function saveConfig(){ localStorage.setItem('nxs_cfg', JSON.stringify(CFG)); }
 
+function _sc(base, scale){ return Math.round(base * scale); }
+
+function hexToRgb(hex){
+  const n = parseInt(hex.replace('#',''), 16);
+  return `${(n>>16)&255},${(n>>8)&255},${n&255}`;
+}
+
 function applyConfig(){
-  // Font size
-  document.documentElement.style.setProperty('--base-font', CFG.fontSize+'px');
-  document.body.style.fontSize = CFG.fontSize+'px';
-  // Compact sidebar
+  const scale = CFG.fontSize / 15;
+
+  // ── Font size: injected stylesheet sobrescreve todos os px explícitos ──
+  let fs = document.getElementById('cfg-font');
+  if(!fs){ fs = document.createElement('style'); fs.id='cfg-font'; document.head.appendChild(fs); }
+  fs.textContent = `
+    body{font-size:${CFG.fontSize}px!important}
+    .msg-bubble{font-size:${_sc(14.5,scale)}px!important}
+    .chat-textarea{font-size:${_sc(14.5,scale)}px!important}
+    .cr-card-body-inner,.verdict-text{font-size:${_sc(14,scale)}px!important}
+    .titan-text{font-size:${_sc(13.5,scale)}px!important}
+    .cw-title{font-size:${_sc(18,scale)}px!important}
+    .cw-desc{font-size:${_sc(14,scale)}px!important}
+    .topbar-title{font-size:${_sc(15,scale)}px!important}
+    .topbar-desc,.greeting-date{font-size:${_sc(13,scale)}px!important}
+    .greeting-name{font-size:${_sc(24,scale)}px!important}
+    .stat-value{font-size:${_sc(22,scale)}px!important}
+    .stat-label,.stat-trend{font-size:${_sc(11,scale)}px!important}
+    .qa-label{font-size:${_sc(13,scale)}px!important}
+    .qa-desc{font-size:${_sc(11,scale)}px!important}
+    .sb-item{font-size:${_sc(13,scale)}px!important}
+    .sb-section-label{font-size:${_sc(9,scale)}px!important}
+    .section-heading{font-size:${_sc(11,scale)}px!important}
+    .int-card-name,.detail-name,.brn-card-name{font-size:${_sc(14,scale)}px!important}
+    .int-card-desc,.int-meta-row,.brn-card-desc{font-size:${_sc(12,scale)}px!important}
+    .chat-hint{font-size:${_sc(10,scale)}px!important}
+    .sp-item-name{font-size:${_sc(13,scale)}px!important}
+    .sp-item-desc{font-size:${_sc(11,scale)}px!important}
+  `;
+
+  // ── Accent color: hex → rgba para compatibilidade total ──
+  const root = document.documentElement;
+  const rgb = hexToRgb(CFG.accentColor);
+  root.style.setProperty('--nexus', CFG.accentColor);
+  root.style.setProperty('--nexus-dim', `rgba(${rgb},0.12)`);
+  root.style.setProperty('--nexus-glow', `rgba(${rgb},0.25)`);
+
+  // ── Compact sidebar ──
   const sb = document.getElementById('sidebar');
-  if(sb) sb.style.setProperty('--sidebar-w', CFG.compactSidebar ? '60px' : '248px');
+  if(sb) sb.style.setProperty('--sidebar-w', CFG.compactSidebar ? '64px' : '248px');
   if(CFG.compactSidebar){
     document.querySelectorAll('.sb-item-label,.sb-section-label,.sb-logo-sub,.sb-logo-eyebrow,.sb-brn-partner,.sb-forge-link span,.sb-settings-btn span,.sb-brn-badge').forEach(el=>el.style.display='none');
-    document.querySelectorAll('.sb-item').forEach(el=>{el.style.justifyContent='center';el.style.padding='10px';});
+    document.querySelectorAll('.sb-item,.sb-forge-link,.sb-settings-btn').forEach(el=>{el.style.justifyContent='center';el.style.padding='10px 0';});
   } else {
     document.querySelectorAll('.sb-item-label,.sb-section-label,.sb-logo-sub,.sb-logo-eyebrow,.sb-brn-partner,.sb-forge-link span,.sb-settings-btn span,.sb-brn-badge').forEach(el=>el.style.display='');
-    document.querySelectorAll('.sb-item').forEach(el=>{el.style.justifyContent='';el.style.padding='';});
+    document.querySelectorAll('.sb-item,.sb-forge-link,.sb-settings-btn').forEach(el=>{el.style.justifyContent='';el.style.padding='';});
   }
-  // Animations
+
+  // ── Animations ──
   if(!CFG.anim){
-    const s=document.createElement('style');s.id='no-anim';
-    s.textContent='*{transition:none!important;animation:none!important}';
-    if(!document.getElementById('no-anim')) document.head.appendChild(s);
+    let na = document.getElementById('cfg-no-anim');
+    if(!na){ na=document.createElement('style'); na.id='cfg-no-anim'; document.head.appendChild(na); }
+    na.textContent='*{transition:none!important;animation:none!important}';
   } else {
-    document.getElementById('no-anim')?.remove();
+    document.getElementById('cfg-no-anim')?.remove();
   }
-  // Accent color
-  const root = document.documentElement;
-  const hex = CFG.accentColor;
-  root.style.setProperty('--nexus', hex);
-  root.style.setProperty('--nexus-dim', hex+'20');
-  root.style.setProperty('--nexus-glow', hex+'40');
-  // UI sync
+
   syncSettingsUI();
 }
 
