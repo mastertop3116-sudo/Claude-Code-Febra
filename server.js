@@ -1121,6 +1121,105 @@ app.get('/api/dashboard/history/:sector', async (req, res) => {
 });
 
 // ──────────────────────────────────────────
+// Dashboard — Integrações
+// ──────────────────────────────────────────
+
+app.get('/api/dashboard/integrations', async (req, res) => {
+  const baseUrl = process.env.RENDER_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`;
+
+  // Test Supabase
+  let supabaseOk = false;
+  try {
+    const { supabase } = require('./integrations/supabase');
+    const { error } = await supabase.from('produtos').select('id').limit(1);
+    supabaseOk = !error;
+  } catch {}
+
+  // UTMify cache check
+  let utmifyLastSync = null;
+  try {
+    const { supabase } = require('./integrations/supabase');
+    const { data } = await supabase
+      .from('agent_memory')
+      .select('updated_at')
+      .eq('key', 'utmify_report')
+      .single();
+    utmifyLastSync = data?.updated_at || null;
+  } catch {}
+
+  // Recent GG Checkout webhook events
+  let recentSales = [];
+  try {
+    const { supabase } = require('./integrations/supabase');
+    const { data } = await supabase
+      .from('stark_reports')
+      .select('id,created_at,data')
+      .order('created_at', { ascending: false })
+      .limit(5);
+    recentSales = data || [];
+  } catch {}
+
+  res.json({
+    utmify: {
+      connected: !!process.env.UTMIFY_API_KEY,
+      webhookUrl: `${baseUrl}/webhook/utmify`,
+      lastSync: utmifyLastSync,
+    },
+    ggcheckout: {
+      connected: true,
+      webhookUrl: `${baseUrl}/webhook/ggcheckout`,
+      recentSales,
+    },
+    openai: {
+      connected: !!process.env.OPENAI_API_KEY,
+      model: 'gpt-4o-mini',
+    },
+    elevenlabs: {
+      connected: !!process.env.ELEVENLABS_API_KEY,
+    },
+    supabase: {
+      connected: supabaseOk,
+      projectId: (process.env.SUPABASE_URL || '').replace('https://','').split('.')[0],
+    },
+  });
+});
+
+app.post('/api/dashboard/integrations/test/:service', async (req, res) => {
+  const { service } = req.params;
+  try {
+    if (service === 'openai') {
+      const { openaiFlash } = require('./integrations/openai');
+      const r = await openaiFlash('Responda apenas: OK');
+      return res.json({ ok: true, message: r.trim() });
+    }
+    if (service === 'supabase') {
+      const { supabase } = require('./integrations/supabase');
+      const { error } = await supabase.from('produtos').select('id').limit(1);
+      return res.json({ ok: !error, message: error ? error.message : 'Conexão OK' });
+    }
+    if (service === 'elevenlabs') {
+      const apiKey = process.env.ELEVENLABS_API_KEY;
+      if (!apiKey) return res.json({ ok: false, message: 'API key não configurada' });
+      const r = await fetch('https://api.elevenlabs.io/v1/voices', {
+        headers: { 'xi-api-key': apiKey }
+      });
+      return res.json({ ok: r.ok, message: r.ok ? `${(await r.json()).voices?.length || 0} vozes disponíveis` : 'Erro na API' });
+    }
+    if (service === 'utmify') {
+      const apiKey = process.env.UTMIFY_API_KEY;
+      if (!apiKey) return res.json({ ok: false, message: 'API key não configurada' });
+      return res.json({ ok: true, message: 'Chave configurada no servidor' });
+    }
+    if (service === 'ggcheckout') {
+      return res.json({ ok: true, message: 'Webhook ativo e aguardando eventos' });
+    }
+    res.status(404).json({ error: 'Serviço não encontrado' });
+  } catch (e) {
+    res.json({ ok: false, message: e.message });
+  }
+});
+
+// ──────────────────────────────────────────
 // Inicia servidor
 // ──────────────────────────────────────────
 const PORT = process.env.PORT || 3000;

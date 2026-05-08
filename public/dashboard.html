@@ -595,6 +595,131 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-s
 .toast.show{transform:translateY(0);opacity:1}
 
 /* ══════════════════════════════════
+   INTEGRAÇÕES
+   ══════════════════════════════════ */
+#view-integrations{background:var(--bg)}
+.int-scroll{flex:1;overflow-y:auto;padding:28px}
+
+.int-summary{
+  display:flex;align-items:center;gap:20px;
+  background:var(--elevated);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:18px 22px;margin-bottom:24px;
+}
+.int-summary-stat{display:flex;flex-direction:column;gap:2px}
+.iss-val{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--nexus)}
+.iss-lbl{font-size:11px;color:var(--text-3)}
+.int-summary-divider{width:1px;height:32px;background:var(--border)}
+.int-summary-spacer{flex:1}
+.int-refresh-btn{
+  display:flex;align-items:center;gap:7px;
+  padding:8px 16px;border-radius:8px;
+  background:var(--nexus-dim);border:1px solid rgba(99,102,241,.25);
+  color:var(--nexus);font-family:'Sora',sans-serif;font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .15s;
+}
+.int-refresh-btn:hover{background:var(--nexus-glow)}
+.int-refresh-btn svg{width:14px;height:14px;stroke:var(--nexus);fill:none;stroke-width:2}
+
+.int-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:14px;margin-bottom:28px;
+}
+
+.int-card{
+  background:var(--elevated);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:0;overflow:hidden;
+  transition:border-color .2s,box-shadow .2s;
+}
+.int-card:hover{border-color:var(--border-md);box-shadow:0 4px 20px rgba(0,0,0,.2)}
+.int-card-top{
+  padding:18px 20px 14px;
+  border-bottom:1px solid var(--border);
+  position:relative;
+}
+.int-card-top::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--ic-color,var(--nexus));
+}
+.int-card-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.int-card-logo{
+  width:40px;height:40px;border-radius:10px;
+  background:var(--ic-bg,rgba(99,102,241,.1));
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+}
+.int-card-info{flex:1;min-width:0}
+.int-card-name{font-size:14px;font-weight:700;margin-bottom:3px}
+.int-card-desc{font-size:12px;color:var(--text-3);line-height:1.4}
+.int-status{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:600;
+  padding:3px 10px;border-radius:20px;
+  flex-shrink:0;
+}
+.int-status.ok{color:#34d399;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25)}
+.int-status.warn{color:#fbbf24;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2)}
+.int-status.err{color:#f87171;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2)}
+.int-status-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+
+.int-meta{display:flex;flex-direction:column;gap:5px}
+.int-meta-row{
+  display:flex;align-items:center;gap:8px;
+  font-size:11.5px;color:var(--text-3);
+}
+.int-meta-row strong{color:var(--text-2);font-weight:500}
+.int-meta-url{
+  font-family:'JetBrains Mono',monospace;font-size:10.5px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:5px;padding:4px 8px;color:var(--text-2);
+  display:flex;align-items:center;gap:6px;justify-content:space-between;
+  margin-top:4px;
+}
+.int-copy-url{
+  font-size:10px;color:var(--nexus);cursor:pointer;flex-shrink:0;
+  padding:1px 6px;border-radius:4px;background:var(--nexus-dim);
+  transition:opacity .15s;
+}
+.int-copy-url:hover{opacity:.8}
+
+.int-card-bottom{padding:12px 20px;display:flex;gap:8px;flex-wrap:wrap}
+.int-btn{
+  padding:6px 14px;border-radius:7px;border:1px solid var(--border-md);
+  background:var(--overlay);color:var(--text-2);
+  font-family:'Sora',sans-serif;font-size:11px;font-weight:500;
+  cursor:pointer;transition:all .15s;
+}
+.int-btn:hover{background:rgba(255,255,255,.06);color:var(--text);border-color:var(--border-hi)}
+.int-btn.primary{
+  background:var(--ic-color,var(--nexus));color:#fff;border-color:transparent;
+  opacity:.85;
+}
+.int-btn.primary:hover{opacity:1}
+
+/* Recent sales table */
+.int-table-wrap{
+  background:var(--elevated);border:1px solid var(--border);
+  border-radius:var(--radius-lg);overflow:hidden;margin-bottom:8px;
+}
+.int-table-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 20px;border-bottom:1px solid var(--border);
+}
+.int-table-title{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3)}
+table.int-table{width:100%;border-collapse:collapse}
+table.int-table th{
+  text-align:left;font-size:10px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;color:var(--text-3);
+  padding:10px 20px;border-bottom:1px solid var(--border);
+}
+table.int-table td{
+  padding:10px 20px;font-size:12.5px;color:var(--text-2);
+  border-bottom:1px solid var(--border);
+}
+table.int-table tr:last-child td{border-bottom:none}
+table.int-table tr:hover td{background:rgba(255,255,255,.02)}
+.int-empty{padding:24px 20px;text-align:center;font-size:12px;color:var(--text-3)}
+
+/* ══════════════════════════════════
    SETTINGS BUTTON (sidebar)
    ══════════════════════════════════ */
 .sb-settings-btn{
@@ -782,6 +907,11 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-s
 
   <div class="sb-section">
     <div class="sb-section-label">Estratégia</div>
+    <div class="sb-item" data-view="integrations" style="--item-color:#64748b">
+      <span class="sb-item-icon">🔌</span>
+      <span class="sb-item-label">Integrações</span>
+      <span class="sb-item-dot"></span>
+    </div>
     <div class="sb-item" data-view="all-sectors" style="--item-color:var(--c-all)">
       <span class="sb-item-icon">⚡</span>
       <span class="sb-item-label">Todos os Setores</span>
@@ -993,6 +1123,61 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-s
   </div>
 
   <!-- ── SECTOR CHAT VIEWS (geradas por JS) ── -->
+
+  <!-- ── INTEGRAÇÕES ── -->
+  <div id="view-integrations" class="view">
+    <div class="topbar">
+      <span class="topbar-icon">🔌</span>
+      <div>
+        <div class="topbar-title">Integrações</div>
+        <div class="topbar-desc">Status das conexões ativas · APIs e webhooks</div>
+      </div>
+      <div class="topbar-spacer"></div>
+      <span class="topbar-badge" style="color:#64748b;border-color:rgba(100,116,139,.3)" id="int-badge">CARREGANDO</span>
+    </div>
+    <div class="int-scroll">
+
+      <!-- Summary bar -->
+      <div class="int-summary">
+        <div class="int-summary-stat">
+          <div class="iss-val" id="int-connected-count">—</div>
+          <div class="iss-lbl">Conectadas</div>
+        </div>
+        <div class="int-summary-divider"></div>
+        <div class="int-summary-stat">
+          <div class="iss-val" id="int-total-count">5</div>
+          <div class="iss-lbl">Total</div>
+        </div>
+        <div class="int-summary-spacer"></div>
+        <button class="int-refresh-btn" onclick="loadIntegrations()">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+          Atualizar status
+        </button>
+      </div>
+
+      <div class="section-heading">Integrações Ativas</div>
+      <div class="int-grid" id="int-grid">
+        <!-- preenchido por JS -->
+        <div class="int-card skeleton" style="height:180px"></div>
+        <div class="int-card skeleton" style="height:180px"></div>
+        <div class="int-card skeleton" style="height:180px"></div>
+        <div class="int-card skeleton" style="height:180px"></div>
+        <div class="int-card skeleton" style="height:180px"></div>
+      </div>
+
+      <div class="section-heading" style="margin-top:4px">Últimas Vendas · GG Checkout</div>
+      <div class="int-table-wrap">
+        <div class="int-table-header">
+          <span class="int-table-title">Webhook Events</span>
+          <span style="font-size:11px;color:var(--text-3)" id="int-sales-updated"></span>
+        </div>
+        <div id="int-sales-body">
+          <div class="int-empty">Carregando eventos...</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
 
   <!-- ── ALL SECTORS ── -->
   <div id="view-all-sectors" class="view" style="--bubble-color:var(--c-all);--input-focus:var(--c-all);--btn-color:var(--c-all)">
@@ -1411,6 +1596,7 @@ function navigate(view){
   if(nEl) nEl.classList.add('active');
   currentView = view;
   if(view==='overview') loadMetrics();
+  else if(view==='integrations'){ if(!intLoaded) loadIntegrations(); }
   else if(!historyLoaded[view]) loadHistory(view);
 }
 window.navigate = navigate;
@@ -1831,6 +2017,155 @@ function showToast(msg){
   t.textContent=msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2200);
 }
+
+// ─── INTEGRATIONS ───────────────────────────
+const INT_DEFS = {
+  utmify: {
+    name:'UTMify',emoji:'📊',
+    color:'#3b82f6',bg:'rgba(59,130,246,.1)',
+    desc:'Rastreamento de anúncios e métricas de ROAS/CPA',
+  },
+  ggcheckout: {
+    name:'GG Checkout',emoji:'💳',
+    color:'#10b981',bg:'rgba(16,185,129,.1)',
+    desc:'Webhook de vendas — Pix e cartão',
+  },
+  openai: {
+    name:'OpenAI',emoji:'🤖',
+    color:'#6366f1',bg:'rgba(99,102,241,.1)',
+    desc:'Motor de IA — GPT-4o Mini (setores, consenso, MAX)',
+  },
+  elevenlabs: {
+    name:'ElevenLabs',emoji:'🎙️',
+    color:'#f59e0b',bg:'rgba(245,158,11,.1)',
+    desc:'Text-to-speech — narração de conteúdo',
+  },
+  supabase: {
+    name:'Supabase',emoji:'🗄️',
+    color:'#34d399',bg:'rgba(52,211,153,.1)',
+    desc:'Banco de dados PostgreSQL — produtos, histórico, relatórios',
+  },
+};
+
+let intData = null;
+let intLoaded = false;
+const testingService = {};
+
+async function loadIntegrations(){
+  intLoaded = true;
+  try {
+    const r = await fetch('/api/dashboard/integrations');
+    intData = await r.json();
+    renderIntegrations(intData);
+  } catch(e){
+    document.getElementById('int-grid').innerHTML =
+      `<div style="grid-column:1/-1;color:var(--text-2);font-size:13px;padding:20px">Erro ao carregar integrações: ${e.message}</div>`;
+  }
+}
+
+function renderIntegrations(d){
+  // Summary
+  const connected = Object.values(d).filter(v=>v.connected).length;
+  document.getElementById('int-connected-count').textContent = connected;
+  document.getElementById('int-total-count').textContent = Object.keys(d).length;
+  const badge = document.getElementById('int-badge');
+  badge.textContent = connected === Object.keys(d).length ? 'TUDO OK' : `${connected}/${Object.keys(d).length} OK`;
+  badge.style.color = connected === Object.keys(d).length ? '#34d399' : '#fbbf24';
+  badge.style.borderColor = connected === Object.keys(d).length ? 'rgba(52,211,153,.3)' : 'rgba(251,191,36,.3)';
+
+  // Cards
+  const grid = document.getElementById('int-grid');
+  grid.innerHTML = Object.entries(INT_DEFS).map(([key, def])=>{
+    const info = d[key] || {};
+    const ok = info.connected;
+    const statusHtml = ok
+      ? `<span class="int-status ok"><span class="int-status-dot"></span>Ativo</span>`
+      : `<span class="int-status warn"><span class="int-status-dot"></span>Inativo</span>`;
+
+    let metaHtml = '';
+    if(key==='utmify'){
+      metaHtml += `<div class="int-meta-row">Última sincronização: <strong>${info.lastSync ? new Date(info.lastSync).toLocaleString('pt-BR') : '—'}</strong></div>`;
+      if(info.webhookUrl) metaHtml += `<div class="int-meta-url"><span>${info.webhookUrl}</span><span class="int-copy-url" onclick="copyText('${info.webhookUrl}')">Copiar</span></div>`;
+    }
+    if(key==='ggcheckout'){
+      if(info.webhookUrl) metaHtml += `<div class="int-meta-url"><span>${info.webhookUrl}</span><span class="int-copy-url" onclick="copyText('${info.webhookUrl}')">Copiar</span></div>`;
+      metaHtml += `<div class="int-meta-row" style="margin-top:4px">Configure este URL no painel GG Checkout</div>`;
+    }
+    if(key==='openai'){
+      metaHtml += `<div class="int-meta-row">Modelo: <strong>${info.model||'gpt-4o-mini'}</strong></div>`;
+      metaHtml += `<div class="int-meta-row">Usado por: <strong>setores, consenso, Conselho de Titãs</strong></div>`;
+    }
+    if(key==='elevenlabs'){
+      metaHtml += `<div class="int-meta-row">Endpoint: <strong>/api/narrar</strong></div>`;
+      metaHtml += `<div class="int-meta-row">Vozes: Rodrigo · Feminino · Profissional</div>`;
+    }
+    if(key==='supabase'){
+      metaHtml += `<div class="int-meta-row">Projeto: <strong>${info.projectId||'—'}</strong></div>`;
+      metaHtml += `<div class="int-meta-row">Tabelas: produtos · criativos · conversations · stark_reports</div>`;
+    }
+
+    return `<div class="int-card" style="--ic-color:${def.color};--ic-bg:${def.bg}">
+      <div class="int-card-top">
+        <div class="int-card-head">
+          <div class="int-card-logo">${def.emoji}</div>
+          <div class="int-card-info">
+            <div class="int-card-name">${def.name}</div>
+            <div class="int-card-desc">${def.desc}</div>
+          </div>
+          ${statusHtml}
+        </div>
+        <div class="int-meta">${metaHtml}</div>
+      </div>
+      <div class="int-card-bottom">
+        <button class="int-btn primary" id="test-btn-${key}" onclick="testIntegration('${key}')">Testar conexão</button>
+        ${key==='utmify'?`<button class="int-btn" onclick="reloadMetrics();showToast('Buscando dados UTMify...')">Atualizar dados</button>`:''}
+        ${key==='ggcheckout'?`<button class="int-btn" onclick="copyText('${info.webhookUrl||''}');showToast('URL copiado!')">Copiar URL webhook</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Sales table
+  const sales = d.ggcheckout?.recentSales || [];
+  const salesBody = document.getElementById('int-sales-body');
+  const updated = document.getElementById('int-sales-updated');
+  if(updated) updated.textContent = 'Atualizado agora';
+  if(!sales.length){
+    salesBody.innerHTML = `<div class="int-empty">Nenhum evento recente registrado.<br><span style="font-size:11px">Configure o webhook URL do GG Checkout para receber eventos em tempo real.</span></div>`;
+  } else {
+    salesBody.innerHTML = `<table class="int-table">
+      <thead><tr><th>Data</th><th>Produto</th><th>Valor</th><th>Status</th></tr></thead>
+      <tbody>${sales.map(s=>{
+        const d2 = typeof s.data==='string' ? JSON.parse(s.data||'{}') : (s.data||{});
+        return `<tr>
+          <td>${new Date(s.created_at).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</td>
+          <td>${d2.product_name||d2.productName||d2.nome||'—'}</td>
+          <td style="color:var(--c-prod);font-family:'JetBrains Mono',monospace">R$${Number(d2.amount||d2.valor||0).toFixed(2)}</td>
+          <td><span class="int-status ok" style="font-size:10px;padding:2px 8px"><span class="int-status-dot"></span>${d2.status||'Pago'}</span></td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>`;
+  }
+}
+
+async function testIntegration(service){
+  if(testingService[service]) return;
+  testingService[service] = true;
+  const btn = document.getElementById(`test-btn-${service}`);
+  if(btn){ btn.textContent='Testando...'; btn.disabled=true; }
+  try {
+    const r = await fetch(`/api/dashboard/integrations/test/${service}`,{method:'POST'});
+    const d = await r.json();
+    showToast(d.ok ? `✓ ${INT_DEFS[service]?.name}: ${d.message}` : `⚠️ ${d.message}`);
+    if(btn){ btn.textContent = d.ok ? '✓ OK' : '✗ Falhou'; }
+    setTimeout(()=>{ if(btn){ btn.textContent='Testar conexão'; btn.disabled=false; } testingService[service]=false; }, 3000);
+  } catch(e){
+    showToast('⚠️ Erro ao testar: '+e.message);
+    if(btn){ btn.textContent='Testar conexão'; btn.disabled=false; }
+    testingService[service]=false;
+  }
+}
+window.testIntegration = testIntegration;
+window.loadIntegrations = loadIntegrations;
 
 // ─── SETTINGS ───────────────────────────────
 const DEFAULTS = { fontSize:15, compactSidebar:false, enterSend:true, anim:true, accentColor:'#6366f1' };
