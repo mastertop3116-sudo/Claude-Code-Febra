@@ -92,20 +92,31 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-s
 }
 
 .sb-logo{
-  padding:22px 20px 18px;
+  padding:20px 20px 16px;
   border-bottom:1px solid var(--border);
+  display:flex;flex-direction:column;gap:3px;
 }
-.sb-logo-eyebrow{
-  font-size:9px;font-weight:600;letter-spacing:3px;
-  text-transform:uppercase;color:var(--text-3);margin-bottom:5px;
+.sb-logo-mark{
+  display:flex;align-items:center;gap:9px;
 }
+.sb-logo-icon{flex-shrink:0}
+.sb-logo-divider{
+  width:1px;height:26px;background:rgba(255,255,255,.1);flex-shrink:0;
+}
+.sb-logo-text{display:flex;flex-direction:column;gap:1px}
 .sb-logo-name{
-  font-size:22px;font-weight:700;letter-spacing:-0.5px;
-  background:linear-gradient(135deg,#818cf8,#34d399);
+  font-size:17px;font-weight:800;letter-spacing:1.5px;
+  background:linear-gradient(135deg,#F2F2F2 0%,#ABABAB 55%,#6A6A6A 100%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1;
+}
+.sb-logo-by{
+  font-size:8px;font-weight:700;letter-spacing:3px;
+  text-transform:uppercase;color:var(--text-3);
 }
 .sb-logo-sub{
-  font-size:10px;color:var(--text-3);margin-top:2px;letter-spacing:0.3px;
+  font-size:10px;color:var(--text-3);margin-top:4px;letter-spacing:0.3px;
+  padding-left:1px;
 }
 
 .sb-section{padding:14px 10px 6px}
@@ -904,16 +915,46 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
 
 <!-- ═══════════════════ SPLASH ═══════════════════ -->
 <div id="splash">
-  <div class="splash-logo">Nexus Digital Holding</div>
-  <div class="splash-name">CONTROL</div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+    <svg width="32" height="32" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="splash-max-grad" x1="15" y1="2" x2="15" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#F2F2F2"/>
+          <stop offset="55%" stop-color="#ABABAB"/>
+          <stop offset="100%" stop-color="#6A6A6A"/>
+        </linearGradient>
+      </defs>
+      <path d="M3 24V9L12 18L15 5L18 18L27 9V24" stroke="url(#splash-max-grad)" stroke-width="2.6" stroke-linejoin="miter" stroke-linecap="square" fill="none"/>
+    </svg>
+    <div style="width:1px;height:30px;background:rgba(255,255,255,.12)"></div>
+    <div>
+      <div class="splash-name" style="font-size:28px;letter-spacing:2px;line-height:1">MAX</div>
+      <div class="splash-logo" style="font-size:9px;letter-spacing:3px;margin-top:2px">BY NEXUS</div>
+    </div>
+  </div>
   <div class="splash-bar"><div class="splash-bar-fill" id="splash-fill"></div></div>
 </div>
 
 <!-- ═══════════════════ SIDEBAR ═══════════════════ -->
 <aside id="sidebar">
   <div class="sb-logo">
-    <div class="sb-logo-eyebrow">Nexus Digital</div>
-    <div class="sb-logo-name">CONTROL</div>
+    <div class="sb-logo-mark">
+      <svg class="sb-logo-icon" width="26" height="26" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="dash-max-grad" x1="15" y1="2" x2="15" y2="28" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#F2F2F2"/>
+            <stop offset="55%" stop-color="#ABABAB"/>
+            <stop offset="100%" stop-color="#6A6A6A"/>
+          </linearGradient>
+        </defs>
+        <path d="M3 24V9L12 18L15 5L18 18L27 9V24" stroke="url(#dash-max-grad)" stroke-width="2.6" stroke-linejoin="miter" stroke-linecap="square" fill="none"/>
+      </svg>
+      <div class="sb-logo-divider"></div>
+      <div class="sb-logo-text">
+        <div class="sb-logo-name">MAX</div>
+        <div class="sb-logo-by">by Nexus</div>
+      </div>
+    </div>
     <div class="sb-logo-sub">Centro de Comando · Rodrigo Cruz</div>
   </div>
 
@@ -2338,8 +2379,6 @@ function copyMcpCmd(){
   }).catch(()=>{});
 }
 
-function _sc(base, scale){ return Math.round(base * scale); }
-
 function hexToRgb(hex){
   const n = parseInt(hex.replace('#',''), 16);
   return `${(n>>16)&255},${(n>>8)&255},${n&255}`;
@@ -2348,33 +2387,8 @@ function hexToRgb(hex){
 function applyConfig(){
   const scale = CFG.fontSize / 15;
 
-  // ── Font size: injected stylesheet sobrescreve todos os px explícitos ──
-  let fs = document.getElementById('cfg-font');
-  if(!fs){ fs = document.createElement('style'); fs.id='cfg-font'; document.head.appendChild(fs); }
-  fs.textContent = `
-    body{font-size:${CFG.fontSize}px!important}
-    .msg-bubble{font-size:${_sc(14.5,scale)}px!important}
-    .chat-textarea{font-size:${_sc(14.5,scale)}px!important}
-    .cr-card-body-inner,.verdict-text{font-size:${_sc(14,scale)}px!important}
-    .titan-text{font-size:${_sc(13.5,scale)}px!important}
-    .cw-title{font-size:${_sc(18,scale)}px!important}
-    .cw-desc{font-size:${_sc(14,scale)}px!important}
-    .topbar-title{font-size:${_sc(15,scale)}px!important}
-    .topbar-desc,.greeting-date{font-size:${_sc(13,scale)}px!important}
-    .greeting-name{font-size:${_sc(24,scale)}px!important}
-    .stat-value{font-size:${_sc(22,scale)}px!important}
-    .stat-label,.stat-trend{font-size:${_sc(11,scale)}px!important}
-    .qa-label{font-size:${_sc(13,scale)}px!important}
-    .qa-desc{font-size:${_sc(11,scale)}px!important}
-    .sb-item{font-size:${_sc(13,scale)}px!important}
-    .sb-section-label{font-size:${_sc(9,scale)}px!important}
-    .section-heading{font-size:${_sc(11,scale)}px!important}
-    .int-card-name,.detail-name,.brn-card-name{font-size:${_sc(14,scale)}px!important}
-    .int-card-desc,.int-meta-row,.brn-card-desc{font-size:${_sc(12,scale)}px!important}
-    .chat-hint{font-size:${_sc(10,scale)}px!important}
-    .sp-item-name{font-size:${_sc(13,scale)}px!important}
-    .sp-item-desc{font-size:${_sc(11,scale)}px!important}
-  `;
+  // ── Font size: zoom escala tudo proporcionalmente de uma vez ──
+  document.body.style.zoom = scale;
 
   // ── Accent color: hex → rgba para compatibilidade total ──
   const root = document.documentElement;
