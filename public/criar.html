@@ -22,7 +22,7 @@
   *{box-sizing:border-box}html,body{margin:0;padding:0}
   body{min-height:100vh;background:var(--bg-0);color:var(--text);font-family:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-feature-settings:"ss01","cv11";-webkit-font-smoothing:antialiased;letter-spacing:-.01em;overflow-x:hidden}
   ::selection{background:var(--accent);color:#fff}
-  #particles-canvas{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:1}
+  #particles-canvas{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:1}
   .bg{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
   .bg::before{content:"";position:absolute;inset:-20%;background:radial-gradient(50% 40% at 20% 10%, rgba(168,85,247,.10), transparent 70%),radial-gradient(60% 50% at 85% 0%, rgba(250,204,21,.06), transparent 70%),radial-gradient(50% 50% at 50% 100%, rgba(168,85,247,.05), transparent 70%);filter:blur(20px)}
   .bg::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(168,85,247,.03) 1px, transparent 1px),linear-gradient(90deg, rgba(168,85,247,.03) 1px, transparent 1px);background-size:56px 56px;mask-image:radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 80%)}
@@ -4886,7 +4886,7 @@ main{position:relative;z-index:auto}
   if(!canvas)return;
   var ctx=canvas.getContext('2d');
   var W,H,dots=[],raf,mouse={x:-9999,y:-9999};
-  var SP=36;
+  var SP=22;
   function resize(){
     W=canvas.width=window.innerWidth;
     H=canvas.height=window.innerHeight;
@@ -4894,18 +4894,18 @@ main{position:relative;z-index:auto}
     var cols=Math.ceil(W/SP)+2,rows=Math.ceil(H/SP)+2;
     for(var r=0;r<rows;r++)
       for(var c=0;c<cols;c++)
-        dots.push({x:c*SP+(r%2)*18,y:r*SP});
+        dots.push({x:c*SP+(r%2)*11,y:r*SP});
   }
   function draw(){
     ctx.clearRect(0,0,W,H);
-    var R=180;
+    var R=160;
     for(var i=0;i<dots.length;i++){
       var d=dots[i];
       var dx=d.x-mouse.x,dy=d.y-mouse.y;
       var t=Math.max(0,1-Math.sqrt(dx*dx+dy*dy)/R);
       ctx.beginPath();
-      ctx.arc(d.x,d.y,1.6+t*4,0,6.28);
-      ctx.fillStyle='rgba(168,85,247,'+(0.22+t*0.58)+')';
+      ctx.arc(d.x,d.y,1.2+t*3.5,0,6.28);
+      ctx.fillStyle='rgba(168,85,247,'+(0.20+t*0.60)+')';
       ctx.fill();
     }
     raf=requestAnimationFrame(draw);
@@ -4914,6 +4914,82 @@ main{position:relative;z-index:auto}
   window.addEventListener('mousemove',function(e){mouse={x:e.clientX,y:e.clientY};},{passive:true});
   window.addEventListener('mouseleave',function(){mouse={x:-9999,y:-9999};});
   resize();draw();
+})();
+</script>
+
+<script>
+/* MAX floating tips — dicas do MAX flutuando nas margens da tela */
+(function(){
+  var TIPS = [
+    'Ebooks com promessa\nde "resultado em X dias"\nvendem 3× mais',
+    'Workbooks geram\nmais depoimentos —\no leitor faz e documenta',
+    'Nicho de fé tem\no menor CAC entre\ntodos os infoprodutos',
+    'Títulos com números\nímpares convertem\n36% a mais',
+    'Pack com 10-12\npregações prontas\ntêm ótimo custo-benefício',
+    'Planner com habit tracker\ngera recompra\nautomática todo mês',
+  ];
+
+  setTimeout(function(){
+    var card = document.querySelector('.fc-card');
+    var cr = card ? card.getBoundingClientRect() : null;
+    var VW = window.innerWidth, VH = window.innerHeight;
+    var lMax = cr ? cr.left - 10 : VW * 0.13;
+    var rMin = cr ? cr.right + 10 : VW * 0.87;
+    if(lMax < 55 && (VW - rMin) < 55) return;
+
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden';
+    document.body.appendChild(wrap);
+
+    function makeBubble(txt, xPx, yPct, delay){
+      var el = document.createElement('div');
+      el.style.cssText =
+        'position:absolute;background:rgba(3,3,10,.85);'
+        +'border:1px solid rgba(168,85,247,.22);border-radius:10px;'
+        +'padding:10px 12px;font-size:10px;color:rgba(168,85,247,.6);'
+        +'font-family:"DM Mono",monospace;letter-spacing:.04em;line-height:1.65;'
+        +'white-space:pre-line;max-width:148px;'
+        +'box-shadow:0 2px 18px rgba(168,85,247,.07),inset 0 1px 0 rgba(255,255,255,.03);'
+        +'opacity:0;transition:opacity 1.4s ease;';
+      el.innerHTML = '<span style="display:block;font-size:9px;color:rgba(168,85,247,.35);'
+        +'letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">MAX · dica</span>'
+        + txt;
+      el.style.left = xPx + 'px';
+      el.style.top  = yPct + '%';
+      wrap.appendChild(el);
+      setTimeout(function(){ el.style.opacity='1'; }, delay);
+
+      var y = yPct * VH / 100;
+      var vy = (Math.random() > .5 ? 1 : -1) * (0.15 + Math.random() * 0.15);
+      return { el:el, y:y, vy:vy };
+    }
+
+    var bubbles = [];
+    var yPositions = [12, 35, 60];
+
+    if(lMax >= 55){
+      var lW = Math.min(lMax - 4, 148);
+      TIPS.slice(0,3).forEach(function(t,i){
+        var xPx = Math.max(4, lMax - lW - 4);
+        bubbles.push(makeBubble(t, xPx, yPositions[i], 700 + i*500));
+      });
+    }
+    if((VW - rMin) >= 55){
+      TIPS.slice(3,6).forEach(function(t,i){
+        bubbles.push(makeBubble(t, rMin + 4, yPositions[i], 1000 + i*500));
+      });
+    }
+
+    function tick(){
+      bubbles.forEach(function(b){
+        b.y += b.vy;
+        if(b.y < VH*0.08 || b.y > VH*0.78) b.vy = -b.vy;
+        b.el.style.top = (b.y/VH*100)+'%';
+      });
+      requestAnimationFrame(tick);
+    }
+    tick();
+  }, 400);
 })();
 </script>
 
