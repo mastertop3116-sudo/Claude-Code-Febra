@@ -1121,6 +1121,177 @@ app.get('/api/dashboard/history/:sector', async (req, res) => {
 });
 
 // ──────────────────────────────────────────
+// MCP Server — Integração com Claude Code externo
+// ──────────────────────────────────────────
+
+const mcpSessions = new Map();
+
+const MCP_TOOLS = [
+  {
+    name: 'nexus_chat',
+    description: 'Conversa com um dos 6 setores da Nexus Digital Holding e recebe uma resposta especializada.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        setor: {
+          type: 'string',
+          enum: ['fabrica-produtos','fabrica-conteudo','motor-monetizacao','lab-ux','engenharia','crescimento'],
+          description: 'Qual setor consultar'
+        },
+        mensagem: { type: 'string', description: 'Sua pergunta ou pedido para o setor' }
+      },
+      required: ['setor','mensagem']
+    }
+  },
+  {
+    name: 'nexus_consenso',
+    description: 'Envia uma pergunta para todos os 6 setores ao mesmo tempo. MAX sintetiza o veredito final.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        pergunta: { type: 'string', description: 'A questão para todos os setores analisarem' }
+      },
+      required: ['pergunta']
+    }
+  },
+  {
+    name: 'nexus_conselho',
+    description: 'Consulta o Conselho de Titãs: Elon Musk, Jeff Bezos, Luciano Hang e Paulo Vieira.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        pergunta: { type: 'string', description: 'A decisão estratégica para o Conselho analisar' }
+      },
+      required: ['pergunta']
+    }
+  },
+  {
+    name: 'nexus_metricas',
+    description: 'Retorna as métricas atuais da Nexus: receita, vendas, ROAS (UTMify e GG Checkout).',
+    inputSchema: { type: 'object', properties: {} }
+  },
+  {
+    name: 'nexus_produtos_brn',
+    description: 'Lista os produtos ativos da BRN VENDAS com preços, links de compra e credenciais da área de membros.',
+    inputSchema: { type: 'object', properties: {} }
+  },
+];
+
+async function executeMcpTool(name, args) {
+  const deps = require('./core/departments');
+  const { chatWithSector, chatWithTitan, getConsensusSynthesis, getConselhoSynthesis, SECTORS, CONSELHO } = deps;
+
+  if (name === 'nexus_chat') {
+    return await chatWithSector(args.setor, args.mensagem);
+  }
+
+  if (name === 'nexus_consenso') {
+    const sectorKeys = Object.keys(SECTORS);
+    const responses = await Promise.all(sectorKeys.map(async sector => {
+      const content = await chatWithSector(sector, args.pergunta);
+      return { sector, content };
+    }));
+    const synthesis = await getConsensusSynthesis(args.pergunta, responses);
+    const parts = responses.map(r => `**${SECTORS[r.sector]?.name}:**\n${r.content}`).join('\n\n---\n\n');
+    return `${parts}\n\n---\n\n**VEREDITO MAX:**\n${synthesis}`;
+  }
+
+  if (name === 'nexus_conselho') {
+    const titanKeys = Object.keys(CONSELHO);
+    const titanResponses = await Promise.all(titanKeys.map(async titan => {
+      const response = await chatWithTitan(titan, args.pergunta);
+      return { titan, response };
+    }));
+    const synthesis = await getConselhoSynthesis(args.pergunta, titanResponses);
+    const parts = titanResponses.map(t => `**${CONSELHO[t.titan]?.name}:**\n${t.response}`).join('\n\n---\n\n');
+    return `${parts}\n\n---\n\n**DECISÕES ESTRATÉGICAS (MAX):**\n${synthesis}`;
+  }
+
+  if (name === 'nexus_metricas') {
+    try {
+      const { getRelatorioVendasHoje } = require('./departments/finance/finance_agent');
+      const vendas = await getRelatorioVendasHoje().catch(() => ({ totalReceita: 0, totalConversoes: 0 }));
+      return `**Métricas Nexus — Hoje**\n- Receita (GG Checkout): R$${Number(vendas.totalReceita||0).toFixed(2)}\n- Conversões: ${vendas.totalConversoes||0}`;
+    } catch (e) {
+      return `Erro ao buscar métricas: ${e.message}`;
+    }
+  }
+
+  if (name === 'nexus_produtos_brn') {
+    return `**Produtos BRN VENDAS**\n\n🥋 **Dinâmicas de Jiu-Jitsu** (+250 dinâmicas)\n- Premium R$27: https://ggcheckout.com.br/checkout/v5/wS3VUYi7LXGVN1gaDkzz\n- Recuperação R$19,90: https://www.ggcheckout.com/checkout/v5/lgLfIj546p8rnNxbyemz\n- Básico R$10: https://www.ggcheckout.com/checkout/v5/U5cywWzxZVWT5yxnZoCo\n- Área de membros: https://areadinamicas.netlify.app/ | Senha: jiujitsu2026\n\n📚 **Kit Despluga Pro** (+500 atividades BNCC)\n- Premium R$27: https://ggcheckout.app/checkout/v5/Nxbc5ow9sG4bxjZaYT1i\n- Recuperação R$17,90: https://ggcheckout.app/checkout/v5/LpRmHzX7GSv9qlS0zKdw\n- Básico R$10: https://ggcheckout.app/checkout/v5/d3reJiARwhAh5TJH7YFK\n- Área de membros: https://areadespluga.netlify.app/area/ | Senha: 2026`;
+  }
+
+  throw new Error(`Ferramenta desconhecida: ${name}`);
+}
+
+// MCP SSE endpoint — cousin's Claude Code connects here
+app.get('/mcp/sse', (req, res) => {
+  const key = req.headers['x-api-key'] || req.query.key;
+  const validKey = process.env.MCP_API_KEY || 'nexus-primo-2026';
+  if (key !== validKey) return res.status(401).json({ error: 'Chave de acesso inválida' });
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'x-api-key, content-type');
+
+  const sessionId = 'mcp_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+  mcpSessions.set(sessionId, res);
+
+  const baseUrl = process.env.RENDER_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`;
+  res.write(`event: endpoint\ndata: ${JSON.stringify({ uri: `${baseUrl}/mcp/messages?sessionId=${sessionId}` })}\n\n`);
+
+  const ping = setInterval(() => res.write(': ping\n\n'), 25000);
+  req.on('close', () => { clearInterval(ping); mcpSessions.delete(sessionId); });
+});
+
+app.options('/mcp/messages', (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'x-api-key, content-type');
+  res.sendStatus(204);
+});
+
+app.post('/mcp/messages', async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  const { sessionId } = req.query;
+  const sseRes = mcpSessions.get(sessionId);
+  if (!sseRes) return res.status(404).json({ error: 'Sessão não encontrada' });
+
+  const { jsonrpc, id, method, params } = req.body || {};
+  res.status(200).send();
+
+  if (!id) return; // notification — no response needed
+
+  let result;
+  try {
+    if (method === 'initialize') {
+      result = {
+        protocolVersion: '2024-11-05',
+        capabilities: { tools: {} },
+        serverInfo: { name: 'Nexus Control MCP', version: '1.0.0' },
+      };
+    } else if (method === 'tools/list') {
+      result = { tools: MCP_TOOLS };
+    } else if (method === 'tools/call') {
+      const text = await executeMcpTool(params.name, params.arguments || {});
+      result = { content: [{ type: 'text', text }] };
+    } else if (method === 'ping') {
+      result = {};
+    } else {
+      result = {};
+    }
+  } catch (e) {
+    const error = { code: -32000, message: e.message };
+    sseRes.write(`event: message\ndata: ${JSON.stringify({ jsonrpc: '2.0', id, error })}\n\n`);
+    return;
+  }
+
+  sseRes.write(`event: message\ndata: ${JSON.stringify({ jsonrpc: '2.0', id, result })}\n\n`);
+});
+
+// ──────────────────────────────────────────
 // Dashboard — Integrações
 // ──────────────────────────────────────────
 
