@@ -49,3 +49,16 @@ create index if not exists idx_lancamentos_produto on lancamentos(produto_id);
 create index if not exists idx_criativos_produto on criativos(produto_id);
 create index if not exists idx_criativos_lancamento on criativos(lancamento_id);
 create index if not exists idx_criativos_tipo on criativos(tipo);
+
+-- Conversas do Dashboard (setores, conselho, histórico)
+create table if not exists dashboard_conversations (
+  id            uuid primary key default gen_random_uuid(),
+  session_id    text not null,
+  sector        text not null,
+  role          text not null,
+  content       text not null,
+  created_at    timestamptz default now()
+);
+
+create index if not exists idx_dash_conv_session on dashboard_conversations(session_id, sector);
+create index if not exists idx_dash_conv_created on dashboard_conversations(created_at);

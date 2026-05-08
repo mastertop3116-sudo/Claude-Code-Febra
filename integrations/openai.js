@@ -40,4 +40,10 @@ async function openaiImage(prompt, size = '1024x1024') {
   return r.data[0].b64_json
 }
 
-module.exports = { openaiFlash, openaiJson, openaiImage }
+// Conversa com histórico completo de mensagens
+async function openaiChat(messages) {
+  const r = await _getClient().chat.completions.create({ model: MODEL, messages })
+  return r.choices[0].message.content
+}
+
+module.exports = { openaiFlash, openaiJson, openaiImage, openaiChat }

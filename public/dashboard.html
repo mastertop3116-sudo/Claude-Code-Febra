@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nexus Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   NEXUS CONTROL — Design System
+   ═══════════════════════════════════════════ */
+:root {
+  --bg:          #07070f;
+  --surface:     #0e0e1c;
+  --elevated:    #141426;
+  --overlay:     #1b1b30;
+  --border:      rgba(255,255,255,0.06);
+  --border-md:   rgba(255,255,255,0.10);
+  --border-hi:   rgba(255,255,255,0.16);
+  --text:        #eaeaf5;
+  --text-2:      #9090b0;
+  --text-3:      #55556a;
+  --nexus:       #6366f1;
+  --nexus-dim:   rgba(99,102,241,0.12);
+  --nexus-glow:  rgba(99,102,241,0.25);
+  --brn:         #10b981;
+  --brn-dim:     rgba(16,185,129,0.10);
+  --brn-glow:    rgba(16,185,129,0.22);
+  --c-prod:      #34d399;
+  --c-cont:      #a78bfa;
+  --c-mono:      #fbbf24;
+  --c-ux:        #f472b6;
+  --c-eng:       #38bdf8;
+  --c-grow:      #fb923c;
+  --c-all:       #818cf8;
+  --c-cons:      #ef4444;
+  --sidebar-w:   248px;
+  --topbar-h:    60px;
+  --radius:      10px;
+  --radius-lg:   14px;
+}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-size:14px;line-height:1.5;display:flex}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:2px}
+
+/* ══════════════════════════════════
+   SPLASH / LOADER
+   ══════════════════════════════════ */
+#splash{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  transition:opacity 0.4s;
+}
+#splash.hidden{opacity:0;pointer-events:none}
+.splash-logo{
+  font-family:'Sora',sans-serif;font-size:13px;font-weight:600;
+  letter-spacing:6px;text-transform:uppercase;color:var(--text-2);
+}
+.splash-name{
+  font-family:'Sora',sans-serif;font-size:38px;font-weight:700;
+  background:linear-gradient(135deg,#6366f1 0%,#a78bfa 50%,#34d399 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:-1px;
+}
+.splash-bar{
+  width:200px;height:2px;background:var(--surface);border-radius:2px;overflow:hidden;
+}
+.splash-bar-fill{
+  height:100%;width:0;background:linear-gradient(90deg,var(--nexus),var(--brn));
+  border-radius:2px;transition:width 0.6s ease;
+}
+
+/* ══════════════════════════════════
+   SIDEBAR
+   ══════════════════════════════════ */
+#sidebar{
+  width:var(--sidebar-w);min-width:var(--sidebar-w);
+  height:100vh;overflow-y:auto;overflow-x:hidden;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  flex-shrink:0;
+  position:relative;
+}
+
+.sb-logo{
+  padding:22px 20px 18px;
+  border-bottom:1px solid var(--border);
+}
+.sb-logo-eyebrow{
+  font-size:9px;font-weight:600;letter-spacing:3px;
+  text-transform:uppercase;color:var(--text-3);margin-bottom:5px;
+}
+.sb-logo-name{
+  font-size:22px;font-weight:700;letter-spacing:-0.5px;
+  background:linear-gradient(135deg,#818cf8,#34d399);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.sb-logo-sub{
+  font-size:10px;color:var(--text-3);margin-top:2px;letter-spacing:0.3px;
+}
+
+.sb-section{padding:14px 10px 6px}
+.sb-section-label{
+  font-size:9px;font-weight:600;letter-spacing:2.5px;
+  text-transform:uppercase;color:var(--text-3);
+  padding:0 10px;margin-bottom:3px;
+}
+
+.sb-item{
+  display:flex;align-items:center;gap:9px;
+  padding:9px 10px;border-radius:8px;cursor:pointer;
+  font-size:12.5px;font-weight:400;color:var(--text-2);
+  transition:all 0.15s;margin-bottom:1px;
+  position:relative;user-select:none;
+}
+.sb-item:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+.sb-item.active{background:rgba(255,255,255,0.06);color:var(--text);font-weight:500}
+.sb-item.active::before{
+  content:'';position:absolute;left:0;top:20%;height:60%;width:3px;
+  border-radius:0 3px 3px 0;background:var(--item-color,var(--nexus));
+}
+.sb-item-icon{font-size:14px;flex-shrink:0;width:18px;text-align:center}
+.sb-item-label{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-item-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--item-color,var(--nexus));
+  opacity:0;transition:opacity 0.15s;flex-shrink:0;
+}
+.sb-item.active .sb-item-dot{opacity:1}
+
+.sb-divider{
+  margin:10px 16px;height:1px;
+  background:var(--border);
+}
+
+/* BRN VENDAS section */
+.sb-brn-header{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 14px 4px;
+}
+.sb-brn-badge{
+  font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--brn);padding:2px 8px;
+  border:1px solid rgba(16,185,129,0.3);border-radius:20px;
+}
+.sb-brn-partner{font-size:10px;color:var(--text-3);margin-left:auto}
+
+.sb-forge-link{
+  margin:8px 10px 16px;
+  display:flex;align-items:center;gap:8px;
+  padding:9px 12px;border-radius:8px;
+  background:var(--nexus-dim);border:1px solid rgba(99,102,241,0.2);
+  cursor:pointer;font-size:12px;color:var(--nexus);font-weight:500;
+  transition:all 0.15s;
+}
+.sb-forge-link:hover{background:var(--nexus-glow)}
+.sb-forge-link svg{width:13px;height:13px;stroke:var(--nexus);flex-shrink:0}
+
+/* ══════════════════════════════════
+   MAIN AREA
+   ══════════════════════════════════ */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+.view{display:none;flex:1;flex-direction:column;overflow:hidden}
+.view.active{display:flex}
+
+/* ── TOPBAR ── */
+.topbar{
+  height:var(--topbar-h);min-height:var(--topbar-h);
+  display:flex;align-items:center;
+  padding:0 28px;gap:16px;
+  border-bottom:1px solid var(--border);
+  background:var(--surface);
+  flex-shrink:0;
+}
+.topbar-icon{font-size:18px}
+.topbar-title{font-size:15px;font-weight:600;letter-spacing:-0.2px}
+.topbar-desc{font-size:12px;color:var(--text-2)}
+.topbar-spacer{flex:1}
+.topbar-badge{
+  font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;
+  padding:4px 12px;border-radius:20px;border:1px solid;
+}
+.topbar-time{
+  font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-3);
+}
+
+/* ══════════════════════════════════
+   OVERVIEW — Visão Geral
+   ══════════════════════════════════ */
+#view-overview{background:var(--bg)}
+.overview-scroll{flex:1;overflow-y:auto;padding:28px}
+
+.greeting{margin-bottom:28px}
+.greeting-name{font-size:24px;font-weight:700;letter-spacing:-0.5px}
+.greeting-date{font-size:13px;color:var(--text-2);margin-top:3px}
+
+.stats-row{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;
+}
+@media(max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+
+.stat-card{
+  background:var(--elevated);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:18px 20px;
+  position:relative;overflow:hidden;
+}
+.stat-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:1.5px;
+  background:var(--card-accent,var(--nexus));
+}
+.stat-value{
+  font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;
+  color:var(--card-accent,var(--nexus));margin-bottom:4px;
+}
+.stat-label{font-size:11px;color:var(--text-2)}
+.stat-trend{
+  font-size:10px;color:var(--text-3);margin-top:6px;
+  font-family:'JetBrains Mono',monospace;
+}
+
+.section-heading{
+  font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text-3);margin-bottom:14px;
+}
+
+.quick-actions{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;
+}
+@media(max-width:800px){.quick-actions{grid-template-columns:1fr}}
+
+.qa-card{
+  background:var(--elevated);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:18px 20px;
+  cursor:pointer;transition:all 0.2s;display:flex;gap:14px;align-items:center;
+}
+.qa-card:hover{background:var(--overlay);border-color:var(--border-md);transform:translateY(-1px)}
+.qa-card:active{transform:translateY(0)}
+.qa-icon{font-size:22px;flex-shrink:0}
+.qa-label{font-size:13px;font-weight:600}
+.qa-desc{font-size:11px;color:var(--text-2);margin-top:2px}
+
+.products-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;
+  margin-bottom:8px;
+}
+
+.product-mini{
+  background:var(--elevated);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px;
+  position:relative;overflow:hidden;
+}
+.product-mini::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1.5px;
+  background:var(--p-color,var(--nexus));
+}
+.product-mini-name{font-size:12.5px;font-weight:600;margin-bottom:2px}
+.product-mini-nicho{font-size:11px;color:var(--text-2);margin-bottom:10px}
+.product-mini-revenue{
+  font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;
+  color:var(--p-color,var(--nexus));
+}
+.product-mini-label{font-size:10px;color:var(--text-3);margin-top:2px}
+.product-mini-row{display:flex;gap:14px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.pms{flex:1}
+.pms-val{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600}
+.pms-lbl{font-size:10px;color:var(--text-3)}
+
+/* ══════════════════════════════════
+   CHAT VIEWS
+   ══════════════════════════════════ */
+.chat-body{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:14px}
+
+/* Welcome state */
+.chat-welcome{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;gap:10px;padding:40px;
+}
+.cw-icon{font-size:44px;margin-bottom:4px}
+.cw-title{font-size:18px;font-weight:700;letter-spacing:-0.3px}
+.cw-desc{font-size:13px;color:var(--text-2);max-width:340px;line-height:1.6}
+.cw-chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:10px}
+.cw-chip{
+  padding:7px 14px;border-radius:20px;
+  background:var(--elevated);border:1px solid var(--border-md);
+  font-size:11.5px;cursor:pointer;transition:all 0.15s;color:var(--text-2);
+}
+.cw-chip:hover{border-color:var(--chip-color,var(--nexus));color:var(--chip-color,var(--nexus));background:var(--chip-bg,var(--nexus-dim))}
+
+/* Messages */
+.msg{display:flex;flex-direction:column;max-width:78%}
+.msg.user{align-self:flex-end;align-items:flex-end}
+.msg.assistant{align-self:flex-start;align-items:flex-start}
+.msg-bubble{
+  padding:12px 16px;border-radius:16px;
+  font-size:13.5px;line-height:1.65;white-space:pre-wrap;word-break:break-word;
+}
+.msg.user .msg-bubble{
+  background:var(--bubble-color,var(--nexus));color:#fff;
+  border-radius:16px 16px 4px 16px;
+}
+.msg.assistant .msg-bubble{
+  background:var(--elevated);border:1px solid var(--border);
+  border-radius:4px 16px 16px 16px;
+  border-left:2.5px solid var(--bubble-color,var(--nexus));
+}
+.msg-meta{font-size:10px;color:var(--text-3);margin-top:4px;padding:0 2px}
+
+/* Typing */
+.typing-wrap{display:flex;flex-direction:column;align-items:flex-start}
+.typing-bubble{
+  padding:13px 18px;background:var(--elevated);border:1px solid var(--border);
+  border-radius:4px 16px 16px 16px;
+  border-left:2.5px solid var(--bubble-color,var(--nexus));
+  display:flex;align-items:center;gap:5px;
+}
+.td{width:6px;height:6px;border-radius:50%;background:var(--text-3);animation:tdBounce 1.2s infinite}
+.td:nth-child(2){animation-delay:.2s}
+.td:nth-child(3){animation-delay:.4s}
+@keyframes tdBounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+
+/* Input area */
+.chat-input-area{
+  flex-shrink:0;padding:14px 20px;
+  border-top:1px solid var(--border);background:var(--surface);
+}
+.chat-input-row{display:flex;gap:10px;align-items:flex-end}
+.chat-textarea{
+  flex:1;background:var(--elevated);border:1px solid var(--border-md);
+  border-radius:var(--radius);padding:11px 15px;
+  color:var(--text);font-family:'Sora',sans-serif;font-size:13.5px;
+  resize:none;min-height:44px;max-height:120px;line-height:1.5;
+  outline:none;transition:border-color 0.2s;
+}
+.chat-textarea:focus{border-color:var(--input-focus,var(--nexus))}
+.chat-textarea::placeholder{color:var(--text-3)}
+.send-btn{
+  width:44px;height:44px;border-radius:var(--radius);
+  background:var(--btn-color,var(--nexus));border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity 0.15s,transform 0.1s;flex-shrink:0;
+}
+.send-btn:hover{opacity:.85;transform:scale(1.04)}
+.send-btn:active{transform:scale(.96)}
+.send-btn:disabled{opacity:.3;cursor:not-allowed;transform:none}
+.send-btn svg{width:17px;height:17px;fill:#fff}
+.chat-hint{font-size:10px;color:var(--text-3);margin-top:6px}
+
+/* ══════════════════════════════════
+   CONSENSUS (Todos os Setores)
+   ══════════════════════════════════ */
+.consensus-block{display:flex;flex-direction:column;gap:0;max-width:100%}
+
+.consensus-responses{
+  background:var(--elevated);border:1px solid var(--border);
+  border-radius:var(--radius-lg);overflow:hidden;margin-top:12px;
+}
+.cr-header{
+  padding:10px 16px;border-bottom:1px solid var(--border);
+  font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);
+}
+.cr-row{
+  display:flex;gap:12px;padding:12px 16px;
+  border-bottom:1px solid var(--border);
+}
+.cr-row:last-child{border-bottom:none}
+.cr-icon{
+  width:30px;height:30px;border-radius:7px;
+  background:var(--row-bg,rgba(255,255,255,0.04));
+  display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;
+}
+.cr-body{flex:1;min-width:0}
+.cr-name{
+  font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.5px;margin-bottom:5px;
+}
+.cr-text{font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.cr-row.pending .cr-text{color:var(--text-3);display:flex;align-items:center;gap:6px}
+
+.verdict-block{
+  margin-top:12px;background:var(--elevated);border:1px solid rgba(99,102,241,.25);
+  border-radius:var(--radius-lg);padding:16px;
+  border-left:3px solid var(--nexus);
+}
+.verdict-header{
+  font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--nexus);margin-bottom:10px;display:flex;align-items:center;gap:6px;
+}
+.verdict-text{font-size:13.5px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+
+/* ══════════════════════════════════
+   CONSELHO DE TITÃS
+   ══════════════════════════════════ */
+.titans-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+@media(max-width:700px){.titans-grid{grid-template-columns:1fr}}
+
+.titan-card{
+  background:var(--elevated);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:14px;
+  border-top:2px solid var(--t-color,var(--nexus));
+}
+.titan-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.titan-emoji{font-size:17px}
+.titan-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.titan-text{font-size:12.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word;color:var(--text-2)}
+
+/* ══════════════════════════════════
+   BRN VENDAS
+   ══════════════════════════════════ */
+#view-brn-overview{background:var(--bg)}
+.brn-scroll{flex:1;overflow-y:auto;padding:28px}
+
+.brn-hero{
+  background:linear-gradient(135deg,var(--brn-dim),rgba(16,185,129,0.03));
+  border:1px solid rgba(16,185,129,0.2);
+  border-radius:var(--radius-lg);padding:24px 28px;margin-bottom:24px;
+  display:flex;align-items:center;gap:20px;
+}
+.brn-hero-badge{
+  font-size:28px;font-weight:800;letter-spacing:1px;
+  background:linear-gradient(135deg,#10b981,#34d399);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.brn-hero-sub{font-size:12px;color:var(--text-2);margin-top:3px}
+.brn-hero-partner{
+  margin-left:auto;font-size:11px;color:var(--brn);
+  background:var(--brn-dim);border:1px solid rgba(16,185,129,0.2);
+  padding:5px 14px;border-radius:20px;font-weight:500;
+}
+
+.brn-products{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:24px}
+
+.brn-card{
+  background:var(--elevated);border:1px solid var(--border);
+  border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;
+  transition:all 0.2s;
+}
+.brn-card:hover{border-color:var(--border-md);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3)}
+.brn-card-top{
+  padding:20px;border-bottom:1px solid var(--border);
+  background:linear-gradient(135deg,var(--bc-bg,rgba(255,255,255,0.02)),transparent);
+}
+.brn-card-emoji{font-size:30px;margin-bottom:10px}
+.brn-card-name{font-size:15px;font-weight:700;margin-bottom:3px}
+.brn-card-desc{font-size:12px;color:var(--text-2)}
+.brn-card-bottom{padding:16px 20px}
+.brn-tickets{display:flex;gap:8px;flex-wrap:wrap}
+.bt{
+  font-size:11px;font-family:'JetBrains Mono',monospace;
+  padding:4px 10px;border-radius:20px;background:rgba(255,255,255,0.04);
+  border:1px solid var(--border-md);
+}
+.bt.premium{color:var(--bc-color,var(--brn));border-color:rgba(16,185,129,0.25)}
+
+.brn-links{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.brn-link-card{
+  background:var(--elevated);border:1px solid var(--border);
+  border-radius:var(--radius);padding:14px;
+}
+.bl-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-3);margin-bottom:4px}
+.bl-value{font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text-2);word-break:break-all}
+
+/* BRN Product detail */
+.brn-detail-scroll{flex:1;overflow-y:auto;padding:28px}
+.detail-header{
+  background:var(--elevated);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:24px;margin-bottom:20px;
+  display:flex;align-items:center;gap:16px;
+}
+.detail-emoji{font-size:36px}
+.detail-name{font-size:18px;font-weight:700}
+.detail-nicho{font-size:12px;color:var(--text-2);margin-top:2px}
+
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.price-card{
+  background:var(--elevated);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px;text-align:center;
+}
+.price-card.featured{border-color:rgba(16,185,129,.3);background:var(--brn-dim)}
+.pc-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-3);margin-bottom:8px}
+.pc-price{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--brn)}
+.pc-note{font-size:10px;color:var(--text-3);margin-top:4px}
+.pc-link{
+  display:block;margin-top:10px;padding:6px;border-radius:6px;
+  font-size:11px;font-weight:600;text-decoration:none;
+  background:var(--brn);color:#fff;transition:opacity .15s;
+  font-family:'Sora',sans-serif;
+}
+.pc-link:hover{opacity:.85}
+
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.info-card{background:var(--elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.ic-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-3);margin-bottom:8px}
+.ic-value{font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--text-2);word-break:break-all}
+.ic-copy{
+  margin-top:8px;display:inline-flex;align-items:center;gap:5px;
+  font-size:10px;color:var(--brn);cursor:pointer;
+  background:var(--brn-dim);border:1px solid rgba(16,185,129,0.2);
+  padding:3px 10px;border-radius:20px;transition:opacity .15s;
+  font-family:'Sora',sans-serif;
+}
+.ic-copy:hover{opacity:.8}
+
+/* ══════════════════════════════════
+   UTILITIES
+   ══════════════════════════════════ */
+.skeleton{
+  background:linear-gradient(90deg,var(--elevated) 25%,var(--overlay) 50%,var(--elevated) 75%);
+  background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:var(--radius);
+}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+.pulse-dots{display:inline-flex;gap:4px}
+.pd{width:4px;height:4px;border-radius:50%;background:var(--text-3);animation:pdPulse 1s infinite}
+.pd:nth-child(2){animation-delay:.2s}
+.pd:nth-child(3){animation-delay:.4s}
+@keyframes pdPulse{0%,100%{opacity:.3}50%{opacity:1}}
+
+.toast{
+  position:fixed;bottom:24px;right:24px;z-index:8888;
+  background:var(--overlay);border:1px solid var(--border-md);
+  border-radius:var(--radius);padding:12px 18px;
+  font-size:13px;font-weight:500;color:var(--text);
+  box-shadow:0 8px 32px rgba(0,0,0,.4);
+  transform:translateY(80px);opacity:0;transition:all 0.3s;
+  max-width:300px;
+}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* Page-level fade in */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.view.active .overview-scroll,
+.view.active .chat-body,
+.view.active .brn-scroll,
+.view.active .brn-detail-scroll{animation:fadeIn .25s ease}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ SPLASH ═══════════════════ -->
+<div id="splash">
+  <div class="splash-logo">Nexus Digital Holding</div>
+  <div class="splash-name">CONTROL</div>
+  <div class="splash-bar"><div class="splash-bar-fill" id="splash-fill"></div></div>
+</div>
+
+<!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+<aside id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-eyebrow">Nexus Digital</div>
+    <div class="sb-logo-name">CONTROL</div>
+    <div class="sb-logo-sub">Centro de Comando · Rodrigo Cruz</div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-section-label">Visão Geral</div>
+    <div class="sb-item active" data-view="overview" style="--item-color:var(--nexus)">
+      <span class="sb-item-icon">⌂</span>
+      <span class="sb-item-label">Dashboard</span>
+      <span class="sb-item-dot"></span>
+    </div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-section-label">Nexus — Setores</div>
+    <div class="sb-item" data-view="fabrica-produtos" style="--item-color:var(--c-prod)">
+      <span class="sb-item-icon">🏭</span>
+      <span class="sb-item-label">Fáb. de Produtos</span>
+      <span class="sb-item-dot"></span>
+    </div>
+    <div class="sb-item" data-view="fabrica-conteudo" style="--item-color:var(--c-cont)">
+      <span class="sb-item-icon">✍️</span>
+      <span class="sb-item-label">Fáb. de Conteúdo</span>
+      <span class="sb-item-dot"></span>
+    </div>
+    <div class="sb-item" data-view="motor-monetizacao" style="--item-color:var(--c-mono)">
+      <span class="sb-item-icon">💰</span>
+      <span class="sb-item-label">Motor de Monetização</span>
+      <span class="sb-item-dot"></span>
+    </div>
+    <div class="sb-item" data-view="lab-ux" style="--item-color:var(--c-ux)">
+      <span class="sb-item-icon">🔬</span>
+      <span class="sb-item-label">Lab de UX</span>
+      <span class="sb-item-dot"></span>
+    </div>
+    <div class="sb-item" data-view="engenharia" style="--item-color:var(--c-eng)">
+      <span class="sb-item-icon">⚙️</span>
+      <span class="sb-item-label">Engenharia</span>
+      <span class="sb-item-dot"></span>
+    </div>
+    <div class="sb-item" data-view="crescimento" style="--item-color:var(--c-grow)">
+      <span class="sb-item-icon">📈</span>
+      <span class="sb-item-label">Crescimento</span>
+      <span class="sb-item-dot"></span>
+    </div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-section-label">Estratégia</div>
+    <div class="sb-item" data-view="all-sectors" style="--item-color:var(--c-all)">
+      <span class="sb-item-icon">⚡</span>
+      <span class="sb-item-label">Todos os Setores</span>
+      <span class="sb-item-dot"></span>
+    </div>
+    <div class="sb-item" data-view="conselho" style="--item-color:var(--c-cons)">
+      <span class="sb-item-icon">🔱</span>
+      <span class="sb-item-label">Conselho de Titãs</span>
+      <span class="sb-item-dot"></span>
+    </div>
+  </div>
+
+  <div class="sb-divider"></div>
+
+  <div class="sb-brn-header">
+    <span class="sb-brn-badge">BRN VENDAS</span>
+    <span class="sb-brn-partner">+ primo</span>
+  </div>
+  <div class="sb-section" style="padding-top:4px">
+    <div class="sb-item" data-view="brn-overview" style="--item-color:var(--brn)">
+      <span class="sb-item-icon">📊</span>
+      <span class="sb-item-label">Visão Geral</span>
+      <span class="sb-item-dot"></span>
+    </div>
+    <div class="sb-item" data-view="brn-jiujitsu" style="--item-color:var(--brn)">
+      <span class="sb-item-icon">🥋</span>
+      <span class="sb-item-label">Jiu-Jitsu</span>
+      <span class="sb-item-dot"></span>
+    </div>
+    <div class="sb-item" data-view="brn-despluga" style="--item-color:var(--brn)">
+      <span class="sb-item-icon">📚</span>
+      <span class="sb-item-label">Kit Despluga Pro</span>
+      <span class="sb-item-dot"></span>
+    </div>
+  </div>
+
+  <div class="sb-divider"></div>
+
+  <div class="sb-forge-link" onclick="window.open('/criar','_blank')">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+    <span>Nexus Forge Studio</span>
+  </div>
+</aside>
+
+<!-- ═══════════════════ MAIN ═══════════════════ -->
+<main id="main">
+
+  <!-- ── OVERVIEW ── -->
+  <div id="view-overview" class="view active">
+    <div class="topbar">
+      <span class="topbar-icon">⌂</span>
+      <div>
+        <div class="topbar-title">Dashboard</div>
+        <div class="topbar-desc">Visão geral da Nexus Digital Holding</div>
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="topbar-time" id="clock"></div>
+    </div>
+    <div class="overview-scroll">
+      <div class="greeting">
+        <div class="greeting-name" id="greeting-text">Bom dia, Rodrigo 👋</div>
+        <div class="greeting-date" id="greeting-date"></div>
+      </div>
+
+      <div class="section-heading">Métricas · Nexus Forge</div>
+      <div class="stats-row" id="stats-row">
+        <div class="stat-card skeleton" style="height:90px;--card-accent:var(--nexus)"></div>
+        <div class="stat-card skeleton" style="height:90px;--card-accent:var(--nexus)"></div>
+        <div class="stat-card skeleton" style="height:90px;--card-accent:var(--nexus)"></div>
+        <div class="stat-card skeleton" style="height:90px;--card-accent:var(--nexus)"></div>
+      </div>
+
+      <div class="section-heading" style="margin-top:24px">Ações Rápidas</div>
+      <div class="quick-actions">
+        <div class="qa-card" onclick="navigate('all-sectors')">
+          <div class="qa-icon">⚡</div>
+          <div>
+            <div class="qa-label">Consultar Todos os Setores</div>
+            <div class="qa-desc">6 departamentos respondem em paralelo</div>
+          </div>
+        </div>
+        <div class="qa-card" onclick="navigate('conselho')">
+          <div class="qa-icon">🔱</div>
+          <div>
+            <div class="qa-label">Acionar Conselho de Titãs</div>
+            <div class="qa-desc">Elon · Bezos · Hang · Paulo Vieira</div>
+          </div>
+        </div>
+        <div class="qa-card" onclick="window.open('/criar','_blank')">
+          <div class="qa-icon">⬡</div>
+          <div>
+            <div class="qa-label">Nexus Forge Studio</div>
+            <div class="qa-desc">Gerar ebooks, roteiros e entregáveis</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-heading">Produtos · Nexus Forge</div>
+      <div class="products-grid" id="products-grid">
+        <div class="product-mini skeleton" style="height:110px"></div>
+        <div class="product-mini skeleton" style="height:110px"></div>
+        <div class="product-mini skeleton" style="height:110px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTOR CHAT VIEWS (geradas por JS) ── -->
+
+  <!-- ── ALL SECTORS ── -->
+  <div id="view-all-sectors" class="view" style="--bubble-color:var(--c-all);--input-focus:var(--c-all);--btn-color:var(--c-all)">
+    <div class="topbar">
+      <span class="topbar-icon">⚡</span>
+      <div>
+        <div class="topbar-title">Todos os Setores</div>
+        <div class="topbar-desc">6 departamentos analisam · MAX sintetiza</div>
+      </div>
+      <div class="topbar-spacer"></div>
+      <span class="topbar-badge" style="color:var(--c-all);border-color:rgba(129,140,248,.3)">CONSENSO</span>
+    </div>
+    <div class="chat-body" id="msgs-all-sectors">
+      <div class="chat-welcome" id="cwelcome-all-sectors" style="--chip-color:var(--c-all);--chip-bg:rgba(129,140,248,.1)">
+        <div class="cw-icon">⚡</div>
+        <div class="cw-title">Modo Consenso</div>
+        <div class="cw-desc">Todos os 6 setores da Nexus analisam sua questão. MAX consolida um veredito executivo.</div>
+        <div class="cw-chips">
+          <div class="cw-chip" onclick="fillInput('all-sectors','Qual produto devemos priorizar agora?')">Qual produto priorizar?</div>
+          <div class="cw-chip" onclick="fillInput('all-sectors','Como atingir R$10k/mês mais rápido?')">Como chegar a R$10k/mês?</div>
+          <div class="cw-chip" onclick="fillInput('all-sectors','Qual a maior alavanca de crescimento no próximo trimestre?')">Maior alavanca agora?</div>
+        </div>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <div class="chat-input-row">
+        <textarea class="chat-textarea" id="input-all-sectors" placeholder="Qual questão ou decisão para todos os setores analisarem?" rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();_send('all-sectors')}"
+          oninput="autoResize(this)"></textarea>
+        <button class="send-btn" onclick="_send('all-sectors')">
+          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
+      <div class="chat-hint">Enter para enviar · Shift+Enter para nova linha · ~15–20s de processamento</div>
+    </div>
+  </div>
+
+  <!-- ── CONSELHO ── -->
+  <div id="view-conselho" class="view" style="--bubble-color:var(--c-cons);--input-focus:var(--c-cons);--btn-color:var(--c-cons)">
+    <div class="topbar">
+      <span class="topbar-icon">🔱</span>
+      <div>
+        <div class="topbar-title">Conselho de Titãs</div>
+        <div class="topbar-desc">Elon Musk · Jeff Bezos · Luciano Hang · Paulo Vieira</div>
+      </div>
+      <div class="topbar-spacer"></div>
+      <span class="topbar-badge" style="color:var(--c-cons);border-color:rgba(239,68,68,.3)">ESTRATÉGICO</span>
+    </div>
+    <div class="chat-body" id="msgs-conselho">
+      <div class="chat-welcome" id="cwelcome-conselho" style="--chip-color:var(--c-cons);--chip-bg:rgba(239,68,68,.08)">
+        <div class="cw-icon">🔱</div>
+        <div class="cw-title">Conselho de Titãs</div>
+        <div class="cw-desc">Os 4 estrategistas analisam sua decisão com perspectivas radicalmente diferentes.</div>
+        <div class="cw-chips">
+          <div class="cw-chip" onclick="fillInput('conselho','Devo lançar um novo produto ou escalar os existentes?')">Novo produto ou escalar?</div>
+          <div class="cw-chip" onclick="fillInput('conselho','Como construir uma marca sólida de infoprodutos no Brasil?')">Construir a marca</div>
+          <div class="cw-chip" onclick="fillInput('conselho','Qual a estratégia para chegar ao valuation de R$1 bilhão?')">Estratégia de longo prazo</div>
+        </div>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <div class="chat-input-row">
+        <textarea class="chat-textarea" id="input-conselho" placeholder="Qual decisão estratégica o Conselho deve analisar?" rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();_send('conselho')}"
+          oninput="autoResize(this)"></textarea>
+        <button class="send-btn" onclick="_send('conselho')">
+          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
+      <div class="chat-hint">Enter para enviar · Shift+Enter para nova linha</div>
+    </div>
+  </div>
+
+  <!-- ── BRN VENDAS — OVERVIEW ── -->
+  <div id="view-brn-overview" class="view">
+    <div class="topbar">
+      <span class="topbar-icon">📊</span>
+      <div>
+        <div class="topbar-title" style="color:var(--brn)">BRN VENDAS</div>
+        <div class="topbar-desc">Infoprodutos low ticket · Rodrigo &amp; Primo</div>
+      </div>
+      <div class="topbar-spacer"></div>
+      <span class="topbar-badge" style="color:var(--brn);border-color:rgba(16,185,129,.3)">CAROL BOT</span>
+    </div>
+    <div class="brn-scroll">
+      <div class="brn-hero">
+        <div>
+          <div class="brn-hero-badge">BRN VENDAS</div>
+          <div class="brn-hero-sub">Bot de vendas IA no WhatsApp · 2 produtos ativos</div>
+        </div>
+        <div class="brn-hero-partner">Rodrigo + Primo</div>
+      </div>
+
+      <div class="section-heading">Produtos Ativos</div>
+      <div class="brn-products">
+        <div class="brn-card" onclick="navigate('brn-jiujitsu')" style="--bc-color:var(--c-prod);--bc-bg:rgba(52,211,153,0.04)">
+          <div class="brn-card-top">
+            <div class="brn-card-emoji">🥋</div>
+            <div class="brn-card-name">Dinâmicas de Jiu-Jitsu</div>
+            <div class="brn-card-desc">+250 dinâmicas práticas para professores</div>
+          </div>
+          <div class="brn-card-bottom">
+            <div class="brn-tickets">
+              <div class="bt premium">Premium R$27</div>
+              <div class="bt">Recup. R$19,90</div>
+              <div class="bt">Básico R$10</div>
+            </div>
+          </div>
+        </div>
+        <div class="brn-card" onclick="navigate('brn-despluga')" style="--bc-color:var(--brn);--bc-bg:rgba(16,185,129,0.04)">
+          <div class="brn-card-top">
+            <div class="brn-card-emoji">📚</div>
+            <div class="brn-card-name">Kit Despluga Pro</div>
+            <div class="brn-card-desc">+500 atividades desplugadas BNCC</div>
+          </div>
+          <div class="brn-card-bottom">
+            <div class="brn-tickets">
+              <div class="bt premium">Premium R$27</div>
+              <div class="bt">Recup. R$17,90</div>
+              <div class="bt">Básico R$10</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-heading">Info Operacional</div>
+      <div class="brn-links">
+        <div class="brn-link-card">
+          <div class="bl-label">Bot CAROL</div>
+          <div class="bl-value">WhatsApp — script de atendimento IA</div>
+        </div>
+        <div class="brn-link-card">
+          <div class="bl-label">Checkout</div>
+          <div class="bl-value">GG Checkout · Pix + cartão</div>
+        </div>
+        <div class="brn-link-card">
+          <div class="bl-label">Recebedor Pix</div>
+          <div class="bl-value" style="color:var(--brn)">RODRIGO ROGER SILVA CRUZ</div>
+        </div>
+        <div class="brn-link-card">
+          <div class="bl-label">Contato Suporte</div>
+          <div class="bl-value">mastertop3116@gmail.com</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BRN — JIU-JITSU ── -->
+  <div id="view-brn-jiujitsu" class="view">
+    <div class="topbar">
+      <span class="topbar-icon">🥋</span>
+      <div>
+        <div class="topbar-title">Dinâmicas de Jiu-Jitsu</div>
+        <div class="topbar-desc">BRN VENDAS · +250 dinâmicas para professores</div>
+      </div>
+      <div class="topbar-spacer"></div>
+      <span class="topbar-badge" style="color:var(--c-prod);border-color:rgba(52,211,153,.3)">ATIVO</span>
+    </div>
+    <div class="brn-detail-scroll">
+      <div class="detail-header">
+        <div class="detail-emoji">🥋</div>
+        <div>
+          <div class="detail-name">Dinâmicas de Jiu-Jitsu</div>
+          <div class="detail-nicho">Professores de Jiu-Jitsu · Público infantil e adulto</div>
+        </div>
+      </div>
+
+      <div class="section-heading">Estrutura de Preços</div>
+      <div class="pricing-grid">
+        <div class="price-card featured">
+          <div class="pc-label">Premium</div>
+          <div class="pc-price">R$27</div>
+          <div class="pc-note">+ 3 bônus inclusos</div>
+          <a class="pc-link" href="https://ggcheckout.com.br/checkout/v5/wS3VUYi7LXGVN1gaDkzz" target="_blank">Link de Compra</a>
+        </div>
+        <div class="price-card">
+          <div class="pc-label">Recuperação</div>
+          <div class="pc-price" style="font-size:18px">R$19,90</div>
+          <div class="pc-note">Após objeção de preço</div>
+          <a class="pc-link" style="background:var(--elevated);color:var(--brn);border:1px solid rgba(16,185,129,.3)" href="https://www.ggcheckout.com/checkout/v5/lgLfIj546p8rnNxbyemz" target="_blank">Link Recuperação</a>
+        </div>
+        <div class="price-card">
+          <div class="pc-label">Básico</div>
+          <div class="pc-price" style="font-size:18px">R$10</div>
+          <div class="pc-note">Última opção</div>
+          <a class="pc-link" style="background:var(--elevated);color:var(--brn);border:1px solid rgba(16,185,129,.3)" href="https://www.ggcheckout.com/checkout/v5/U5cywWzxZVWT5yxnZoCo" target="_blank">Link Básico</a>
+        </div>
+      </div>
+
+      <div class="section-heading">Acesso do Cliente</div>
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="ic-label">Área de Membros</div>
+          <div class="ic-value" style="color:var(--brn)">areadinamicas.netlify.app</div>
+          <div class="ic-copy" onclick="copyText('https://areadinamicas.netlify.app/')">📋 Copiar URL</div>
+        </div>
+        <div class="info-card">
+          <div class="ic-label">Senha de Acesso</div>
+          <div class="ic-value" style="color:var(--brn);font-size:18px;font-weight:700">jiujitsu2026</div>
+          <div class="ic-copy" onclick="copyText('jiujitsu2026')">📋 Copiar senha</div>
+        </div>
+        <div class="info-card" style="grid-column:1/-1">
+          <div class="ic-label">Bônus do Premium</div>
+          <div style="margin-top:6px;display:flex;gap:10px;flex-wrap:wrap">
+            <span class="bt">🥊 Certificado de Jiu-Jiteiro</span>
+            <span class="bt">🎮 Jogos de Luta Interativos</span>
+            <span class="bt">💪 100 Drills de Preparação Física</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BRN — KIT DESPLUGA ── -->
+  <div id="view-brn-despluga" class="view">
+    <div class="topbar">
+      <span class="topbar-icon">📚</span>
+      <div>
+        <div class="topbar-title">Kit Despluga Pro</div>
+        <div class="topbar-desc">BRN VENDAS · +500 atividades desplugadas BNCC</div>
+      </div>
+      <div class="topbar-spacer"></div>
+      <span class="topbar-badge" style="color:var(--brn);border-color:rgba(16,185,129,.3)">ATIVO</span>
+    </div>
+    <div class="brn-detail-scroll">
+      <div class="detail-header">
+        <div class="detail-emoji">📚</div>
+        <div>
+          <div class="detail-name">Kit Despluga Pro</div>
+          <div class="detail-nicho">Professoras do Ensino Fundamental · Pensamento Computacional BNCC</div>
+        </div>
+      </div>
+
+      <div class="section-heading">Estrutura de Preços</div>
+      <div class="pricing-grid">
+        <div class="price-card featured">
+          <div class="pc-label">Kit Completo</div>
+          <div class="pc-price">R$27</div>
+          <div class="pc-note">+ 4 bônus inclusos</div>
+          <a class="pc-link" href="https://ggcheckout.app/checkout/v5/Nxbc5ow9sG4bxjZaYT1i" target="_blank">Link de Compra</a>
+        </div>
+        <div class="price-card">
+          <div class="pc-label">Recuperação</div>
+          <div class="pc-price" style="font-size:18px">R$17,90</div>
+          <div class="pc-note">Após objeção de preço</div>
+          <a class="pc-link" style="background:var(--elevated);color:var(--brn);border:1px solid rgba(16,185,129,.3)" href="https://ggcheckout.app/checkout/v5/LpRmHzX7GSv9qlS0zKdw" target="_blank">Link Recuperação</a>
+        </div>
+        <div class="price-card">
+          <div class="pc-label">Básico</div>
+          <div class="pc-price" style="font-size:18px">R$10</div>
+          <div class="pc-note">100 atividades · sem bônus</div>
+          <a class="pc-link" style="background:var(--elevated);color:var(--brn);border:1px solid rgba(16,185,129,.3)" href="https://ggcheckout.app/checkout/v5/d3reJiARwhAh5TJH7YFK" target="_blank">Link Básico</a>
+        </div>
+      </div>
+
+      <div class="section-heading">Acesso do Cliente</div>
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="ic-label">Área de Membros</div>
+          <div class="ic-value" style="color:var(--brn)">areadespluga.netlify.app/area/</div>
+          <div class="ic-copy" onclick="copyText('https://areadespluga.netlify.app/area/')">📋 Copiar URL</div>
+        </div>
+        <div class="info-card">
+          <div class="ic-label">Senha de Acesso</div>
+          <div class="ic-value" style="color:var(--brn);font-size:18px;font-weight:700">2026</div>
+          <div class="ic-copy" onclick="copyText('2026')">📋 Copiar senha</div>
+        </div>
+        <div class="info-card" style="grid-column:1/-1">
+          <div class="ic-label">Bônus do Kit Completo</div>
+          <div style="margin-top:6px;display:flex;gap:10px;flex-wrap:wrap">
+            <span class="bt">🌐 Ponte Digital</span>
+            <span class="bt">🎥 Práticas Avançadas (AR + Chroma Key)</span>
+            <span class="bt">📖 Storytelling &amp; Lógica</span>
+            <span class="bt">📋 Guia BNCC Comentado</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+// ─── CONSTANTS ──────────────────────────────
+const SESSION = localStorage.getItem('nxs_sess') || (()=>{
+  const s='sess_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  localStorage.setItem('nxs_sess',s); return s;
+})();
+
+const SECTOR_CFG = {
+  'fabrica-produtos':   {name:'Fábrica de Produtos',emoji:'🏭',color:'#34d399',role:'Criação de infoprodutos e entregáveis',suggestions:['Crie uma estrutura de produto para professores de academia','Como montar uma oferta irresistível para o BIDCAP?','Quais infoprodutos posso lançar nos próximos 30 dias?']},
+  'fabrica-conteudo':   {name:'Fábrica de Conteúdo',emoji:'✍️',color:'#a78bfa',role:'Roteiros, Reels e copies de conversão',suggestions:['Crie um roteiro de Reels de 30s para o BIDCAP','Escreva 5 hooks para Instagram Stories de Jiu-Jitsu','Planejamento de conteúdo para a semana']},
+  'motor-monetizacao':  {name:'Motor de Monetização',emoji:'💰',color:'#fbbf24',role:'Precificação, funis e estratégias de venda',suggestions:['Como estruturar o funil do BIDCAP?','Qual o melhor price point para um produto de Jiu-Jitsu?','Como aumentar o ticket médio sem perder volume?']},
+  'lab-ux':             {name:'Lab de UX',emoji:'🔬',color:'#f472b6',role:'Experiência, conversão e redução de fricção',suggestions:['Onde estão os maiores pontos de abandono no funil?','O que melhorar na landing page do BIDCAP?','Como reduzir fricção no checkout?']},
+  'engenharia':         {name:'Engenharia',emoji:'⚙️',color:'#38bdf8',role:'Sistemas, automações e APIs',suggestions:['Quais automações eliminam mais trabalho manual agora?','Como integrar o UTMify sem MCP?','Como evitar o cold start do Render?']},
+  'crescimento':        {name:'Crescimento',emoji:'📈',color:'#fb923c',role:'Novos nichos, tráfego e expansão',suggestions:['Quais nichos explorar depois do Jiu-Jitsu e Ballet?','Como otimizar os anúncios do Meta Ads?','Estratégia de expansão para 90 dias']},
+};
+
+const CONSELHO_CFG = {
+  elon:  {name:'Elon Musk',emoji:'🚀',color:'#34d399'},
+  bezos: {name:'Jeff Bezos',emoji:'📦',color:'#f59e0b'},
+  hang:  {name:'Luciano Hang',emoji:'🇧🇷',color:'#22c55e'},
+  paulo: {name:'Paulo Vieira',emoji:'🎯',color:'#a855f7'},
+};
+
+const SECTOR_CSS_VAR = {
+  'fabrica-produtos':'--c-prod','fabrica-conteudo':'--c-cont',
+  'motor-monetizacao':'--c-mono','lab-ux':'--c-ux',
+  'engenharia':'--c-eng','crescimento':'--c-grow',
+};
+
+// ─── STATE ──────────────────────────────────
+let currentView = 'overview';
+const historyLoaded = {};
+const sendingLock = {};
+let metricsLoaded = false;
+
+// ─── SPLASH ─────────────────────────────────
+(function initSplash(){
+  const fill = document.getElementById('splash-fill');
+  let p=0;
+  const t = setInterval(()=>{
+    p = Math.min(p+Math.random()*18+5, 92);
+    fill.style.width = p+'%';
+    if(p>=92) clearInterval(t);
+  },120);
+  setTimeout(()=>{
+    fill.style.width='100%';
+    setTimeout(()=>{
+      document.getElementById('splash').classList.add('hidden');
+      loadMetrics();
+    },400);
+  },900);
+})();
+
+// ─── CLOCK ──────────────────────────────────
+function updateClock(){
+  const el = document.getElementById('clock');
+  if(el) el.textContent = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+updateClock(); setInterval(updateClock,1000);
+
+// ─── GREETING ───────────────────────────────
+(function setGreeting(){
+  const h = new Date().getHours();
+  const g = h<12?'Bom dia':h<18?'Boa tarde':'Boa noite';
+  document.getElementById('greeting-text').textContent = g+', Rodrigo 👋';
+  const days=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+  const months=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const d=new Date();
+  document.getElementById('greeting-date').textContent =
+    `${days[d.getDay()]}, ${d.getDate()} de ${months[d.getMonth()]} de ${d.getFullYear()}`;
+})();
+
+// ─── BUILD SECTOR VIEWS ─────────────────────
+(function buildSectorViews(){
+  const main = document.getElementById('main');
+  const refNode = document.getElementById('view-all-sectors');
+
+  Object.entries(SECTOR_CFG).forEach(([key,cfg])=>{
+    const cssVar = SECTOR_CSS_VAR[key] || '--nexus';
+    const div = document.createElement('div');
+    div.id = `view-${key}`;
+    div.className = 'view';
+    div.style.cssText = `--bubble-color:${cfg.color};--input-focus:${cfg.color};--btn-color:${cfg.color}`;
+
+    div.innerHTML = `
+      <div class="topbar">
+        <span class="topbar-icon">${cfg.emoji}</span>
+        <div>
+          <div class="topbar-title">${cfg.name}</div>
+          <div class="topbar-desc">${cfg.role}</div>
+        </div>
+        <div class="topbar-spacer"></div>
+        <span class="topbar-badge" style="color:${cfg.color};border-color:${cfg.color}30">SETOR</span>
+      </div>
+      <div class="chat-body" id="msgs-${key}">
+        <div class="chat-welcome" id="cwelcome-${key}" style="--chip-color:${cfg.color};--chip-bg:${cfg.color}15">
+          <div class="cw-icon">${cfg.emoji}</div>
+          <div class="cw-title">${cfg.name}</div>
+          <div class="cw-desc">${cfg.role} — Histórico salvo e contextualizado</div>
+          <div class="cw-chips">
+            ${cfg.suggestions.map(s=>`<div class="cw-chip" onclick="fillInput('${key}','${s.replace(/'/g,"\\'")}')">${s}</div>`).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <div class="chat-input-row">
+          <textarea class="chat-textarea" id="input-${key}" placeholder="Fale com ${cfg.name}..." rows="1"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();_send('${key}')}"
+            oninput="autoResize(this)"></textarea>
+          <button class="send-btn" id="sbtn-${key}" onclick="_send('${key}')">
+            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </button>
+        </div>
+        <div class="chat-hint">Enter para enviar · Shift+Enter para nova linha</div>
+      </div>`;
+
+    main.insertBefore(div, refNode);
+  });
+})();
+
+// ─── NAVIGATION ─────────────────────────────
+function navigate(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(n=>n.classList.remove('active'));
+  const vEl = document.getElementById(`view-${view}`);
+  const nEl = document.querySelector(`[data-view="${view}"]`);
+  if(vEl) vEl.classList.add('active');
+  if(nEl) nEl.classList.add('active');
+  currentView = view;
+  if(view==='overview') loadMetrics();
+  else if(!historyLoaded[view]) loadHistory(view);
+}
+window.navigate = navigate;
+
+document.querySelectorAll('[data-view]').forEach(el=>{
+  el.addEventListener('click',()=>navigate(el.dataset.view));
+});
+
+// ─── METRICS ────────────────────────────────
+async function loadMetrics(){
+  if(metricsLoaded) return;
+  try {
+    const r = await fetch('/api/dashboard/metrics');
+    const d = await r.json();
+    renderMetrics(d);
+    metricsLoaded = true;
+  } catch(e){
+    document.getElementById('stats-row').innerHTML =
+      `<div style="color:var(--text-2);font-size:12px;padding:16px;grid-column:1/-1">Erro ao carregar métricas. Verifique a conexão com o Supabase.</div>`;
+  }
+}
+
+function renderMetrics(data){
+  const utmify = data.utmify;
+  const vendas = data.vendasHoje || {};
+  const PROD_COLORS = {'BIDCAP':'#34d399','TESTE BM':'#a78bfa','5D':'#fbbf24'};
+
+  // Stats row
+  let totalReceita=0, totalVendas=0, melhorROI=0;
+  if(utmify?.dashboards){
+    utmify.dashboards.forEach(d=>{
+      totalReceita += d.receita||0;
+      totalVendas += d.vendas||0;
+      const roi = d.investimento>0?(((d.receita||0)-d.investimento)/d.investimento*100):0;
+      if(roi>melhorROI) melhorROI=roi;
+    });
+  }
+
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-card" style="--card-accent:var(--nexus)">
+      <div class="stat-value">R$${fmtCurrency(totalReceita)}</div>
+      <div class="stat-label">Receita Acumulada · UTMify</div>
+      <div class="stat-trend">Nexus Forge Products</div>
+    </div>
+    <div class="stat-card" style="--card-accent:var(--c-prod)">
+      <div class="stat-value">${totalVendas}</div>
+      <div class="stat-label">Total de Vendas</div>
+      <div class="stat-trend">Todos os produtos</div>
+    </div>
+    <div class="stat-card" style="--card-accent:var(--c-mono)">
+      <div class="stat-value">R$${fmtCurrency(vendas.totalReceita||0)}</div>
+      <div class="stat-label">Receita Hoje · GG Checkout</div>
+      <div class="stat-trend">${vendas.totalConversoes||0} conversões confirmadas</div>
+    </div>
+    <div class="stat-card" style="--card-accent:var(--c-grow)">
+      <div class="stat-value">${melhorROI>0?melhorROI.toFixed(0)+'%':'—'}</div>
+      <div class="stat-label">Melhor ROI</div>
+      <div class="stat-trend">${utmify?.atualizadoEm?'Att: '+new Date(utmify.atualizadoEm).toLocaleDateString('pt-BR'):'Dados UTMify'}</div>
+    </div>`;
+
+  // Products grid
+  if(utmify?.dashboards?.length){
+    document.getElementById('products-grid').innerHTML = utmify.dashboards.map(d=>{
+      const color = PROD_COLORS[d.nome]||'var(--nexus)';
+      const roi = d.investimento>0?(((d.receita||0)-d.investimento)/d.investimento*100).toFixed(1):'—';
+      const roas = d.investimento>0?((d.receita||0)/d.investimento).toFixed(2):'—';
+      return `<div class="product-mini" style="--p-color:${color}">
+        <div class="product-mini-name">${d.nome||d.dashboardId}</div>
+        <div class="product-mini-nicho">${d.nicho||'Infoproduto'}</div>
+        <div class="product-mini-revenue">R$${fmtCurrency(d.receita||0)}</div>
+        <div class="product-mini-label">receita bruta</div>
+        <div class="product-mini-row">
+          <div class="pms"><div class="pms-val">${roas}x</div><div class="pms-lbl">ROAS</div></div>
+          <div class="pms"><div class="pms-val">${roi}%</div><div class="pms-lbl">ROI</div></div>
+          <div class="pms"><div class="pms-val">${d.vendas||0}</div><div class="pms-lbl">Vendas</div></div>
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    document.getElementById('products-grid').innerHTML =
+      `<div style="grid-column:1/-1;color:var(--text-2);font-size:12px;padding:16px;background:var(--elevated);border:1px solid var(--border);border-radius:var(--radius)">
+        Dados UTMify não disponíveis em cache. Peça ao Claude Code para atualizar as métricas com as ferramentas MCP do UTMify.
+      </div>`;
+  }
+}
+
+// ─── HISTORY ────────────────────────────────
+async function loadHistory(sector){
+  historyLoaded[sector] = true;
+  try {
+    const r = await fetch(`/api/dashboard/history/${sector}?session_id=${SESSION}`);
+    const d = await r.json();
+    if(!d.messages?.length) return;
+    const wEl = document.getElementById(`cwelcome-${sector}`);
+    if(wEl) wEl.remove();
+    d.messages.forEach(m=>appendMsg(sector, m.role, m.content, false));
+    scrollBot(sector);
+  } catch(e){ /* silencioso */ }
+}
+
+// ─── MESSAGES ───────────────────────────────
+function appendMsg(sector, role, content, animate=true){
+  const cfg = SECTOR_CFG[sector]||{};
+  const wEl = document.getElementById(`cwelcome-${sector}`);
+  if(wEl) wEl.remove();
+  const box = document.getElementById(`msgs-${sector}`);
+  if(!box) return;
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const time = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  div.innerHTML = `<div class="msg-bubble">${esc(content)}</div>
+    <div class="msg-meta">${role==='user'?'Você':cfg.name||'MAX'} · ${time}</div>`;
+  if(animate) div.style.cssText='opacity:0;transform:translateY(8px);transition:all .2s';
+  box.appendChild(div);
+  if(animate) requestAnimationFrame(()=>{div.style.opacity='1';div.style.transform='translateY(0)'});
+  scrollBot(sector);
+  return div;
+}
+
+function showTyping(sector){
+  const box = document.getElementById(`msgs-${sector}`);
+  if(!box) return;
+  const div = document.createElement('div');
+  div.id = `typing-${sector}`;
+  div.className = 'typing-wrap';
+  div.innerHTML = `<div class="typing-bubble"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;
+  box.appendChild(div);
+  scrollBot(sector);
+}
+
+function hideTyping(sector){
+  const el = document.getElementById(`typing-${sector}`);
+  if(el) el.remove();
+}
+
+function scrollBot(sector){
+  const el = document.getElementById(`msgs-${sector}`);
+  if(el) el.scrollTop = el.scrollHeight;
+}
+
+// ─── SEND ────────────────────────────────────
+async function _send(sector){
+  if(sendingLock[sector]) return;
+  const inp = document.getElementById(`input-${sector}`);
+  const msg = inp?.value?.trim();
+  if(!msg) return;
+  sendingLock[sector] = true;
+  const btn = document.getElementById(`sbtn-${sector}`);
+  if(btn) btn.disabled = true;
+  inp.value=''; inp.style.height='auto';
+
+  if(sector==='all-sectors')    { await sendConsensus(msg); }
+  else if(sector==='conselho')  { await sendConselho(msg); }
+  else                           { await sendSector(sector, msg); }
+
+  sendingLock[sector]=false;
+  if(btn) btn.disabled=false;
+}
+window._send = _send;
+
+// ─── SECTOR CHAT ────────────────────────────
+async function sendSector(sector, msg){
+  appendMsg(sector,'user',msg);
+  showTyping(sector);
+  try {
+    const r = await fetch('/api/dashboard/chat',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({sector, message:msg, session_id:SESSION})
+    });
+    const d = await r.json();
+    hideTyping(sector);
+    appendMsg(sector,'assistant', d.reply||d.error||'Erro ao processar.');
+  } catch(e){
+    hideTyping(sector);
+    appendMsg(sector,'assistant','⚠️ Erro de conexão. Tente novamente.');
+  }
+}
+
+// ─── CONSENSUS (SSE) ────────────────────────
+async function sendConsensus(msg){
+  const box = document.getElementById('msgs-all-sectors');
+  const wEl = document.getElementById('cwelcome-all-sectors');
+  if(wEl) wEl.remove();
+
+  // User message
+  const uDiv = document.createElement('div');
+  uDiv.className='msg user';
+  uDiv.innerHTML=`<div class="msg-bubble">${esc(msg)}</div>`;
+  box.appendChild(uDiv);
+
+  // Responses container
+  const container = document.createElement('div');
+  container.className='msg assistant';
+  container.style.maxWidth='100%';
+
+  const respBox = document.createElement('div');
+  respBox.className='consensus-responses';
+  respBox.innerHTML=`<div class="cr-header">⚡ Análise dos 6 Setores</div>`;
+
+  Object.entries(SECTOR_CFG).forEach(([k,c])=>{
+    const row = document.createElement('div');
+    row.className='cr-row pending';
+    row.id=`cr-${k}`;
+    row.innerHTML=`
+      <div class="cr-icon">${c.emoji}</div>
+      <div class="cr-body">
+        <div class="cr-name" style="color:${c.color}">${c.name}</div>
+        <div class="cr-text"><div class="pulse-dots"><div class="pd"></div><div class="pd"></div><div class="pd"></div></div> analisando...</div>
+      </div>`;
+    respBox.appendChild(row);
+  });
+
+  container.appendChild(respBox);
+  box.appendChild(container);
+  scrollBot('all-sectors');
+
+  const src = new EventSource(`/api/dashboard/consensus-stream?message=${encodeURIComponent(msg)}&session_id=${encodeURIComponent(SESSION)}`);
+
+  src.onmessage = e=>{
+    const data = JSON.parse(e.data);
+    if(data.type==='sector'){
+      const row = document.getElementById(`cr-${data.sector}`);
+      if(row){
+        row.classList.remove('pending');
+        row.querySelector('.cr-text').innerHTML = esc(data.response);
+      }
+    } else if(data.type==='synthesizing'){
+      const vBlock = document.createElement('div');
+      vBlock.className='verdict-block';
+      vBlock.id='verdict-block';
+      vBlock.innerHTML=`<div class="verdict-header">⬡ Veredito MAX <div class="pulse-dots" style="display:inline-flex"><div class="pd"></div><div class="pd"></div><div class="pd"></div></div></div>
+        <div class="verdict-text" id="verdict-text" style="color:var(--text-3);font-style:italic">Consolidando perspectivas...</div>`;
+      container.appendChild(vBlock);
+    } else if(data.type==='synthesis'){
+      const vt = document.getElementById('verdict-text');
+      if(vt){vt.style.cssText='';vt.innerHTML=esc(data.content);}
+      const vh = document.querySelector('#verdict-block .verdict-header');
+      if(vh) vh.innerHTML='⬡ Veredito MAX';
+    } else if(data.type==='done'){
+      src.close();
+    } else if(data.type==='error'){
+      src.close();
+      appendMsg('all-sectors','assistant','⚠️ Erro ao processar. Tente novamente.');
+    }
+    scrollBot('all-sectors');
+  };
+  src.onerror=()=>src.close();
+}
+
+// ─── CONSELHO ───────────────────────────────
+async function sendConselho(msg){
+  const box = document.getElementById('msgs-conselho');
+  const wEl = document.getElementById('cwelcome-conselho');
+  if(wEl) wEl.remove();
+
+  const uDiv = document.createElement('div');
+  uDiv.className='msg user';
+  uDiv.innerHTML=`<div class="msg-bubble">${esc(msg)}</div>`;
+  box.appendChild(uDiv);
+
+  const loading = document.createElement('div');
+  loading.className='typing-wrap'; loading.id='conselho-loading';
+  loading.innerHTML=`<div class="typing-bubble"><div class="td"></div><div class="td"></div><div class="td"></div></div>
+    <div style="margin-top:8px;font-size:11px;color:var(--text-3)">O Conselho está deliberando...</div>`;
+  box.appendChild(loading);
+  scrollBot('conselho');
+
+  try {
+    const r = await fetch('/api/dashboard/conselho',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({question:msg,session_id:SESSION})
+    });
+    const d = await r.json();
+    document.getElementById('conselho-loading')?.remove();
+
+    const container = document.createElement('div');
+    container.className='msg assistant'; container.style.maxWidth='100%';
+
+    const grid = document.createElement('div');
+    grid.className='titans-grid';
+    (d.titans||[]).forEach(t=>{
+      const cfg=CONSELHO_CFG[t.titan]||{name:t.titan,emoji:'🎭',color:'var(--nexus)'};
+      const card=document.createElement('div');
+      card.className='titan-card';
+      card.style.cssText=`--t-color:${cfg.color}`;
+      card.innerHTML=`<div class="titan-head"><div class="titan-emoji">${cfg.emoji}</div>
+        <div class="titan-name" style="color:${cfg.color}">${cfg.name}</div></div>
+        <div class="titan-text">${esc(t.response)}</div>`;
+      grid.appendChild(card);
+    });
+    container.appendChild(grid);
+
+    if(d.synthesis){
+      const vBlock = document.createElement('div');
+      vBlock.className='verdict-block'; vBlock.style.marginTop='12px';
+      vBlock.innerHTML=`<div class="verdict-header">⬡ Veredito MAX</div>
+        <div class="verdict-text">${esc(d.synthesis)}</div>`;
+      container.appendChild(vBlock);
+    }
+    box.appendChild(container);
+    scrollBot('conselho');
+  } catch(e){
+    document.getElementById('conselho-loading')?.remove();
+    appendMsg('conselho','assistant','⚠️ Erro ao consultar o Conselho. Tente novamente.');
+  }
+}
+
+// ─── UTILS ──────────────────────────────────
+function autoResize(el){
+  el.style.height='auto';
+  el.style.height=Math.min(el.scrollHeight,120)+'px';
+}
+window.autoResize=autoResize;
+
+function fillInput(sector, text){
+  const el=document.getElementById(`input-${sector}`);
+  if(el){el.value=text;el.focus();autoResize(el);}
+}
+window.fillInput=fillInput;
+
+function esc(s){
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\n/g,'<br>');
+}
+
+function fmtCurrency(v){
+  return Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function copyText(text){
+  navigator.clipboard.writeText(text).then(()=>showToast('✓ Copiado!')).catch(()=>{
+    // fallback
+    const ta=document.createElement('textarea');
+    ta.value=text; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    showToast('✓ Copiado!');
+  });
+}
+window.copyText=copyText;
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+})();
+</script>
+</body>
+</html>

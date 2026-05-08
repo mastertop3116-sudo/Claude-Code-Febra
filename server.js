@@ -1005,6 +1005,122 @@ app.post("/api/narrar", async (req, res) => {
 });
 
 // ──────────────────────────────────────────
+// Dashboard — Nexus Control Center
+// ──────────────────────────────────────────
+
+app.get('/dashboard', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+app.get('/api/dashboard/config', (req, res) => {
+  const { SECTORS, CONSELHO } = require('./core/departments');
+  res.json({ sectors: SECTORS, conselho: CONSELHO });
+});
+
+app.get('/api/dashboard/metrics', async (req, res) => {
+  try {
+    const { getUTMifyReport, getRelatorioVendasHoje } = require('./departments/finance/finance_agent');
+    const [utmRow, vendasHoje] = await Promise.all([
+      getUTMifyReport(),
+      getRelatorioVendasHoje().catch(() => ({ totalReceita: 0, totalConversoes: 0, vendas: [] })),
+    ]);
+    res.json({
+      utmify: utmRow?.context || utmRow?.data || null,
+      vendasHoje: { totalReceita: vendasHoje.totalReceita, totalConversoes: vendasHoje.totalConversoes },
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.post('/api/dashboard/chat', async (req, res) => {
+  try {
+    const { sector, message, session_id } = req.body;
+    if (!sector || !message || !session_id) return res.status(400).json({ error: 'Parâmetros incompletos' });
+    const { chatWithSector, saveConversation, getHistory } = require('./core/departments');
+    const history = await getHistory(session_id, sector, 12);
+    await saveConversation(session_id, sector, 'user', message);
+    const reply = await chatWithSector(sector, message, history);
+    await saveConversation(session_id, sector, 'assistant', reply);
+    res.json({ reply });
+  } catch (e) {
+    console.error('[/api/dashboard/chat]', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/api/dashboard/consensus-stream', async (req, res) => {
+  const { question, session_id } = req.query;
+  if (!question || !session_id) return res.status(400).json({ error: 'Parâmetros incompletos' });
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+
+  const { SECTORS, chatWithSector, getConsensusSynthesis, saveConversation, getHistory } = require('./core/departments');
+
+  const sectorKeys = Object.keys(SECTORS);
+  const responses = [];
+
+  await Promise.all(sectorKeys.map(async (sector) => {
+    try {
+      const history = await getHistory(session_id, sector, 6);
+      await saveConversation(session_id, sector, 'user', question);
+      const content = await chatWithSector(sector, question, history);
+      await saveConversation(session_id, sector, 'assistant', content);
+      responses.push({ sector, content });
+      res.write(`data: ${JSON.stringify({ type: 'sector', sector, content })}\n\n`);
+    } catch (e) {
+      res.write(`data: ${JSON.stringify({ type: 'sector', sector, content: `Erro: ${e.message}` })}\n\n`);
+    }
+  }));
+
+  try {
+    const synthesis = await getConsensusSynthesis(question, responses);
+    res.write(`data: ${JSON.stringify({ type: 'synthesis', content: synthesis })}\n\n`);
+  } catch (e) {
+    res.write(`data: ${JSON.stringify({ type: 'synthesis', content: `Erro na síntese: ${e.message}` })}\n\n`);
+  }
+
+  res.write('data: [DONE]\n\n');
+  res.end();
+});
+
+app.post('/api/dashboard/conselho', async (req, res) => {
+  try {
+    const { question, session_id } = req.body;
+    if (!question || !session_id) return res.status(400).json({ error: 'Parâmetros incompletos' });
+    const { CONSELHO, chatWithTitan, getConselhoSynthesis } = require('./core/departments');
+
+    const titanKeys = Object.keys(CONSELHO);
+    const titanResponses = await Promise.all(titanKeys.map(async (titan) => {
+      const response = await chatWithTitan(titan, question);
+      return { titan, response };
+    }));
+
+    const synthesis = await getConselhoSynthesis(question, titanResponses);
+    res.json({ titans: titanResponses, synthesis });
+  } catch (e) {
+    console.error('[/api/dashboard/conselho]', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/api/dashboard/history/:sector', async (req, res) => {
+  try {
+    const { sector } = req.params;
+    const { session_id } = req.query;
+    if (!session_id) return res.status(400).json({ error: 'session_id obrigatório' });
+    const { getHistory } = require('./core/departments');
+    const history = await getHistory(session_id, sector, 50);
+    res.json({ history });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ──────────────────────────────────────────
 // Inicia servidor
 // ──────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
