@@ -536,6 +536,124 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-s
 }
 .toast.show{transform:translateY(0);opacity:1}
 
+/* ══════════════════════════════════
+   SETTINGS BUTTON (sidebar)
+   ══════════════════════════════════ */
+.sb-settings-btn{
+  margin:4px 10px 8px;
+  display:flex;align-items:center;gap:8px;
+  padding:9px 12px;border-radius:8px;
+  background:rgba(255,255,255,0.03);border:1px solid var(--border);
+  cursor:pointer;font-size:12.5px;color:var(--text-3);font-weight:500;
+  transition:all 0.15s;
+}
+.sb-settings-btn:hover{background:rgba(255,255,255,0.06);color:var(--text-2);border-color:var(--border-md)}
+.sb-settings-btn svg{width:14px;height:14px;flex-shrink:0;transition:transform .4s}
+.sb-settings-btn:hover svg{transform:rotate(60deg)}
+
+/* ══════════════════════════════════
+   SETTINGS PANEL
+   ══════════════════════════════════ */
+.settings-backdrop{
+  position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0);
+  pointer-events:none;transition:background .25s;
+}
+.settings-backdrop.open{background:rgba(0,0,0,0.5);pointer-events:all}
+
+.settings-panel{
+  position:fixed;right:0;top:0;bottom:0;z-index:501;
+  width:320px;background:var(--surface);
+  border-left:1px solid var(--border-md);
+  display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  overflow-y:auto;
+}
+.settings-panel.open{transform:translateX(0)}
+
+.sp-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 20px 16px;border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.sp-title{font-size:15px;font-weight:700;letter-spacing:-0.3px}
+.sp-close{
+  width:30px;height:30px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--text-3);transition:all .15s;
+}
+.sp-close:hover{background:rgba(255,255,255,0.06);color:var(--text)}
+.sp-close svg{width:16px;height:16px}
+
+.sp-section{padding:16px 20px 8px}
+.sp-section-label{
+  font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--text-3);margin-bottom:12px;
+}
+
+.sp-item{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:12px 0;border-bottom:1px solid var(--border);
+}
+.sp-item:last-child{border-bottom:none}
+.sp-item-name{font-size:13px;font-weight:500;margin-bottom:2px}
+.sp-item-desc{font-size:11px;color:var(--text-3);line-height:1.4}
+
+/* Font size buttons */
+.font-size-controls{display:flex;gap:4px;flex-shrink:0}
+.fs-btn{
+  width:34px;height:34px;border-radius:7px;border:1px solid var(--border-md);
+  background:var(--elevated);color:var(--text-2);cursor:pointer;
+  font-family:'Sora',sans-serif;font-size:11px;font-weight:700;
+  transition:all .15s;
+}
+.fs-btn:hover{border-color:var(--nexus);color:var(--nexus);background:var(--nexus-dim)}
+.fs-btn.active{border-color:var(--nexus);color:#fff;background:var(--nexus)}
+
+/* Toggle switch */
+.sp-toggle{
+  width:42px;height:24px;border-radius:12px;
+  background:var(--elevated);border:1px solid var(--border-md);
+  position:relative;cursor:pointer;transition:all .2s;flex-shrink:0;
+}
+.sp-toggle-on{background:var(--nexus);border-color:var(--nexus)}
+.sp-toggle-knob{
+  position:absolute;top:3px;left:3px;
+  width:16px;height:16px;border-radius:50%;background:#fff;
+  transition:transform .2s;
+}
+.sp-toggle-on .sp-toggle-knob{transform:translateX(18px)}
+
+.sp-footer{
+  margin-top:auto;padding:16px 20px;
+  border-top:1px solid var(--border);
+}
+.sp-version{font-size:10px;color:var(--text-3)}
+
+/* Accent color swatches */
+.accent-colors{display:flex;gap:8px;padding:10px 0 14px;flex-wrap:wrap}
+.ac-swatch{
+  width:28px;height:28px;border-radius:50%;cursor:pointer;
+  border:2px solid transparent;transition:all .15s;
+}
+.ac-swatch:hover{transform:scale(1.15)}
+.ac-swatch.active{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.15)}
+
+/* Danger / action buttons */
+.sp-danger-btn{
+  padding:6px 14px;border-radius:7px;border:1px solid rgba(239,68,68,.3);
+  background:rgba(239,68,68,.08);color:#ef4444;
+  font-family:'Sora',sans-serif;font-size:11px;font-weight:600;
+  cursor:pointer;transition:all .15s;flex-shrink:0;
+}
+.sp-danger-btn:hover{background:rgba(239,68,68,.16)}
+.sp-action-btn{
+  padding:6px 14px;border-radius:7px;border:1px solid rgba(99,102,241,.3);
+  background:var(--nexus-dim);color:var(--nexus);
+  font-family:'Sora',sans-serif;font-size:11px;font-weight:600;
+  cursor:pointer;transition:all .15s;flex-shrink:0;
+}
+.sp-action-btn:hover{background:var(--nexus-glow)}
+
 /* Page-level fade in */
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .view.active .overview-scroll,
@@ -648,7 +766,111 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-s
     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
     <span>Nexus Forge Studio</span>
   </div>
+  <div class="sb-settings-btn" id="sb-settings-btn" onclick="openSettings()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    <span>Configurações</span>
+  </div>
 </aside>
+
+<!-- ═══════════════════ SETTINGS MODAL ═══════════════════ -->
+<div id="settings-backdrop" class="settings-backdrop" onclick="closeSettings()"></div>
+<div id="settings-panel" class="settings-panel">
+  <div class="sp-header">
+    <div class="sp-title">Configurações</div>
+    <div class="sp-close" onclick="closeSettings()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>
+  </div>
+
+  <div class="sp-section">
+    <div class="sp-section-label">Aparência</div>
+
+    <div class="sp-item">
+      <div class="sp-item-info">
+        <div class="sp-item-name">Tamanho da Fonte</div>
+        <div class="sp-item-desc">Ajusta o tamanho do texto em todo o dashboard</div>
+      </div>
+      <div class="font-size-controls">
+        <button class="fs-btn" data-size="13" onclick="setFontSize(13)">P</button>
+        <button class="fs-btn" data-size="15" onclick="setFontSize(15)">M</button>
+        <button class="fs-btn" data-size="17" onclick="setFontSize(17)">G</button>
+        <button class="fs-btn" data-size="19" onclick="setFontSize(19)">XG</button>
+      </div>
+    </div>
+
+    <div class="sp-item">
+      <div class="sp-item-info">
+        <div class="sp-item-name">Largura da Sidebar</div>
+        <div class="sp-item-desc">Compacta a barra lateral para mais espaço de chat</div>
+      </div>
+      <div class="sp-toggle" id="toggle-sidebar" onclick="toggleCompactSidebar()">
+        <div class="sp-toggle-knob"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sp-section">
+    <div class="sp-section-label">Aparência · Cor de Destaque</div>
+    <div class="sp-item" style="border-bottom:none;padding-bottom:0">
+      <div class="sp-item-info">
+        <div class="sp-item-name">Cor principal do Nexus</div>
+        <div class="sp-item-desc">Afeta botões, bordas ativas e acentos</div>
+      </div>
+    </div>
+    <div class="accent-colors">
+      <div class="ac-swatch active" data-color="#6366f1" style="background:#6366f1" title="Índigo (padrão)" onclick="setAccentColor('#6366f1')"></div>
+      <div class="ac-swatch" data-color="#8b5cf6" style="background:#8b5cf6" title="Violeta" onclick="setAccentColor('#8b5cf6')"></div>
+      <div class="ac-swatch" data-color="#3b82f6" style="background:#3b82f6" title="Azul" onclick="setAccentColor('#3b82f6')"></div>
+      <div class="ac-swatch" data-color="#06b6d4" style="background:#06b6d4" title="Ciano" onclick="setAccentColor('#06b6d4')"></div>
+      <div class="ac-swatch" data-color="#10b981" style="background:#10b981" title="Esmeralda" onclick="setAccentColor('#10b981')"></div>
+      <div class="ac-swatch" data-color="#f59e0b" style="background:#f59e0b" title="Âmbar" onclick="setAccentColor('#f59e0b')"></div>
+    </div>
+  </div>
+
+  <div class="sp-section">
+    <div class="sp-section-label">Chat</div>
+    <div class="sp-item">
+      <div class="sp-item-info">
+        <div class="sp-item-name">Enviar com Enter</div>
+        <div class="sp-item-desc">Shift+Enter para nova linha</div>
+      </div>
+      <div class="sp-toggle sp-toggle-on" id="toggle-enter" onclick="toggleSetting('enter')">
+        <div class="sp-toggle-knob"></div>
+      </div>
+    </div>
+    <div class="sp-item">
+      <div class="sp-item-info">
+        <div class="sp-item-name">Animações</div>
+        <div class="sp-item-desc">Transições e efeitos de entrada</div>
+      </div>
+      <div class="sp-toggle sp-toggle-on" id="toggle-anim" onclick="toggleSetting('anim')">
+        <div class="sp-toggle-knob"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sp-section">
+    <div class="sp-section-label">Dados</div>
+    <div class="sp-item">
+      <div class="sp-item-info">
+        <div class="sp-item-name">Limpar Sessão</div>
+        <div class="sp-item-desc">Reseta o ID de sessão — histórico começa do zero</div>
+      </div>
+      <button class="sp-danger-btn" onclick="clearSession()">Limpar</button>
+    </div>
+    <div class="sp-item" style="border-bottom:none">
+      <div class="sp-item-info">
+        <div class="sp-item-name">Recarregar Métricas</div>
+        <div class="sp-item-desc">Força atualização dos dados do UTMify</div>
+      </div>
+      <button class="sp-action-btn" onclick="reloadMetrics()">Atualizar</button>
+    </div>
+  </div>
+
+  <div class="sp-footer">
+    <div class="sp-version">Nexus Control · v2.0 · <span id="sp-session-id" style="opacity:.5"></span></div>
+  </div>
+</div>
 
 <!-- ═══════════════════ MAIN ═══════════════════ -->
 <main id="main">
@@ -1477,6 +1699,114 @@ function showToast(msg){
   t.textContent=msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2200);
 }
+
+// ─── SETTINGS ───────────────────────────────
+const DEFAULTS = { fontSize:15, compactSidebar:false, enterSend:true, anim:true, accentColor:'#6366f1' };
+let CFG = Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem('nxs_cfg')||'{}'));
+
+function saveConfig(){ localStorage.setItem('nxs_cfg', JSON.stringify(CFG)); }
+
+function applyConfig(){
+  // Font size
+  document.documentElement.style.setProperty('--base-font', CFG.fontSize+'px');
+  document.body.style.fontSize = CFG.fontSize+'px';
+  // Compact sidebar
+  const sb = document.getElementById('sidebar');
+  if(sb) sb.style.setProperty('--sidebar-w', CFG.compactSidebar ? '60px' : '248px');
+  if(CFG.compactSidebar){
+    document.querySelectorAll('.sb-item-label,.sb-section-label,.sb-logo-sub,.sb-logo-eyebrow,.sb-brn-partner,.sb-forge-link span,.sb-settings-btn span,.sb-brn-badge').forEach(el=>el.style.display='none');
+    document.querySelectorAll('.sb-item').forEach(el=>{el.style.justifyContent='center';el.style.padding='10px';});
+  } else {
+    document.querySelectorAll('.sb-item-label,.sb-section-label,.sb-logo-sub,.sb-logo-eyebrow,.sb-brn-partner,.sb-forge-link span,.sb-settings-btn span,.sb-brn-badge').forEach(el=>el.style.display='');
+    document.querySelectorAll('.sb-item').forEach(el=>{el.style.justifyContent='';el.style.padding='';});
+  }
+  // Animations
+  if(!CFG.anim){
+    const s=document.createElement('style');s.id='no-anim';
+    s.textContent='*{transition:none!important;animation:none!important}';
+    if(!document.getElementById('no-anim')) document.head.appendChild(s);
+  } else {
+    document.getElementById('no-anim')?.remove();
+  }
+  // Accent color
+  const root = document.documentElement;
+  const hex = CFG.accentColor;
+  root.style.setProperty('--nexus', hex);
+  root.style.setProperty('--nexus-dim', hex+'20');
+  root.style.setProperty('--nexus-glow', hex+'40');
+  // UI sync
+  syncSettingsUI();
+}
+
+function syncSettingsUI(){
+  // Font buttons
+  document.querySelectorAll('.fs-btn').forEach(b=>{
+    b.classList.toggle('active', parseInt(b.dataset.size)===CFG.fontSize);
+  });
+  // Toggles
+  document.getElementById('toggle-sidebar')?.classList.toggle('sp-toggle-on', CFG.compactSidebar);
+  document.getElementById('toggle-enter')?.classList.toggle('sp-toggle-on', CFG.enterSend);
+  document.getElementById('toggle-anim')?.classList.toggle('sp-toggle-on', CFG.anim);
+  // Swatches
+  document.querySelectorAll('.ac-swatch').forEach(s=>{
+    s.classList.toggle('active', s.dataset.color===CFG.accentColor);
+  });
+  // Session ID
+  const sid = document.getElementById('sp-session-id');
+  if(sid) sid.textContent = SESSION.slice(0,12)+'…';
+}
+
+function openSettings(){
+  document.getElementById('settings-backdrop').classList.add('open');
+  document.getElementById('settings-panel').classList.add('open');
+  syncSettingsUI();
+}
+function closeSettings(){
+  document.getElementById('settings-backdrop').classList.remove('open');
+  document.getElementById('settings-panel').classList.remove('open');
+}
+window.openSettings=openSettings;
+window.closeSettings=closeSettings;
+
+function setFontSize(size){
+  CFG.fontSize=size; saveConfig(); applyConfig();
+}
+window.setFontSize=setFontSize;
+
+function toggleCompactSidebar(){
+  CFG.compactSidebar=!CFG.compactSidebar; saveConfig(); applyConfig();
+}
+window.toggleCompactSidebar=toggleCompactSidebar;
+
+function toggleSetting(key){
+  if(key==='enter'){ CFG.enterSend=!CFG.enterSend; }
+  else if(key==='anim'){ CFG.anim=!CFG.anim; }
+  saveConfig(); applyConfig();
+}
+window.toggleSetting=toggleSetting;
+
+function setAccentColor(hex){
+  CFG.accentColor=hex; saveConfig(); applyConfig();
+}
+window.setAccentColor=setAccentColor;
+
+function clearSession(){
+  if(!confirm('Limpar sessão? O histórico de chat será iniciado do zero.')) return;
+  localStorage.removeItem('nxs_sess');
+  location.reload();
+}
+window.clearSession=clearSession;
+
+function reloadMetrics(){
+  metricsLoaded=false;
+  loadMetrics();
+  closeSettings();
+  showToast('Recarregando métricas...');
+}
+window.reloadMetrics=reloadMetrics;
+
+// Apply on load
+applyConfig();
 
 })();
 </script>
