@@ -1083,7 +1083,7 @@ app.get('/api/dashboard/consensus-stream', async (req, res) => {
     res.write(`data: ${JSON.stringify({ type: 'synthesis', content: `Erro na síntese: ${e.message}` })}\n\n`);
   }
 
-  res.write('data: [DONE]\n\n');
+  res.write(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
   res.end();
 });
 

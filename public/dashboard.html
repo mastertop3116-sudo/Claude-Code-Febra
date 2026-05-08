@@ -43,7 +43,7 @@
 
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden}
-body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-size:14px;line-height:1.5;display:flex}
+body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-size:15px;line-height:1.5;display:flex}
 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:4px;height:4px}
@@ -118,7 +118,7 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-s
 .sb-item{
   display:flex;align-items:center;gap:9px;
   padding:9px 10px;border-radius:8px;cursor:pointer;
-  font-size:12.5px;font-weight:400;color:var(--text-2);
+  font-size:13px;font-weight:400;color:var(--text-2);
   transition:all 0.15s;margin-bottom:1px;
   position:relative;user-select:none;
 }
@@ -287,7 +287,7 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-s
 }
 .cw-icon{font-size:44px;margin-bottom:4px}
 .cw-title{font-size:18px;font-weight:700;letter-spacing:-0.3px}
-.cw-desc{font-size:13px;color:var(--text-2);max-width:340px;line-height:1.6}
+.cw-desc{font-size:14px;color:var(--text-2);max-width:340px;line-height:1.6}
 .cw-chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:10px}
 .cw-chip{
   padding:7px 14px;border-radius:20px;
@@ -302,7 +302,7 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-s
 .msg.assistant{align-self:flex-start;align-items:flex-start}
 .msg-bubble{
   padding:12px 16px;border-radius:16px;
-  font-size:13.5px;line-height:1.65;white-space:pre-wrap;word-break:break-word;
+  font-size:14.5px;line-height:1.65;white-space:pre-wrap;word-break:break-word;
 }
 .msg.user .msg-bubble{
   background:var(--bubble-color,var(--nexus));color:#fff;
@@ -337,7 +337,7 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-s
 .chat-textarea{
   flex:1;background:var(--elevated);border:1px solid var(--border-md);
   border-radius:var(--radius);padding:11px 15px;
-  color:var(--text);font-family:'Sora',sans-serif;font-size:13.5px;
+  color:var(--text);font-family:'Sora',sans-serif;font-size:14.5px;
   resize:none;min-height:44px;max-height:120px;line-height:1.5;
   outline:none;transition:border-color 0.2s;
 }
@@ -383,7 +383,7 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-s
   font-size:10px;font-weight:700;text-transform:uppercase;
   letter-spacing:.5px;margin-bottom:5px;
 }
-.cr-text{font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.cr-text{font-size:14px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
 .cr-row.pending .cr-text{color:var(--text-3);display:flex;align-items:center;gap:6px}
 
 .verdict-block{
@@ -411,7 +411,7 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-s
 .titan-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .titan-emoji{font-size:17px}
 .titan-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
-.titan-text{font-size:12.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word;color:var(--text-2)}
+.titan-text{font-size:13.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word;color:var(--text-2)}
 
 /* ══════════════════════════════════
    BRN VENDAS
@@ -1347,7 +1347,7 @@ async function sendConsensus(msg){
   box.appendChild(container);
   scrollBot('all-sectors');
 
-  const src = new EventSource(`/api/dashboard/consensus-stream?message=${encodeURIComponent(msg)}&session_id=${encodeURIComponent(SESSION)}`);
+  const src = new EventSource(`/api/dashboard/consensus-stream?question=${encodeURIComponent(msg)}&session_id=${encodeURIComponent(SESSION)}`);
 
   src.onmessage = e=>{
     const data = JSON.parse(e.data);
@@ -1355,7 +1355,7 @@ async function sendConsensus(msg){
       const row = document.getElementById(`cr-${data.sector}`);
       if(row){
         row.classList.remove('pending');
-        row.querySelector('.cr-text').innerHTML = esc(data.response);
+        row.querySelector('.cr-text').innerHTML = esc(data.content);
       }
     } else if(data.type==='synthesizing'){
       const vBlock = document.createElement('div');
