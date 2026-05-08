@@ -167,7 +167,7 @@
   body.mode-cri [data-showon="ent"]{display:none}body.mode-cri [data-showon="car"]{display:none}body.mode-cri [data-showon="cri"]{display:block}
   body.mode-ilu [data-showon="ent"]{display:none}body.mode-ilu [data-showon="car"]{display:none}body.mode-ilu [data-showon="ilu"]{display:block}
   [data-showon="chat"]{display:none}
-  body.mode-chat [data-showon="ent"]{display:none}body.mode-chat [data-showon="chat"]{display:block}
+  body.mode-chat [data-showon="ent"]{display:none}body.mode-chat [data-showon="chat"]{display:flex;flex-direction:column}
   body.mode-chat #btn-gerar{display:none}body.mode-chat #gen-time-note{display:none}body.mode-chat #wizard-bar{display:none}body.mode-chat .head{display:none}body.mode-chat #sec-mode{display:none}
   body.mode-chat .grid{grid-template-columns:1fr}
   body.mode-chat aside{display:none}
@@ -4917,5 +4917,85 @@ main{position:relative;z-index:auto}
 
   </div>
 </div>
+<script>
+/* forge-chat standalone — roda em script próprio, imune a erros de outros scripts */
+(function(){
+  if(typeof window._fcSend==='function')return; // IIFE principal OK
+  var hist=[],done=false;
+  var inp=document.getElementById('fc-input');
+  var btn=document.getElementById('fc-send');
+  var msgs=document.getElementById('fc-msgs');
+  var typ=document.getElementById('fc-typing');
+  var sw=document.getElementById('fc-summary-wrap');
+  var ir=document.getElementById('fc-input-row');
+  var rst=document.getElementById('fc-reset');
+  if(!inp||!btn||!msgs)return;
+  function hideWelcome(){
+    var w=document.getElementById('fc-welcome');
+    if(w&&w.style.display!=='none'){w.style.transition='opacity .18s';w.style.opacity='0';setTimeout(function(){w.style.display='none';},180);}
+    msgs.style.display='flex';
+  }
+  function addMsg(role,txt){
+    hideWelcome();
+    var el=document.createElement('div');
+    el.className='fc-msg '+(role==='user'?'user':'max');
+    el.innerHTML='<div class="fc-avatar">'+(role==='user'?'V':'M')+'</div><div class="fc-bubble">'+txt.replace(/\n/g,'<br>')+'</div>';
+    msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;
+  }
+  function showSummary(p){
+    var L={ebook:'Ebook',workbook:'Workbook',checklist:'Checklist',planner:'Planner',cheat_sheet:'Guia Rápido',pregacoes:'Pack de Pregações',script_vsl:'Script de Vendas'};
+    if(sw)sw.style.display='block';if(ir)ir.style.display='none';if(!sw)return;
+    sw.innerHTML='<div class="fc-summary"><div style="font-size:12px;font-weight:700;color:var(--accent);font-family:\'DM Mono\',monospace;letter-spacing:.05em;margin-bottom:4px">✦ RESUMO DO PRODUTO</div>'
+      +'<div class="fc-summary-row"><span class="fc-summary-key">Tipo</span><span class="fc-summary-val">'+(L[p.tipo]||p.tipo)+'</span></div>'
+      +'<div class="fc-summary-row"><span class="fc-summary-key">Título</span><span class="fc-summary-val">'+p.titulo+'</span></div>'
+      +'<div class="fc-summary-row"><span class="fc-summary-key">Público</span><span class="fc-summary-val">'+(p.publico||'—')+'</span></div>'
+      +'<button class="fc-gerar-btn" id="fc-gb">🚀 Gerar agora</button>'
+      +'<button onclick="window._chatReset&&window._chatReset()" style="width:100%;padding:8px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text-3);font-size:12px;cursor:pointer;font-family:\'DM Mono\',monospace">✏️ Quero ajustar</button>'
+      +'</div>';
+    var gb=document.getElementById('fc-gb');if(gb)gb.addEventListener('click',function(){gerar(p);});
+  }
+  function gerar(p){
+    function s(id,v){var e=document.getElementById(id);if(e)e.value=v||'';}
+    s('inp-titulo',p.titulo);s('inp-subtitulo',p.subtitulo);s('inp-autor',p.autor);
+    s('inp-descricao',(p.dor||'')+(p.transformacao?' → '+p.transformacao:''));
+    s('inp-avatar',p.publico);s('inp-paginas',p.paginas);
+    s('dna-nome',p.titulo);s('dna-nicho',p.tema);s('dna-publico',p.publico);s('dna-preco',p.preco);
+    if(typeof window._fcSetType==='function')window._fcSetType(p.tipo);
+    document.body.className='mode-ent';
+    setTimeout(function(){var b=document.getElementById('btn-gerar');if(b)b.click();},100);
+  }
+  function send(){
+    var text=inp.value.trim();if(!text||done)return;
+    inp.value='';inp.style.height='auto';
+    addMsg('user',text);hist.push({role:'user',content:text});
+    btn.disabled=true;inp.disabled=true;if(typ)typ.style.display='block';
+    fetch('/api/forge-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:hist})})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(typ)typ.style.display='none';
+      if(d.error){addMsg('max','⚠️ '+d.error);}
+      else{addMsg('max',d.resposta||'...');hist.push({role:'assistant',content:d.resposta});
+        if(d.pronto&&d.payload){done=true;setTimeout(function(){showSummary(d.payload);},300);}
+      }
+      if(!done){btn.disabled=false;inp.disabled=false;inp.focus();}
+    })
+    .catch(function(e){if(typ)typ.style.display='none';addMsg('max','⚠️ Erro: '+e.message);btn.disabled=false;inp.disabled=false;});
+  }
+  function chatReset(){
+    hist=[];done=false;msgs.innerHTML='';msgs.style.display='none';
+    if(sw){sw.style.display='none';sw.innerHTML='';}if(ir)ir.style.display='';
+    btn.disabled=false;inp.disabled=false;
+    var w=document.getElementById('fc-welcome');if(w){w.style.display='flex';w.style.opacity='1';}
+  }
+  btn.addEventListener('click',send);
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
+  inp.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px';});
+  if(rst)rst.addEventListener('click',chatReset);
+  document.querySelectorAll('.fc-chip').forEach(function(c){
+    c.addEventListener('click',function(){inp.value=c.dataset.prompt||c.textContent.trim();inp.focus();inp.dispatchEvent(new Event('input'));send();});
+  });
+  window._fcSend=send;window._chatReset=chatReset;
+})();
+</script>
 </body>
 </html>
