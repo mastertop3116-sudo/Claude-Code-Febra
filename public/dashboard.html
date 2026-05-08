@@ -356,46 +356,104 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-s
 .chat-hint{font-size:10px;color:var(--text-3);margin-top:6px}
 
 /* ══════════════════════════════════
-   CONSENSUS (Todos os Setores)
+   MARKDOWN RENDERED CONTENT
    ══════════════════════════════════ */
-.consensus-block{display:flex;flex-direction:column;gap:0;max-width:100%}
+.md h1,.md h2{font-size:15px;font-weight:700;margin:12px 0 6px;color:var(--text)}
+.md h3{font-size:13.5px;font-weight:700;margin:10px 0 5px;color:var(--text)}
+.md strong{font-weight:700;color:var(--text)}
+.md em{font-style:italic;color:var(--text-2)}
+.md ul,.md ol{padding-left:18px;margin:6px 0}
+.md li{margin-bottom:3px;line-height:1.6}
+.md p{margin:0 0 8px}
+.md p:last-child{margin-bottom:0}
+.md code{background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:.9em}
+.md hr{border:none;border-top:1px solid var(--border);margin:10px 0}
 
-.consensus-responses{
+/* ══════════════════════════════════
+   CONSENSUS — Accordion Cards
+   ══════════════════════════════════ */
+.consensus-wrap{display:flex;flex-direction:column;gap:6px;margin-top:12px;max-width:100%}
+
+.cr-card{
   background:var(--elevated);border:1px solid var(--border);
-  border-radius:var(--radius-lg);overflow:hidden;margin-top:12px;
+  border-radius:var(--radius-lg);overflow:hidden;
+  border-left:3px solid var(--cc-color,var(--border));
+  transition:border-color .2s;
 }
-.cr-header{
-  padding:10px 16px;border-bottom:1px solid var(--border);
+.cr-card.done{border-left-color:var(--cc-color,var(--nexus))}
+
+.cr-card-head{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 14px;cursor:pointer;user-select:none;
+  transition:background .15s;
+}
+.cr-card-head:hover{background:rgba(255,255,255,0.03)}
+
+.cr-card-icon{
+  width:32px;height:32px;border-radius:8px;flex-shrink:0;
+  background:rgba(255,255,255,0.04);
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+}
+.cr-card-meta{flex:1;min-width:0}
+.cr-card-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.cr-card-preview{
+  font-size:12px;color:var(--text-3);margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:600px;
+}
+.cr-card-badge{
+  font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  padding:2px 8px;border-radius:20px;flex-shrink:0;
+}
+.cr-card-badge.pending{color:var(--text-3);background:rgba(255,255,255,0.04);border:1px solid var(--border)}
+.cr-card-badge.done{color:var(--cc-color,var(--nexus));background:rgba(255,255,255,0.06);border:1px solid var(--cc-color,var(--nexus))3a}
+.cr-card-chevron{
+  width:20px;height:20px;flex-shrink:0;color:var(--text-3);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .25s;
+}
+.cr-card-chevron svg{width:14px;height:14px;stroke:currentColor;fill:none}
+.cr-card.expanded .cr-card-chevron{transform:rotate(180deg)}
+
+.cr-card-body{
+  max-height:0;overflow:hidden;
+  transition:max-height .35s cubic-bezier(.4,0,.2,1),padding .2s;
+  padding:0 14px;
+}
+.cr-card.expanded .cr-card-body{
+  max-height:2000px;padding:0 14px 14px;
+}
+.cr-card-body-inner{
+  padding-top:12px;border-top:1px solid var(--border);
+  font-size:13.5px;line-height:1.65;color:var(--text-2);
+  word-break:break-word;
+}
+
+.consensus-toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:8px;
+}
+.consensus-label{
   font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-3);
 }
-.cr-row{
-  display:flex;gap:12px;padding:12px 16px;
-  border-bottom:1px solid var(--border);
+.consensus-toggle-all{
+  font-size:11px;color:var(--text-3);cursor:pointer;
+  padding:3px 10px;border-radius:20px;
+  border:1px solid var(--border);background:transparent;
+  font-family:'Sora',sans-serif;transition:all .15s;
 }
-.cr-row:last-child{border-bottom:none}
-.cr-icon{
-  width:30px;height:30px;border-radius:7px;
-  background:var(--row-bg,rgba(255,255,255,0.04));
-  display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;
-}
-.cr-body{flex:1;min-width:0}
-.cr-name{
-  font-size:10px;font-weight:700;text-transform:uppercase;
-  letter-spacing:.5px;margin-bottom:5px;
-}
-.cr-text{font-size:14px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
-.cr-row.pending .cr-text{color:var(--text-3);display:flex;align-items:center;gap:6px}
+.consensus-toggle-all:hover{color:var(--text-2);border-color:var(--border-md)}
 
 .verdict-block{
-  margin-top:12px;background:var(--elevated);border:1px solid rgba(99,102,241,.25);
+  margin-top:10px;background:var(--elevated);
+  border:1px solid rgba(99,102,241,.25);
   border-radius:var(--radius-lg);padding:16px;
   border-left:3px solid var(--nexus);
 }
 .verdict-header{
   font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
-  color:var(--nexus);margin-bottom:10px;display:flex;align-items:center;gap:6px;
+  color:var(--nexus);margin-bottom:12px;display:flex;align-items:center;gap:6px;
 }
-.verdict-text{font-size:13.5px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.verdict-text{font-size:14px;line-height:1.7;color:var(--text-2);word-break:break-word}
 
 /* ══════════════════════════════════
    CONSELHO DE TITÃS
@@ -962,7 +1020,7 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-s
     <div class="chat-input-area">
       <div class="chat-input-row">
         <textarea class="chat-textarea" id="input-all-sectors" placeholder="Qual questão ou decisão para todos os setores analisarem?" rows="1"
-          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();_send('all-sectors')}"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey&&window._enterSend()){event.preventDefault();_send('all-sectors')}"
           oninput="autoResize(this)"></textarea>
         <button class="send-btn" onclick="_send('all-sectors')">
           <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
@@ -998,7 +1056,7 @@ body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-s
     <div class="chat-input-area">
       <div class="chat-input-row">
         <textarea class="chat-textarea" id="input-conselho" placeholder="Qual decisão estratégica o Conselho deve analisar?" rows="1"
-          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();_send('conselho')}"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey&&window._enterSend()){event.preventDefault();_send('conselho')}"
           oninput="autoResize(this)"></textarea>
         <button class="send-btn" onclick="_send('conselho')">
           <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
@@ -1330,7 +1388,7 @@ updateClock(); setInterval(updateClock,1000);
       <div class="chat-input-area">
         <div class="chat-input-row">
           <textarea class="chat-textarea" id="input-${key}" placeholder="Fale com ${cfg.name}..." rows="1"
-            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();_send('${key}')}"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey&&window._enterSend()){event.preventDefault();_send('${key}')}"
             oninput="autoResize(this)"></textarea>
           <button class="send-btn" id="sbtn-${key}" onclick="_send('${key}')">
             <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
@@ -1453,6 +1511,37 @@ async function loadHistory(sector){
   } catch(e){ /* silencioso */ }
 }
 
+// ─── MARKDOWN RENDERER ──────────────────────
+function renderMD(text){
+  let s = String(text)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  // Headers
+  s = s.replace(/^### (.+)$/gm,'<h3>$1</h3>');
+  s = s.replace(/^## (.+)$/gm,'<h2>$1</h2>');
+  s = s.replace(/^# (.+)$/gm,'<h1>$1</h1>');
+  // Bold / italic
+  s = s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  s = s.replace(/\*(.+?)\*/g,'<em>$1</em>');
+  // Inline code
+  s = s.replace(/`([^`]+)`/g,'<code>$1</code>');
+  // HR
+  s = s.replace(/^---+$/gm,'<hr>');
+  // Lists — unordered
+  s = s.replace(/^[-•] (.+)$/gm,'<li>$1</li>');
+  s = s.replace(/(<li>.*<\/li>\n?)+/g,'<ul>$&</ul>');
+  // Lists — ordered
+  s = s.replace(/^\d+\. (.+)$/gm,'<li>$1</li>');
+  // Paragraphs from double newlines
+  s = s.replace(/\n{2,}/g,'</p><p>');
+  s = s.replace(/\n/g,'<br>');
+  s = '<p>' + s + '</p>';
+  // Clean up empty <p> around block elements
+  s = s.replace(/<p>(<h[123]>|<ul>|<ol>|<hr>)/g,'$1');
+  s = s.replace(/(<\/h[123]>|<\/ul>|<\/ol>|<hr>)<\/p>/g,'$1');
+  s = s.replace(/<p><\/p>/g,'');
+  return '<div class="md">' + s + '</div>';
+}
+
 // ─── MESSAGES ───────────────────────────────
 function appendMsg(sector, role, content, animate=true){
   const cfg = SECTOR_CFG[sector]||{};
@@ -1463,7 +1552,8 @@ function appendMsg(sector, role, content, animate=true){
   const div = document.createElement('div');
   div.className = `msg ${role}`;
   const time = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-  div.innerHTML = `<div class="msg-bubble">${esc(content)}</div>
+  const body = role==='assistant' ? renderMD(content) : `<div>${esc(content)}</div>`;
+  div.innerHTML = `<div class="msg-bubble">${body}</div>
     <div class="msg-meta">${role==='user'?'Você':cfg.name||'MAX'} · ${time}</div>`;
   if(animate) div.style.cssText='opacity:0;transform:translateY(8px);transition:all .2s';
   box.appendChild(div);
@@ -1532,6 +1622,23 @@ async function sendSector(sector, msg){
 }
 
 // ─── CONSENSUS (SSE) ────────────────────────
+function toggleCrCard(id){
+  const card = document.getElementById(`cr-${id}`);
+  if(card) card.classList.toggle('expanded');
+}
+window.toggleCrCard = toggleCrCard;
+
+let _allExpanded = false;
+function toggleAllCards(wrap){
+  _allExpanded = !_allExpanded;
+  wrap.querySelectorAll('.cr-card').forEach(c=>{
+    c.classList.toggle('expanded', _allExpanded);
+  });
+  const btn = wrap.querySelector('.consensus-toggle-all');
+  if(btn) btn.textContent = _allExpanded ? 'Colapsar todos' : 'Expandir todos';
+}
+window.toggleAllCards = toggleAllCards;
+
 async function sendConsensus(msg){
   const box = document.getElementById('msgs-all-sectors');
   const wEl = document.getElementById('cwelcome-all-sectors');
@@ -1540,62 +1647,87 @@ async function sendConsensus(msg){
   // User message
   const uDiv = document.createElement('div');
   uDiv.className='msg user';
-  uDiv.innerHTML=`<div class="msg-bubble">${esc(msg)}</div>`;
+  uDiv.innerHTML=`<div class="msg-bubble"><div>${esc(msg)}</div></div>`;
   box.appendChild(uDiv);
 
-  // Responses container
+  // Container
   const container = document.createElement('div');
-  container.className='msg assistant';
-  container.style.maxWidth='100%';
+  container.className='msg assistant'; container.style.maxWidth='100%';
 
-  const respBox = document.createElement('div');
-  respBox.className='consensus-responses';
-  respBox.innerHTML=`<div class="cr-header">⚡ Análise dos 6 Setores</div>`;
+  const wrap = document.createElement('div');
+  wrap.className='consensus-wrap';
+  const uid = 'cw'+Date.now();
+  wrap.id = uid;
 
+  // Toolbar
+  const toolbar = document.createElement('div');
+  toolbar.className='consensus-toolbar';
+  toolbar.innerHTML=`<span class="consensus-label">⚡ Análise dos 6 Setores</span>
+    <button class="consensus-toggle-all" onclick="toggleAllCards(document.getElementById('${uid}'))">Expandir todos</button>`;
+  wrap.appendChild(toolbar);
+
+  // Accordion cards (pending state)
   Object.entries(SECTOR_CFG).forEach(([k,c])=>{
-    const row = document.createElement('div');
-    row.className='cr-row pending';
-    row.id=`cr-${k}`;
-    row.innerHTML=`
-      <div class="cr-icon">${c.emoji}</div>
-      <div class="cr-body">
-        <div class="cr-name" style="color:${c.color}">${c.name}</div>
-        <div class="cr-text"><div class="pulse-dots"><div class="pd"></div><div class="pd"></div><div class="pd"></div></div> analisando...</div>
-      </div>`;
-    respBox.appendChild(row);
+    const card = document.createElement('div');
+    card.className='cr-card'; card.id=`cr-${k}`;
+    card.style.setProperty('--cc-color', c.color);
+    card.innerHTML=`
+      <div class="cr-card-head" onclick="toggleCrCard('${k}')">
+        <div class="cr-card-icon">${c.emoji}</div>
+        <div class="cr-card-meta">
+          <div class="cr-card-name" style="color:${c.color}">${c.name}</div>
+          <div class="cr-card-preview" id="cr-preview-${k}">Analisando sua questão...</div>
+        </div>
+        <span class="cr-card-badge pending" id="cr-badge-${k}">
+          <div class="pulse-dots" style="display:inline-flex"><div class="pd"></div><div class="pd"></div><div class="pd"></div></div>
+        </span>
+        <div class="cr-card-chevron">
+          <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="cr-card-body"><div class="cr-card-body-inner md" id="cr-body-${k}"></div></div>`;
+    wrap.appendChild(card);
   });
 
-  container.appendChild(respBox);
+  container.appendChild(wrap);
   box.appendChild(container);
   scrollBot('all-sectors');
 
   const src = new EventSource(`/api/dashboard/consensus-stream?question=${encodeURIComponent(msg)}&session_id=${encodeURIComponent(SESSION)}`);
 
   src.onmessage = e=>{
-    const data = JSON.parse(e.data);
+    let data;
+    try { data = JSON.parse(e.data); } catch{ return; }
+
     if(data.type==='sector'){
-      const row = document.getElementById(`cr-${data.sector}`);
-      if(row){
-        row.classList.remove('pending');
-        row.querySelector('.cr-text').innerHTML = esc(data.content);
+      const card = document.getElementById(`cr-${data.sector}`);
+      const preview = document.getElementById(`cr-preview-${data.sector}`);
+      const badge = document.getElementById(`cr-badge-${data.sector}`);
+      const body = document.getElementById(`cr-body-${data.sector}`);
+      if(card){ card.classList.add('done','expanded'); }
+      if(body){ body.innerHTML = renderMD(data.content).replace('<div class="md">','').replace(/<\/div>$/,''); }
+      if(preview){
+        const plain = data.content.replace(/[#*`_]/g,'').trim();
+        preview.textContent = plain.slice(0,90) + (plain.length>90?'…':'');
       }
-    } else if(data.type==='synthesizing'){
-      const vBlock = document.createElement('div');
-      vBlock.className='verdict-block';
-      vBlock.id='verdict-block';
-      vBlock.innerHTML=`<div class="verdict-header">⬡ Veredito MAX <div class="pulse-dots" style="display:inline-flex"><div class="pd"></div><div class="pd"></div><div class="pd"></div></div></div>
-        <div class="verdict-text" id="verdict-text" style="color:var(--text-3);font-style:italic">Consolidando perspectivas...</div>`;
-      container.appendChild(vBlock);
+      if(badge){ badge.className='cr-card-badge done'; badge.textContent='Concluído'; }
+
     } else if(data.type==='synthesis'){
-      const vt = document.getElementById('verdict-text');
-      if(vt){vt.style.cssText='';vt.innerHTML=esc(data.content);}
-      const vh = document.querySelector('#verdict-block .verdict-header');
-      if(vh) vh.innerHTML='⬡ Veredito MAX';
+      let vBlock = document.getElementById('verdict-block-'+uid);
+      if(!vBlock){
+        vBlock = document.createElement('div');
+        vBlock.className='verdict-block'; vBlock.id='verdict-block-'+uid;
+        vBlock.innerHTML=`<div class="verdict-header">⬡ Veredito MAX</div>
+          <div class="verdict-text md" id="verdict-text-${uid}"></div>`;
+        wrap.appendChild(vBlock);
+      }
+      const vt = document.getElementById('verdict-text-'+uid);
+      if(vt) vt.innerHTML = renderMD(data.content).replace('<div class="md">','').replace(/<\/div>$/,'');
+
     } else if(data.type==='done'){
       src.close();
     } else if(data.type==='error'){
       src.close();
-      appendMsg('all-sectors','assistant','⚠️ Erro ao processar. Tente novamente.');
     }
     scrollBot('all-sectors');
   };
@@ -1640,7 +1772,7 @@ async function sendConselho(msg){
       card.style.cssText=`--t-color:${cfg.color}`;
       card.innerHTML=`<div class="titan-head"><div class="titan-emoji">${cfg.emoji}</div>
         <div class="titan-name" style="color:${cfg.color}">${cfg.name}</div></div>
-        <div class="titan-text">${esc(t.response)}</div>`;
+        <div class="titan-text">${renderMD(t.response)}</div>`;
       grid.appendChild(card);
     });
     container.appendChild(grid);
@@ -1649,7 +1781,7 @@ async function sendConselho(msg){
       const vBlock = document.createElement('div');
       vBlock.className='verdict-block'; vBlock.style.marginTop='12px';
       vBlock.innerHTML=`<div class="verdict-header">⬡ Veredito MAX</div>
-        <div class="verdict-text">${esc(d.synthesis)}</div>`;
+        <div class="verdict-text">${renderMD(d.synthesis)}</div>`;
       container.appendChild(vBlock);
     }
     box.appendChild(container);
@@ -1703,6 +1835,7 @@ function showToast(msg){
 // ─── SETTINGS ───────────────────────────────
 const DEFAULTS = { fontSize:15, compactSidebar:false, enterSend:true, anim:true, accentColor:'#6366f1' };
 let CFG = Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem('nxs_cfg')||'{}'));
+window._enterSend = ()=>CFG.enterSend;
 
 function saveConfig(){ localStorage.setItem('nxs_cfg', JSON.stringify(CFG)); }
 
