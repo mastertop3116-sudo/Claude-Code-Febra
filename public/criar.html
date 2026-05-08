@@ -4918,7 +4918,7 @@ main{position:relative;z-index:auto}
 </script>
 
 <script>
-/* MAX floating tips — órbita sentido horário ao redor da tela */
+/* MAX floating tips — movimento horizontal esq→dir, loop contínuo */
 (function(){
   var TIPS = [
     'Ebooks com promessa\nde "resultado em X dias"\nvendem 3× mais',
@@ -4932,46 +4932,27 @@ main{position:relative;z-index:auto}
     'Bundle de 3 produtos\ndobra o ticket médio\ncom mesma oferta',
   ];
 
-  var ORBIT_S  = 80;
+  var CROSS_S  = 38;
   var CYCLE_MS = 30000;
   var FADE_MS  = 500;
-  var BW = 172, BH = 110;
+  var BW = 172;
 
   setTimeout(function(){
-    var VW = window.innerWidth;
-    var VH = window.innerHeight;
+    var VW   = window.innerWidth;
+    var VH   = window.innerHeight;
+    var LOOP = VW + BW;
+    var spd  = LOOP / CROSS_S; // px/s
 
-    // Track: retângulo que percorre a borda da tela
-    // Os cards ficam atrás do chat (z-index:1 < app-shell z-index:2)
-    var PAD = 6;
-    var TL = PAD;
-    var TR = VW - BW - PAD;
-    var TT = PAD;
-    var TB = VH - BH - PAD;
-    var W  = TR - TL;
-    var H  = TB - TT;
-    var P  = 2 * (W + H);
-
-    // Posição sentido horário: topo esq→dir, dir top→bot, baixo dir→esq, esq bot→top
-    function getPos(t){
-      var d = ((t % 1) + 1) % 1 * P;
-      if(d < W) return { x: TL + d,  y: TT };
-      d -= W;
-      if(d < H) return { x: TR,      y: TT + d };
-      d -= H;
-      if(d < W) return { x: TR - d,  y: TB };
-      d -= W;
-                return { x: TL,      y: TB - d };
-    }
+    // 6 alturas distribuídas verticalmente
+    var yPos = [0.08, 0.22, 0.38, 0.54, 0.68, 0.83].map(function(p){ return p * VH; });
 
     var wrap = document.createElement('div');
     wrap.style.cssText = 'position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden';
     document.body.appendChild(wrap);
 
-    var N = 6;
     var bubbles = [];
 
-    for(var i = 0; i < N; i++){
+    for(var i = 0; i < 6; i++){
       (function(i){
         var el = document.createElement('div');
         el.style.cssText =
@@ -4993,16 +4974,14 @@ main{position:relative;z-index:auto}
         setText();
         wrap.appendChild(el);
 
-        // Posição inicial espalhada na órbita
-        var t0 = i / N;
-        var pos0 = getPos(t0);
-        el.style.left = pos0.x + 'px';
-        el.style.top  = pos0.y + 'px';
+        // Cada card começa espalhado na "fila" horizontal
+        var x0 = -BW + i * (LOOP / 6);
+        el.style.left = x0 + 'px';
+        el.style.top  = yPos[i] + 'px';
 
-        // Aparece com stagger
-        setTimeout(function(){ el.style.opacity = '1'; }, 600 + i * 350);
+        setTimeout(function(){ el.style.opacity = '1'; }, 600 + i * 300);
 
-        // Ciclo de texto a cada 30s, com stagger entre cards
+        // Troca de texto a cada 30s com stagger entre cards
         setTimeout(function(){
           setInterval(function(){
             el.style.opacity = '0';
@@ -5012,9 +4991,9 @@ main{position:relative;z-index:auto}
               el.style.opacity = '1';
             }, FADE_MS + 80);
           }, CYCLE_MS);
-        }, 600 + i * 350 + FADE_MS + i * 4800);
+        }, 600 + i * 300 + FADE_MS + i * 4800);
 
-        bubbles.push({ el: el, t: t0 });
+        bubbles.push({ el: el, x: x0 });
       })(i);
     }
 
@@ -5023,13 +5002,11 @@ main{position:relative;z-index:auto}
       if(!last) last = ts;
       var dt = (ts - last) / 1000;
       last = ts;
-      var speed = 1 / ORBIT_S;
 
       bubbles.forEach(function(b){
-        b.t = (b.t + speed * dt) % 1;
-        var pos = getPos(b.t);
-        b.el.style.left = pos.x + 'px';
-        b.el.style.top  = pos.y + 'px';
+        b.x += spd * dt;
+        if(b.x > VW) b.x -= LOOP; // reaparece pelo lado esquerdo
+        b.el.style.left = b.x + 'px';
       });
       requestAnimationFrame(tick);
     }
