@@ -1197,10 +1197,12 @@ Exemplos válidos:
     for (const [, key, value] of memMatches) {
       const k = key.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
       if (!k || !value.trim()) continue;
-      await supabase.from('max_memory').upsert(
-        { key: k, value: value.trim(), updated_at: new Date().toISOString() },
-        { onConflict: 'key' }
-      ).catch(() => {});
+      try {
+        await supabase.from('max_memory').upsert(
+          { key: k, value: value.trim(), updated_at: new Date().toISOString() },
+          { onConflict: 'key' }
+        );
+      } catch (_) {}
     }
 
     // 8. Salva resposta no histórico
