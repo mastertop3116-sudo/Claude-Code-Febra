@@ -3429,36 +3429,101 @@ main{position:relative;z-index:auto}
       document.getElementById('fc-ajustar-btn')?.addEventListener('click', () => _ajustarComPayload(payload));
     }
 
-    function _gerarComPayload(payload) {
-      const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
-      set('inp-titulo',    payload.titulo);
-      set('inp-subtitulo', payload.subtitulo);
-      set('inp-autor',     payload.autor);
-      set('inp-descricao', (payload.dor || '') + (payload.transformacao ? ' → ' + payload.transformacao : ''));
-      set('inp-avatar',    payload.publico);
-      set('inp-paginas',   payload.paginas);
-      set('dna-nome',      payload.titulo);
-      set('dna-nicho',     payload.tema);
-      set('dna-publico',   payload.publico);
-      set('dna-preco',     payload.preco);
+    async function _gerarComPayload(payload) {
+      if (typeof window._fcSetType === 'function' && payload.tipo) window._fcSetType(payload.tipo);
 
-      if (typeof window._fcSetType === 'function') window._fcSetType(payload.tipo);
+      const apiPayload = {
+        tipo:      payload.tipo || selectedType,
+        titulo:    payload.titulo,
+        subtitulo: payload.subtitulo || '',
+        autor:     payload.autor || '',
+        descricao: (payload.dor || '') + (payload.transformacao ? ' → ' + payload.transformacao : ''),
+        avatar:    payload.publico || '',
+        paginas:   parseInt(payload.paginas) || 15,
+        temaKey:   selectedTheme,
+        formato:   selectedFmt,
+        cabecalho: { ativo: false, texto: '' },
+        rodape:    { ativo: false, texto: '', numeroPagina: true, copyright: '' },
+        produto: {
+          nome:         payload.titulo,
+          nicho:        payload.tema || '',
+          publico_alvo: payload.publico || '',
+          preco:        payload.preco || '',
+          relatorio:    '',
+        },
+      };
 
-      // Troca para modo ent diretamente — evita clicar em tab que pode crashar listeners
-      if (typeof window.switchMode === 'function') {
-        window.switchMode('ent');
-      } else {
-        currentMode = 'ent';
-        document.body.className = 'mode-ent';
-        const bg = document.getElementById('btn-gerar');
-        if (bg) { bg.style.display = ''; bg.textContent = '🚀 Gerar Infoproduto'; }
+      hideErr();
+      setProgress(2, 'Conectando ao servidor…');
+      document.getElementById('overlay-prog').classList.add('show');
+      _startElapsed();
+
+      const _DICAS = [
+        '💡 Títulos com números ímpares (3, 7, 9) convertem até 36% mais.',
+        '✏️ O conteúdo gerado é seu ponto de partida. Edite e injete sua voz antes de publicar.',
+        '🚀 Entregáveis bem estruturados aumentam o valor percebido do seu produto até 3×.',
+      ];
+      let _dicaIdx = 0;
+      const _tipEl = document.getElementById('gen-tip');
+      if (_tipEl) _tipEl.textContent = _DICAS[0];
+      const _dicaTimer = setInterval(() => {
+        if (!_tipEl) return;
+        _tipEl.style.opacity = '0';
+        setTimeout(() => {
+          _dicaIdx = (_dicaIdx + 1) % _DICAS.length;
+          _tipEl.textContent = _DICAS[_dicaIdx];
+          _tipEl.style.opacity = '1';
+        }, 400);
+      }, 12000);
+      const _stopDicas = () => { clearInterval(_dicaTimer); if (_tipEl) _tipEl.style.opacity = '0'; };
+
+      try {
+        const initRes = await fetch('/api/criar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(apiPayload),
+        });
+        if (!initRes.ok) throw new Error('Falha ao iniciar geração (status ' + initRes.status + ')');
+        const { jobId } = await initRes.json();
+
+        await new Promise((resolve, reject) => {
+          const es = new EventSource('/api/criar/progress/' + jobId);
+          _activeEventSource = es;
+          es.onmessage = async e => {
+            const d = JSON.parse(e.data);
+            if (d.error) { es.close(); reject(new Error(d.error)); return; }
+            if (d.progress !== undefined) setProgress(d.progress, d.message);
+            if (d.done) {
+              es.close();
+              _stopDicas(); _stopElapsed();
+              setProgress(100, 'Baixando resultado…');
+              try {
+                const r = await fetch('/api/criar/result/' + jobId);
+                if (!r.ok) throw new Error('resultado HTTP ' + r.status);
+                const resultado = await r.json();
+                setProgress(100, 'Pronto!');
+                showSuccess(resultado, apiPayload.titulo);
+                resolve(resultado);
+              } catch (fetchErr) {
+                reject(new Error('Geração concluída mas falha ao baixar resultado: ' + fetchErr.message));
+              }
+            }
+          };
+          es.onerror = () => { es.close(); _stopDicas(); _stopElapsed(); reject(new Error('Conexão perdida — tente novamente.')); };
+        });
+
+      } catch (err) {
+        _stopDicas(); _stopElapsed();
+        document.getElementById('overlay-prog').classList.remove('show');
+        const rawMsg = err.message || '';
+        const friendlyMsg = rawMsg.includes('500') ? 'Erro no servidor — o conteúdo pode ser muito longo. Tente reduzir o nº de páginas.' :
+          rawMsg.includes('429') ? 'Muitas requisições. Aguarde 30 segundos e tente novamente.' :
+          rawMsg.includes('Conexão perdida') ? 'Conexão perdida com o servidor. Clique em Tentar novamente.' :
+          rawMsg || 'Algo deu errado. Tente novamente.';
+        showErr('⚠ ' + friendlyMsg);
       }
-
-      setTimeout(() => {
-        const btn = document.getElementById('btn-gerar');
-        if (btn) { btn.disabled = false; btn.click(); }
-      }, 400);
     }
+    window._gerarDireto = _gerarComPayload;
 
     function _ajustarComPayload(payload) {
       const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
@@ -5089,6 +5154,7 @@ main{position:relative;z-index:auto}
     else{document.body.className='mode-ent';}
   }
   function gerar(p){
+    if(typeof window._gerarDireto==='function'){window._gerarDireto(p);return;}
     function s(id,v){var e=document.getElementById(id);if(e)e.value=v||'';}
     s('inp-titulo',p.titulo);s('inp-subtitulo',p.subtitulo);s('inp-autor',p.autor);
     s('inp-descricao',(p.dor||'')+(p.transformacao?' → '+p.transformacao:''));
