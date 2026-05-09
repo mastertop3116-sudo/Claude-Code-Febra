@@ -1120,11 +1120,7 @@ app.post('/api/dashboard/assistant', async (req, res) => {
     const OpenAI = require('openai');
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-    // 1. Garante que a tabela max_memory existe
-    await supabase.rpc('create_max_memory_if_not_exists').catch(() => {});
-    // fallback: tenta criar via insert (vai falhar silenciosamente se não existir)
-
-    // 2. Carrega memórias salvas
+    // 1. Carrega memórias salvas
     const { data: memories } = await supabase
       .from('max_memory')
       .select('key, value')
