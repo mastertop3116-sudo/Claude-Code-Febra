@@ -1107,6 +1107,116 @@ app.post('/api/dashboard/conselho', async (req, res) => {
   }
 });
 
+// ──────────────────────────────────────────
+// MAX Assistente — IA pessoal Jarvis-level com memória persistente
+// ──────────────────────────────────────────
+app.post('/api/dashboard/assistant', async (req, res) => {
+  try {
+    const { message, session_id } = req.body;
+    if (!message || !session_id) return res.status(400).json({ error: 'Parâmetros incompletos' });
+
+    const { saveConversation, getHistory } = require('./core/departments');
+    const { supabase } = require('./integrations/supabase');
+    const OpenAI = require('openai');
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+    // 1. Garante que a tabela max_memory existe
+    await supabase.rpc('create_max_memory_if_not_exists').catch(() => {});
+    // fallback: tenta criar via insert (vai falhar silenciosamente se não existir)
+
+    // 2. Carrega memórias salvas
+    const { data: memories } = await supabase
+      .from('max_memory')
+      .select('key, value')
+      .order('updated_at', { ascending: false })
+      .limit(60);
+
+    const memoryBlock = memories?.length
+      ? memories.map(m => `• ${m.key}: ${m.value}`).join('\n')
+      : 'Nenhuma memória registrada ainda.';
+
+    // 3. Carrega histórico da conversa (últimas 40 mensagens)
+    const history = await getHistory(session_id, 'max-assistant', 40);
+
+    // 4. Sistema Jarvis
+    const systemPrompt = `Você é MAX — a inteligência artificial pessoal de Rodrigo Cruz. Pense no J.A.R.V.I.S. do Homem de Ferro: inteligente, proativo, direto, confiante e totalmente dedicado ao sucesso do seu dono.
+
+═══ QUEM É RODRIGO ═══
+- Empreendedor digital, fundador da Nexus Digital Holding
+- Especialidade: infoprodutos low-ticket brasileiros em escala
+- Parceiro de negócios: Bruno (BRN VENDAS) — nunca chame de "primo"
+- Meta imediata: R$10.000/mês. Visão de longo prazo: valuation de R$1 bilhão
+
+═══ PRODUTOS ATIVOS ═══
+- BIDCAP / Jiu-Jitsu infantil: R$17–R$29, Meta Ads ativo, avatares: pais/mães de crianças 4–12 anos e professores de academia
+- Kit Despluga Pro: +500 atividades desplugadas BNCC, avatar: professoras do Ensino Fundamental
+- Stack de criação: OpenAI + Gamma AI + ElevenLabs + GG Checkout + UTMify
+
+═══ MEMÓRIAS APRENDIDAS ═══
+${memoryBlock}
+
+═══ DASHBOARD NEXUS OS ═══
+Você está integrado ao dashboard. Seções disponíveis: Briefing, Métricas, Radar de Oportunidades, Pipeline, Board de Ofertas, Biblioteca, 6 setores de IA (Fábrica de Produtos, Fábrica de Conteúdo, Motor de Monetização, Lab de UX, Engenharia, Crescimento), Conselho de Titãs (Elon, Bezos, Hang, Paulo Vieira), BRN VENDAS, Integrações.
+
+═══ COMO VOCÊ DEVE AGIR ═══
+- Perguntas simples → respostas simples e diretas
+- Estratégia / negócio → profundo, concreto, com próximos 3 passos claros
+- Nunca invente métricas ou dados que Rodrigo não informou
+- Chame de "Rodrigo" quando fizer sentido contextual (não em toda frase)
+- Humor leve e inteligência situacional são bem-vindos
+- Responda sempre em português brasileiro
+- Se uma ação no dashboard foi solicitada, confirme brevemente que foi executada
+
+═══ SISTEMA DE MEMÓRIA ═══
+Quando aprender algo novo e relevante sobre Rodrigo, seus produtos, metas, preferências ou decisões, adicione ao FINAL da resposta (linha separada, máximo 2 por resposta):
+[M: chave_sem_espacos → valor curto e descritivo]
+Exemplos válidos:
+[M: produto_prioritario → BIDCAP Jiu-Jitsu, Meta Ads ativo]
+[M: meta_lancamento → 3 produtos novos em outubro]
+[M: preferencia_resposta → direto, sem enrolação]`;
+
+    // 5. Salva mensagem do usuário
+    await saveConversation(session_id, 'max-assistant', 'user', message);
+
+    // 6. Chama GPT-4o (melhor qualidade para o assistente pessoal)
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      ...history.map(h => ({ role: h.role, content: h.content })),
+      { role: 'user', content: message }
+    ];
+
+    const completion = await client.chat.completions.create({
+      model: 'gpt-4o',
+      messages,
+      max_tokens: 1000,
+      temperature: 0.7,
+    });
+
+    const rawReply = completion.choices[0].message.content;
+
+    // 7. Extrai e salva memórias novas
+    const memMatches = [...rawReply.matchAll(/\[M:\s*(.+?)\s*→\s*(.+?)\]/g)];
+    const cleanReply = rawReply.replace(/\[M:.*?\]\n?/g, '').trim();
+
+    for (const [, key, value] of memMatches) {
+      const k = key.trim().toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+      if (!k || !value.trim()) continue;
+      await supabase.from('max_memory').upsert(
+        { key: k, value: value.trim(), updated_at: new Date().toISOString() },
+        { onConflict: 'key' }
+      ).catch(() => {});
+    }
+
+    // 8. Salva resposta no histórico
+    await saveConversation(session_id, 'max-assistant', 'assistant', cleanReply);
+
+    res.json({ reply: cleanReply });
+  } catch (e) {
+    console.error('[/api/dashboard/assistant]', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.get('/api/dashboard/history/:sector', async (req, res) => {
   try {
     const { sector } = req.params;

@@ -2194,19 +2194,15 @@ async function sendAssist(){
   const local = detectLocalAction(msg);
 
   try {
-    const r = await fetch('/api/dashboard/chat', {
+    const r = await fetch('/api/dashboard/assistant', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        sector:'crescimento',
-        message: `Você é o MAX, assistente do dashboard Nexus OS do Rodrigo Cruz. Responda a mensagem abaixo de forma direta e natural — como um assistente inteligente. Se for uma pergunta, responda a pergunta. Se for um pedido de ação no dashboard (ex: adicionar card, navegar), diga apenas "Entendido, executando." em uma linha. Não invente dados que não foram fornecidos.\n\nMensagem: ${msg}`,
-        session_id: SESSION
-      })
+      body: JSON.stringify({ message: msg, session_id: SESSION })
     });
     const d = await r.json();
     assistHideTyping();
 
-    // Monta ações com base na detecção local
+    // Monta botões de ação local se detectou comando
     const actions = [];
     if(local?.type === 'addCard'){
       const col = boardData?.cols?.find(c=>c.title.toLowerCase().includes(local.colHint)) || boardData?.cols?.[0];
@@ -2227,7 +2223,7 @@ async function sendAssist(){
       actions.push({label:`Ir para ${VIEW_TITLES[local.view]||local.view}`, fn:()=>navigate(local.view)});
     }
 
-    assistAppend('ai', d.response || d.message || 'Feito!', actions);
+    assistAppend('ai', d.reply || d.error || 'Erro ao conectar.', actions);
     if(!assistOpen){
       document.getElementById('assist-unread').style.display = 'block';
     }
