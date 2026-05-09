@@ -2199,7 +2199,7 @@ async function sendAssist(){
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         sector:'crescimento',
-        message: `[DASHBOARD ASSIST] O usuário Rodrigo pediu: "${msg}"\n\nVocê é o MAX Assistente integrado ao dashboard Nexus OS. Responda de forma direta e útil. Se for uma ação de dashboard (adicionar card, navegar, etc.), confirme que será executada e dê uma resposta curta (máximo 3 frases). Não use saudações longas.`,
+        message: `Você é o MAX, assistente do dashboard Nexus OS do Rodrigo Cruz. Responda a mensagem abaixo de forma direta e natural — como um assistente inteligente. Se for uma pergunta, responda a pergunta. Se for um pedido de ação no dashboard (ex: adicionar card, navegar), diga apenas "Entendido, executando." em uma linha. Não invente dados que não foram fornecidos.\n\nMensagem: ${msg}`,
         session_id: SESSION
       })
     });
