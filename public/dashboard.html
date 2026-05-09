@@ -16,7 +16,7 @@
   --brn:#10b981;--brn-dim:rgba(16,185,129,0.13);--brn-glow:rgba(16,185,129,0.28);
   --c-prod:#34d399;--c-cont:#a78bfa;--c-mono:#fbbf24;--c-ux:#f472b6;
   --c-eng:#38bdf8;--c-grow:#fb923c;--c-all:#818cf8;--c-cons:#ef4444;
-  --statusbar-h:42px;--sidebar-w:64px;--radius:10px;--radius-lg:14px;
+  --statusbar-h:42px;--sidebar-w:192px;--sidebar-collapsed:52px;--radius:10px;--radius-lg:14px;
   --card-glow:rgba(99,102,241,0.18);
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -54,18 +54,30 @@ body::after{content:'';position:fixed;inset:0;z-index:9990;pointer-events:none;o
 #app-wrap::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 90% 70% at 10% -10%,rgba(99,102,241,0.22) 0%,transparent 60%),radial-gradient(ellipse 70% 60% at 95% 110%,rgba(16,185,129,0.16) 0%,transparent 55%),radial-gradient(ellipse 50% 40% at 50% 50%,rgba(99,102,241,0.04) 0%,transparent 70%)}
 
 /* SIDEBAR */
-#sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);height:100%;background:rgba(7,7,16,0.98);border-right:1px solid rgba(99,102,241,0.12);display:flex;flex-direction:column;align-items:center;overflow:visible;flex-shrink:0;position:relative;z-index:50;padding:10px 0;box-shadow:1px 0 0 rgba(99,102,241,0.06),4px 0 24px rgba(0,0,0,0.4)}
-.sb-top{padding-bottom:10px;border-bottom:1px solid var(--border);width:100%;display:flex;justify-content:center;margin-bottom:8px}
-.sb-nav{flex:1;width:100%;overflow-y:auto;overflow-x:visible;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0}
-.sb-bottom{padding-top:8px;border-top:1px solid var(--border);width:100%;display:flex;justify-content:center}
-.sb-item{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;position:relative;transition:all 0.15s;color:var(--text-3);user-select:none;flex-shrink:0}
-.sb-item:hover{background:rgba(255,255,255,0.08);color:var(--text);transform:scale(1.07)}
-.sb-item.active{background:rgba(255,255,255,0.10);color:var(--text);box-shadow:0 0 16px var(--item-color,var(--nexus)),inset 0 0 12px rgba(255,255,255,0.04)}
-.sb-item.active::before{content:'';position:absolute;left:-1px;top:15%;height:70%;width:3px;border-radius:0 4px 4px 0;background:var(--item-color,var(--nexus));box-shadow:0 0 12px var(--item-color,var(--nexus)),0 0 24px var(--item-color,var(--nexus))}
-.sb-item[data-tooltip]::after{content:attr(data-tooltip);position:absolute;left:calc(100% + 14px);top:50%;transform:translateY(-50%);background:#13132a;color:var(--text);padding:6px 13px;border-radius:8px;font-size:12px;font-family:'Outfit',sans-serif;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 0.18s,transform 0.18s;transform:translateY(-50%) translateX(-4px);border:1px solid var(--border-md);z-index:200;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.04)}
-.sb-item:hover[data-tooltip]::after{opacity:1;transform:translateY(-50%) translateX(0)}
-.sb-item:hover[data-tooltip]::after{opacity:1}
-.sb-divider{width:32px;height:1px;background:var(--border);margin:6px 0;flex-shrink:0}
+#sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);height:100%;background:rgba(7,7,16,0.98);border-right:1px solid rgba(99,102,241,0.12);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;position:relative;z-index:50;box-shadow:1px 0 0 rgba(99,102,241,0.06),4px 0 24px rgba(0,0,0,0.4);transition:width .25s cubic-bezier(.4,0,.2,1),min-width .25s cubic-bezier(.4,0,.2,1)}
+#sidebar.collapsed{width:var(--sidebar-collapsed);min-width:var(--sidebar-collapsed)}
+.sb-top{padding:13px 12px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px;flex-shrink:0}
+.sb-brand{font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,#F2F2F2 0%,#ABABAB 55%,#6A6A6A 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;flex:1;transition:opacity .2s}
+#sidebar.collapsed .sb-brand{opacity:0;width:0;overflow:hidden}
+.sb-collapse-btn{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-3);flex-shrink:0;transition:all .15s;background:transparent;border:none}
+.sb-collapse-btn:hover{color:var(--text);background:rgba(255,255,255,0.07)}
+.sb-collapse-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;transition:transform .25s}
+#sidebar.collapsed .sb-collapse-btn svg{transform:scaleX(-1)}
+.sb-nav{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;padding:6px 8px;gap:1px}
+.sb-nav::-webkit-scrollbar{width:0}
+.sb-bottom{padding:8px 8px 12px;border-top:1px solid var(--border);flex-shrink:0}
+.sb-group-label{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--text-3);padding:10px 8px 4px;white-space:nowrap;overflow:hidden;opacity:0.55;flex-shrink:0;transition:opacity .2s,height .25s,padding .25s}
+#sidebar.collapsed .sb-group-label{opacity:0;height:0;padding:0;margin:0;pointer-events:none}
+.sb-item{width:100%;height:36px;border-radius:8px;display:flex;align-items:center;gap:9px;cursor:pointer;font-size:16px;position:relative;transition:background .15s,box-shadow .15s;color:var(--text-3);user-select:none;padding:0 8px;flex-shrink:0;overflow:hidden;white-space:nowrap;background:transparent;border:none}
+.sb-icon{font-size:16px;flex-shrink:0;width:20px;text-align:center;line-height:1;transition:transform .15s}
+.sb-label{font-size:12.5px;font-weight:500;font-family:'Outfit',sans-serif;color:var(--text-3);transition:color .15s,opacity .2s,width .25s;white-space:nowrap;overflow:hidden}
+#sidebar.collapsed .sb-label{opacity:0;width:0}
+.sb-item:hover{background:rgba(255,255,255,0.07)}
+.sb-item:hover .sb-label,.sb-item:hover .sb-icon{color:var(--text)}
+.sb-item:hover .sb-icon{transform:scale(1.1)}
+.sb-item.active{background:rgba(255,255,255,0.09);box-shadow:0 0 14px color-mix(in srgb,var(--item-color,var(--nexus)) 35%,transparent)}
+.sb-item.active .sb-label{color:var(--text);font-weight:600}
+.sb-item.active::before{content:'';position:absolute;left:0;top:15%;height:70%;width:3px;border-radius:0 4px 4px 0;background:var(--item-color,var(--nexus));box-shadow:0 0 10px var(--item-color,var(--nexus))}
 
 /* MAIN */
 #main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;position:relative;z-index:1}
@@ -486,33 +498,39 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
 <!-- SIDEBAR -->
 <aside id="sidebar">
   <div class="sb-top">
-    <svg width="26" height="26" viewBox="0 0 30 30" fill="none"><defs><linearGradient id="dg" x1="15" y1="2" x2="15" y2="28" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#F2F2F2"/><stop offset="55%" stop-color="#ABABAB"/><stop offset="100%" stop-color="#6A6A6A"/></linearGradient></defs><path d="M3 24V9L12 18L15 5L18 18L27 9V24" stroke="url(#dg)" stroke-width="2.6" stroke-linejoin="miter" stroke-linecap="square" fill="none"/></svg>
+    <svg width="22" height="22" viewBox="0 0 30 30" fill="none" flex-shrink="0"><defs><linearGradient id="dg" x1="15" y1="2" x2="15" y2="28" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#F2F2F2"/><stop offset="55%" stop-color="#ABABAB"/><stop offset="100%" stop-color="#6A6A6A"/></linearGradient></defs><path d="M3 24V9L12 18L15 5L18 18L27 9V24" stroke="url(#dg)" stroke-width="2.6" stroke-linejoin="miter" stroke-linecap="square" fill="none"/></svg>
+    <span class="sb-brand">NEXUS OS</span>
+    <button class="sb-collapse-btn" onclick="toggleSidebar()" title="Recolher">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
   </div>
   <nav class="sb-nav">
-    <div class="sb-item active" data-view="briefing" data-tooltip="Briefing do Dia" style="--item-color:var(--nexus)">☀️</div>
-    <div class="sb-item" data-view="overview" data-tooltip="Métricas" style="--item-color:var(--nexus)">📊</div>
-    <div class="sb-item" data-view="radar" data-tooltip="Radar de Oportunidades" style="--item-color:var(--c-grow)">🎯</div>
-    <div class="sb-item" data-view="pipeline" data-tooltip="Pipeline de Produtos" style="--item-color:var(--c-mono)">📦</div>
-    <div class="sb-item" data-view="biblioteca" data-tooltip="Biblioteca Nexus" style="--item-color:var(--c-cont)">🗂️</div>
-    <div class="sb-divider"></div>
-    <div class="sb-item" data-view="fabrica-produtos" data-tooltip="Fábrica de Produtos" style="--item-color:var(--c-prod)">🏭</div>
-    <div class="sb-item" data-view="fabrica-conteudo" data-tooltip="Fábrica de Conteúdo" style="--item-color:var(--c-cont)">✍️</div>
-    <div class="sb-item" data-view="motor-monetizacao" data-tooltip="Motor de Monetização" style="--item-color:var(--c-mono)">💰</div>
-    <div class="sb-item" data-view="lab-ux" data-tooltip="Lab de UX" style="--item-color:var(--c-ux)">🔬</div>
-    <div class="sb-item" data-view="engenharia" data-tooltip="Engenharia" style="--item-color:var(--c-eng)">⚙️</div>
-    <div class="sb-item" data-view="crescimento" data-tooltip="Crescimento" style="--item-color:var(--c-grow)">📈</div>
-    <div class="sb-item" data-view="all-sectors" data-tooltip="Todos os Setores" style="--item-color:var(--c-all)">⚡</div>
-    <div class="sb-item" data-view="conselho" data-tooltip="Conselho de Titãs" style="--item-color:var(--c-cons)">👑</div>
-    <div class="sb-divider"></div>
-    <div class="sb-item" data-view="brn-overview" data-tooltip="BRN VENDAS" style="--item-color:var(--brn)">🤝</div>
-    <div class="sb-item" data-view="brn-jiujitsu" data-tooltip="Jiu-Jitsu" style="--item-color:var(--brn)">🥋</div>
-    <div class="sb-item" data-view="brn-despluga" data-tooltip="Kit Despluga Pro" style="--item-color:var(--brn)">📚</div>
-    <div class="sb-divider"></div>
-    <div class="sb-item" data-view="integrations" data-tooltip="Integrações" style="--item-color:#64748b">🔌</div>
+    <div class="sb-group-label">NEXUS</div>
+    <div class="sb-item active" data-view="briefing" style="--item-color:var(--nexus)"><span class="sb-icon">☀️</span><span class="sb-label">Briefing do Dia</span></div>
+    <div class="sb-item" data-view="overview" style="--item-color:var(--nexus)"><span class="sb-icon">📊</span><span class="sb-label">Métricas</span></div>
+    <div class="sb-item" data-view="radar" style="--item-color:var(--c-grow)"><span class="sb-icon">🎯</span><span class="sb-label">Radar</span></div>
+    <div class="sb-item" data-view="pipeline" style="--item-color:var(--c-mono)"><span class="sb-icon">📦</span><span class="sb-label">Pipeline</span></div>
+    <div class="sb-item" data-view="biblioteca" style="--item-color:var(--c-cont)"><span class="sb-icon">🗂️</span><span class="sb-label">Biblioteca</span></div>
+    <div class="sb-group-label">SETORES · MAX</div>
+    <div class="sb-item" data-view="fabrica-produtos" style="--item-color:var(--c-prod)"><span class="sb-icon">🏭</span><span class="sb-label">Fábrica de Produtos</span></div>
+    <div class="sb-item" data-view="fabrica-conteudo" style="--item-color:var(--c-cont)"><span class="sb-icon">✍️</span><span class="sb-label">Fábrica de Conteúdo</span></div>
+    <div class="sb-item" data-view="motor-monetizacao" style="--item-color:var(--c-mono)"><span class="sb-icon">💰</span><span class="sb-label">Motor Monetização</span></div>
+    <div class="sb-item" data-view="lab-ux" style="--item-color:var(--c-ux)"><span class="sb-icon">🔬</span><span class="sb-label">Lab de UX</span></div>
+    <div class="sb-item" data-view="engenharia" style="--item-color:var(--c-eng)"><span class="sb-icon">⚙️</span><span class="sb-label">Engenharia</span></div>
+    <div class="sb-item" data-view="crescimento" style="--item-color:var(--c-grow)"><span class="sb-icon">📈</span><span class="sb-label">Crescimento</span></div>
+    <div class="sb-item" data-view="all-sectors" style="--item-color:var(--c-all)"><span class="sb-icon">⚡</span><span class="sb-label">Todos os Setores</span></div>
+    <div class="sb-item" data-view="conselho" style="--item-color:var(--c-cons)"><span class="sb-icon">👑</span><span class="sb-label">Conselho de Titãs</span></div>
+    <div class="sb-group-label">BRN VENDAS</div>
+    <div class="sb-item" data-view="brn-overview" style="--item-color:var(--brn)"><span class="sb-icon">🤝</span><span class="sb-label">Visão Geral</span></div>
+    <div class="sb-item" data-view="brn-jiujitsu" style="--item-color:var(--brn)"><span class="sb-icon">🥋</span><span class="sb-label">Jiu-Jitsu</span></div>
+    <div class="sb-item" data-view="brn-despluga" style="--item-color:var(--brn)"><span class="sb-icon">📚</span><span class="sb-label">Kit Despluga Pro</span></div>
+    <div class="sb-group-label">SISTEMA</div>
+    <div class="sb-item" data-view="integrations" style="--item-color:#64748b"><span class="sb-icon">🔌</span><span class="sb-label">Integrações</span></div>
   </nav>
   <div class="sb-bottom">
-    <div class="sb-item" data-tooltip="Configurações" onclick="openSettings()">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    <div class="sb-item" onclick="openSettings()" style="--item-color:var(--text-2)">
+      <span class="sb-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>
+      <span class="sb-label">Configurações</span>
     </div>
   </div>
 </aside>
@@ -1776,6 +1794,8 @@ function syncSettingsUI(){
 }
 
 function openSettings(){ document.getElementById('settings-backdrop').classList.add('open'); document.getElementById('settings-panel').classList.add('open'); syncSettingsUI(); }
+function toggleSidebar(){ const s=document.getElementById('sidebar'); s.classList.toggle('collapsed'); try{localStorage.setItem('nxs_sb_collapsed',s.classList.contains('collapsed')?'1':'0');}catch(e){} }
+window.toggleSidebar=toggleSidebar;
 function closeSettings(){ document.getElementById('settings-backdrop').classList.remove('open'); document.getElementById('settings-panel').classList.remove('open'); }
 window.openSettings=openSettings; window.closeSettings=closeSettings;
 
@@ -1876,6 +1896,7 @@ function showToast(msg){ const t=document.getElementById('toast');t.textContent=
 applyConfig();
 loadPipeline();
 loadBiblioteca();
+if(localStorage.getItem('nxs_sb_collapsed')==='1') document.getElementById('sidebar').classList.add('collapsed');
 
 })();
 </script>
