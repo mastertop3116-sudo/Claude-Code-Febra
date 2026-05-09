@@ -3430,12 +3430,11 @@ main{position:relative;z-index:auto}
     }
 
     function _gerarComPayload(payload) {
-      // Preenche os campos hidden do formulário
       const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
       set('inp-titulo',    payload.titulo);
       set('inp-subtitulo', payload.subtitulo);
       set('inp-autor',     payload.autor);
-      set('inp-descricao', payload.dor + (payload.transformacao ? ' → ' + payload.transformacao : ''));
+      set('inp-descricao', (payload.dor || '') + (payload.transformacao ? ' → ' + payload.transformacao : ''));
       set('inp-avatar',    payload.publico);
       set('inp-paginas',   payload.paginas);
       set('dna-nome',      payload.titulo);
@@ -3444,12 +3443,21 @@ main{position:relative;z-index:auto}
       set('dna-preco',     payload.preco);
 
       if (typeof window._fcSetType === 'function') window._fcSetType(payload.tipo);
-      const entTab = document.querySelector('.mode-tab[data-mode="ent"]');
-      if (entTab) entTab.click(); else document.body.className = 'mode-ent';
+
+      // Troca para modo ent diretamente — evita clicar em tab que pode crashar listeners
+      if (typeof window.switchMode === 'function') {
+        window.switchMode('ent');
+      } else {
+        currentMode = 'ent';
+        document.body.className = 'mode-ent';
+        const bg = document.getElementById('btn-gerar');
+        if (bg) { bg.style.display = ''; bg.textContent = '🚀 Gerar Infoproduto'; }
+      }
+
       setTimeout(() => {
         const btn = document.getElementById('btn-gerar');
         if (btn) { btn.disabled = false; btn.click(); }
-      }, 300);
+      }, 400);
     }
 
     function _ajustarComPayload(payload) {
@@ -3457,7 +3465,7 @@ main{position:relative;z-index:auto}
       set('inp-titulo',    payload.titulo);
       set('inp-subtitulo', payload.subtitulo);
       set('inp-autor',     payload.autor);
-      set('inp-descricao', payload.dor + (payload.transformacao ? ' → ' + payload.transformacao : ''));
+      set('inp-descricao', (payload.dor || '') + (payload.transformacao ? ' → ' + payload.transformacao : ''));
       set('inp-avatar',    payload.publico);
       set('inp-paginas',   payload.paginas);
       set('dna-nome',      payload.titulo);
@@ -3465,8 +3473,12 @@ main{position:relative;z-index:auto}
       set('dna-publico',   payload.publico);
       set('dna-preco',     payload.preco);
       if (typeof window._fcSetType === 'function') window._fcSetType(payload.tipo);
-      const entTab = document.querySelector('.mode-tab[data-mode="ent"]');
-      if (entTab) entTab.click(); else document.body.className = 'mode-ent';
+      if (typeof window.switchMode === 'function') {
+        window.switchMode('ent');
+      } else {
+        currentMode = 'ent';
+        document.body.className = 'mode-ent';
+      }
     }
 
     async function _send() {
@@ -5073,8 +5085,8 @@ main{position:relative;z-index:auto}
     s('inp-avatar',p.publico);s('inp-paginas',p.paginas);
     s('dna-nome',p.titulo);s('dna-nicho',p.tema);s('dna-publico',p.publico);s('dna-preco',p.preco);
     if(typeof window._fcSetType==='function')window._fcSetType(p.tipo);
-    var et=document.querySelector('.mode-tab[data-mode="ent"]');
-    if(et)et.click();else document.body.className='mode-ent';
+    if(typeof window.switchMode==='function'){window.switchMode('ent');}
+    else{document.body.className='mode-ent';}
   }
   function gerar(p){
     function s(id,v){var e=document.getElementById(id);if(e)e.value=v||'';}
@@ -5083,9 +5095,9 @@ main{position:relative;z-index:auto}
     s('inp-avatar',p.publico);s('inp-paginas',p.paginas);
     s('dna-nome',p.titulo);s('dna-nicho',p.tema);s('dna-publico',p.publico);s('dna-preco',p.preco);
     if(typeof window._fcSetType==='function')window._fcSetType(p.tipo);
-    var et=document.querySelector('.mode-tab[data-mode="ent"]');
-    if(et)et.click();else document.body.className='mode-ent';
-    setTimeout(function(){var b=document.getElementById('btn-gerar');if(b){b.disabled=false;b.click();}},300);
+    if(typeof window.switchMode==='function'){window.switchMode('ent');}
+    else{document.body.className='mode-ent';}
+    setTimeout(function(){var b=document.getElementById('btn-gerar');if(b){b.disabled=false;b.click();}},400);
   }
   function send(){
     var text=inp.value.trim();if(!text||done)return;
