@@ -3216,7 +3216,7 @@ main{position:relative;z-index:auto}
       if (currentMode === 'car') {
         btnGerar.textContent = '📱 Gerar Carrossel';
         genNote.textContent  = '~60s · slides PNG · sem marca d\'água';
-        hintText.textContent = '✏️ Clique no gancho para editar';
+        if (hintText) hintText.textContent = '✏️ Clique no gancho para editar';
         updateSlidePreviewColors();
       } else if (currentMode === 'conv') {
         // conversor — botão principal fica oculto via CSS, apenas limpa o estado
@@ -3239,7 +3239,7 @@ main{position:relative;z-index:auto}
         genNote.style.display  = '';
         btnGerar.textContent = '🚀 Gerar Infoproduto';
         genNote.textContent  = (TYPE_TIME[selectedType] || '~90s') + ' · gerado no servidor · sem marca d\'água';
-        hintText.textContent = '✏️ Clique no título ou subtítulo para editar';
+        if (hintText) hintText.textContent = '✏️ Clique no título ou subtítulo para editar';
         updatePreviewColors();
       }
     });
