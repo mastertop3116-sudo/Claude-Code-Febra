@@ -14,6 +14,7 @@ const TIPOS_VALIDOS = {
   planner:     { label: 'Planner / Organizador',             paginas: 30 },
   cheat_sheet: { label: 'Guia de Consulta Rápida',           paginas: 8  },
   pregacoes:   { label: 'Pack de Pregações Prontas',         paginas: 15 },
+  devocional:  { label: 'Devocional Diário',                 paginas: 7  },
   script_vsl:  { label: 'Script de Vendas (narração em áudio)', paginas: null },
 }
 
@@ -45,7 +46,7 @@ Se tiver contexto suficiente:
   "pronto": true,
   "resposta": "Perfeito! Tenho tudo que preciso. Montando seu [tipo]...",
   "contexto": {
-    "tipo": "ebook|workbook|checklist|planner|cheat_sheet|pregacoes|script_vsl",
+    "tipo": "ebook|workbook|checklist|planner|cheat_sheet|pregacoes|devocional|script_vsl",
     "titulo": "título sugerido ou fornecido",
     "subtitulo": "subtítulo complementar",
     "tema": "nicho/tema do produto",

@@ -26,6 +26,21 @@ Responda APENAS em JSON válido:
   "cta_principal": "string"
 }`
 
+const SYSTEM_DEVOCIONAL = `Você é um escritor cristão brasileiro especialista em devocionais diários.
+Crie um índice onde CADA item é UM DEVOCIONAL COMPLETO PARA UM DIA ESPECÍFICO — nunca teoria, nunca "como fazer devocional".
+Nomeação obrigatória: "Dia 1 — [Tema]", "Dia 2 — [Tema]", etc. Cada tema é uma virtude ou ensinamento bíblico distinto.
+Responda APENAS em JSON válido:
+{
+  "indice": [{
+    "numero": 1,
+    "titulo": "Dia 1 — A Fé que Renova a Manhã",
+    "objetivo": "Versículo: Hebreus 11:1 · Foco: confiar em Deus mesmo sem ver o caminho",
+    "tipo_pagina": "devocional"
+  }],
+  "framework_transformacao": "string",
+  "cta_principal": "string"
+}`
+
 function _parse(raw) {
   try {
     return JSON.parse(raw)
@@ -42,6 +57,11 @@ async function run({ estrategia, tipo, num_paginas, num_capitulos }) {
     const numPrg = Math.min(num_capitulos || 6, GAMMA_MAX_CAPS)
     const prompt = `Tipo: pregações prontas\nNúmero de pregações: ${numPrg}\nPáginas: ${Math.min(parseInt(num_paginas) || 20, 20)}\nEstratégia: ${JSON.stringify(estrategia)}`
     return _parse(await openaiJson(prompt, SYSTEM_PREGACOES))
+  }
+  if (tipo === 'devocional') {
+    const numDias = Math.min(parseInt(num_paginas) || 7, GAMMA_MAX_CAPS)
+    const prompt = `Tipo: devocional diário\nNúmero EXATO de dias: ${numDias}\nGere EXATAMENTE ${numDias} entradas no índice — um devocional por dia, Dia 1 até Dia ${numDias}.\nEstratégia: ${JSON.stringify(estrategia)}`
+    return _parse(await openaiJson(prompt, SYSTEM_DEVOCIONAL))
   }
   // Server-side cap: max 20 páginas alinhado ao Gamma
   const pags = Math.min(parseInt(num_paginas) || 15, 20)

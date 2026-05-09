@@ -39,6 +39,27 @@ JSON APENAS:
   "copy_contracapa": "string (2 parágrafos + CTA)"
 }`
 
+// Usado para devocionais diários — gera o devocional de cada dia, não teoria
+const SYSTEM_DEVOCIONAL = `Escritor cristão brasileiro. Linguagem calorosa, íntima e acessível. Profundidade espiritual sem academicismo.
+
+CADA SEÇÃO É UM DEVOCIONAL COMPLETO PARA UM DIA. Estrutura OBRIGATÓRIA para cada seção:
+1. **📖 Versículo do Dia** — cite o versículo bíblico completo com referência (ex: "Pois Deus amou o mundo de tal maneira... — João 3:16")
+2. **Reflexão** — 3 a 4 parágrafos meditando o versículo e conectando com a vida real do leitor hoje
+3. **🤔 Para pensar hoje:** — lista com 2 a 3 perguntas de reflexão pessoal
+4. **🙏 Oração do Dia** — oração escrita em 1ª pessoa, íntima e direta, 1 a 2 parágrafos
+5. **✅ Desafio do Dia** — 1 ação concreta e específica para praticar neste dia
+
+NÃO escreva teoria sobre como fazer um devocional. NÃO explique o que é oração.
+Escreva O DEVOCIONAL PRONTO — o leitor abre, lê e já está fazendo o devocional.
+Mínimo 300 palavras por seção.
+
+JSON APENAS:
+{
+  "secoes": [{"numero":1,"titulo":"string","gancho":"string (inspiração do dia em até 15 palavras)","conteudo":"string markdown mín 300 palavras","ponto_de_acao":"string (desafio do dia em 1 frase curta)"}],
+  "copy_capa": "string (máx 10 palavras)",
+  "copy_contracapa": "string (2-3 parágrafos + convite caloroso para a jornada de 7 dias)"
+}`
+
 // Usado para pregações prontas — gera sermões completos, não teoria
 const SYSTEM_PREGACOES = `Pregador e escritor cristão brasileiro. Linguagem acessível por faixa etária. Zero jargão acadêmico.
 
@@ -96,8 +117,10 @@ const GAMMA_MAX_SECOES = 10
 async function run({ estrategia, estrutura, autor, tipo, num_paginas }) {
   // Server-side cap: max 20 páginas alinhado ao Gamma
   const paginasNum = Math.min(parseInt(num_paginas) || 0, 20)
-  // ~2 páginas por seção; mín 3, máx GAMMA_MAX_SECOES
-  const maxSecoes = paginasNum > 0 ? Math.min(Math.max(3, Math.round(paginasNum / 2)), GAMMA_MAX_SECOES) : 7
+  // Devocional: 1 página = 1 dia; outros tipos: ~2 páginas por seção
+  const maxSecoes = tipo === 'devocional'
+    ? Math.min(paginasNum || 7, GAMMA_MAX_SECOES)
+    : paginasNum > 0 ? Math.min(Math.max(3, Math.round(paginasNum / 2)), GAMMA_MAX_SECOES) : 7
 
   const key = _cacheKey(estrategia, estrutura, autor, tipo, maxSecoes)
   if (_cache.has(key)) {
@@ -105,14 +128,21 @@ async function run({ estrategia, estrutura, autor, tipo, num_paginas }) {
     return _cache.get(key)
   }
 
-  const systemPrompt = tipo === 'pregacoes' ? SYSTEM_PREGACOES : PRO_TYPES.has(tipo) ? SYSTEM_PRO : SYSTEM_FLASH
+  const systemPrompt = tipo === 'devocional' ? SYSTEM_DEVOCIONAL
+    : tipo === 'pregacoes' ? SYSTEM_PREGACOES
+    : PRO_TYPES.has(tipo) ? SYSTEM_PRO
+    : SYSTEM_FLASH
 
   // Limita o índice passado ao arquiteto para respeitar maxSecoes
   const indiceReduzido = estrutura?.indice
     ? { ...estrutura, indice: estrutura.indice.slice(0, maxSecoes) }
     : estrutura
 
-  const prompt = `Autor: ${autor}\nTipo: ${tipo}\nNúmero máximo de seções: ${maxSecoes}\nEstratégia: ${JSON.stringify(estrategia)}\nEstrutura: ${JSON.stringify(indiceReduzido)}\nEscreva exatamente ${maxSecoes} seções (não mais que isso).`
+  const extraDevocional = tipo === 'devocional'
+    ? `\nIMPORTANTE: Escreva cada seção como um DEVOCIONAL COMPLETO para aquele dia específico. Inclua versículo, reflexão, perguntas, oração e desafio. NÃO escreva teoria sobre como fazer devocional.`
+    : ''
+
+  const prompt = `Autor: ${autor}\nTipo: ${tipo}\nNúmero máximo de seções: ${maxSecoes}\nEstratégia: ${JSON.stringify(estrategia)}\nEstrutura: ${JSON.stringify(indiceReduzido)}\nEscreva exatamente ${maxSecoes} seções (não mais que isso).${extraDevocional}`
 
   console.log(`[copywriter] tipo=${tipo} maxSecoes=${maxSecoes} → OpenAI gpt-4o-mini`)
   const result = await _callModel(systemPrompt, prompt)
