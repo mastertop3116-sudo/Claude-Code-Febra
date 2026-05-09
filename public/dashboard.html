@@ -467,6 +467,45 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
 .view.active .radar-scroll,.view.active .pipeline-scroll,.view.active .int-scroll,
 .view.active .board-scroll{animation:fadeIn .25s ease}
 
+/* ASSISTENTE FLUTUANTE */
+#assist-btn{position:fixed;bottom:24px;right:24px;z-index:700;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--nexus),#8b5cf6);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(99,102,241,0.5),0 0 0 1px rgba(99,102,241,0.3);transition:all .2s;flex-shrink:0}
+#assist-btn:hover{transform:scale(1.08);box-shadow:0 6px 32px rgba(99,102,241,0.65),0 0 0 1px rgba(99,102,241,0.5)}
+#assist-btn svg{width:22px;height:22px;fill:#fff}
+#assist-btn .assist-unread{position:absolute;top:2px;right:2px;width:10px;height:10px;border-radius:50%;background:#ef4444;border:2px solid var(--bg);display:none}
+#assist-panel{position:fixed;bottom:86px;right:24px;z-index:699;width:360px;max-height:520px;background:var(--surface);border:1px solid var(--border-md);border-radius:16px;box-shadow:0 24px 64px rgba(0,0,0,.7),0 0 0 1px rgba(99,102,241,0.1);display:flex;flex-direction:column;overflow:hidden;transform:translateY(12px) scale(.97);opacity:0;pointer-events:none;transition:all .22s cubic-bezier(.4,0,.2,1)}
+#assist-panel.open{transform:translateY(0) scale(1);opacity:1;pointer-events:all}
+.assist-header{padding:14px 16px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.assist-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--nexus),#8b5cf6);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.assist-avatar svg{width:16px;height:16px;fill:#fff}
+.assist-title{font-size:13px;font-weight:700;font-family:'Bricolage Grotesque',sans-serif}
+.assist-subtitle{font-size:10px;color:var(--brn);display:flex;align-items:center;gap:4px}
+.assist-close{margin-left:auto;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-3);background:transparent;border:none;font-size:16px;transition:all .15s}
+.assist-close:hover{background:rgba(255,255,255,.07);color:var(--text)}
+.assist-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;min-height:200px}
+.assist-msgs::-webkit-scrollbar{width:0}
+.assist-msg{display:flex;flex-direction:column;max-width:88%}
+.assist-msg.user{align-self:flex-end;align-items:flex-end}
+.assist-msg.ai{align-self:flex-start;align-items:flex-start}
+.assist-bubble{padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.5;word-break:break-word}
+.assist-msg.user .assist-bubble{background:var(--nexus);color:#fff;border-radius:14px 14px 4px 14px}
+.assist-msg.ai .assist-bubble{background:var(--elevated);border:1px solid var(--border);border-radius:4px 14px 14px 14px;color:var(--text-2)}
+.assist-actions{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.assist-action-btn{padding:4px 11px;border-radius:20px;background:var(--nexus-dim);border:1px solid rgba(99,102,241,.3);color:var(--nexus);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s}
+.assist-action-btn:hover{background:var(--nexus-glow)}
+.assist-typing{display:flex;align-items:center;gap:5px;padding:9px 13px;background:var(--elevated);border:1px solid var(--border);border-radius:4px 14px 14px 14px;align-self:flex-start}
+.assist-td{width:5px;height:5px;border-radius:50%;background:var(--text-3);animation:tdBounce 1.2s infinite}
+.assist-td:nth-child(2){animation-delay:.2s}.assist-td:nth-child(3){animation-delay:.4s}
+.assist-suggestions{padding:0 10px 8px;display:flex;gap:5px;flex-wrap:wrap;flex-shrink:0}
+.assist-sug{padding:5px 11px;border-radius:20px;background:var(--elevated);border:1px solid var(--border-md);font-size:11px;color:var(--text-3);cursor:pointer;transition:all .15s;white-space:nowrap}
+.assist-sug:hover{border-color:var(--nexus);color:var(--nexus);background:var(--nexus-dim)}
+.assist-input-row{padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end;flex-shrink:0}
+.assist-input{flex:1;background:var(--elevated);border:1px solid var(--border-md);border-radius:10px;padding:9px 13px;color:var(--text);font-family:'Outfit',sans-serif;font-size:13px;resize:none;min-height:38px;max-height:100px;outline:none;line-height:1.4;transition:border-color .2s}
+.assist-input:focus{border-color:var(--nexus)}
+.assist-input::placeholder{color:var(--text-3)}
+.assist-send{width:36px;height:36px;border-radius:9px;background:var(--nexus);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s}
+.assist-send:hover{opacity:.85}.assist-send:disabled{opacity:.3;cursor:not-allowed}
+.assist-send svg{width:15px;height:15px;fill:#fff}
+
 /* BOARD */
 #view-board{background:var(--bg)}
 .board-scroll{flex:1;overflow-x:auto;overflow-y:hidden;padding:20px 24px}
@@ -1091,6 +1130,35 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
     </div>
   </div>
   <div class="sp-footer"><div class="sp-version">Nexus OS · v3.0 · <span id="sp-session-id" style="opacity:.5"></span></div></div>
+</div>
+
+<!-- ASSISTENTE FLUTUANTE -->
+<button id="assist-btn" onclick="toggleAssist()" title="Assistente MAX">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" style="display:none"/><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+  <div class="assist-unread" id="assist-unread"></div>
+</button>
+<div id="assist-panel">
+  <div class="assist-header">
+    <div class="assist-avatar"><svg viewBox="0 0 30 30"><path d="M3 24V9L12 18L15 5L18 18L27 9V24" stroke="#fff" stroke-width="2.5" fill="none" stroke-linejoin="miter" stroke-linecap="square"/></svg></div>
+    <div>
+      <div class="assist-title">MAX Assistente</div>
+      <div class="assist-subtitle"><span style="width:5px;height:5px;border-radius:50%;background:var(--brn);display:inline-block"></span>Online agora</div>
+    </div>
+    <button class="assist-close" onclick="toggleAssist()">✕</button>
+  </div>
+  <div class="assist-msgs" id="assist-msgs"></div>
+  <div class="assist-suggestions" id="assist-sugs">
+    <div class="assist-sug" onclick="assistFill(this.textContent)">Adicionar card no board</div>
+    <div class="assist-sug" onclick="assistFill(this.textContent)">Ver métricas de hoje</div>
+    <div class="assist-sug" onclick="assistFill(this.textContent)">Gerar ideia de oferta</div>
+    <div class="assist-sug" onclick="assistFill(this.textContent)">O que devo priorizar hoje?</div>
+  </div>
+  <div class="assist-input-row">
+    <textarea class="assist-input" id="assist-input" placeholder="O que você precisa?" rows="1" oninput="autoResize(this)" onkeydown="if((event.metaKey||event.ctrlKey)&&event.key==='Enter'){event.preventDefault();sendAssist()}"></textarea>
+    <button class="assist-send" id="assist-send-btn" onclick="sendAssist()">
+      <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+    </button>
+  </div>
 </div>
 
 <!-- CARD MODAL -->
@@ -2019,6 +2087,159 @@ document.addEventListener('keydown',e=>{
   if((e.metaKey||e.ctrlKey)&&e.key==='k'){ e.preventDefault(); openCmdBar(); }
   if(e.key==='Escape'&&document.getElementById('cmd-overlay').classList.contains('open')) closeCmdBar();
 });
+
+// ─── ASSISTENTE FLUTUANTE ──────────────────────
+let assistOpen = false;
+let assistBusy = false;
+let assistGreeted = false;
+
+function toggleAssist(){
+  assistOpen = !assistOpen;
+  document.getElementById('assist-panel').classList.toggle('open', assistOpen);
+  document.getElementById('assist-unread').style.display = 'none';
+  if(assistOpen && !assistGreeted){
+    assistGreeted = true;
+    const hour = new Date().getHours();
+    const greet = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite';
+    assistAppend('ai', `${greet}, Rodrigo! Sou o MAX Assistente. Posso adicionar cards no board, criar tarefas, navegar entre seções, responder perguntas sobre o negócio — é só pedir.`);
+  }
+  if(assistOpen) setTimeout(()=>document.getElementById('assist-input')?.focus(), 250);
+}
+window.toggleAssist = toggleAssist;
+
+function assistFill(text){ const el=document.getElementById('assist-input'); if(el){el.value=text;el.focus();autoResize(el);} }
+window.assistFill = assistFill;
+
+function assistAppend(role, text, actions){
+  const box = document.getElementById('assist-msgs');
+  if(!box) return;
+  const wrap = document.createElement('div');
+  wrap.className = `assist-msg ${role}`;
+  const bubble = document.createElement('div');
+  bubble.className = 'assist-bubble';
+  bubble.innerHTML = role==='ai' ? renderMD(text) : `<span>${esc(text)}</span>`;
+  wrap.appendChild(bubble);
+  if(actions?.length){
+    const row = document.createElement('div');
+    row.className = 'assist-actions';
+    actions.forEach(a=>{
+      const btn = document.createElement('button');
+      btn.className = 'assist-action-btn';
+      btn.textContent = a.label;
+      btn.onclick = ()=>{ a.fn(); btn.textContent='✓ Feito'; btn.disabled=true; };
+      row.appendChild(btn);
+    });
+    wrap.appendChild(row);
+  }
+  box.appendChild(wrap);
+  box.scrollTop = box.scrollHeight;
+  return wrap;
+}
+
+function assistShowTyping(){
+  const box=document.getElementById('assist-msgs');
+  const el=document.createElement('div');
+  el.id='assist-typing';
+  el.className='assist-typing';
+  el.innerHTML='<div class="assist-td"></div><div class="assist-td"></div><div class="assist-td"></div>';
+  box.appendChild(el); box.scrollTop=box.scrollHeight;
+}
+function assistHideTyping(){ document.getElementById('assist-typing')?.remove(); }
+
+// Detecta ações locais na mensagem do usuário antes de ir pra API
+function detectLocalAction(msg){
+  const m = msg.toLowerCase();
+  // Adicionar card no board
+  const addMatch = m.match(/adiciona?(?:r)?\s+(?:card\s+)?[""']?(.+?)[""']?\s+(?:no\s+board|no\s+trello|na\s+coluna)\s+[""']?(.+?)[""']?$/i)
+    || m.match(/(?:cria?r?\s+card|novo\s+card)[:\s]+[""']?(.+?)[""']?\s+(?:em|na?|no)\s+[""']?(.+?)[""']?$/i);
+  if(addMatch){
+    const title = addMatch[1].trim();
+    const colHint = addMatch[2].trim().toLowerCase();
+    return {type:'addCard', title, colHint};
+  }
+  // Navegar
+  const navMap = {
+    'briefing':['briefing','início','inicio','home'],
+    'overview':['métrica','metrica','receita','vendas'],
+    'board':['board','trello','ofertas'],
+    'pipeline':['pipeline','produto'],
+    'biblioteca':['biblioteca','respostas salvas'],
+    'radar':['radar','oportunidade'],
+    'integrations':['integraç','integrac'],
+    'conselho':['conselho','titã'],
+    'all-sectors':['todos os setores','consenso'],
+  };
+  for(const [view, keys] of Object.entries(navMap)){
+    if(keys.some(k=>m.includes(k))){
+      if(m.match(/\b(ir|abrir?|mostrar?|ver|navegar?|abre)\b/)) return {type:'navigate', view};
+    }
+  }
+  return null;
+}
+
+async function sendAssist(){
+  if(assistBusy) return;
+  const inp = document.getElementById('assist-input');
+  const msg = inp?.value?.trim();
+  if(!msg) return;
+  inp.value=''; inp.style.height='auto';
+  assistBusy = true;
+  document.getElementById('assist-send-btn').disabled = true;
+  document.getElementById('assist-sugs').style.display = 'none';
+
+  assistAppend('user', msg);
+  assistShowTyping();
+
+  // Tenta detectar ação local
+  const local = detectLocalAction(msg);
+
+  try {
+    const r = await fetch('/api/dashboard/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        sector:'crescimento',
+        message: `[DASHBOARD ASSIST] O usuário Rodrigo pediu: "${msg}"\n\nVocê é o MAX Assistente integrado ao dashboard Nexus OS. Responda de forma direta e útil. Se for uma ação de dashboard (adicionar card, navegar, etc.), confirme que será executada e dê uma resposta curta (máximo 3 frases). Não use saudações longas.`,
+        session_id: SESSION
+      })
+    });
+    const d = await r.json();
+    assistHideTyping();
+
+    // Monta ações com base na detecção local
+    const actions = [];
+    if(local?.type === 'addCard'){
+      const col = boardData?.cols?.find(c=>c.title.toLowerCase().includes(local.colHint)) || boardData?.cols?.[0];
+      if(col){
+        actions.push({
+          label: `+ Adicionar "${local.title}" em ${col.title}`,
+          fn: ()=>{
+            if(!boardData) return;
+            const card={id:'card'+Date.now(),col:col.id,title:local.title,desc:'',cover:'',labels:[],checklist:[]};
+            boardData.cards.push(card);
+            saveBoardData();
+            if(currentView==='board') renderBoard();
+            showToast(`✓ Card adicionado em "${col.title}"`);
+          }
+        });
+      }
+    } else if(local?.type === 'navigate'){
+      actions.push({label:`Ir para ${VIEW_TITLES[local.view]||local.view}`, fn:()=>navigate(local.view)});
+    }
+
+    assistAppend('ai', d.response || d.message || 'Feito!', actions);
+    if(!assistOpen){
+      document.getElementById('assist-unread').style.display = 'block';
+    }
+  } catch(e){
+    assistHideTyping();
+    assistAppend('ai', 'Erro ao conectar com o MAX. Tente novamente.');
+  }
+
+  assistBusy = false;
+  document.getElementById('assist-send-btn').disabled = false;
+}
+window.sendAssist = sendAssist;
 
 // ─── BOARD DE OFERTAS ──────────────────────────
 const BOARD_LABELS = [
