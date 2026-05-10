@@ -3430,54 +3430,56 @@ main{position:relative;z-index:auto}
     }
 
     async function _gerarComPayload(payload) {
-      if (typeof window._fcSetType === 'function' && payload.tipo) window._fcSetType(payload.tipo);
-
-      const apiPayload = {
-        tipo:      payload.tipo || selectedType,
-        titulo:    payload.titulo,
-        subtitulo: payload.subtitulo || '',
-        autor:     payload.autor || '',
-        descricao: (payload.dor || '') + (payload.transformacao ? ' → ' + payload.transformacao : ''),
-        avatar:    payload.publico || '',
-        paginas:   parseInt(payload.paginas) || 15,
-        temaKey:   selectedTheme,
-        formato:   selectedFmt,
-        cabecalho: { ativo: false, texto: '' },
-        rodape:    { ativo: false, texto: '', numeroPagina: true, copyright: '' },
-        produto: {
-          nome:         payload.titulo,
-          nicho:        payload.tema || '',
-          publico_alvo: payload.publico || '',
-          preco:        payload.preco || '',
-          relatorio:    '',
-        },
-      };
-
-      hideErr();
-      setProgress(2, 'Conectando ao servidor…');
-      document.getElementById('overlay-prog').classList.add('show');
-      _startElapsed();
-
-      const _DICAS = [
-        '💡 Títulos com números ímpares (3, 7, 9) convertem até 36% mais.',
-        '✏️ O conteúdo gerado é seu ponto de partida. Edite e injete sua voz antes de publicar.',
-        '🚀 Entregáveis bem estruturados aumentam o valor percebido do seu produto até 3×.',
-      ];
-      let _dicaIdx = 0;
-      const _tipEl = document.getElementById('gen-tip');
-      if (_tipEl) _tipEl.textContent = _DICAS[0];
-      const _dicaTimer = setInterval(() => {
-        if (!_tipEl) return;
-        _tipEl.style.opacity = '0';
-        setTimeout(() => {
-          _dicaIdx = (_dicaIdx + 1) % _DICAS.length;
-          _tipEl.textContent = _DICAS[_dicaIdx];
-          _tipEl.style.opacity = '1';
-        }, 400);
-      }, 12000);
-      const _stopDicas = () => { clearInterval(_dicaTimer); if (_tipEl) _tipEl.style.opacity = '0'; };
-
+      let _stopDicas = () => {};
       try {
+        if (typeof window._fcSetType === 'function' && payload.tipo) window._fcSetType(payload.tipo);
+        if (typeof window.switchMode === 'function') window.switchMode('chat');
+
+        const apiPayload = {
+          tipo:      payload.tipo || selectedType,
+          titulo:    payload.titulo,
+          subtitulo: payload.subtitulo || '',
+          autor:     payload.autor || '',
+          descricao: (payload.dor || '') + (payload.transformacao ? ' → ' + payload.transformacao : ''),
+          avatar:    payload.publico || '',
+          paginas:   parseInt(payload.paginas) || 15,
+          temaKey:   selectedTheme,
+          formato:   selectedFmt,
+          cabecalho: { ativo: false, texto: '' },
+          rodape:    { ativo: false, texto: '', numeroPagina: true, copyright: '' },
+          produto: {
+            nome:         payload.titulo,
+            nicho:        payload.tema || '',
+            publico_alvo: payload.publico || '',
+            preco:        payload.preco || '',
+            relatorio:    '',
+          },
+        };
+
+        hideErr();
+        setProgress(2, 'Conectando ao servidor…');
+        document.getElementById('overlay-prog').classList.add('show');
+        _startElapsed();
+
+        const _DICAS = [
+          '💡 Títulos com números ímpares (3, 7, 9) convertem até 36% mais.',
+          '✏️ O conteúdo gerado é seu ponto de partida. Edite e injete sua voz antes de publicar.',
+          '🚀 Entregáveis bem estruturados aumentam o valor percebido do seu produto até 3×.',
+        ];
+        let _dicaIdx = 0;
+        const _tipEl = document.getElementById('gen-tip');
+        if (_tipEl) _tipEl.textContent = _DICAS[0];
+        const _dicaTimer = setInterval(() => {
+          if (!_tipEl) return;
+          _tipEl.style.opacity = '0';
+          setTimeout(() => {
+            _dicaIdx = (_dicaIdx + 1) % _DICAS.length;
+            _tipEl.textContent = _DICAS[_dicaIdx];
+            _tipEl.style.opacity = '1';
+          }, 400);
+        }, 12000);
+        _stopDicas = () => { clearInterval(_dicaTimer); if (_tipEl) _tipEl.style.opacity = '0'; };
+
         const initRes = await fetch('/api/criar', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -3514,7 +3516,7 @@ main{position:relative;z-index:auto}
 
       } catch (err) {
         _stopDicas(); _stopElapsed();
-        document.getElementById('overlay-prog').classList.remove('show');
+        document.getElementById('overlay-prog')?.classList.remove('show');
         const rawMsg = err.message || '';
         const friendlyMsg = rawMsg.includes('500') ? 'Erro no servidor — o conteúdo pode ser muito longo. Tente reduzir o nº de páginas.' :
           rawMsg.includes('429') ? 'Muitas requisições. Aguarde 30 segundos e tente novamente.' :
