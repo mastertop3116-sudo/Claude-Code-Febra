@@ -1283,6 +1283,36 @@ const MCP_TOOLS = [
     description: 'Lista os produtos ativos da BRN VENDAS com preços, links de compra e credenciais da área de membros.',
     inputSchema: { type: 'object', properties: {} }
   },
+  {
+    name: 'nexus_forge',
+    description: 'Gera um infoproduto completo (ebook, workbook, checklist, planner, pack de pregações, devocional) usando o Nexus Forge com Gamma AI + OpenAI. Retorna o link do documento e a copy da contracapa.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        tipo: {
+          type: 'string',
+          enum: ['ebook','workbook','checklist','planner','cheat_sheet','pregacoes','devocional'],
+          description: 'Tipo do infoproduto'
+        },
+        titulo:    { type: 'string', description: 'Título do produto' },
+        descricao: { type: 'string', description: 'Nicho, tema e público-alvo do produto' },
+        paginas:   { type: 'number', description: 'Número de páginas (máx 20, padrão 15)' },
+        autor:     { type: 'string', description: 'Nome do autor ou marca (opcional)' }
+      },
+      required: ['tipo','titulo','descricao']
+    }
+  },
+  {
+    name: 'nexus_max',
+    description: 'Conversa com o MAX Assistente — IA executiva da Nexus com memória persistente da empresa. Use para consultas estratégicas, tarefas, relatórios e decisões que precisam de contexto completo do negócio.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        mensagem: { type: 'string', description: 'Sua pergunta, pedido ou tarefa para o MAX' }
+      },
+      required: ['mensagem']
+    }
+  },
 ];
 
 async function executeMcpTool(name, args) {
@@ -1327,6 +1357,67 @@ async function executeMcpTool(name, args) {
 
   if (name === 'nexus_produtos_brn') {
     return `**Produtos BRN VENDAS**\n\n🥋 **Dinâmicas de Jiu-Jitsu** (+250 dinâmicas)\n- Premium R$27: https://ggcheckout.com.br/checkout/v5/wS3VUYi7LXGVN1gaDkzz\n- Recuperação R$19,90: https://www.ggcheckout.com/checkout/v5/lgLfIj546p8rnNxbyemz\n- Básico R$10: https://www.ggcheckout.com/checkout/v5/U5cywWzxZVWT5yxnZoCo\n- Área de membros: https://areadinamicas.netlify.app/ | Senha: jiujitsu2026\n\n📚 **Kit Despluga Pro** (+500 atividades BNCC)\n- Premium R$27: https://ggcheckout.app/checkout/v5/Nxbc5ow9sG4bxjZaYT1i\n- Recuperação R$17,90: https://ggcheckout.app/checkout/v5/LpRmHzX7GSv9qlS0zKdw\n- Básico R$10: https://ggcheckout.app/checkout/v5/d3reJiARwhAh5TJH7YFK\n- Área de membros: https://areadespluga.netlify.app/area/ | Senha: 2026`;
+  }
+
+  if (name === 'nexus_forge') {
+    const { generate } = require('./departments/creative/deliverable_generator');
+    const resultado = await generate({
+      tipo:      args.tipo || 'ebook',
+      titulo:    args.titulo,
+      subtitulo: '',
+      autor:     args.autor || '',
+      descricao: args.descricao || '',
+      avatar:    '',
+      paginas:   Math.min(parseInt(args.paginas) || 15, 20),
+      temaKey:   'bemestar',
+      formato:   'pdf',
+      cabecalho: { ativo: false, texto: '' },
+      rodape:    { ativo: false, texto: '', numeroPagina: true, copyright: '' },
+      produto: {
+        nome:         args.titulo,
+        nicho:        args.descricao || '',
+        publico_alvo: '',
+        preco:        '',
+        relatorio:    '',
+      },
+      onProgress: () => {},
+    });
+
+    let msg = `✅ **"${resultado.titulo}"** gerado com sucesso!\n\n`;
+    if (resultado.gammaUrl)       msg += `📄 **Abrir no Gamma:** ${resultado.gammaUrl}\n`;
+    if (resultado.gammaSource)    msg += `✦ Gerado com Gamma AI\n`;
+    if (resultado.gammaError)     msg += `⚠ Gamma indisponível — gerado via PDFKit\n`;
+    if (resultado.copyContracapa) msg += `\n**Copy da contracapa:**\n${resultado.copyContracapa}`;
+    return msg;
+  }
+
+  if (name === 'nexus_max') {
+    const { openaiChat } = require('./integrations/openai');
+    const { createClient } = require('@supabase/supabase-js');
+    const _supa = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY);
+
+    let memoriaCtx = '';
+    try {
+      const { data: mems } = await _supa.from('max_memory').select('key,value').order('updated_at', { ascending: false }).limit(40);
+      if (mems?.length) memoriaCtx = '\n\nMemória da empresa:\n' + mems.map(m => `- ${m.key}: ${m.value}`).join('\n');
+    } catch (_) {}
+
+    const system = `Você é o MAX, assistente executivo da Nexus Digital Holding. Presidente: Rodrigo Cruz. Parceiro BRN: Bruno.
+Você tem acesso à memória persistente da empresa e responde com profundidade estratégica.
+Ao aprender algo importante, registre com [M: chave → valor].${memoriaCtx}`;
+
+    const resposta = await openaiChat([
+      { role: 'system', content: system },
+      { role: 'user', content: args.mensagem },
+    ]);
+
+    const matches = [...resposta.matchAll(/\[M:\s*([^\]→]+?)\s*→\s*([^\]]+?)\]/g)];
+    for (const [, key, value] of matches) {
+      const k = key.trim().replace(/\s+/g, '_').toLowerCase();
+      try { await _supa.from('max_memory').upsert({ key: k, value: value.trim() }, { onConflict: 'key' }); } catch (_) {}
+    }
+
+    return resposta;
   }
 
   throw new Error(`Ferramenta desconhecida: ${name}`);
