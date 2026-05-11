@@ -1468,6 +1468,208 @@ const ATIV_COLORS = {
   kit_dinamicas:        { primary: '#C2410C', light: '#FFF7ED', accent: '#FB923C', dark: '#7C2D12', tip: '#FFFBEB', tipBorder: '#F59E0B', tipText: '#78350F' },
 }
 
+// ── Gerador de labirinto (DFS) ──
+function _generateMaze(cols, rows) {
+  const grid = Array.from({ length: rows }, () =>
+    Array.from({ length: cols }, () => ({ top: true, right: true, bottom: true, left: true, visited: false }))
+  )
+  function carve(c, r) {
+    grid[r][c].visited = true
+    const dirs = [
+      { dc: 0, dr: -1, wall: 'top',    opp: 'bottom' },
+      { dc: 1, dr:  0, wall: 'right',  opp: 'left'   },
+      { dc: 0, dr:  1, wall: 'bottom', opp: 'top'    },
+      { dc: -1,dr:  0, wall: 'left',   opp: 'right'  },
+    ].sort(() => Math.random() - 0.5)
+    for (const { dc, dr, wall, opp } of dirs) {
+      const nc = c + dc, nr = r + dr
+      if (nc >= 0 && nc < cols && nr >= 0 && nr < rows && !grid[nr][nc].visited) {
+        grid[r][c][wall] = false
+        grid[nr][nc][opp] = false
+        carve(nc, nr)
+      }
+    }
+  }
+  carve(0, 0)
+  return grid
+}
+
+// ── Templates visuais ──
+function _drawVisualLabirinto(doc, x, y, w, h, TC, instrucao) {
+  const cols = 5, rows = 5
+  const maze = _generateMaze(cols, rows)
+  const cw = (w - 4) / cols, ch = (h - 28) / rows
+  const ox = x + 2, oy = y + 22
+
+  doc.rect(x, y, w, h).fill('#F8FAFF')
+  doc.fillColor(TC.primary).font('Helvetica-Bold').fontSize(8)
+    .text(instrucao || 'Encontre o caminho do INICIO ate o FIM!', x, y + 5, { width: w, align: 'center' })
+
+  maze.forEach((row, r) => {
+    row.forEach((cell, c) => {
+      const cx = ox + c * cw, cy2 = oy + r * ch
+      doc.save().lineWidth(1.5).strokeColor(TC.dark)
+      if (cell.top)    doc.moveTo(cx, cy2).lineTo(cx + cw, cy2).stroke()
+      if (cell.right)  doc.moveTo(cx + cw, cy2).lineTo(cx + cw, cy2 + ch).stroke()
+      if (cell.bottom) doc.moveTo(cx, cy2 + ch).lineTo(cx + cw, cy2 + ch).stroke()
+      if (cell.left)   doc.moveTo(cx, cy2).lineTo(cx, cy2 + ch).stroke()
+      doc.restore()
+    })
+  })
+  // Outer border
+  doc.rect(ox, oy, cols * cw, rows * ch).lineWidth(2).stroke(TC.primary)
+  // Start marker
+  doc.circle(ox + cw / 2, oy + ch / 2, 7).fill(TC.accent)
+  doc.fillColor('#FFFFFF').font('Helvetica-Bold').fontSize(6).text('IN', ox + 1, oy + ch / 2 - 4, { width: cw, align: 'center' })
+  // End marker
+  doc.rect(ox + (cols - 1) * cw + 4, oy + (rows - 1) * ch + 4, cw - 8, ch - 8).fill(TC.primary)
+  doc.fillColor('#FFFFFF').font('Helvetica-Bold').fontSize(6).text('FIM', ox + (cols - 1) * cw, oy + (rows - 1) * ch + ch / 2 - 4, { width: cw, align: 'center' })
+}
+
+function _drawVisualSequencia(doc, n, x, y, w, h, TC, instrucao) {
+  const count = Math.min(n || 4, 5)
+  const bw = Math.min(62, (w - 20) / count - 8)
+  const bh = 44
+  const totalW = count * bw + (count - 1) * 14
+  const startX = x + (w - totalW) / 2
+  const by = y + (h - bh) / 2 + 6
+
+  doc.rect(x, y, w, h).fill('#F8FAFF')
+  doc.fillColor(TC.primary).font('Helvetica-Bold').fontSize(8)
+    .text(instrucao || 'Numere os passos na ordem correta:', x, y + 5, { width: w, align: 'center' })
+
+  for (let i = 0; i < count; i++) {
+    const bx = startX + i * (bw + 14)
+    doc.roundedRect(bx, by, bw, bh, 5).fill('#FFFFFF')
+    doc.roundedRect(bx, by, bw, bh, 5).lineWidth(1.5).stroke(TC.primary)
+    // Numbered circle at top
+    doc.circle(bx + bw / 2, by - 8, 9).fill(TC.primary)
+    doc.fillColor('#FFFFFF').font('Helvetica-Bold').fontSize(9).text(String(i + 1), bx, by - 14, { width: bw, align: 'center' })
+    // Empty line inside
+    doc.moveTo(bx + 6, by + bh - 12).lineTo(bx + bw - 6, by + bh - 12).lineWidth(0.6).dash(3).stroke('#CCC').undash()
+    if (i < count - 1) {
+      const ax = bx + bw + 4
+      doc.moveTo(ax, by + bh / 2).lineTo(ax + 10, by + bh / 2).lineWidth(1.5).stroke(TC.accent)
+      doc.moveTo(ax + 10, by + bh / 2 - 4).lineTo(ax + 14, by + bh / 2).lineTo(ax + 10, by + bh / 2 + 4).fill(TC.accent)
+    }
+  }
+}
+
+function _drawVisualPadrao(doc, seed, x, y, w, h, TC, instrucao) {
+  const s = (seed || 42) * 1103515245
+  const shapes = ['circle', 'rect', 'diamond']
+  const cols = [TC.primary, TC.accent, TC.dark]
+  const rows2 = 2, cols2 = 7
+  const cw = (w - 16) / cols2, ch = (h - 28) / rows2
+
+  doc.rect(x, y, w, h).fill('#F8FAFF')
+  doc.fillColor(TC.primary).font('Helvetica-Bold').fontSize(8)
+    .text(instrucao || 'Complete o padrao: o que vem a seguir?', x, y + 5, { width: w, align: 'center' })
+
+  for (let r = 0; r < rows2; r++) {
+    for (let c = 0; c < cols2; c++) {
+      const cx = x + 8 + c * cw + cw / 2
+      const cy2 = y + 22 + r * ch + ch / 2
+      const isQ = c === cols2 - 1
+      const idx = ((s + r * 7 + c) % 3 + 3) % 3
+      const sz = Math.min(cw, ch) / 2 - 3
+
+      if (isQ) {
+        doc.circle(cx, cy2, sz + 2).lineWidth(1.5).dash(4).stroke('#AAAAAA').undash()
+        doc.fillColor('#AAAAAA').font('Helvetica-Bold').fontSize(14).text('?', cx - 6, cy2 - 8)
+      } else {
+        doc.fillColor(cols[idx])
+        if (shapes[idx] === 'circle') {
+          doc.circle(cx, cy2, sz).fill()
+        } else if (shapes[idx] === 'rect') {
+          doc.rect(cx - sz, cy2 - sz, sz * 2, sz * 2).fill()
+        } else {
+          doc.moveTo(cx, cy2 - sz).lineTo(cx + sz, cy2).lineTo(cx, cy2 + sz).lineTo(cx - sz, cy2).fill()
+        }
+      }
+    }
+  }
+}
+
+function _drawVisualCifra(doc, seed, x, y, w, h, TC, instrucao) {
+  const SYMS = ['@', '#', '*', '&', '%', '!', '+', '=']
+  const LETS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+  const n = 6
+  const cw = (w - 8) / n
+
+  doc.rect(x, y, w, h).fill('#F8FAFF')
+  doc.fillColor(TC.primary).font('Helvetica-Bold').fontSize(8)
+    .text(instrucao || 'Use a tabela para decifrar a mensagem secreta:', x, y + 5, { width: w, align: 'center' })
+
+  // Table header
+  for (let i = 0; i < n; i++) {
+    const cx = x + 4 + i * cw
+    doc.roundedRect(cx, y + 18, cw - 3, 20, 3).fill(TC.light)
+    doc.fillColor(TC.primary).font('Helvetica-Bold').fontSize(12).text(SYMS[i], cx, y + 20, { width: cw - 3, align: 'center' })
+    doc.roundedRect(cx, y + 40, cw - 3, 16, 3).lineWidth(1).stroke(TC.primary)
+    doc.fillColor('#333').font('Helvetica-Bold').fontSize(10).text(LETS[i], cx, y + 42, { width: cw - 3, align: 'center' })
+  }
+
+  // Encoded word (3 symbols)
+  const word = [SYMS[1], SYMS[4], SYMS[2]]
+  const ww = 36, gap = 10
+  const totalWw = word.length * ww + (word.length - 1) * gap
+  const wordX = x + (w - totalWw) / 2
+  doc.fillColor('#444').font('Helvetica').fontSize(8).text('Mensagem:', x, y + h - 30, { width: w / 3 })
+  word.forEach((sym, i) => {
+    const sx = wordX + i * (ww + gap)
+    doc.roundedRect(sx, y + h - 28, ww, 18, 3).fill('#FFFDE7')
+    doc.roundedRect(sx, y + h - 28, ww, 18, 3).lineWidth(1).stroke('#FBC02D')
+    doc.fillColor(TC.primary).font('Helvetica-Bold').fontSize(14).text(sym, sx, y + h - 26, { width: ww, align: 'center' })
+    doc.moveTo(sx + 4, y + h - 6).lineTo(sx + ww - 4, y + h - 6).lineWidth(0.6).stroke('#999')
+  })
+}
+
+function _drawVisualOrdenar(doc, seed, x, y, w, h, TC, instrucao) {
+  const base = [2, 5, 1, 8, 3]
+  const s = (seed || 7) % 3
+  const nums = [...base.slice(s), ...base.slice(0, s)]
+  const n = nums.length
+  const cw = Math.min(44, (w - 20) / n - 6)
+  const startX = x + (w - n * (cw + 6)) / 2
+
+  doc.rect(x, y, w, h).fill('#F8FAFF')
+  doc.fillColor(TC.primary).font('Helvetica-Bold').fontSize(8)
+    .text(instrucao || 'Ordene os numeros do menor para o maior:', x, y + 5, { width: w, align: 'center' })
+
+  // Shuffled cards
+  doc.fillColor('#555').font('Helvetica').fontSize(7).text('EMBARALHADO:', x + 4, y + 18)
+  nums.forEach((n2, i) => {
+    const cx = startX + i * (cw + 6)
+    doc.roundedRect(cx, y + 26, cw, cw, 4).fill(TC.light)
+    doc.roundedRect(cx, y + 26, cw, cw, 4).lineWidth(1.5).stroke(TC.primary)
+    doc.fillColor(TC.primary).font('Helvetica-Bold').fontSize(18).text(String(n2), cx, y + 30, { width: cw, align: 'center' })
+  })
+
+  // Arrow
+  doc.fillColor(TC.accent).font('Helvetica-Bold').fontSize(18).text('v', x + w / 2 - 5, y + 26 + cw + 2)
+
+  // Empty boxes for answer
+  doc.fillColor('#555').font('Helvetica').fontSize(7).text('ORDEM CORRETA:', x + 4, y + 26 + cw + 20)
+  for (let i = 0; i < n; i++) {
+    const cx = startX + i * (cw + 6)
+    doc.roundedRect(cx, y + 26 + cw + 28, cw, cw).lineWidth(1.5).dash(4).stroke('#BBBBBB').undash()
+  }
+}
+
+function _drawVisualTemplate(doc, ativ, x, y, w, h, TC, fBody, fBold) {
+  const tipo = (ativ.tipo_visual || 'sequencia').toLowerCase()
+  const instrucao = ativ.instrucao_visual || ''
+  const seed = ativ.numero || 1
+
+  if (tipo === 'labirinto')        _drawVisualLabirinto(doc, x, y, w, h, TC, instrucao)
+  else if (tipo === 'sequencia')   _drawVisualSequencia(doc, (ativ.passos || []).length, x, y, w, h, TC, instrucao)
+  else if (tipo === 'padrao')      _drawVisualPadrao(doc, seed * 37, x, y, w, h, TC, instrucao)
+  else if (tipo === 'cifra')       _drawVisualCifra(doc, seed * 13, x, y, w, h, TC, instrucao)
+  else if (tipo === 'ordenar')     _drawVisualOrdenar(doc, seed, x, y, w, h, TC, instrucao)
+  else                             _drawVisualPadrao(doc, seed, x, y, w, h, TC, instrucao)
+}
+
 function _drawAtividadePage(doc, ativ, num, TC, W, H, ML, CW, fBody, fBold, totalItems) {
   doc.addPage({ size: 'A4', margin: 0 })
   doc.rect(0, 0, W, H).fill('#FFFFFF')
@@ -1482,125 +1684,99 @@ function _drawAtividadePage(doc, ativ, num, TC, W, H, ML, CW, fBody, fBold, tota
     .text(ativ.titulo || ('Atividade ' + num), ML + 42, 13, { width: CW - 42, lineGap: 2 })
   const meta = [ativ.ano_escolar, ativ.duracao, ativ.bncc].filter(Boolean).join('  |  ')
   if (meta) {
-    doc.fillColor('#C7D2FE').font(fBody).fontSize(8)
+    doc.fillColor('rgba(255,255,255,0.6)').font(fBody).fontSize(8)
       .text(meta, ML + 42, 36, { width: CW - 80 })
   }
-  doc.fillColor('#C7D2FE').font(fBody).fontSize(7)
+  doc.fillColor('rgba(255,255,255,0.4)').font(fBody).fontSize(7)
     .text(num + ' / ' + totalItems, 0, 40, { width: W - ML - 8, align: 'right' })
 
   // Student fields
-  doc.rect(0, 58, W, 36).fill('#F5F5F5')
-  doc.rect(0, 94, W, 0.5).fill('#D1D5DB')
+  doc.rect(0, 58, W, 32).fill('#F5F5F5')
+  doc.rect(0, 90, W, 0.5).fill('#D1D5DB')
   doc.fillColor('#374151').font(fBody).fontSize(8)
-  doc.text('Aluno(a): ', ML, 68)
-  const aw = doc.widthOfString('Aluno(a): ')
-  doc.moveTo(ML + aw, 78).lineTo(ML + 200, 78).lineWidth(0.6).stroke('#9CA3AF')
-  doc.text('Turma: ', ML + 215, 68)
-  const tw = doc.widthOfString('Turma: ')
-  doc.moveTo(ML + 215 + tw, 78).lineTo(ML + 310, 78).lineWidth(0.6).stroke('#9CA3AF')
-  doc.text('Data: ', ML + 325, 68)
-  const dw = doc.widthOfString('Data: ')
-  doc.moveTo(ML + 325 + dw, 78).lineTo(ML + 460, 78).lineWidth(0.6).stroke('#9CA3AF')
+  doc.text('Aluno(a): ', ML, 65)
+  doc.moveTo(ML + doc.widthOfString('Aluno(a): '), 74).lineTo(ML + 195, 74).lineWidth(0.6).stroke('#9CA3AF')
+  doc.text('Turma: ', ML + 210, 65)
+  doc.moveTo(ML + 210 + doc.widthOfString('Turma: '), 74).lineTo(ML + 300, 74).lineWidth(0.6).stroke('#9CA3AF')
+  doc.text('Data: ', ML + 315, 65)
+  doc.moveTo(ML + 315 + doc.widthOfString('Data: '), 74).lineTo(ML + 445, 74).lineWidth(0.6).stroke('#9CA3AF')
 
-  let cy = 102
+  let cy = 98
   const pad = 8
-  const sectionGap = 6
+  const sectionGap = 5
 
   function sectionHeader(label) {
-    doc.rect(ML, cy, CW, 20).fill(TC.light)
-    doc.rect(ML, cy, 3, 20).fill(TC.primary)
-    doc.fillColor(TC.primary).font(fBold).fontSize(9)
-      .text(label, ML + 10, cy + 6, { width: CW - 16 })
-    cy += 20
+    doc.rect(ML, cy, CW, 18).fill(TC.light)
+    doc.rect(ML, cy, 3, 18).fill(TC.primary)
+    doc.fillColor(TC.primary).font(fBold).fontSize(8)
+      .text(label, ML + 10, cy + 5, { width: CW - 16 })
+    cy += 18
   }
 
-  function textBlock(text) {
-    if (!text) return
-    const h = doc.heightOfString(text, { width: CW - pad * 2, lineGap: 2 })
-    doc.fillColor('#1F2937').font(fBody).fontSize(10)
-      .text(text, ML + pad, cy + pad, { width: CW - pad * 2, lineGap: 2 })
-    cy += h + pad * 2 + sectionGap
-  }
-
-  // Objetivo
+  // Objetivo (compact)
   if (ativ.objetivo) {
     sectionHeader('OBJETIVO')
-    textBlock(ativ.objetivo)
+    const h2 = doc.heightOfString(ativ.objetivo, { width: CW - pad * 2, lineGap: 1 })
+    doc.fillColor('#1F2937').font(fBody).fontSize(9)
+      .text(ativ.objetivo, ML + pad, cy + 4, { width: CW - pad * 2, lineGap: 1 })
+    cy += h2 + 10 + sectionGap
   }
 
-  // Materiais
+  // Materiais (compact, 3 cols)
   if (ativ.materiais && ativ.materiais.length) {
     sectionHeader('MATERIAIS')
-    const matCols = 2
-    const colW = (CW - pad * 2) / matCols
-    const startCy = cy + pad
-    ativ.materiais.forEach((m, i) => {
-      const col = i % matCols
-      const row = Math.floor(i / matCols)
-      const x = ML + pad + col * colW
-      const y = startCy + row * 16
-      doc.circle(x + 4, y + 5, 3).fill(TC.primary)
-      doc.fillColor('#1F2937').font(fBody).fontSize(9)
-        .text(m, x + 12, y, { width: colW - 14 })
+    const matCols = 3, colW = (CW - pad * 2) / matCols
+    const startCy2 = cy + 4
+    ativ.materiais.slice(0, 9).forEach((m, i) => {
+      const col = i % matCols, row = Math.floor(i / matCols)
+      const mx = ML + pad + col * colW, my = startCy2 + row * 14
+      doc.circle(mx + 3, my + 4, 2.5).fill(TC.primary)
+      doc.fillColor('#1F2937').font(fBody).fontSize(8).text(m, mx + 9, my, { width: colW - 11 })
     })
-    const rows = Math.ceil(ativ.materiais.length / matCols)
-    cy += rows * 16 + pad * 2 + sectionGap
+    cy += Math.ceil(ativ.materiais.length / matCols) * 14 + 8 + sectionGap
   }
 
-  // Passo a passo
-  if (ativ.passos && ativ.passos.length) {
-    sectionHeader('PASSO A PASSO')
-    cy += 4
-    ativ.passos.forEach((passo, i) => {
-      if (cy > H - 120) return
-      doc.circle(ML + pad + 8, cy + 7, 9).fill(TC.primary)
-      doc.fillColor('#FFFFFF').font(fBold).fontSize(8)
-        .text(String(i + 1), ML + pad, cy + 3, { width: 18, align: 'center' })
-      const ph = doc.heightOfString(passo, { width: CW - pad * 2 - 26, lineGap: 2 })
-      doc.fillColor('#1F2937').font(fBody).fontSize(10)
-        .text(passo, ML + pad + 22, cy + 1, { width: CW - pad * 2 - 26, lineGap: 2 })
-      cy += Math.max(ph, 18) + 8
+  // ELEMENTO VISUAL — destaque central
+  const visualH = 148
+  if (cy + visualH < H - 100) {
+    sectionHeader('ATIVIDADE')
+    doc.roundedRect(ML, cy, CW, visualH, 6).fill('#FFFFFF')
+    doc.roundedRect(ML, cy, CW, visualH, 6).lineWidth(1.5).stroke(TC.primary)
+    _drawVisualTemplate(doc, ativ, ML + 4, cy + 2, CW - 8, visualH - 4, TC, fBody, fBold)
+    cy += visualH + sectionGap
+  }
+
+  // Passo a passo (compact)
+  if (ativ.passos && ativ.passos.length && cy < H - 120) {
+    sectionHeader('COMO FAZER')
+    cy += 3
+    ativ.passos.slice(0, 3).forEach((passo, i) => {
+      if (cy > H - 80) return
+      doc.circle(ML + pad + 7, cy + 6, 7).fill(TC.primary)
+      doc.fillColor('#FFFFFF').font(fBold).fontSize(7).text(String(i + 1), ML + pad, cy + 2, { width: 15, align: 'center' })
+      const ph = doc.heightOfString(passo, { width: CW - pad * 2 - 22, lineGap: 1 })
+      doc.fillColor('#1F2937').font(fBody).fontSize(9).text(passo, ML + pad + 18, cy + 1, { width: CW - pad * 2 - 22, lineGap: 1 })
+      cy += Math.max(ph, 14) + 7
     })
     cy += sectionGap
   }
 
-  // Responda aqui
-  if (ativ.campos_resposta && ativ.campos_resposta.length) {
-    sectionHeader('RESPONDA AQUI')
-    cy += 6
-    ativ.campos_resposta.forEach(campo => {
-      if (cy > H - 80) return
-      doc.fillColor('#374151').font(fBody).fontSize(9)
-        .text(campo, ML + pad, cy, { width: CW - pad * 2 })
-      cy += 16
-      for (let l = 0; l < 3; l++) {
-        doc.moveTo(ML + pad, cy)
-          .lineTo(ML + CW - pad, cy)
-          .lineWidth(0.5).dash(4, { space: 3 }).stroke('#D1D5DB').undash()
-        cy += 14
-      }
-      cy += 6
-    })
-  }
-
   // Dica do professor
   if (ativ.dica_professor) {
-    const remaining = H - cy - 12
-    if (remaining > 48) {
-      const tipH = Math.min(remaining, Math.max(48, doc.heightOfString(ativ.dica_professor, { width: CW - pad * 3 }) + 32))
+    const remaining = H - cy - 10
+    if (remaining > 42) {
+      const tipH = Math.min(remaining, Math.max(42, doc.heightOfString(ativ.dica_professor, { width: CW - 28 }) + 28))
       doc.rect(ML, cy, CW, tipH).fill(TC.tip)
       doc.rect(ML, cy, 4, tipH).fill(TC.tipBorder)
-      doc.fillColor(TC.tipBorder).font(fBold).fontSize(8)
-        .text('DICA DO PROFESSOR', ML + 12, cy + 8)
-      doc.fillColor(TC.tipText).font(fBody).fontSize(9)
-        .text(ativ.dica_professor, ML + 12, cy + 20, { width: CW - pad * 3, lineGap: 2 })
+      doc.fillColor(TC.tipBorder).font(fBold).fontSize(7).text('DICA DO PROFESSOR', ML + 10, cy + 6)
+      doc.fillColor(TC.tipText).font(fBody).fontSize(8)
+        .text(ativ.dica_professor, ML + 10, cy + 17, { width: CW - 24, lineGap: 1 })
     }
   }
 
-  // Bottom
   doc.rect(0, H - 4, W, 4).fill(TC.primary)
   doc.fillColor('#9CA3AF').font(fBody).fontSize(7)
-    .text('Gerado por Nexus MAX', 0, H - 15, { width: W, align: 'center' })
+    .text('Gerado por Nexus MAX', 0, H - 14, { width: W, align: 'center' })
 }
 
 function _drawPlanoPage(doc, aula, num, TC, W, H, ML, CW, fBody, fBold, totalItems) {
