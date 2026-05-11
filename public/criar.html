@@ -3151,7 +3151,7 @@ main{position:relative;z-index:auto}
   // ---- slide dots generator ----
   function updateSlideDots(count) {
     const container = document.getElementById('slide-dots');
-    container.innerHTML = '';
+    if (!container) return;
     for (let i = 0; i < Math.min(count, 8); i++) {
       const dot = document.createElement('div');
       dot.className = 'slide-dot' + (i === 0 ? ' active' : '');
