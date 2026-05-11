@@ -1920,15 +1920,31 @@ async function sendConsensus(msg){
 }
 
 // ─── BLOCO DE NOTAS ────────────────────────────────────────────────────────
+// Notas — tenta API Supabase, cai para localStorage se tabela não existe
+const NOTAS_LS_KEY='nxs_notas';
+function _notasLS(){ try{return JSON.parse(localStorage.getItem(NOTAS_LS_KEY)||'[]');}catch{return [];} }
+function _saveNotasLS(arr){ localStorage.setItem(NOTAS_LS_KEY,JSON.stringify(arr)); }
+let _notasUseAPI=true;
+
+function _renderNotas(notas){
+  const list=document.getElementById('notes-list');
+  if(!list) return;
+  if(!notas||notas.length===0){list.innerHTML='<div class="notes-loading">Nenhuma nota ainda.</div>';return;}
+  list.innerHTML=notas.map(n=>`<div class="note-item" data-id="${n.id}"><button class="note-item-del" onclick="deleteNota('${n.id}',this.closest('.note-item'))" title="Apagar">✕</button>${esc(n.content)}<div class="note-item-time">${new Date(n.created_at).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</div></div>`).join('');
+}
+
 async function loadNotas(){
   const list=document.getElementById('notes-list');
   if(!list) return;
-  try{
-    const r=await fetch('/api/dashboard/notes');
-    const {notas}=await r.json();
-    if(!notas||notas.length===0){list.innerHTML='<div class="notes-loading">Nenhuma nota ainda.</div>';return;}
-    list.innerHTML=notas.map(n=>`<div class="note-item" data-id="${n.id}"><button class="note-item-del" onclick="deleteNota('${n.id}',this.closest('.note-item'))" title="Apagar">✕</button>${esc(n.content)}<div class="note-item-time">${new Date(n.created_at).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</div></div>`).join('');
-  }catch{list.innerHTML='<div class="notes-loading">Erro ao carregar.</div>';}
+  if(_notasUseAPI){
+    try{
+      const r=await fetch('/api/dashboard/notes');
+      const d=await r.json();
+      if(d.notas){ _renderNotas(d.notas); return; }
+    }catch{}
+    _notasUseAPI=false;
+  }
+  _renderNotas(_notasLS());
 }
 
 async function saveNota(){
@@ -1937,17 +1953,32 @@ async function saveNota(){
   if(!content) return;
   const btn=document.querySelector('.notes-save-btn');
   if(btn){btn.textContent='Salvando...';btn.disabled=true;}
-  try{
-    await fetch('/api/dashboard/notes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content,session_id:SESSION})});
-    ta.value='';
-    await loadNotas();
-  }catch(e){alert('Erro ao salvar: '+e.message);}
-  finally{if(btn){btn.textContent='Salvar nota →';btn.disabled=false;}}
+  const now=new Date().toISOString();
+  if(_notasUseAPI){
+    try{
+      const r=await fetch('/api/dashboard/notes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content,session_id:SESSION})});
+      if(r.ok){ ta.value=''; await loadNotas(); return; }
+    }catch{}
+    _notasUseAPI=false;
+  }
+  // fallback localStorage
+  const notas=_notasLS();
+  notas.unshift({id:'ls-'+Date.now(),content,created_at:now});
+  if(notas.length>50) notas.pop();
+  _saveNotasLS(notas);
+  ta.value='';
+  _renderNotas(notas);
+  if(btn){btn.textContent='Salvar nota →';btn.disabled=false;}
 }
 
 async function deleteNota(id,el){
   el?.remove();
-  await fetch(`/api/dashboard/notes/${id}`,{method:'DELETE'}).catch(()=>{});
+  if(!id.startsWith('ls-')){
+    fetch(`/api/dashboard/notes/${id}`,{method:'DELETE'}).catch(()=>{});
+  } else {
+    const notas=_notasLS().filter(n=>n.id!==id);
+    _saveNotasLS(notas);
+  }
 }
 
 // ─── CONSELHO ──────────────────────────────────
