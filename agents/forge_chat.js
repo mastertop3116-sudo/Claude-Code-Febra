@@ -8,14 +8,17 @@ const { openaiJson } = require('../integrations/openai')
 const { jsonrepair }  = require('jsonrepair')
 
 const TIPOS_VALIDOS = {
-  ebook:       { label: 'Ebook / Guia Completo',             paginas: 15 },
-  workbook:    { label: 'Workbook / Caderno de Exercícios',  paginas: 30 },
-  checklist:   { label: 'Checklist',                         paginas: 8  },
-  planner:     { label: 'Planner / Organizador',             paginas: 30 },
-  cheat_sheet: { label: 'Guia de Consulta Rápida',           paginas: 8  },
-  pregacoes:   { label: 'Pack de Pregações Prontas',         paginas: 15 },
-  devocional:  { label: 'Devocional Diário',                 paginas: 7  },
-  script_vsl:  { label: 'Script de Vendas (narração em áudio)', paginas: null },
+  ebook:                { label: 'Ebook / Guia Completo',                     paginas: 15 },
+  workbook:             { label: 'Workbook / Caderno de Exercícios',           paginas: 30 },
+  checklist:            { label: 'Checklist',                                  paginas: 8  },
+  planner:              { label: 'Planner / Organizador',                      paginas: 30 },
+  cheat_sheet:          { label: 'Guia de Consulta Rápida',                   paginas: 8  },
+  pregacoes:            { label: 'Pack de Pregações Prontas',                  paginas: 15 },
+  devocional:           { label: 'Devocional Diário',                          paginas: 7  },
+  script_vsl:           { label: 'Script de Vendas (narração em áudio)',       paginas: null },
+  atividade_desplugada: { label: 'Kit de Atividades Desplugadas (PDF visual)', paginas: 5  },
+  plano_de_aula:        { label: 'Planos de Aula Completos (PDF visual)',      paginas: 5  },
+  kit_dinamicas:        { label: 'Kit de Dinâmicas Pedagógicas (PDF visual)',  paginas: 5  },
 }
 
 const SYSTEM_COLLECT = `Você é o MAX, especialista em criação de infoprodutos digitais brasileiros da Nexus.
@@ -33,8 +36,9 @@ Tema + tipo + público = suficiente para gerar. Título, transformação e pági
 REGRA #4 — NÃO REPITA O QUE JÁ FOI DITO:
 Leia todo o histórico da conversa antes de perguntar. Se já foi respondido, não pergunte de novo.
 
-TIPOS DISPONÍVEIS: ebook, workbook, checklist, planner, cheat_sheet, pregacoes, devocional, script_vsl
-- Para script_vsl: colete também preço e prova social se não mencionados
+TIPOS DISPONÍVEIS: ebook, workbook, checklist, planner, cheat_sheet, pregacoes, devocional, script_vsl, atividade_desplugada, plano_de_aula, kit_dinamicas
+- Para script_vsl: colete também preço e prova social
+- Para atividade_desplugada / plano_de_aula / kit_dinamicas: colete também ano escolar alvo (ex: 1o ao 3o ano) e numero de atividades desejadas (paginas = numero de atividades) se não mencionados
 
 TOM: parceiro estratégico, direto, confiante — celebre brevemente o que o usuário trouxe e siga em frente.
 

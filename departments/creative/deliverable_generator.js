@@ -1458,10 +1458,439 @@ function _markdownParaGamma(titulo, subtitulo, autor, estrategia, copy) {
 }
 
 // ──────────────────────────────────────────
+// Tipos visuais: atividade_desplugada, plano_de_aula, kit_dinamicas
+// ──────────────────────────────────────────
+const TIPOS_ATIVIDADE = new Set(['atividade_desplugada', 'plano_de_aula', 'kit_dinamicas'])
+
+const ATIV_COLORS = {
+  atividade_desplugada: { primary: '#4338CA', light: '#EEF2FF', accent: '#818CF8', dark: '#312E81', tip: '#FFFBEB', tipBorder: '#F59E0B', tipText: '#78350F' },
+  plano_de_aula:        { primary: '#047857', light: '#ECFDF5', accent: '#34D399', dark: '#064E3B', tip: '#FFFBEB', tipBorder: '#F59E0B', tipText: '#78350F' },
+  kit_dinamicas:        { primary: '#C2410C', light: '#FFF7ED', accent: '#FB923C', dark: '#7C2D12', tip: '#FFFBEB', tipBorder: '#F59E0B', tipText: '#78350F' },
+}
+
+function _drawAtividadePage(doc, ativ, num, TC, W, H, ML, CW, fBody, fBold, totalItems) {
+  doc.addPage({ size: 'A4', margin: 0 })
+  doc.rect(0, 0, W, H).fill('#FFFFFF')
+  doc.rect(0, 0, W, 4).fill(TC.primary)
+
+  // Header band
+  doc.rect(0, 4, W, 54).fill(TC.primary)
+  doc.circle(ML + 18, 31, 14).fill(TC.dark)
+  doc.fillColor('#FFFFFF').font(fBold).fontSize(11)
+    .text(String(num), ML + 4, 25, { width: 28, align: 'center' })
+  doc.fillColor('#FFFFFF').font(fBold).fontSize(14)
+    .text(ativ.titulo || ('Atividade ' + num), ML + 42, 13, { width: CW - 42, lineGap: 2 })
+  const meta = [ativ.ano_escolar, ativ.duracao, ativ.bncc].filter(Boolean).join('  |  ')
+  if (meta) {
+    doc.fillColor('#C7D2FE').font(fBody).fontSize(8)
+      .text(meta, ML + 42, 36, { width: CW - 80 })
+  }
+  doc.fillColor('#C7D2FE').font(fBody).fontSize(7)
+    .text(num + ' / ' + totalItems, 0, 40, { width: W - ML - 8, align: 'right' })
+
+  // Student fields
+  doc.rect(0, 58, W, 36).fill('#F5F5F5')
+  doc.rect(0, 94, W, 0.5).fill('#D1D5DB')
+  doc.fillColor('#374151').font(fBody).fontSize(8)
+  doc.text('Aluno(a): ', ML, 68)
+  const aw = doc.widthOfString('Aluno(a): ')
+  doc.moveTo(ML + aw, 78).lineTo(ML + 200, 78).lineWidth(0.6).stroke('#9CA3AF')
+  doc.text('Turma: ', ML + 215, 68)
+  const tw = doc.widthOfString('Turma: ')
+  doc.moveTo(ML + 215 + tw, 78).lineTo(ML + 310, 78).lineWidth(0.6).stroke('#9CA3AF')
+  doc.text('Data: ', ML + 325, 68)
+  const dw = doc.widthOfString('Data: ')
+  doc.moveTo(ML + 325 + dw, 78).lineTo(ML + 460, 78).lineWidth(0.6).stroke('#9CA3AF')
+
+  let cy = 102
+  const pad = 8
+  const sectionGap = 6
+
+  function sectionHeader(label) {
+    doc.rect(ML, cy, CW, 20).fill(TC.light)
+    doc.rect(ML, cy, 3, 20).fill(TC.primary)
+    doc.fillColor(TC.primary).font(fBold).fontSize(9)
+      .text(label, ML + 10, cy + 6, { width: CW - 16 })
+    cy += 20
+  }
+
+  function textBlock(text) {
+    if (!text) return
+    const h = doc.heightOfString(text, { width: CW - pad * 2, lineGap: 2 })
+    doc.fillColor('#1F2937').font(fBody).fontSize(10)
+      .text(text, ML + pad, cy + pad, { width: CW - pad * 2, lineGap: 2 })
+    cy += h + pad * 2 + sectionGap
+  }
+
+  // Objetivo
+  if (ativ.objetivo) {
+    sectionHeader('OBJETIVO')
+    textBlock(ativ.objetivo)
+  }
+
+  // Materiais
+  if (ativ.materiais && ativ.materiais.length) {
+    sectionHeader('MATERIAIS')
+    const matCols = 2
+    const colW = (CW - pad * 2) / matCols
+    const startCy = cy + pad
+    ativ.materiais.forEach((m, i) => {
+      const col = i % matCols
+      const row = Math.floor(i / matCols)
+      const x = ML + pad + col * colW
+      const y = startCy + row * 16
+      doc.circle(x + 4, y + 5, 3).fill(TC.primary)
+      doc.fillColor('#1F2937').font(fBody).fontSize(9)
+        .text(m, x + 12, y, { width: colW - 14 })
+    })
+    const rows = Math.ceil(ativ.materiais.length / matCols)
+    cy += rows * 16 + pad * 2 + sectionGap
+  }
+
+  // Passo a passo
+  if (ativ.passos && ativ.passos.length) {
+    sectionHeader('PASSO A PASSO')
+    cy += 4
+    ativ.passos.forEach((passo, i) => {
+      if (cy > H - 120) return
+      doc.circle(ML + pad + 8, cy + 7, 9).fill(TC.primary)
+      doc.fillColor('#FFFFFF').font(fBold).fontSize(8)
+        .text(String(i + 1), ML + pad, cy + 3, { width: 18, align: 'center' })
+      const ph = doc.heightOfString(passo, { width: CW - pad * 2 - 26, lineGap: 2 })
+      doc.fillColor('#1F2937').font(fBody).fontSize(10)
+        .text(passo, ML + pad + 22, cy + 1, { width: CW - pad * 2 - 26, lineGap: 2 })
+      cy += Math.max(ph, 18) + 8
+    })
+    cy += sectionGap
+  }
+
+  // Responda aqui
+  if (ativ.campos_resposta && ativ.campos_resposta.length) {
+    sectionHeader('RESPONDA AQUI')
+    cy += 6
+    ativ.campos_resposta.forEach(campo => {
+      if (cy > H - 80) return
+      doc.fillColor('#374151').font(fBody).fontSize(9)
+        .text(campo, ML + pad, cy, { width: CW - pad * 2 })
+      cy += 16
+      for (let l = 0; l < 3; l++) {
+        doc.moveTo(ML + pad, cy)
+          .lineTo(ML + CW - pad, cy)
+          .lineWidth(0.5).dash(4, { space: 3 }).stroke('#D1D5DB').undash()
+        cy += 14
+      }
+      cy += 6
+    })
+  }
+
+  // Dica do professor
+  if (ativ.dica_professor) {
+    const remaining = H - cy - 12
+    if (remaining > 48) {
+      const tipH = Math.min(remaining, Math.max(48, doc.heightOfString(ativ.dica_professor, { width: CW - pad * 3 }) + 32))
+      doc.rect(ML, cy, CW, tipH).fill(TC.tip)
+      doc.rect(ML, cy, 4, tipH).fill(TC.tipBorder)
+      doc.fillColor(TC.tipBorder).font(fBold).fontSize(8)
+        .text('DICA DO PROFESSOR', ML + 12, cy + 8)
+      doc.fillColor(TC.tipText).font(fBody).fontSize(9)
+        .text(ativ.dica_professor, ML + 12, cy + 20, { width: CW - pad * 3, lineGap: 2 })
+    }
+  }
+
+  // Bottom
+  doc.rect(0, H - 4, W, 4).fill(TC.primary)
+  doc.fillColor('#9CA3AF').font(fBody).fontSize(7)
+    .text('Gerado por Nexus MAX', 0, H - 15, { width: W, align: 'center' })
+}
+
+function _drawPlanoPage(doc, aula, num, TC, W, H, ML, CW, fBody, fBold, totalItems) {
+  doc.addPage({ size: 'A4', margin: 0 })
+  doc.rect(0, 0, W, H).fill('#FFFFFF')
+  doc.rect(0, 0, W, 4).fill(TC.primary)
+
+  // Header
+  doc.rect(0, 4, W, 54).fill(TC.primary)
+  doc.circle(ML + 18, 31, 14).fill(TC.dark)
+  doc.fillColor('#FFFFFF').font(fBold).fontSize(11)
+    .text(String(num), ML + 4, 25, { width: 28, align: 'center' })
+  doc.fillColor('#FFFFFF').font(fBold).fontSize(14)
+    .text(aula.titulo || ('Aula ' + num), ML + 42, 13, { width: CW - 60, lineGap: 2 })
+  const meta = [aula.ano_escolar, aula.disciplina, aula.duracao].filter(Boolean).join('  |  ')
+  if (meta) {
+    doc.fillColor('#A7F3D0').font(fBody).fontSize(8)
+      .text(meta, ML + 42, 36, { width: CW - 80 })
+  }
+  doc.fillColor('#A7F3D0').font(fBody).fontSize(7)
+    .text(num + ' / ' + totalItems, 0, 40, { width: W - ML - 8, align: 'right' })
+
+  // School fields (2 rows)
+  doc.rect(0, 58, W, 44).fill('#F9FAFB')
+  doc.rect(0, 102, W, 0.5).fill('#E5E7EB')
+  const field = (label, x, y, lineEnd) => {
+    const lw = doc.widthOfString(label + ': ')
+    doc.fillColor('#374151').font(fBody).fontSize(8).text(label + ': ', x, y)
+    doc.moveTo(x + lw, y + 10).lineTo(lineEnd, y + 10).lineWidth(0.6).stroke('#9CA3AF')
+  }
+  field('Escola', ML, 65, ML + 240)
+  field('Professor(a)', ML + 255, 65, ML + CW)
+  field('Turma', ML, 82, ML + 100)
+  field('Data', ML + 115, 82, ML + 230)
+  field('Duracao', ML + 245, 82, ML + CW)
+
+  let cy = 110
+  const pad = 8
+  const sectionGap = 6
+
+  function sectionHeader(label) {
+    doc.rect(ML, cy, CW, 20).fill(TC.light)
+    doc.rect(ML, cy, 3, 20).fill(TC.primary)
+    doc.fillColor(TC.primary).font(fBold).fontSize(9)
+      .text(label, ML + 10, cy + 6, { width: CW - 16 })
+    cy += 20
+  }
+
+  function textBlock(text, indent) {
+    if (!text) return
+    const x = ML + (indent || pad)
+    const w = CW - (indent || pad) - pad
+    const h = doc.heightOfString(text, { width: w, lineGap: 2 })
+    doc.fillColor('#1F2937').font(fBody).fontSize(9)
+      .text(text, x, cy + 4, { width: w, lineGap: 2 })
+    cy += h + 12 + sectionGap
+  }
+
+  function bulletList(items) {
+    if (!items || !items.length) return
+    items.forEach(item => {
+      if (cy > H - 60) return
+      doc.circle(ML + pad + 3, cy + 5, 3).fill(TC.primary)
+      const h = doc.heightOfString(item, { width: CW - pad * 2 - 14, lineGap: 2 })
+      doc.fillColor('#1F2937').font(fBody).fontSize(9)
+        .text(item, ML + pad + 12, cy, { width: CW - pad * 2 - 14, lineGap: 2 })
+      cy += Math.max(h, 12) + 6
+    })
+    cy += sectionGap
+  }
+
+  // Objetivo geral
+  sectionHeader('OBJETIVO GERAL')
+  textBlock(aula.objetivo_geral)
+
+  // Objetivos especificos
+  if (aula.objetivos_especificos && aula.objetivos_especificos.length) {
+    sectionHeader('OBJETIVOS ESPECIFICOS')
+    cy += 4
+    bulletList(aula.objetivos_especificos)
+  }
+
+  // BNCC
+  if (aula.bncc) {
+    sectionHeader('ALINHAMENTO BNCC')
+    const bnccText = Array.isArray(aula.bncc) ? aula.bncc.join('  |  ') : aula.bncc
+    textBlock(bnccText)
+  }
+
+  // Materiais
+  if (aula.materiais && aula.materiais.length) {
+    sectionHeader('MATERIAIS')
+    cy += 4
+    bulletList(aula.materiais)
+  }
+
+  // Desenvolvimento
+  const fases = [
+    { label: 'SENSIBILIZACAO (introducao)', text: aula.introducao },
+    { label: 'DESENVOLVIMENTO', text: aula.desenvolvimento },
+    { label: 'ENCERRAMENTO', text: aula.encerramento },
+  ].filter(f => f.text)
+
+  if (fases.length) {
+    sectionHeader('DESENVOLVIMENTO DA AULA')
+    cy += 4
+    fases.forEach(fase => {
+      if (cy > H - 100) return
+      doc.fillColor(TC.primary).font(fBold).fontSize(8)
+        .text(fase.label, ML + pad, cy)
+      cy += 14
+      const h = doc.heightOfString(fase.text, { width: CW - pad * 2 - 8, lineGap: 2 })
+      doc.fillColor('#374151').font(fBody).fontSize(9)
+        .text(fase.text, ML + pad + 8, cy, { width: CW - pad * 2 - 8, lineGap: 2 })
+      cy += h + 10
+    })
+    cy += sectionGap
+  }
+
+  // Avaliacao
+  if (aula.avaliacao && cy < H - 80) {
+    sectionHeader('AVALIACAO')
+    textBlock(aula.avaliacao)
+  }
+
+  // Dica
+  if (aula.dica) {
+    const remaining = H - cy - 12
+    if (remaining > 48) {
+      const tipH = Math.min(remaining, Math.max(48, doc.heightOfString(aula.dica, { width: CW - pad * 3 }) + 32))
+      doc.rect(ML, cy, CW, tipH).fill(TC.tip)
+      doc.rect(ML, cy, 4, tipH).fill(TC.tipBorder)
+      doc.fillColor(TC.tipBorder).font(fBold).fontSize(8)
+        .text('DICA DO PROFESSOR', ML + 12, cy + 8)
+      doc.fillColor(TC.tipText).font(fBody).fontSize(9)
+        .text(aula.dica, ML + 12, cy + 20, { width: CW - pad * 3, lineGap: 2 })
+    }
+  }
+
+  doc.rect(0, H - 4, W, 4).fill(TC.primary)
+  doc.fillColor('#9CA3AF').font(fBody).fontSize(7)
+    .text('Gerado por Nexus MAX', 0, H - 15, { width: W, align: 'center' })
+}
+
+async function gerarPDFAtividades(config, data) {
+  const isPlano = config.tipo === 'plano_de_aula'
+  const items = isPlano ? (data.aulas || []) : (data.atividades || [])
+  const TC = ATIV_COLORS[config.tipo] || ATIV_COLORS.atividade_desplugada
+
+  const W = 595.28, H = 841.89
+  const ML = 40, MR = 40, CW = W - ML - MR
+
+  return new Promise((resolve, reject) => {
+    const doc = new PDFDocument({
+      size: 'A4', margin: 0, autoFirstPage: false,
+      info: { Title: data.titulo || config.titulo, Author: config.autor || 'Nexus Digital' },
+    })
+    const chunks = []
+    doc.on('data', c => chunks.push(c))
+    doc.on('end', () => resolve(Buffer.concat(chunks)))
+    doc.on('error', reject)
+
+    let fBody = 'Helvetica', fBold = 'Helvetica-Bold'
+    const fonteCorpo = config.fonteCorpo || 'Nunito'
+    const fonteTitulo = config.fonteTitulo || 'Poppins'
+    try {
+      if (FONT_FILES[fonteTitulo]) {
+        const p = path.join(FONTS_DIR, FONT_FILES[fonteTitulo].bold)
+        if (fs.existsSync(p)) { doc.registerFont('at-bold', p); fBold = 'at-bold' }
+      }
+      if (FONT_FILES[fonteCorpo]) {
+        const pr = path.join(FONTS_DIR, FONT_FILES[fonteCorpo].reg)
+        const pb = path.join(FONTS_DIR, FONT_FILES[fonteCorpo].bold)
+        if (fs.existsSync(pr)) { doc.registerFont('at-body', pr); fBody = 'at-body' }
+        if (fs.existsSync(pb)) { doc.registerFont('at-body-bold', pb); fBold = 'at-body-bold' }
+      }
+    } catch (_) {}
+
+    // ── Capa ──
+    doc.addPage({ size: 'A4', margin: 0 })
+    doc.rect(0, 0, W, H).fill('#FAFAFA')
+    doc.rect(0, 0, W, 300).fill(TC.primary)
+    // Decorative shapes
+    doc.save().opacity(0.15).circle(W - 30, 30, 140).fill(TC.dark).restore()
+    doc.save().opacity(0.2).circle(60, 260, 90).fill(TC.accent).restore()
+
+    const typeLabel = { atividade_desplugada: 'ATIVIDADES DESPLUGADAS', plano_de_aula: 'PLANOS DE AULA', kit_dinamicas: 'KIT DE DINAMICAS' }[config.tipo] || 'KIT EDUCACIONAL'
+    doc.fillColor(TC.accent).font(fBold).fontSize(9).text(typeLabel, ML, 60, { characterSpacing: 2 })
+    doc.fillColor('#FFFFFF').font(fBold).fontSize(24)
+      .text(data.titulo || config.titulo || 'Kit Educacional', ML, 80, { width: CW - 80, lineGap: 6 })
+    if (config.autor) {
+      doc.fillColor('rgba(255,255,255,0.65)').font(fBody).fontSize(11)
+        .text(config.autor, ML, 250)
+    }
+
+    // Info cards
+    const cardY = 330, cardW = (CW - 20) / 3
+    ;[
+      { value: String(items.length), label: isPlano ? 'Aulas' : 'Atividades' },
+      { value: 'BNCC', label: 'Alinhamento' },
+      { value: 'A4', label: 'Formato PDF' },
+    ].forEach((c, i) => {
+      const cx = ML + i * (cardW + 10)
+      doc.roundedRect(cx, cardY, cardW, 68, 6).fill(TC.light)
+      doc.fillColor(TC.primary).font(fBold).fontSize(22)
+        .text(c.value, cx, cardY + 8, { width: cardW, align: 'center' })
+      doc.fillColor('#6B7280').font(fBody).fontSize(9)
+        .text(c.label, cx, cardY + 40, { width: cardW, align: 'center' })
+    })
+
+    // Sumario
+    doc.fillColor('#111827').font(fBold).fontSize(12).text('SUMARIO', ML, 430)
+    doc.moveTo(ML, 447).lineTo(ML + CW, 447).lineWidth(1).stroke(TC.primary)
+
+    let listY = 456
+    items.forEach((item, i) => {
+      if (listY > 760) return
+      const t = item.titulo || ('Item ' + (i + 1))
+      const sub = [item.ano_escolar, item.duracao].filter(Boolean).join(' · ')
+      doc.fillColor(TC.primary).font(fBold).fontSize(9)
+        .text(String(i + 1).padStart(2, '0'), ML, listY)
+      doc.fillColor('#111827').font(fBold).fontSize(10)
+        .text(t, ML + 22, listY, { width: CW - 50 })
+      if (sub) {
+        doc.fillColor('#6B7280').font(fBody).fontSize(8)
+          .text(sub, ML + 22, listY + 12, { width: CW - 50 })
+      }
+      listY += sub ? 30 : 22
+      doc.moveTo(ML, listY - 4).lineTo(ML + CW, listY - 4)
+        .lineWidth(0.4).dash(3).stroke('#E5E7EB').undash()
+    })
+
+    doc.rect(0, H - 48, W, 48).fill(TC.dark)
+    doc.fillColor('#FFFFFF').font(fBody).fontSize(8)
+      .text('Gerado por Nexus MAX · nexus.com.br', ML, H - 28, { width: CW, align: 'center' })
+
+    // ── Pages per item ──
+    items.forEach((item, i) => {
+      if (isPlano) {
+        _drawPlanoPage(doc, item, i + 1, TC, W, H, ML, CW, fBody, fBold, items.length)
+      } else {
+        _drawAtividadePage(doc, item, i + 1, TC, W, H, ML, CW, fBody, fBold, items.length)
+      }
+    })
+
+    doc.end()
+  })
+}
+
+async function _generateAtividades(params) {
+  const { titulo, autor, nicho, tipo, num_paginas, tema, onProgress, fonteCorpo, fonteTitulo } = params
+  const progress = typeof onProgress === 'function' ? onProgress : () => {}
+  const atividadesAgent = require('../../agents/atividades')
+
+  await progress(10, 'Planejando estrutura das atividades...')
+  const numAtiv = Math.min(parseInt(num_paginas) || 5, 10)
+
+  await progress(35, 'Gerando conteudo das atividades com IA...')
+  const data = await atividadesAgent.run({
+    tipo,
+    titulo,
+    tema: nicho || tema || titulo,
+    publico: params.avatar_publico || params.avatar || 'professores',
+    num_atividades: numAtiv,
+    ano_escolar: params.subtitulo || '',
+  })
+
+  await progress(70, 'Montando PDF visual...')
+  const config = { tipo, titulo: data.titulo || titulo, autor: autor || '', fonteCorpo: fonteCorpo || 'Nunito', fonteTitulo: fonteTitulo || 'Poppins' }
+  const pdfBuffer = await gerarPDFAtividades(config, data)
+
+  const slug = (data.titulo || titulo || 'kit').replace(/[^a-zA-Z0-9]/g, '_').slice(0, 40)
+  return {
+    titulo: data.titulo || titulo,
+    pdf: pdfBuffer,
+    pdfFilename: slug + '.pdf',
+    copyContracapa: '',
+    gammaUrl: null,
+  }
+}
+
+// ──────────────────────────────────────────
 // Função principal
 // config.onProgress(pct, msg) — callback opcional para progresso em tempo real
 // ──────────────────────────────────────────
 async function generate(params) {
+  if (TIPOS_ATIVIDADE.has(params.tipo)) {
+    return _generateAtividades(params);
+  }
+
   const {
     titulo, subtitulo, autor, nicho, avatar_publico, tipo,
     num_paginas, num_capitulos, tema, gerar_carrossel, formato_carrossel, onProgress,

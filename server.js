@@ -151,7 +151,7 @@ app.post("/api/criar", (req, res) => {
 
   // Killer de segurança: 15 minutos para ebooks/infoprodutos (30+ seções + Gamma polling podem somar >5 min)
   const tipoBody = req.body.tipo || "ebook";
-  const INFOPRODUTOS = new Set(["ebook", "workbook", "script_vsl", "planner", "cheat_sheet", "certificado", "checklist", "pregacoes", "devocional"]);
+  const INFOPRODUTOS = new Set(["ebook", "workbook", "script_vsl", "planner", "cheat_sheet", "certificado", "checklist", "pregacoes", "devocional", "atividade_desplugada", "plano_de_aula", "kit_dinamicas"]);
   const jobTimeoutMs = INFOPRODUTOS.has(tipoBody) ? 15 * 60 * 1000 : 5 * 60 * 1000;
   const jobKiller = setTimeout(() => {
     const job = criarJobs.get(jobId);
