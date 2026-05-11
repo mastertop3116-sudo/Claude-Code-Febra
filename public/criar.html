@@ -3419,8 +3419,10 @@ main{position:relative;z-index:auto}
     }
 
     function _showSummary(payload) {
+      if (!summaryWrap) return;
       summaryWrap.style.display = 'block';
-      inputRow.style.display = 'none';
+      summaryWrap.onclick = null; // limpa handler anterior
+      if (inputRow) inputRow.style.display = 'none';
       const tipo = TIPO_LABELS[payload.tipo] || payload.tipo;
       summaryWrap.innerHTML = `
         <div class="fc-summary">
@@ -3434,21 +3436,21 @@ main{position:relative;z-index:auto}
           <button id="fc-ajustar-btn" style="width:100%;padding:8px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text-3);font-size:12px;cursor:pointer;font-family:'DM Mono',monospace">✏️ Quero ajustar</button>
         </div>`;
 
-      // Event delegation no container — imune a timing e innerHTML
-      summaryWrap.onclick = e => {
-        const btn = e.target.closest('button');
-        if (!btn) return;
-        if (btn.id === 'fc-gerar-btn') { e.stopPropagation(); _gerarComPayload(payload); }
-        else if (btn.id === 'fc-ajustar-btn') { e.stopPropagation(); _ajustarComPayload(payload); }
-      };
+      // Ataches diretos nos botões — mais confiável que event delegation
+      const gerarBtn    = summaryWrap.querySelector('#fc-gerar-btn');
+      const ajustarBtn  = summaryWrap.querySelector('#fc-ajustar-btn');
+      if (gerarBtn)   gerarBtn.onclick   = e => { e.stopPropagation(); _gerarComPayload(payload); };
+      if (ajustarBtn) ajustarBtn.onclick = e => { e.stopPropagation(); _ajustarComPayload(payload); };
     }
 
     async function _gerarComPayload(payload) {
+      // Overlay primeiro — garante que o usuário vê algo imediatamente
+      document.body.className = 'mode-chat';
+      const _overlayEl = document.getElementById('overlay-prog');
+      if (_overlayEl) _overlayEl.classList.add('show');
+
       let _stopDicas = () => {};
       try {
-        if (typeof window._fcSetType === 'function' && payload.tipo) window._fcSetType(payload.tipo);
-        if (typeof window.switchMode === 'function') window.switchMode('chat');
-
         const apiPayload = {
           tipo:      payload.tipo || selectedType,
           titulo:    payload.titulo,
@@ -3471,8 +3473,6 @@ main{position:relative;z-index:auto}
         };
 
         hideErr();
-        const _overlayEl = document.getElementById('overlay-prog');
-        if (_overlayEl) _overlayEl.classList.add('show');
         setProgress(2, 'Conectando ao servidor…');
         _startElapsed();
 
