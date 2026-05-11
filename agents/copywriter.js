@@ -139,7 +139,9 @@ async function run({ estrategia, estrutura, autor, tipo, num_paginas }) {
     : estrutura
 
   const extraDevocional = tipo === 'devocional'
-    ? `\nIMPORTANTE: Escreva cada seção como um DEVOCIONAL COMPLETO para aquele dia específico. Inclua versículo, reflexão, perguntas, oração e desafio. NÃO escreva teoria sobre como fazer devocional.`
+    ? `\nINSTRUÇÃO ABSOLUTA: Você está escrevendo OS ${maxSecoes} DEVOCIONAIS — não um guia sobre como fazê-los. IGNORE qualquer linguagem de "aprenda a" ou "como criar" que apareça na estratégia acima. Cada seção É um devocional completo pronto para o leitor usar agora: ele abre, lê e já está fazendo o devocional. Siga EXATAMENTE a estrutura do SYSTEM: Versículo → Reflexão → Para pensar hoje → Oração do Dia → Desafio do Dia.`
+    : tipo === 'pregacoes'
+    ? `\nINSTRUÇÃO ABSOLUTA: Você está escrevendo AS ${maxSecoes} PREGAÇÕES PRONTAS — não um guia sobre como pregar. IGNORE qualquer linguagem de "aprenda a" na estratégia. Cada seção É uma pregação completa que o pregador lê e usa diretamente.`
     : ''
 
   const prompt = `Autor: ${autor}\nTipo: ${tipo}\nNúmero máximo de seções: ${maxSecoes}\nEstratégia: ${JSON.stringify(estrategia)}\nEstrutura: ${JSON.stringify(indiceReduzido)}\nEscreva exatamente ${maxSecoes} seções (não mais que isso).${extraDevocional}`

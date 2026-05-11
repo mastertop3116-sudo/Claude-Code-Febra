@@ -1087,6 +1087,50 @@ app.get('/api/dashboard/consensus-stream', async (req, res) => {
   res.end();
 });
 
+// ── BLOCO DE NOTAS — salvar e listar notas do Presidente ──────────────────────
+app.post('/api/dashboard/notes', async (req, res) => {
+  try {
+    const { content, session_id } = req.body;
+    if (!content?.trim()) return res.status(400).json({ error: 'Conteúdo vazio' });
+    const { supabase } = require('./integrations/supabase');
+    const { data, error } = await supabase.from('nexus_notas').insert({
+      content: content.trim(),
+      session_id: session_id || '',
+      created_at: new Date().toISOString(),
+    }).select().single();
+    if (error) throw error;
+    res.json({ ok: true, nota: data });
+  } catch (e) {
+    console.error('[/api/dashboard/notes POST]', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/api/dashboard/notes', async (req, res) => {
+  try {
+    const { supabase } = require('./integrations/supabase');
+    const { data, error } = await supabase
+      .from('nexus_notas')
+      .select('id, content, created_at')
+      .order('created_at', { ascending: false })
+      .limit(20);
+    if (error) throw error;
+    res.json({ notas: data || [] });
+  } catch (e) {
+    res.json({ notas: [] });
+  }
+});
+
+app.delete('/api/dashboard/notes/:id', async (req, res) => {
+  try {
+    const { supabase } = require('./integrations/supabase');
+    await supabase.from('nexus_notas').delete().eq('id', req.params.id);
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.post('/api/dashboard/conselho', async (req, res) => {
   try {
     const { question, session_id } = req.body;
@@ -1593,8 +1637,26 @@ app.post('/api/dashboard/integrations/test/:service', async (req, res) => {
 // Inicia servidor
 // ──────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
+async function runMigrations() {
+  try {
+    const { createClient } = require('@supabase/supabase-js');
+    const _supa = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY);
+    // Tenta inserir e apagar um registro de teste para forçar a detecção da tabela
+    // A tabela nexus_notas deve ser criada manualmente no Supabase Studio se não existir
+    const { error } = await _supa.from('nexus_notas').select('id').limit(1);
+    if (error && error.code === 'PGRST205') {
+      console.log('[migrations] Tabela nexus_notas não encontrada — crie no Supabase Studio com: CREATE TABLE nexus_notas (id UUID DEFAULT gen_random_uuid() PRIMARY KEY, content TEXT NOT NULL, session_id TEXT DEFAULT \'\', created_at TIMESTAMPTZ DEFAULT NOW());');
+    } else {
+      console.log('[migrations] nexus_notas ✅');
+    }
+  } catch (e) {
+    console.log('[migrations] Aviso:', e.message);
+  }
+}
+
 app.listen(PORT, async () => {
   console.log(`NEXUS — Servidor rodando na porta ${PORT}`);
   console.log(`[Gamma] API KEY: ${process.env.GAMMA_API_KEY ? "✅ configurada" : "❌ NÃO CONFIGURADA — geração PDF usará apenas PDFKit"}`);
+  await runMigrations();
   await registerWebhook();
 });

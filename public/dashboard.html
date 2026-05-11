@@ -260,31 +260,50 @@ body::after{content:'';position:fixed;inset:0;z-index:9990;pointer-events:none;o
 .md hr{border:none;border-top:1px solid var(--border);margin:10px 0}
 
 /* CONSENSUS */
-.consensus-wrap{display:flex;flex-direction:column;gap:6px;margin-top:12px;max-width:100%}
-.cr-card{background:var(--elevated);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;border-left:3px solid var(--cc-color,var(--border));transition:border-color .2s}
-.cr-card.done{border-left-color:var(--cc-color,var(--nexus))}
-.cr-card-head{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none;transition:background .15s}
-.cr-card-head:hover{background:rgba(255,255,255,0.03)}
-.cr-card-icon{width:32px;height:32px;border-radius:8px;flex-shrink:0;background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;font-size:15px}
-.cr-card-meta{flex:1;min-width:0}
-.cr-card-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
-.cr-card-preview{font-size:12px;color:var(--text-3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:600px}
-.cr-card-badge{font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:20px;flex-shrink:0}
-.cr-card-badge.pending{color:var(--text-3);background:rgba(255,255,255,0.04);border:1px solid var(--border)}
-.cr-card-badge.done{color:var(--cc-color,var(--nexus));background:rgba(255,255,255,0.06);border:1px solid var(--cc-color,var(--nexus))}
-.cr-card-chevron{width:20px;height:20px;flex-shrink:0;color:var(--text-3);display:flex;align-items:center;justify-content:center;transition:transform .25s}
-.cr-card-chevron svg{width:14px;height:14px;stroke:currentColor;fill:none}
-.cr-card.expanded .cr-card-chevron{transform:rotate(180deg)}
-.cr-card-body{max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.4,0,.2,1),padding .2s;padding:0 14px}
-.cr-card.expanded .cr-card-body{max-height:2000px;padding:0 14px 14px}
-.cr-card-body-inner{padding-top:12px;border-top:1px solid var(--border);font-size:13.5px;line-height:1.65;color:var(--text-2);word-break:break-word}
-.consensus-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.consensus-label{font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-3)}
-.consensus-toggle-all{font-size:11px;color:var(--text-3);cursor:pointer;padding:3px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;font-family:'Outfit',sans-serif;transition:all .15s}
-.consensus-toggle-all:hover{color:var(--text-2);border-color:var(--border-md)}
-.verdict-block{margin-top:10px;background:var(--elevated);border:1px solid rgba(99,102,241,.25);border-radius:var(--radius-lg);padding:16px;border-left:3px solid var(--nexus)}
-.verdict-header{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--nexus);margin-bottom:12px;display:flex;align-items:center;gap:6px}
-.verdict-text{font-size:14px;line-height:1.7;color:var(--text-2);word-break:break-word}
+/* SALA DE REUNIÃO */
+.sala-view{flex-direction:column}
+.sala-layout{display:flex;flex:1;overflow:hidden;gap:0}
+.sala-chat-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.sala-notes-panel{width:300px;flex-shrink:0;border-left:1px solid var(--border);display:flex;flex-direction:column;background:var(--surface);overflow:hidden}
+.sala-welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding:40px;flex:1}
+.sala-welcome-avatars{display:flex;gap:8px;font-size:22px;margin-bottom:4px}
+.sala-welcome-title{font-size:18px;font-weight:700;color:var(--text-1)}
+.sala-welcome-desc{font-size:13px;color:var(--text-3);max-width:360px;line-height:1.5}
+.sala-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px}
+/* Bolhas de grupo chat — cada setor fala */
+.sector-msg{display:flex;flex-direction:column;gap:4px;margin:6px 0;animation:fadeSlide .25s ease}
+.sector-msg-header{display:flex;align-items:center;gap:6px;padding:0 4px}
+.sector-msg-icon{font-size:14px;width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.05);flex-shrink:0}
+.sector-msg-name{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px}
+.sector-msg-body{background:var(--elevated);border:1px solid var(--border);border-radius:0 12px 12px 12px;padding:10px 13px;font-size:13px;line-height:1.6;color:var(--text-2);word-break:break-word;position:relative}
+.sector-msg-body.pending{color:var(--text-3);font-style:italic}
+.sector-msg-expand{display:block;margin-top:6px;font-size:11px;color:var(--text-3);cursor:pointer;user-select:none}
+.sector-msg-expand:hover{color:var(--text-2)}
+.sector-msg-full{display:none;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+.sector-msg-body.expanded .sector-msg-full{display:block}
+/* Veredito MAX */
+.verdict-bubble{background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(99,102,241,.06));border:1px solid rgba(99,102,241,.3);border-radius:12px;padding:14px 16px;margin:10px 0;border-left:3px solid var(--nexus)}
+.verdict-bubble-header{font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--nexus);margin-bottom:8px}
+.verdict-bubble-text{font-size:13.5px;line-height:1.65;color:var(--text-1);word-break:break-word}
+/* Notas */
+.notes-header{padding:14px 16px 10px;border-bottom:1px solid var(--border)}
+.notes-title{display:block;font-size:12px;font-weight:700;color:var(--text-1);margin-bottom:2px}
+.notes-sub{font-size:10px;color:var(--text-3)}
+.notes-textarea{flex:0 0 auto;width:100%;box-sizing:border-box;padding:10px 14px;font-size:12.5px;font-family:'Outfit',sans-serif;background:transparent;color:var(--text-1);border:none;border-bottom:1px solid var(--border);resize:none;outline:none;min-height:100px;line-height:1.5}
+.notes-textarea::placeholder{color:var(--text-3)}
+.notes-save-btn{margin:8px 12px;padding:7px 14px;background:var(--nexus);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:opacity .15s;text-align:left}
+.notes-save-btn:hover{opacity:.85}
+.notes-list{flex:1;overflow-y:auto;padding:6px 10px 12px}
+.notes-loading{font-size:11px;color:var(--text-3);padding:10px 4px;text-align:center}
+.note-item{background:var(--elevated);border:1px solid var(--border);border-radius:8px;padding:9px 11px;margin-bottom:6px;font-size:12px;color:var(--text-2);line-height:1.5;position:relative;cursor:default}
+.note-item-time{font-size:10px;color:var(--text-3);margin-top:4px}
+.note-item-del{position:absolute;top:7px;right:8px;font-size:13px;color:var(--text-3);cursor:pointer;opacity:0;transition:opacity .15s;background:none;border:none;padding:0}
+.note-item:hover .note-item-del{opacity:1}
+/* compatibilidade — manter classes antigas cr-card para não quebrar JS legado */
+.consensus-wrap{display:none}
+.verdict-block{display:none}
+.cr-card,.cr-card-head,.cr-card-body,.cr-card-body-inner,.cr-card-icon,.cr-card-meta,.cr-card-name,.cr-card-preview,.cr-card-badge,.cr-card-chevron,.consensus-toolbar,.consensus-label,.consensus-toggle-all{display:none}
+.verdict-header,.verdict-text{display:none}
 
 /* CONSELHO */
 .titans-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
@@ -844,31 +863,50 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
   <!-- SECTOR CHAT VIEWS (geradas por JS) -->
 
   <!-- ALL SECTORS -->
-  <div id="view-all-sectors" class="view" style="--bubble-color:var(--c-all);--input-focus:var(--c-all);--btn-color:var(--c-all)">
+  <div id="view-all-sectors" class="view sala-view" style="--bubble-color:var(--c-all);--input-focus:var(--c-all);--btn-color:var(--c-all)">
     <div class="topbar">
       <span class="topbar-icon">⚡</span>
-      <div><div class="topbar-title">Todos os Setores</div><div class="topbar-desc">6 departamentos analisam · MAX sintetiza</div></div>
+      <div><div class="topbar-title">Sala de Reunião</div><div class="topbar-desc">6 setores em paralelo · MAX sintetiza</div></div>
       <div class="topbar-spacer"></div>
-      <span class="topbar-badge" style="color:var(--c-all);border-color:rgba(129,140,248,.3)">CONSENSO</span>
+      <span class="topbar-badge" style="color:var(--c-all);border-color:rgba(129,140,248,.3)">SALA</span>
     </div>
-    <div class="chat-body" id="msgs-all-sectors">
-      <div class="chat-welcome" id="cwelcome-all-sectors" style="--chip-color:var(--c-all);--chip-bg:rgba(129,140,248,.1)">
-        <div class="cw-icon">⚡</div>
-        <div class="cw-title">Modo Consenso</div>
-        <div class="cw-desc">Todos os 6 setores da Nexus analisam sua questão. MAX consolida um veredito executivo.</div>
-        <div class="cw-chips">
-          <div class="cw-chip" onclick="fillInput('all-sectors','Qual produto devemos priorizar agora?')">Qual produto priorizar?</div>
-          <div class="cw-chip" onclick="fillInput('all-sectors','Como atingir R$10k/mês mais rápido?')">Como chegar a R$10k/mês?</div>
-          <div class="cw-chip" onclick="fillInput('all-sectors','Qual a maior alavanca de crescimento no próximo trimestre?')">Maior alavanca agora?</div>
+    <div class="sala-layout">
+      <!-- CHAT DOS SETORES -->
+      <div class="sala-chat-panel">
+        <div class="chat-body" id="msgs-all-sectors">
+          <div class="sala-welcome" id="cwelcome-all-sectors">
+            <div class="sala-welcome-avatars">
+              <span title="Fábrica de Produtos">🏭</span><span title="Fábrica de Conteúdo">✍️</span><span title="Motor Monetização">💰</span><span title="Lab de UX">🔬</span><span title="Engenharia">⚙️</span><span title="Crescimento">📈</span>
+            </div>
+            <div class="sala-welcome-title">Sala de Reunião</div>
+            <div class="sala-welcome-desc">Todos os setores respondem ao mesmo tempo. MAX resume em 1 veredito.</div>
+            <div class="sala-chips">
+              <div class="cw-chip" onclick="fillInput('all-sectors','Qual produto devemos priorizar agora?')">Qual produto priorizar?</div>
+              <div class="cw-chip" onclick="fillInput('all-sectors','Como chegar a R$10k/mês mais rápido?')">Como chegar a R$10k/mês?</div>
+              <div class="cw-chip" onclick="fillInput('all-sectors','Qual a maior alavanca de crescimento agora?')">Maior alavanca agora?</div>
+            </div>
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <div class="chat-input-row">
+            <textarea class="chat-textarea" id="input-all-sectors" placeholder="Coloque uma questão para a sala debater..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey&&window._enterSend()){event.preventDefault();_send('all-sectors')}" oninput="autoResize(this)"></textarea>
+            <button class="send-btn" onclick="_send('all-sectors')"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+          </div>
+          <div class="chat-hint">Enter para enviar · Shift+Enter para nova linha</div>
         </div>
       </div>
-    </div>
-    <div class="chat-input-area">
-      <div class="chat-input-row">
-        <textarea class="chat-textarea" id="input-all-sectors" placeholder="Qual questão para todos os setores analisarem?" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey&&window._enterSend()){event.preventDefault();_send('all-sectors')}" oninput="autoResize(this)"></textarea>
-        <button class="send-btn" onclick="_send('all-sectors')"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+      <!-- BLOCO DE NOTAS -->
+      <div class="sala-notes-panel">
+        <div class="notes-header">
+          <span class="notes-title">📝 Bloco de Notas</span>
+          <span class="notes-sub">Salvo no banco · IAs ficam cientes</span>
+        </div>
+        <textarea id="nota-input" class="notes-textarea" placeholder="Anote uma ideia, decisão ou tarefa..."></textarea>
+        <button class="notes-save-btn" onclick="saveNota()">Salvar nota →</button>
+        <div class="notes-list" id="notes-list">
+          <div class="notes-loading">Carregando notas...</div>
+        </div>
       </div>
-      <div class="chat-hint">Enter para enviar · Shift+Enter para nova linha · ~15–20s de processamento</div>
     </div>
   </div>
 
@@ -1368,6 +1406,7 @@ function navigate(view){
   else if(view==='pipeline'){ loadPipeline(); }
   else if(view==='biblioteca'){ loadBiblioteca(); }
   else if(view==='board'){ loadBoard(); }
+  else if(view==='all-sectors'){ loadNotas(); }
   else if(!STATIC_VIEWS.has(view) && !historyLoaded[view]){ loadHistory(view); }
 }
 window.navigate = navigate;
@@ -1833,50 +1872,82 @@ window.toggleAllCards=toggleAllCards;
 async function sendConsensus(msg){
   const box = document.getElementById('msgs-all-sectors');
   document.getElementById('cwelcome-all-sectors')?.remove();
+  // Mensagem do usuário
   const uDiv=document.createElement('div');
   uDiv.className='msg user';
   uDiv.innerHTML=`<div class="msg-bubble"><div>${esc(msg)}</div></div>`;
   box.appendChild(uDiv);
-  const container=document.createElement('div');
-  container.className='msg assistant'; container.style.maxWidth='100%';
-  const wrap=document.createElement('div');
-  wrap.className='consensus-wrap';
-  const uid='cw'+Date.now(); wrap.id=uid;
-  const toolbar=document.createElement('div');
-  toolbar.className='consensus-toolbar';
-  toolbar.innerHTML=`<span class="consensus-label">⚡ Análise dos 6 Setores</span><button class="consensus-toggle-all" onclick="toggleAllCards(document.getElementById('${uid}'))">Expandir todos</button>`;
-  wrap.appendChild(toolbar);
+  // Criar bolhas pendentes para cada setor
+  const uid='cw'+Date.now();
+  const bubbleIds={};
   Object.entries(SECTOR_CFG).forEach(([k,c])=>{
-    const card=document.createElement('div');
-    card.className='cr-card'; card.id=`cr-${k}`;
-    card.style.setProperty('--cc-color',c.color);
-    card.innerHTML=`<div class="cr-card-head" onclick="toggleCrCard('${k}')"><div class="cr-card-icon">${c.emoji}</div><div class="cr-card-meta"><div class="cr-card-name" style="color:${c.color}">${c.name}</div><div class="cr-card-preview" id="cr-preview-${k}">Analisando...</div></div><span class="cr-card-badge pending" id="cr-badge-${k}"><div class="pulse-dots"><div class="pd"></div><div class="pd"></div><div class="pd"></div></div></span><div class="cr-card-chevron"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div></div><div class="cr-card-body"><div class="cr-card-body-inner md" id="cr-body-${k}"></div></div>`;
-    wrap.appendChild(card);
+    const wrap=document.createElement('div');
+    wrap.className='sector-msg';
+    const bid='sb-'+k+'-'+uid;
+    bubbleIds[k]=bid;
+    wrap.innerHTML=`<div class="sector-msg-header"><div class="sector-msg-icon">${c.emoji}</div><div class="sector-msg-name" style="color:${c.color}">${c.name}</div></div><div class="sector-msg-body pending" id="${bid}"><span class="sector-pending-text">Analisando...</span></div>`;
+    box.appendChild(wrap);
   });
-  container.appendChild(wrap);
-  box.appendChild(container);
   scrollBot('all-sectors');
   const src=new EventSource(`/api/dashboard/consensus-stream?question=${encodeURIComponent(msg)}&session_id=${encodeURIComponent(SESSION)}`);
   src.onmessage=e=>{
     let data; try{data=JSON.parse(e.data);}catch{return;}
     if(data.type==='sector'){
-      const card=document.getElementById(`cr-${data.sector}`);
-      const preview=document.getElementById(`cr-preview-${data.sector}`);
-      const badge=document.getElementById(`cr-badge-${data.sector}`);
-      const body=document.getElementById(`cr-body-${data.sector}`);
-      if(card) card.classList.add('done','expanded');
-      if(body) body.innerHTML=renderMD(data.content).replace('<div class="md">','').replace(/<\/div>$/,'');
-      if(preview){ const plain=data.content.replace(/[#*`_]/g,'').trim(); preview.textContent=plain.slice(0,90)+(plain.length>90?'…':''); }
-      if(badge){ badge.className='cr-card-badge done'; badge.textContent='Concluído'; }
+      const bodyEl=document.getElementById(bubbleIds[data.sector]);
+      if(bodyEl){
+        bodyEl.classList.remove('pending');
+        const plain=data.content.replace(/[#*_`]/g,'').trim();
+        const preview=plain.slice(0,180)+(plain.length>180?'…':'');
+        const hasMore=plain.length>180;
+        const fullHtml=renderMD(data.content).replace('<div class="md">','').replace(/<\/div>$/,'');
+        bodyEl.innerHTML=`<span class="sector-preview-text">${esc(preview)}</span>${hasMore?`<span class="sector-msg-expand" onclick="this.closest('.sector-msg-body').classList.toggle('expanded');this.textContent=this.closest('.sector-msg-body').classList.contains('expanded')?'ver menos ↑':'ver mais ↓'">ver mais ↓</span><div class="sector-msg-full md">${fullHtml}</div>`:''}`;
+      }
     } else if(data.type==='synthesis'){
-      let vBlock=document.getElementById('verdict-block-'+uid);
-      if(!vBlock){ vBlock=document.createElement('div'); vBlock.className='verdict-block'; vBlock.id='verdict-block-'+uid; vBlock.innerHTML=`<div class="verdict-header">⬡ Veredito MAX</div><div class="verdict-text md" id="verdict-text-${uid}"></div>`; wrap.appendChild(vBlock); }
+      let vBlock=document.getElementById('verdict-'+uid);
+      if(!vBlock){
+        vBlock=document.createElement('div');
+        vBlock.className='verdict-bubble';
+        vBlock.id='verdict-'+uid;
+        vBlock.innerHTML=`<div class="verdict-bubble-header">⬡ Veredito MAX</div><div class="verdict-bubble-text md" id="verdict-text-${uid}"></div>`;
+        box.appendChild(vBlock);
+      }
       const vt=document.getElementById('verdict-text-'+uid);
       if(vt) vt.innerHTML=renderMD(data.content).replace('<div class="md">','').replace(/<\/div>$/,'');
     } else if(data.type==='done'||data.type==='error'){ src.close(); }
     scrollBot('all-sectors');
   };
   src.onerror=()=>src.close();
+}
+
+// ─── BLOCO DE NOTAS ────────────────────────────────────────────────────────
+async function loadNotas(){
+  const list=document.getElementById('notes-list');
+  if(!list) return;
+  try{
+    const r=await fetch('/api/dashboard/notes');
+    const {notas}=await r.json();
+    if(!notas||notas.length===0){list.innerHTML='<div class="notes-loading">Nenhuma nota ainda.</div>';return;}
+    list.innerHTML=notas.map(n=>`<div class="note-item" data-id="${n.id}"><button class="note-item-del" onclick="deleteNota('${n.id}',this.closest('.note-item'))" title="Apagar">✕</button>${esc(n.content)}<div class="note-item-time">${new Date(n.created_at).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</div></div>`).join('');
+  }catch{list.innerHTML='<div class="notes-loading">Erro ao carregar.</div>';}
+}
+
+async function saveNota(){
+  const ta=document.getElementById('nota-input');
+  const content=ta?.value?.trim();
+  if(!content) return;
+  const btn=document.querySelector('.notes-save-btn');
+  if(btn){btn.textContent='Salvando...';btn.disabled=true;}
+  try{
+    await fetch('/api/dashboard/notes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content,session_id:SESSION})});
+    ta.value='';
+    await loadNotas();
+  }catch(e){alert('Erro ao salvar: '+e.message);}
+  finally{if(btn){btn.textContent='Salvar nota →';btn.disabled=false;}}
+}
+
+async function deleteNota(id,el){
+  el?.remove();
+  await fetch(`/api/dashboard/notes/${id}`,{method:'DELETE'}).catch(()=>{});
 }
 
 // ─── CONSELHO ──────────────────────────────────
