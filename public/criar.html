@@ -1507,8 +1507,8 @@ main{position:relative;z-index:auto}
         <div>
           <div class="el-label">Voz</div>
           <select class="el-select" id="el-voice-select">
-            <option value="rodrigo">Liam — masculino</option>
             <option value="feminino">Rachel — feminino</option>
+            <option value="rodrigo">Liam — masculino</option>
             <option value="profissional">George — profissional</option>
           </select>
         </div>
@@ -1614,8 +1614,8 @@ main{position:relative;z-index:auto}
       <div style="font-size:13px;color:var(--text-2);margin-bottom:10px;font-weight:600;letter-spacing:.03em">🎙 NARRAÇÃO DE IA</div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <select id="narr-voz" style="background:#12121e;border:1px solid var(--border);color:var(--text-1);border-radius:8px;padding:7px 12px;font-size:12px;flex:1;min-width:140px">
-          <option value="rodrigo" style="background:#12121e;color:#e2e8f0">Liam — Masculino</option>
           <option value="feminino" style="background:#12121e;color:#e2e8f0">Rachel — Feminino</option>
+          <option value="rodrigo" style="background:#12121e;color:#e2e8f0">Liam — Masculino</option>
           <option value="profissional" style="background:#12121e;color:#e2e8f0">George — Profissional</option>
         </select>
         <button id="btn-narrar" onclick="gerarNarracao()" style="background:linear-gradient(135deg,rgba(168,85,247,.25),rgba(168,85,247,.12));border:1px solid rgba(168,85,247,.4);color:var(--accent);border-radius:8px;padding:8px 16px;font-size:12px;cursor:pointer;white-space:nowrap;transition:all .2s">
@@ -3476,10 +3476,24 @@ main{position:relative;z-index:auto}
         setProgress(2, 'Conectando ao servidor…');
         _startElapsed();
 
+        const _FASES = [
+          [3000,  'MAX recebeu o pedido — iniciando geração…'],
+          [8000,  'Estruturando os capítulos do produto…'],
+          [16000, 'Desenvolvendo o conteúdo de cada seção…'],
+          [28000, 'Revisando coerência e fluxo narrativo…'],
+          [45000, 'Finalizando formatação e layout…'],
+          [65000, 'Quase pronto — aplicando últimos ajustes…'],
+        ];
+        const _faseTimers = _FASES.map(([delay, msg]) =>
+          setTimeout(() => { if (_realPct < 90) setProgress(_realPct + 1, msg); }, delay)
+        );
+
         const _DICAS = [
           '💡 Títulos com números ímpares (3, 7, 9) convertem até 36% mais.',
           '✏️ O conteúdo gerado é seu ponto de partida. Edite e injete sua voz antes de publicar.',
           '🚀 Entregáveis bem estruturados aumentam o valor percebido do seu produto até 3×.',
+          '🎯 Quanto mais específico o público, mais alto o preço que o produto pode cobrar.',
+          '📱 Produtos com capa profissional vendem mais — a capa já está sendo gerada junto.',
         ];
         let _dicaIdx = 0;
         const _tipEl = document.getElementById('gen-tip');
@@ -3492,8 +3506,12 @@ main{position:relative;z-index:auto}
             _tipEl.textContent = _DICAS[_dicaIdx];
             _tipEl.style.opacity = '1';
           }, 400);
-        }, 12000);
-        _stopDicas = () => { clearInterval(_dicaTimer); if (_tipEl) _tipEl.style.opacity = '0'; };
+        }, 10000);
+        _stopDicas = () => {
+          clearInterval(_dicaTimer);
+          _faseTimers.forEach(t => clearTimeout(t));
+          if (_tipEl) _tipEl.style.opacity = '0';
+        };
 
         const initRes = await fetch('/api/criar', {
           method: 'POST',
