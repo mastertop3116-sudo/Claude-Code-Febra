@@ -95,11 +95,12 @@ Tom: acessivel, ludico, pratico para professores`
     : tipo === 'kit_dinamicas' ? SYSTEM_DINAMICA
     : SYSTEM_ATIVIDADE
 
+  // geminiJson ignora 2o param — usar geminiFlash com systemInstruction
   let raw
   try {
-    raw = await geminiJson(prompt, system)
+    raw = await geminiFlash(prompt, system)
   } catch (_) {
-    raw = await geminiFlash(prompt + '\n\nResponda em JSON valido conforme a estrutura definida.')
+    raw = await geminiFlash(prompt + '\n\nResponda em JSON valido com todos os campos da estrutura definida.')
   }
   return _parse(raw)
 }
