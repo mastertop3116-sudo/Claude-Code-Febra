@@ -2487,11 +2487,13 @@ main{position:relative;z-index:auto}
   function setProgress(pct, msg) {
     _realPct = pct;
     const bar = document.getElementById('prog-fill');
-    bar.style.width = pct + '%';
-    document.getElementById('prog-pct').textContent = pct + '%';
-    document.getElementById('prog-msg').textContent = msg || '';
+    const pctEl = document.getElementById('prog-pct');
+    const msgEl = document.getElementById('prog-msg');
+    if (bar) bar.style.width = pct + '%';
+    if (pctEl) pctEl.textContent = pct + '%';
+    if (msgEl) msgEl.textContent = msg || '';
     clearTimeout(_fakeTimer);
-    if (pct < 92) {
+    if (bar && pct < 92) {
       (function creep() {
         _fakeTimer = setTimeout(() => {
           const cur = parseFloat(bar.style.width) || 0;
@@ -3469,8 +3471,9 @@ main{position:relative;z-index:auto}
         };
 
         hideErr();
+        const _overlayEl = document.getElementById('overlay-prog');
+        if (_overlayEl) _overlayEl.classList.add('show');
         setProgress(2, 'Conectando ao servidor…');
-        document.getElementById('overlay-prog').classList.add('show');
         _startElapsed();
 
         const _DICAS = [
