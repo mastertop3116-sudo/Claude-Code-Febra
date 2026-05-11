@@ -244,7 +244,7 @@ app.get("/api/criar/progress/:jobId", (req, res) => {
 app.get("/api/criar/result/:jobId", (req, res) => {
   const job = criarJobs.get(req.params.jobId);
   if (!job) return res.status(404).json({ error: "Resultado não encontrado ou expirado" });
-  if (job.status !== "done") return res.status(202).json({ status: job.status, progress: job.progress });
+  if (job.status !== "done") return res.status(202).json({ status: job.status, progress: job.progress, message: job.message || '' });
   const result = {
     titulo: job.titulo,
     pdf: job.pdf,

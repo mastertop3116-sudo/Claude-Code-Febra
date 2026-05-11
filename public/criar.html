@@ -3514,7 +3514,22 @@ main{position:relative;z-index:auto}
               }
             }
           };
-          es.onerror = () => { es.close(); _stopDicas(); _stopElapsed(); reject(new Error('Conexão perdida — tente novamente.')); };
+          es.onerror = async () => {
+            es.close(); _stopDicas();
+            setProgress(50, 'Reconectando ao servidor…');
+            try {
+              for (let _poll = 0; _poll < 90; _poll++) {
+                await new Promise(r => setTimeout(r, 5000));
+                const pr = await fetch('/api/criar/result/' + jobId);
+                if (pr.status === 404) break;
+                const pj = await pr.json();
+                if (pj.status === 'error') { _stopElapsed(); reject(new Error(pj.message || 'Erro na geração.')); return; }
+                if (pj.pdf || pj.gammaUrl || pj.docx) { _stopElapsed(); setProgress(100, 'Pronto!'); showSuccess(pj, apiPayload.titulo); resolve(pj); return; }
+                if (pj.progress !== undefined) setProgress(pj.progress, pj.message || 'Gerando…');
+              }
+            } catch (_) {}
+            _stopElapsed(); reject(new Error('Conexão perdida — tente novamente.'));
+          };
         });
 
       } catch (err) {
