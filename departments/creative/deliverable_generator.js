@@ -2088,21 +2088,13 @@ async function _generateCadernoColorir(params) {
   const { openaiImage } = require("../../integrations/openai");
 
   const imagens = new Array(total).fill(null);
-  const errosImagem = [];
   for (let i = 0; i < total; i++) {
     const pg  = paginasList[i];
     const pct = 15 + Math.round(((i + 1) / total) * 55);
     await progress(pct, `🖌️ Desenhando ${pg.nome_pt} (${i + 1}/${total})...`);
-    try {
-      const dallePrompt = `${pg.prompt_en}, simple coloring book page for children ages 4-8, thick black outlines only, NO color fill, NO shading, NO gray tones, pure white background, clean line art, cute friendly style, printable`;
-      imagens[i] = await openaiImage(dallePrompt, "1024x1024");
-      if (!imagens[i] || imagens[i].length === 0) throw new Error("openaiImage retornou vazio");
-      console.log(`[colorir] ✓ imagem ${i + 1}/${total} — ${pg.nome_pt} (${Math.round(imagens[i].length / 1024)}KB)`);
-    } catch (e) {
-      const errMsg = e.message || String(e);
-      console.error(`[colorir] ✗ falha imagem ${i + 1} (${pg.nome_pt}):`, errMsg);
-      errosImagem.push(`img${i + 1}: ${errMsg.slice(0, 120)}`);
-    }
+    const dallePrompt = `${pg.prompt_en}, simple coloring book page for children ages 4-8, thick black outlines only, NO color fill, NO shading, NO gray tones, pure white background, clean line art, cute friendly style, printable`;
+    imagens[i] = await openaiImage(dallePrompt, "1024x1024");
+    console.log(`[colorir] ✓ imagem ${i + 1}/${total} — ${pg.nome_pt} (${Math.round(imagens[i].length / 1024)}KB)`);
   }
 
   // Monta PDF
