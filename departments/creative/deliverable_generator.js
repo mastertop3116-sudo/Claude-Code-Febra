@@ -2088,6 +2088,7 @@ async function _generateCadernoColorir(params) {
   const { openaiImage } = require("../../integrations/openai");
 
   const imagens = new Array(total).fill(null);
+  const errosImagem = [];
   for (let i = 0; i < total; i++) {
     const pg  = paginasList[i];
     const pct = 15 + Math.round(((i + 1) / total) * 55);
@@ -2101,7 +2102,7 @@ async function _generateCadernoColorir(params) {
     } catch (e) {
       const errMsg = e.message || String(e);
       console.error(`[colorir] ✗ falha imagem ${i + 1} (${pg.nome_pt}):`, errMsg);
-      await progress(pct, `⚠️ Imagem ${i + 1} falhou: ${errMsg.slice(0, 80)}`);
+      errosImagem.push(`img${i + 1}: ${errMsg.slice(0, 120)}`);
     }
   }
 
@@ -2245,7 +2246,9 @@ async function _generateCadernoColorir(params) {
     },
     pdf: pdfBuffer,
     pdfFilename: `${(plano.titulo_capa || titulo || "caderno-colorir").replace(/[^a-zA-Z0-9]/g, "_")}.pdf`,
-    copyContracapa: `${total} desenhos prontos para colorir e aprender. Perfeito para crianças de 4 a 8 anos!`,
+    copyContracapa: errosImagem.length
+      ? `DEBUG ERROS: ${errosImagem.join(' | ')}`
+      : `${total} desenhos prontos para colorir e aprender. Perfeito para crianças de 4 a 8 anos!`,
   };
 }
 
