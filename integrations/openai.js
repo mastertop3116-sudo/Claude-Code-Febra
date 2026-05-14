@@ -34,10 +34,11 @@ async function openaiImage(prompt, size = '1024x1024') {
     prompt,
     n: 1,
     size,
-    response_format: 'b64_json',
     quality: 'standard',
   })
-  return r.data[0].b64_json
+  const url = r.data[0].url
+  const res = await fetch(url)
+  return Buffer.from(await res.arrayBuffer())
 }
 
 // Conversa com histórico completo de mensagens

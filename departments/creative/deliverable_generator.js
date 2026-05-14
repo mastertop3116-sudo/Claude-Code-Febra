@@ -2095,10 +2095,9 @@ async function _generateCadernoColorir(params) {
     await progress(pct, `🖌️ Desenhando ${pg.nome_pt} (${i + 1}/${total})...`);
     try {
       const dallePrompt = `${pg.prompt_en}, simple coloring book page for children ages 4-8, thick black outlines only, NO color fill, NO shading, NO gray tones, pure white background, clean line art, cute friendly style, printable`;
-      const b64 = await openaiImage(dallePrompt, "1024x1024");
-      if (!b64) throw new Error("openaiImage retornou vazio");
-      imagens[i] = Buffer.from(b64, "base64");
-      console.log(`[colorir] ✓ imagem ${i + 1}/${total} — ${pg.nome_pt}`);
+      imagens[i] = await openaiImage(dallePrompt, "1024x1024");
+      if (!imagens[i] || imagens[i].length === 0) throw new Error("openaiImage retornou vazio");
+      console.log(`[colorir] ✓ imagem ${i + 1}/${total} — ${pg.nome_pt} (${Math.round(imagens[i].length / 1024)}KB)`);
     } catch (e) {
       const errMsg = e.message || String(e);
       console.error(`[colorir] ✗ falha imagem ${i + 1} (${pg.nome_pt}):`, errMsg);
