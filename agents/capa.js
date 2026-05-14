@@ -32,6 +32,7 @@ const TIPO_FRAME = {
   workbook:            'interactive workbook cover, hand-written feel, warm study desk atmosphere, creative and approachable',
   kit_dinamicas:       'dynamic activities kit cover, playful movement, group energy, colorful and vibrant',
   atividade_desplugada:'unplugged activity pack cover, paper crafts aesthetic, creative hands-on feel, fun and educational',
+  caderno_colorir:     'coloring book cover for children, bright rainbow colors, crayons and pencils scattered around, joyful playful aesthetic, bold outlines',
   plano_de_aula:       'lesson plan cover, classroom energy, organized and professional, teacher-focused design',
   script_vsl:          'video sales letter, camera lens or stage light, persuasive bold energy, dark cinematic',
 }

@@ -22,6 +22,7 @@ const arquiteto    = require("../../agents/arquiteto");
 const copywriter   = require("../../agents/copywriter");
 const carrosselAgent = require("../../agents/carrossel");
 const capaAgent    = require("../../agents/capa");
+const colorirAgent = require("../../agents/colorir");
 
 const MAX_TENTATIVAS = 3;
 
@@ -2060,10 +2061,208 @@ async function _generateAtividades(params) {
 }
 
 // ──────────────────────────────────────────
+// Caderno de Colorir — pipeline com DALL-E por página
+// ──────────────────────────────────────────
+async function _generateCadernoColorir(params) {
+  const {
+    titulo, subtitulo, nicho, avatar_publico, publico,
+    num_paginas, paginas, onProgress,
+  } = params;
+
+  const progress = typeof onProgress === "function" ? onProgress : () => {};
+  const numPags  = Math.min(parseInt(num_paginas || paginas) || 10, 12);
+  const nichoFinal = nicho || titulo || "animais e natureza";
+
+  await progress(5, "Listando desenhos do caderno...");
+  const plano = await colorirAgent.run({
+    titulo, nicho: nichoFinal,
+    publico: avatar_publico || publico || "crianças de 4 a 8 anos",
+    num_paginas: numPags,
+  });
+
+  const paginasList = plano.paginas || [];
+  const total = paginasList.length;
+
+  // Gera imagens DALL-E em paralelo (lotes de 3 para não sobrecarregar)
+  await progress(15, `🎨 Gerando ${total} desenhos para colorir...`);
+  const OpenAI = require("openai");
+  let _oaiClient = null;
+  const getOAI = () => { if (!_oaiClient) _oaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY }); return _oaiClient; };
+
+  const LOTE = 3;
+  const imagens = new Array(total).fill(null);
+  for (let i = 0; i < total; i += LOTE) {
+    const lote = paginasList.slice(i, i + LOTE);
+    const pct  = 15 + Math.round(((i + LOTE) / total) * 55);
+    await progress(pct, `🖌️ Desenhando ${i + 1}–${Math.min(i + LOTE, total)} de ${total}...`);
+    await Promise.all(lote.map(async (pg, idx) => {
+      try {
+        const dallePrompt = `${pg.prompt_en}, simple black and white coloring book illustration for children ages 4-8, thick black outlines only, absolutely NO color fill, NO shading, NO gray, pure white background, clean crisp lines, cute friendly style, printable worksheet`;
+        const resp = await getOAI().images.generate({
+          model: "dall-e-3", prompt: dallePrompt,
+          size: "1024x1024", quality: "standard", n: 1,
+        });
+        const imgRes = await fetch(resp.data[0].url);
+        imagens[i + idx] = Buffer.from(await imgRes.arrayBuffer());
+      } catch (e) {
+        console.warn(`[colorir] falha na imagem ${i + idx + 1}:`, e.message);
+      }
+    }));
+  }
+
+  // Monta PDF
+  await progress(75, "📄 Montando caderno PDF...");
+  const doc = new PDFDocument({ size: "A4", margin: 0, autoFirstPage: false });
+  const chunks = [];
+  doc.on("data", c => chunks.push(c));
+
+  const W = 595.28, H = 841.89;
+  const FONT_DIR = path.join(__dirname, "../../assets/fonts");
+  const hasBold  = fs.existsSync(path.join(FONT_DIR, "Anton-Regular.ttf"));
+  const hasBody  = fs.existsSync(path.join(FONT_DIR, "Nunito-Bold.ttf")) ||
+                   fs.existsSync(path.join(FONT_DIR, "NunitoExtraLight-Bold.ttf"));
+
+  const fTitle = hasBold  ? path.join(FONT_DIR, "Anton-Regular.ttf")             : "Helvetica-Bold";
+  const fBody  = hasBody  ? (
+    fs.existsSync(path.join(FONT_DIR, "Nunito-Bold.ttf"))
+      ? path.join(FONT_DIR, "Nunito-Bold.ttf")
+      : path.join(FONT_DIR, "NunitoExtraLight-Bold.ttf")
+  ) : "Helvetica";
+
+  const tryFont = (doc, font, fallback) => {
+    try { doc.font(font); } catch { doc.font(fallback); }
+  };
+
+  // ── Capa ──
+  doc.addPage();
+  // Fundo amarelo vibrante
+  doc.rect(0, 0, W, H).fill("#FFF176");
+  // Borda colorida (4 lados)
+  const BW = 18;
+  doc.rect(0, 0, W, BW).fill("#FF7043");
+  doc.rect(0, H - BW, W, BW).fill("#FF7043");
+  doc.rect(0, 0, BW, H).fill("#FF7043");
+  doc.rect(W - BW, 0, BW, H).fill("#FF7043");
+  // Bolinhas decorativas nos cantos
+  const dots = ["#4FC3F7","#81C784","#FF8A65","#CE93D8"];
+  [[BW+20, BW+20],[W-BW-20, BW+20],[BW+20, H-BW-20],[W-BW-20, H-BW-20]].forEach(([x,y],i)=>{
+    doc.circle(x, y, 14).fill(dots[i % dots.length]);
+  });
+
+  // Título
+  tryFont(doc, fTitle, "Helvetica-Bold");
+  doc.fillColor("#E53935").fontSize(38)
+    .text(plano.titulo_capa || titulo || "Caderno de Colorir", BW + 30, H * 0.22, {
+      width: W - (BW + 30) * 2, align: "center", lineGap: 6,
+    });
+
+  // Subtítulo
+  tryFont(doc, fBody, "Helvetica");
+  doc.fillColor("#333").fontSize(18)
+    .text(plano.subtitulo_capa || subtitulo || "Pinte, divirta-se e aprenda!", BW + 30, H * 0.42, {
+      width: W - (BW + 30) * 2, align: "center",
+    });
+
+  // Ícone central estrelinha (asterisco grande)
+  doc.fillColor("#FF7043").fontSize(90)
+    .text("★", 0, H * 0.52, { width: W, align: "center" });
+
+  // Rodapé
+  doc.fillColor("#555").fontSize(13)
+    .text(`${total} desenhos para colorir`, 0, H * 0.82, { width: W, align: "center" });
+
+  // ── Páginas de atividade ──
+  for (let i = 0; i < paginasList.length; i++) {
+    const pg    = paginasList[i];
+    const img   = imagens[i];
+    doc.addPage();
+
+    // Fundo branco
+    doc.rect(0, 0, W, H).fill("#FFFFFF");
+
+    // Topo colorido
+    const headerColors = ["#FF7043","#4FC3F7","#81C784","#CE93D8","#FFB74D","#4DB6AC"];
+    const hColor = headerColors[i % headerColors.length];
+    doc.rect(0, 0, W, 68).fill(hColor);
+
+    // Número da página no topo esquerdo
+    tryFont(doc, fTitle, "Helvetica-Bold");
+    doc.fillColor("white").fontSize(22)
+      .text(`${i + 1}`, 24, 20, { width: 40, align: "center" });
+
+    // Título da página
+    doc.fillColor("white").fontSize(26)
+      .text(pg.instrucao || `Pinte o ${pg.nome_pt}!`, 70, 20, {
+        width: W - 100, align: "center",
+      });
+
+    // Imagem centralizada
+    const imgSize = 400;
+    const imgX = (W - imgSize) / 2;
+    const imgY = 88;
+    if (img) {
+      try {
+        doc.image(img, imgX, imgY, { width: imgSize, height: imgSize, fit: [imgSize, imgSize] });
+      } catch (e) {
+        // fallback: moldura vazia
+        doc.rect(imgX, imgY, imgSize, imgSize).stroke("#ccc");
+        doc.fillColor("#aaa").fontSize(14)
+          .text("Imagem indisponível", imgX, imgY + imgSize / 2 - 10, { width: imgSize, align: "center" });
+      }
+    } else {
+      // Caixa tracejada como placeholder
+      doc.save().dash(8, { space: 4 })
+        .rect(imgX, imgY, imgSize, imgSize).stroke("#BBB").restore();
+      doc.fillColor("#CCC").fontSize(14)
+        .text("✏️ Desenhe aqui!", imgX, imgY + imgSize / 2 - 10, { width: imgSize, align: "center" });
+    }
+
+    // Campo "Escreva o nome:"
+    const lineY = imgY + imgSize + 28;
+    tryFont(doc, fBody, "Helvetica");
+    doc.fillColor("#333").fontSize(16)
+      .text("Escreva o nome:", 60, lineY);
+    // Linha pontilhada
+    doc.save().dash(4, { space: 3 })
+      .moveTo(220, lineY + 14).lineTo(W - 60, lineY + 14)
+      .stroke("#555").restore();
+
+    // Linha de crédito no rodapé
+    doc.fillColor("#BBB").fontSize(9)
+      .text("Nexus Forge · Caderno de Colorir", 0, H - 28, { width: W, align: "center" });
+  }
+
+  await new Promise(resolve => { doc.end(); doc.on("end", resolve); });
+  const pdfBuffer = Buffer.concat(chunks);
+
+  await progress(95, "✅ Caderno pronto!");
+
+  return {
+    titulo: plano.titulo_capa || titulo || "Caderno de Colorir",
+    conteudo: {
+      capa: { titulo: plano.titulo_capa || titulo, subtitulo: plano.subtitulo_capa || "" },
+      secoes: paginasList.map((pg) => ({
+        titulo: pg.nome_pt,
+        conteudo: pg.instrucao,
+        gancho: null, ponto_de_acao: null, destaques: [],
+      })),
+      conclusao: "",
+    },
+    pdf: pdfBuffer,
+    pdfFilename: `${(plano.titulo_capa || titulo || "caderno-colorir").replace(/[^a-zA-Z0-9]/g, "_")}.pdf`,
+    copyContracapa: `${total} desenhos prontos para colorir e aprender. Perfeito para crianças de 4 a 8 anos!`,
+  };
+}
+
+// ──────────────────────────────────────────
 // Função principal
 // config.onProgress(pct, msg) — callback opcional para progresso em tempo real
 // ──────────────────────────────────────────
 async function generate(params) {
+  if (params.tipo === "caderno_colorir") {
+    return _generateCadernoColorir(params);
+  }
+
   if (TIPOS_ATIVIDADE.has(params.tipo)) {
     return _generateAtividades(params);
   }

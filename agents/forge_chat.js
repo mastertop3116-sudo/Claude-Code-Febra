@@ -19,6 +19,7 @@ const TIPOS_VALIDOS = {
   atividade_desplugada: { label: 'Kit de Atividades Desplugadas (PDF visual)', paginas: 5  },
   plano_de_aula:        { label: 'Planos de Aula Completos (PDF visual)',      paginas: 5  },
   kit_dinamicas:        { label: 'Kit de Dinâmicas Pedagógicas (PDF visual)',  paginas: 5  },
+  caderno_colorir:      { label: 'Caderno de Colorir (PDF com desenhos)',        paginas: 10 },
 }
 
 const SYSTEM_COLLECT = `Você é o MAX, especialista em criação de infoprodutos digitais brasileiros da Nexus.
@@ -41,8 +42,9 @@ TIPOS DISPONÍVEIS E MAPEAMENTO:
 - atividade_desplugada → quando o usuário pede "atividade desplugada", "kit de atividades", "atividades sem computador", "dinâmica de pensamento computacional"
 - plano_de_aula → quando pede "plano de aula", "planejamento de aula", "sequência didática"
 - kit_dinamicas → quando pede "kit de dinâmicas", "dinâmicas para sala", "jogos pedagógicos", "brincadeiras educativas"
+- caderno_colorir → quando pede "caderno de colorir", "livro de colorir", "desenhos para colorir", "páginas de colorir", "atividade de colorir", "coloring book"
 
-ATENÇÃO — tipos visuais (atividade_desplugada, plano_de_aula, kit_dinamicas):
+ATENÇÃO — tipos visuais (atividade_desplugada, plano_de_aula, kit_dinamicas, caderno_colorir):
 - Para estes tipos, "paginas" = número de atividades/aulas (ex: "5 atividades" → paginas: 5)
 - Colete ano escolar alvo se mencionado (ex: "1o ao 3o ano")
 - Para script_vsl: colete também preço e prova social
@@ -59,7 +61,7 @@ Se tiver contexto suficiente:
   "pronto": true,
   "resposta": "Perfeito! Tenho tudo que preciso. Montando seu [tipo]...",
   "contexto": {
-    "tipo": "ebook|workbook|checklist|planner|cheat_sheet|pregacoes|devocional|script_vsl|atividade_desplugada|plano_de_aula|kit_dinamicas",
+    "tipo": "ebook|workbook|checklist|planner|cheat_sheet|pregacoes|devocional|script_vsl|atividade_desplugada|plano_de_aula|kit_dinamicas|caderno_colorir",
     "titulo": "título sugerido ou fornecido",
     "subtitulo": "subtítulo complementar",
     "tema": "nicho/tema do produto",
