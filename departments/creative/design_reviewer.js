@@ -7,6 +7,7 @@
 
 const { geminiJson } = require("../../integrations/gemini");
 const { saveMemory } = require("../../integrations/supabase");
+const { _inferTema } = require("../../agents/capa");
 require("dotenv").config();
 
 // Critérios visuais específicos por nicho/tema
@@ -47,6 +48,42 @@ const NICHE_VISUAL_CRITERIA = {
 - Elementos: formas abstratas, geometria dinâmica, texturas digitais
 - Composição: assimétrica, moderna, que faz o olho explorar
 - Ausência de clichês fotográficos ou designs convencionais`,
+  espiritual: `
+- Atmosfera sagrada: transmite fé, paz, reverência e presença divina?
+- Paleta: dourado, sépia, creme, luz branca — tons que remetem ao sagrado
+- Elementos: luz divina, raios suaves, cruz, páginas de bíblia, natureza serena
+- Composição: equilibrada, centralizada, inspiradora — convida ao silêncio interior
+- Ausência de elementos profanos, agressivos ou modernos demais`,
+  infantil: `
+- Alegria imediata: a imagem transmite diversão, energia e segurança para crianças?
+- Paleta: cores primárias vibrantes mas harmônicas — amarelo, azul, vermelho, verde
+- Elementos: personagens estilizados (sticker-art), formas arredondadas, expressões amigáveis
+- Composição: aberta, dinâmica, com foco central claro e borda limpa
+- Ausência de elementos assustadores, escuros ou inadequados para o público infantil`,
+  esportivo: `
+- Energia física: a imagem transmite movimento, força e determinação atlética?
+- Paleta: preto, vermelho, laranja elétrico ou azul intenso — alta energia, sem pastéis
+- Elementos: silhueta em movimento, equipamento esportivo, luz dramática
+- Composição: dinâmica, diagonal, transmite velocidade e impacto
+- Ausência de elementos femininos delicados, estáticos ou acadêmicos`,
+  saude: `
+- Bem-estar visual: a imagem transmite saúde, vitalidade e equilíbrio?
+- Paleta: verde fresco, branco limpo, azul suave — associações naturais e médicas
+- Elementos: natureza (folhas, água), figura humana em movimento leve, luz natural
+- Composição: aberta, com respiro, transmite clareza e higiene visual
+- Ausência de elementos industriais, escuros ou agressivos`,
+  financas: `
+- Prosperidade visual: a imagem transmite confiança, crescimento e riqueza?
+- Paleta: verde escuro, dourado, preto premium — nada barato ou colorido demais
+- Elementos: gráficos ascendentes abstratos, formas geométricas precisas, textura premium
+- Composição: hierárquica, limpa, transmite competência e autoridade financeira
+- Ausência de dinheiro literal, cifrões explícitos ou clichês financeiros`,
+  educacao: `
+- Inspiração ao conhecimento: a imagem convida à descoberta e ao aprendizado?
+- Paleta: âmbar quente, azul profundo ou verde intelectual — acolhedora mas séria
+- Elementos: livros abertos, luz de descoberta, formas que remetem à aprendizagem
+- Composição: acolhedora, organizada, transmite sabedoria acessível
+- Ausência de elementos infantilizados ou excessivamente corporativos`,
 };
 
 // ──────────────────────────────────────────
@@ -56,7 +93,9 @@ const NICHE_VISUAL_CRITERIA = {
 async function revisarCapaVisual(coverImageBuffer, titulo, temaKey) {
   if (!coverImageBuffer) return null;
 
-  const critEspecificos = NICHE_VISUAL_CRITERIA[temaKey] || NICHE_VISUAL_CRITERIA.produtividade;
+  // temaKey may be a product type ('devocional') — infer the visual theme if not a criteria key
+  const resolvedKey = NICHE_VISUAL_CRITERIA[temaKey] ? temaKey : _inferTema('', temaKey);
+  const critEspecificos = NICHE_VISUAL_CRITERIA[resolvedKey] || NICHE_VISUAL_CRITERIA.produtividade;
 
   try {
     const { openaiJson: _oaiJson } = require("../../integrations/openai");
@@ -65,7 +104,7 @@ async function revisarCapaVisual(coverImageBuffer, titulo, temaKey) {
     const _getClient = () => { if (!_client) _client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY }); return _client; };
 
     const reviewPrompt = `Você é um diretor de arte RIGOROSO especialista em capas de produtos digitais para o mercado brasileiro de infoprodutos.
-Avalie esta imagem para ser usada como capa do entregável "${titulo}" (nicho: ${temaKey}).
+Avalie esta imagem para ser usada como capa do entregável "${titulo}" (nicho: ${resolvedKey}).
 
 CRITÉRIOS GERAIS (peso 50%):
 1. Impacto visual imediato — em 3 segundos chama atenção e comunica o valor?
@@ -74,7 +113,7 @@ CRITÉRIOS GERAIS (peso 50%):
 4. Qualidade técnica — sem artefatos, desfoque, ou erros de geração visíveis?
 5. Ausência de texto na imagem — imagem pura, sem letras ou números?
 
-CRITÉRIOS ESPECÍFICOS DO NICHO "${temaKey}" (peso 50%):
+CRITÉRIOS ESPECÍFICOS DO NICHO "${resolvedKey}" (peso 50%):
 ${critEspecificos}
 
 Responda EM JSON puro (sem markdown):

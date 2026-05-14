@@ -21,6 +21,7 @@ const estrategista = require("../../agents/estrategista");
 const arquiteto    = require("../../agents/arquiteto");
 const copywriter   = require("../../agents/copywriter");
 const carrosselAgent = require("../../agents/carrossel");
+const capaAgent    = require("../../agents/capa");
 
 const MAX_TENTATIVAS = 3;
 
@@ -2100,6 +2101,17 @@ async function generate(params) {
   let capaBuffer = null;
   if (capaImagem) {
     capaBuffer = typeof capaImagem === "string" ? Buffer.from(capaImagem, "base64") : capaImagem;
+  } else {
+    try {
+      await progress(72, "🎨 Criando capa com DALL-E 3...");
+      const capaResult = await capaAgent.run({ titulo, nicho: nichoFinal, tema: temaKey, tipo });
+      capaBuffer = capaResult.buffer;
+      // Update temaKey if capa agent inferred a more specific theme
+      if (capaResult.temaKey && capaResult.temaKey !== temaKey) temaKey = capaResult.temaKey;
+      console.log(`[capa DALL-E] tema=${capaResult.temaKey} tipo=${tipo}`);
+    } catch (e) {
+      console.warn("[capa DALL-E] falha — continuando sem imagem:", e.message);
+    }
   }
 
   let slides = null;
