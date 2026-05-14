@@ -2095,10 +2095,13 @@ async function _generateCadernoColorir(params) {
     try {
       const dallePrompt = `${pg.prompt_en}, simple coloring book page for children ages 4-8, thick black outlines only, NO color fill, NO shading, NO gray tones, pure white background, clean line art, cute friendly style, printable`;
       const b64 = await openaiImage(dallePrompt, "1024x1024");
+      if (!b64) throw new Error("openaiImage retornou vazio");
       imagens[i] = Buffer.from(b64, "base64");
       console.log(`[colorir] ✓ imagem ${i + 1}/${total} — ${pg.nome_pt}`);
     } catch (e) {
-      console.error(`[colorir] ✗ falha imagem ${i + 1} (${pg.nome_pt}):`, e.message);
+      const errMsg = e.message || String(e);
+      console.error(`[colorir] ✗ falha imagem ${i + 1} (${pg.nome_pt}):`, errMsg);
+      await progress(pct, `⚠️ Imagem ${i + 1} falhou: ${errMsg.slice(0, 80)}`);
     }
   }
 
