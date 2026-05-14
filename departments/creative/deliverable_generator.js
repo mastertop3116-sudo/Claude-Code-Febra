@@ -2188,14 +2188,7 @@ async function _generateCadernoColorir(params) {
     const imgX = (W - imgSize) / 2;
     const imgY = 88;
     if (img) {
-      try {
-        doc.image(img, imgX, imgY, { width: imgSize, height: imgSize, fit: [imgSize, imgSize] });
-      } catch (e) {
-        // fallback: moldura vazia
-        doc.rect(imgX, imgY, imgSize, imgSize).stroke("#ccc");
-        doc.fillColor("#aaa").fontSize(14)
-          .text("Imagem indisponível", imgX, imgY + imgSize / 2 - 10, { width: imgSize, align: "center" });
-      }
+      doc.image(img, imgX, imgY, { width: imgSize, height: imgSize, fit: [imgSize, imgSize] });
     } else {
       // Caixa tracejada como placeholder
       doc.save().dash(8, { space: 4 })
