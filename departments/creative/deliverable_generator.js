@@ -2083,31 +2083,23 @@ async function _generateCadernoColorir(params) {
   const paginasList = plano.paginas || [];
   const total = paginasList.length;
 
-  // Gera imagens DALL-E em paralelo (lotes de 3 para não sobrecarregar)
+  // Gera imagens DALL-E sequencialmente (DALL-E 3 não aceita paralelo — 1 req/s)
   await progress(15, `🎨 Gerando ${total} desenhos para colorir...`);
-  const OpenAI = require("openai");
-  let _oaiClient = null;
-  const getOAI = () => { if (!_oaiClient) _oaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY }); return _oaiClient; };
+  const { openaiImage } = require("../../integrations/openai");
 
-  const LOTE = 3;
   const imagens = new Array(total).fill(null);
-  for (let i = 0; i < total; i += LOTE) {
-    const lote = paginasList.slice(i, i + LOTE);
-    const pct  = 15 + Math.round(((i + LOTE) / total) * 55);
-    await progress(pct, `🖌️ Desenhando ${i + 1}–${Math.min(i + LOTE, total)} de ${total}...`);
-    await Promise.all(lote.map(async (pg, idx) => {
-      try {
-        const dallePrompt = `${pg.prompt_en}, simple black and white coloring book illustration for children ages 4-8, thick black outlines only, absolutely NO color fill, NO shading, NO gray, pure white background, clean crisp lines, cute friendly style, printable worksheet`;
-        const resp = await getOAI().images.generate({
-          model: "dall-e-3", prompt: dallePrompt,
-          size: "1024x1024", quality: "standard", n: 1,
-        });
-        const imgRes = await fetch(resp.data[0].url);
-        imagens[i + idx] = Buffer.from(await imgRes.arrayBuffer());
-      } catch (e) {
-        console.warn(`[colorir] falha na imagem ${i + idx + 1}:`, e.message);
-      }
-    }));
+  for (let i = 0; i < total; i++) {
+    const pg  = paginasList[i];
+    const pct = 15 + Math.round(((i + 1) / total) * 55);
+    await progress(pct, `🖌️ Desenhando ${pg.nome_pt} (${i + 1}/${total})...`);
+    try {
+      const dallePrompt = `${pg.prompt_en}, simple coloring book page for children ages 4-8, thick black outlines only, NO color fill, NO shading, NO gray tones, pure white background, clean line art, cute friendly style, printable`;
+      const b64 = await openaiImage(dallePrompt, "1024x1024");
+      imagens[i] = Buffer.from(b64, "base64");
+      console.log(`[colorir] ✓ imagem ${i + 1}/${total} — ${pg.nome_pt}`);
+    } catch (e) {
+      console.error(`[colorir] ✗ falha imagem ${i + 1} (${pg.nome_pt}):`, e.message);
+    }
   }
 
   // Monta PDF
