@@ -27,7 +27,7 @@ async function openaiJson(prompt, systemInstruction = null) {
   return r.choices[0].message.content
 }
 
-// Gera uma imagem via DALL-E 3 e retorna base64
+// Gera uma imagem via DALL-E 3 e retorna Buffer PNG
 async function openaiImage(prompt, size = '1024x1024') {
   const r = await _getClient().images.generate({
     model: 'dall-e-3',
@@ -37,8 +37,14 @@ async function openaiImage(prompt, size = '1024x1024') {
     quality: 'standard',
   })
   const url = r.data[0].url
+  if (!url) throw new Error('DALL-E não retornou URL')
   const res = await fetch(url)
-  return Buffer.from(await res.arrayBuffer())
+  if (!res.ok) throw new Error(`fetch imagem HTTP ${res.status}: ${res.statusText}`)
+  const buf = Buffer.from(await res.arrayBuffer())
+  if (buf.length < 1000) throw new Error(`imagem muito pequena (${buf.length} bytes) — provavelmente erro`)
+  // Validar magic bytes PNG: \x89PNG
+  if (buf[0] !== 0x89 || buf[1] !== 0x50) throw new Error(`resposta não é PNG (bytes: ${buf[0]},${buf[1]})`)
+  return buf
 }
 
 // Conversa com histórico completo de mensagens
