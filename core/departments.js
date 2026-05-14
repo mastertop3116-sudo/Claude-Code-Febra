@@ -275,13 +275,11 @@ Papel: consolidar perspectivas dos departamentos em veredito executivo acionáve
 
 ${responsesText}
 
-VEREDITO EXECUTIVO CONSOLIDADO:
-1. Top 3 ações priorizadas por impacto (seja específico)
-2. O que fazer nas próximas 24h
-3. Métrica de sucesso para cada ação
-4. Um alerta crítico (se houver)
-
-Seja direto. Não repita o que os departamentos disseram.`,
+VEREDITO — máximo 5 linhas, sem repetir o que os departamentos disseram:
+1. Ação #1 (a mais importante)
+2. Ação #2
+3. O que fazer HOJE
+4. Alerta (só se crítico, senão omita)`,
     },
   ];
 

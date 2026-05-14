@@ -284,7 +284,10 @@ body::after{content:'';position:fixed;inset:0;z-index:9990;pointer-events:none;o
 /* Veredito MAX */
 .verdict-bubble{background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(99,102,241,.06));border:1px solid rgba(99,102,241,.3);border-radius:12px;padding:14px 16px;margin:10px 0;border-left:3px solid var(--nexus)}
 .verdict-bubble-header{font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--nexus);margin-bottom:8px}
-.verdict-bubble-text{font-size:13.5px;line-height:1.65;color:var(--text-1);word-break:break-word}
+.verdict-bubble-text{font-size:13.5px;line-height:1.65;color:var(--text-1);word-break:break-word;max-height:220px;overflow:hidden;transition:max-height .3s ease}
+.verdict-bubble-text.expanded{max-height:2000px}
+.verdict-expand{display:inline-block;margin-top:8px;font-size:11px;color:var(--nexus);cursor:pointer;border:none;background:none;padding:0;font-family:'Outfit',sans-serif}
+.verdict-expand:hover{opacity:.8}
 /* Notas */
 .notes-header{padding:14px 16px 10px;border-bottom:1px solid var(--border)}
 .notes-title{display:block;font-size:12px;font-weight:700;color:var(--text-1);margin-bottom:2px}
@@ -1908,7 +1911,7 @@ async function sendConsensus(msg){
         vBlock=document.createElement('div');
         vBlock.className='verdict-bubble';
         vBlock.id='verdict-'+uid;
-        vBlock.innerHTML=`<div class="verdict-bubble-header">⬡ Veredito MAX</div><div class="verdict-bubble-text md" id="verdict-text-${uid}"></div>`;
+        vBlock.innerHTML=`<div class="verdict-bubble-header">⬡ Veredito MAX</div><div class="verdict-bubble-text md" id="verdict-text-${uid}"></div><button class="verdict-expand" onclick="const t=this.previousElementSibling;t.classList.toggle('expanded');this.textContent=t.classList.contains('expanded')?'ver menos ↑':'ver mais ↓'">ver mais ↓</button>`;
         box.appendChild(vBlock);
       }
       const vt=document.getElementById('verdict-text-'+uid);
