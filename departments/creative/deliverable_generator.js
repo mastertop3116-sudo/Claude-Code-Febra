@@ -2245,9 +2245,7 @@ async function _generateCadernoColorir(params) {
     },
     pdf: pdfBuffer,
     pdfFilename: `${(plano.titulo_capa || titulo || "caderno-colorir").replace(/[^a-zA-Z0-9]/g, "_")}.pdf`,
-    copyContracapa: errosImagem.length
-      ? `DEBUG ERROS: ${errosImagem.join(' | ')}`
-      : `${total} desenhos prontos para colorir e aprender. Perfeito para crianças de 4 a 8 anos!`,
+    copyContracapa: `${total} desenhos prontos para colorir e aprender. Perfeito para crianças de 4 a 8 anos!`,
   };
 }
 
