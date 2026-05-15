@@ -333,9 +333,22 @@ async function gerarPDF(config, conteudo) {
       cy += 4;
     }
 
+    // ── Sanitiza Unicode problemático para PDFKit ──
+    function sanitizeText(t) {
+      return String(t || "")
+        .replace(/[□☐]/g, "[ ]")
+        .replace(/[☑✅✔]/g, "[x]")
+        .replace(/→/g, "->")
+        .replace(/←/g, "<-")
+        .replace(/✓/g, "v")
+        .replace(/[""]/g, '"')
+        .replace(/['']/g, "'")
+        .replace(/[…]/g, "...");
+    }
+
     // ── Detecta tipo de linha ──
     function getLineType(line) {
-      const l = line.trim();
+      const l = line.trim().replace(/^\*\*/, "").replace(/\*\*$/, "");
       if (/^\[\s*[xX✓]?\s*\]/.test(l))           return "checkbox";
       if (/^[-*•]\s+/.test(l))                     return "bullet";
       if (/^\d+\.\s+/.test(l))                     return "numbered";
@@ -348,7 +361,7 @@ async function gerarPDF(config, conteudo) {
     // ── Checkbox visual ──
     function writeChecklistItem(line) {
       const checked   = /^\[\s*[xX✓]\s*\]/.test(line.trim());
-      const cleanText = line.replace(/^\[\s*[xX✓]?\s*\]\s*/, "").replace(/\*\*/g, "").trim();
+      const cleanText = sanitizeText(line.replace(/^\[\s*[xX✓]?\s*\]\s*/, "").replace(/\*\*/g, "").trim());
       if (!cleanText) return;
       const est  = doc.heightOfString(cleanText, { width: CW - 30, fontSize: 11, lineGap: 3 });
       const boxH = Math.max(20, est + 4);
@@ -377,11 +390,11 @@ async function gerarPDF(config, conteudo) {
 
     // ── Ponto de ação (▸) ──
     function writeActionPoint(line) {
-      const cleanText = line.replace(/^▸\s*/, "").replace(/\*\*/g, "").trim();
+      const cleanText = sanitizeText(line.replace(/^▸\s*/, "").replace(/\*\*/g, "").trim());
       if (!cleanText) return;
       const est  = doc.heightOfString(cleanText, { width: CW - 46, fontSize: 10.5, lineGap: 3 });
-      const boxH = Math.max(48, Math.ceil(est * 1.4) + 32);
-      if (cy + boxH + 16 > CB) newPage();
+      const boxH = Math.max(40, Math.ceil(est * 1.2) + 26);
+      if (cy + boxH > CB) newPage();
       doc.save();
       doc.fillOpacity(0.07);
       doc.rect(ML, cy, CW, boxH).fill(C.primary);
@@ -407,7 +420,7 @@ async function gerarPDF(config, conteudo) {
 
     // ── Parágrafo normal ──
     function writeParagraph(line) {
-      const cleanText = line.replace(/\*\*/g, "").trim();
+      const cleanText = sanitizeText(line.replace(/\*\*/g, "").trim());
       if (!cleanText) return;
       if (cy + 24 > CB) newPage();
       doc.fillColor(TEXT_DARK).font(F.body).fontSize(11)
@@ -434,7 +447,7 @@ async function gerarPDF(config, conteudo) {
     // ── Corpo principal ──
     function writeBody(text) {
       if (!text) return;
-      const lines = String(text).split(/\n/).map(l => l.trim()).filter(Boolean);
+      const lines = sanitizeText(String(text)).split(/\n/).map(l => l.trim()).filter(Boolean);
       for (const line of lines) dispatchLine(line);
     }
 
@@ -444,10 +457,10 @@ async function gerarPDF(config, conteudo) {
       const t = text.trim();
       if (/^▸/.test(t))                              { writeActionPoint(t); return; }
       if (/^(FATO\/DADO|FATO|DADO)\s*:/i.test(t))   { writeFactBox(t);     return; }
-      const cleanText = t.replace(/\*\*/g, "");
+      const cleanText = sanitizeText(t.replace(/\*\*/g, ""));
       const est  = doc.heightOfString(cleanText, { width: CW - 50, fontSize: 10.5, lineGap: 3.5 });
-      const boxH = Math.max(54, Math.ceil(est * 1.4) + 38);
-      if (cy + boxH + 16 > CB) newPage();
+      const boxH = Math.max(48, Math.ceil(est * 1.2) + 32);
+      if (cy + boxH > CB) newPage();
       doc.save();
       doc.fillOpacity(0.06);
       doc.rect(ML, cy, CW, boxH).fill(C.primary);
@@ -527,8 +540,8 @@ async function gerarPDF(config, conteudo) {
     // ── Quote / gancho box ──
     function writeGanchoBox(texto) {
       if (!texto) return;
-      const clean = texto.replace(/\*\*/g, "").trim();
-      const est  = doc.heightOfString(clean, { width: CW - 68, fontSize: 12.5, lineGap: 5 });
+      const clean = sanitizeText(texto.replace(/\*\*/g, "").trim());
+      const est  = doc.heightOfString(clean, { width: CW - 62, fontSize: 12.5, lineGap: 5 });
       const boxH = Math.max(84, Math.ceil(est * 1.4) + 56);
       if (cy + boxH + 20 > CB) newPage();
       doc.save();
@@ -814,7 +827,16 @@ async function gerarPDF(config, conteudo) {
       newPage(secao.titulo);
       drawChapterBanner(secao.titulo, numStr);
       if (secao.gancho) writeGanchoBox(secao.gancho);
-      writeBody(secao.conteudo);
+      let bodyContent = secao.conteudo || "";
+      if (config.tipo === "checklist") {
+        bodyContent = bodyContent
+          .split(/[;]\s*/)
+          .map(s => s.trim().replace(/[.;]$/, ""))
+          .filter(s => s.length > 3)
+          .map(s => (/^\[\s*[xX✓]?\s*\]/.test(s) ? s : `[ ] ${s}`))
+          .join("\n");
+      }
+      writeBody(bodyContent);
       if (secao.ponto_de_acao) {
         cy += 6;
         writeActionPoint(`▸ ${secao.ponto_de_acao}`);
