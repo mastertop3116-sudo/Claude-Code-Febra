@@ -8,8 +8,6 @@
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/wavesurfer.js@6.6.4/dist/wavesurfer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/wavesurfer.js@6.6.4/dist/plugin/wavesurfer.regions.min.js"></script>
-<!-- FFmpeg.wasm pré-carregado para export rápido -->
-<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/umd/ffmpeg.js" defer></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -359,7 +357,7 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'Outfit',
   <button class="btn-new" onclick="newProject()">Novo Projeto</button>
   <button class="btn-export" id="btn-export" onclick="startExport()">
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    Exportar MP4
+    Exportar Vídeo
   </button>
 </div>
 
@@ -522,7 +520,6 @@ let wavesurfer = null, wsRegion = null;
 let playRAF = null, playStartReal = 0, playStartOffset = 0;
 let activeVideoEl = null, lastPlayingSceneId = null;
 let audioEl = null;
-let ffmpegInst = null;
 let exportCancelled = false;
 let sceneIdN = 0;
 
@@ -1285,7 +1282,7 @@ function initWS() {
 }
 
 // ════════════════════════════════════════════════════════════════
-// EXPORT — FIXED: proper video capture + seeked-event wait
+// EXPORT — native MediaRecorder, no FFmpeg dependency
 // ════════════════════════════════════════════════════════════════
 async function startExport() {
   if (!state.scenes.length) { toast('Adicione pelo menos uma cena', 'warn'); return; }
@@ -1295,131 +1292,83 @@ async function startExport() {
   document.getElementById('exp-cancel-btn').style.display = '';
   document.getElementById('exp-done-actions').style.display = 'none';
 
+  const W = state.format === 'vertical' ? 1080 : 1920;
+  const H = state.format === 'vertical' ? 1920 : 1080;
+
+  const expCanvas = document.createElement('canvas');
+  expCanvas.width = W; expCanvas.height = H;
+  const expCtx = expCanvas.getContext('2d');
+
+  let audioCtx = null, audioSrc = null;
+
   try {
-    // ── Load FFmpeg ──
-    setExp(2, 'Verificando FFmpeg.wasm...');
-    // Script carregado via <script defer> no head — esperar se ainda não estiver pronto
-    if (!window.FFmpeg?.createFFmpeg) {
-      setExp(3, 'Aguardando FFmpeg carregar...');
-      await new Promise((res, rej) => {
-        let attempts = 0;
-        const check = () => {
-          if (window.FFmpeg?.createFFmpeg) return res();
-          if (++attempts > 40) return rej(new Error('FFmpeg.wasm não carregou. Verifique sua conexão e recarregue a página.'));
-          setTimeout(check, 250);
-        };
-        check();
-      });
-    }
+    setExp(3, 'Preparando exportação...');
 
-    const { createFFmpeg } = window.FFmpeg;
-    if (!ffmpegInst) {
-      ffmpegInst = createFFmpeg({
-        log: false,
-        corePath: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core-st@0.11.1/dist/ffmpeg-core.js',
-        logger: ({ message }) => {
-          const m = message || '';
-          const tm = m.match(/time=(\d+):(\d+):(\d+\.\d+)/);
-          if (tm) {
-            const secs = +tm[1]*3600 + +tm[2]*60 + +tm[3];
-            const tot = totalDur();
-            const pct = Math.min(94, 35 + (secs/tot)*55);
-            setExp(pct, `Codificando ${fmtT(secs)} / ${fmtT(tot)}...`);
-          }
-        }
-      });
-      setExp(5, 'Inicializando FFmpeg.wasm...');
-      await ffmpegInst.load();
-    }
-
-    if (exportCancelled) return closeExportOverlay();
-    setExp(10, 'FFmpeg pronto. Preparando cenas...');
-
-    const W = state.format === 'vertical' ? 1080 : 1920;
-    const H = state.format === 'vertical' ? 1920 : 1080;
-
-    const expCanvas = document.createElement('canvas');
-    expCanvas.width = W; expCanvas.height = H;
-    const expCtx = expCanvas.getContext('2d');
-
-    // ── Record each scene ──
-    const parts = [];
-    for (let i = 0; i < state.scenes.length; i++) {
-      if (exportCancelled) return closeExportOverlay();
-      const sc = state.scenes[i];
-      const pct = 10 + (i / state.scenes.length) * 22;
-      setExp(pct, `Renderizando cena ${i+1} / ${state.scenes.length}: "${sc.name}"...`);
-      const blob = await recordScene(expCanvas, expCtx, sc, W, H);
-      const name = `part_${i}.webm`;
-      ffmpegInst.FS('writeFile', name, new Uint8Array(await blob.arrayBuffer()));
-      parts.push(name);
-    }
-
-    if (exportCancelled) return closeExportOverlay();
-    setExp(34, 'Concatenando cenas...');
-
-    // ── Concat ──
-    const concatTxt = parts.map(p => `file '${p}'`).join('\n');
-    ffmpegInst.FS('writeFile', 'concat.txt', concatTxt);
-    await ffmpegInst.run('-f','concat','-safe','0','-i','concat.txt','-c:v','copy','merged.webm');
-
-    if (exportCancelled) return closeExportOverlay();
-
-    // ── Audio ──
-    let inArgs = ['-i','merged.webm'];
-    let mapArgs = ['-map','0:v'];
-    let audioArgs = [];
+    const videoTracks = expCanvas.captureStream(30).getVideoTracks();
+    let streamTracks = [...videoTracks];
 
     if (state.audio.blob) {
-      setExp(36, 'Processando áudio...');
-      ffmpegInst.FS('writeFile', 'aud_raw.mp3', new Uint8Array(await state.audio.blob.arrayBuffer()));
-      const filters = [];
-      const aStart = state.audio.start || 0;
-      const aEnd = state.audio.end || state.audio.totalDuration;
-      if (aStart > 0 || (state.audio.end && aEnd < state.audio.totalDuration)) {
-        filters.push(`atrim=start=${aStart}:end=${aEnd}`,'asetpts=PTS-STARTPTS');
-      }
+      setExp(7, 'Carregando áudio...');
+      audioCtx = new AudioContext();
+      const dest = audioCtx.createMediaStreamDestination();
+      const arrBuf = await state.audio.blob.arrayBuffer();
+      const audioBuf = await audioCtx.decodeAudioData(arrBuf);
+      audioSrc = audioCtx.createBufferSource();
+      audioSrc.buffer = audioBuf;
       const spd = parseFloat(document.getElementById('aud-speed').value) || 1;
-      if (spd !== 1) filters.push(`atempo=${spd}`);
-      if (filters.length) {
-        await ffmpegInst.run('-i','aud_raw.mp3','-af',filters.join(','),'aud.mp3');
-      } else {
-        ffmpegInst.FS('writeFile','aud.mp3', ffmpegInst.FS('readFile','aud_raw.mp3'));
-      }
-      inArgs = ['-i','merged.webm','-i','aud.mp3'];
-      mapArgs = ['-map','0:v','-map','1:a'];
-      audioArgs = ['-c:a','aac','-b:a','128k','-shortest'];
+      audioSrc.playbackRate.value = spd;
+      audioSrc.connect(dest);
+      streamTracks = [...videoTracks, ...dest.stream.getAudioTracks()];
+      audioSrc.start(0, state.audio.start || 0);
     }
 
-    setExp(38, 'Codificando MP4 final (libx264)...');
-    await ffmpegInst.run(
-      ...inArgs, ...mapArgs,
-      '-c:v','libx264','-crf','23','-preset','fast','-pix_fmt','yuv420p',
-      ...audioArgs,
-      'output.mp4'
-    );
+    const mimeType = ['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm']
+      .find(m => { try { return MediaRecorder.isTypeSupported(m); } catch(e) { return false; } })
+      || 'video/webm';
+
+    const recorder = new MediaRecorder(new MediaStream(streamTracks), {
+      mimeType, videoBitsPerSecond: 10_000_000
+    });
+    const chunks = [];
+    recorder.ondataavailable = e => { if (e.data?.size > 0) chunks.push(e.data); };
+    recorder.start(100);
+    setExp(10, 'Gravando cenas...');
+
+    const total = totalDur();
+    let elapsed = 0;
+    for (let i = 0; i < state.scenes.length; i++) {
+      if (exportCancelled) break;
+      const sc = state.scenes[i];
+      const dur = getSceneDur(sc);
+      setExp(10 + (elapsed / Math.max(total, 0.01)) * 82, `Renderizando cena ${i+1}/${state.scenes.length}: "${sc.name}"...`);
+      await renderSceneToCanvas(expCtx, sc, W, H, dur);
+      elapsed += dur;
+    }
+
+    await new Promise(r => { recorder.onstop = r; recorder.stop(); });
+    if (audioSrc) { try { audioSrc.stop(); } catch(_) {} }
+    if (audioCtx) { try { audioCtx.close(); } catch(_) {} }
+
+    if (exportCancelled) { closeExportOverlay(); return; }
 
     setExp(97, 'Preparando download...');
-    const data = ffmpegInst.FS('readFile', 'output.mp4');
-    const url = URL.createObjectURL(new Blob([data.buffer], { type:'video/mp4' }));
+    const blob = new Blob(chunks, { type: mimeType });
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `nexus-criativo-${Date.now()}.mp4`;
+    a.href = url; a.download = `nexus-criativo-${Date.now()}.webm`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(() => URL.revokeObjectURL(url), 8000);
 
     setExp(100, 'Exportação concluída!');
     document.getElementById('exp-icon').textContent = '✅';
-    document.getElementById('exp-title').textContent = 'MP4 Exportado!';
+    document.getElementById('exp-title').textContent = 'Vídeo Exportado!';
     document.getElementById('exp-cancel-btn').style.display = 'none';
     document.getElementById('exp-done-actions').style.display = 'flex';
-    toast('MP4 exportado com sucesso!', 'ok');
-
-    // Cleanup FFmpeg FS
-    [...parts, 'concat.txt','merged.webm','aud_raw.mp3','aud.mp3','output.mp4'].forEach(f => {
-      try { ffmpegInst.FS('unlink', f); } catch(e) {}
-    });
+    toast('Vídeo exportado com sucesso!', 'ok');
 
   } catch (e) {
+    if (audioSrc) { try { audioSrc.stop(); } catch(_) {} }
+    if (audioCtx) { try { audioCtx.close(); } catch(_) {} }
     console.error('[Export]', e);
     document.getElementById('exp-icon').textContent = '❌';
     document.getElementById('exp-title').textContent = 'Falha na exportação';
@@ -1430,85 +1379,44 @@ async function startExport() {
   }
 }
 
-// Record a single scene — FIXED: native video.play() for video scenes
-function recordScene(canvas, ctx, sc, W, H) {
-  return new Promise(async (resolve, reject) => {
-    const duration = getSceneDur(sc);
-    const mimeType = ['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm']
-      .find(m => { try { return MediaRecorder.isTypeSupported(m); } catch(e) { return false; } })
-      || 'video/webm';
-
-    const chunks = [];
-    const stream = canvas.captureStream(30);
-    const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 8_000_000 });
-    recorder.ondataavailable = e => { if (e.data?.size > 0) chunks.push(e.data); };
-    recorder.onstop = () => resolve(new Blob(chunks, { type: 'video/webm' }));
+// Render one scene in real-time onto the export canvas, resolves when duration is reached
+function renderSceneToCanvas(ctx, sc, W, H, duration) {
+  return new Promise(resolve => {
+    let resolved = false;
+    const done = () => { if (!resolved) { resolved = true; resolve(); } };
+    const startWall = performance.now();
 
     if (sc.type === 'video' && sc.videoEl) {
       const video = sc.videoEl;
-      video.muted = true;
-      video.loop = false;
-
-      // Wait for seek to trim start
-      await new Promise(r => {
-        const onSeeked = () => r();
-        video.addEventListener('seeked', onSeeked, { once: true });
-        video.currentTime = sc.trimStart || 0;
-        setTimeout(r, 2500); // fallback
-      });
-
-      // Draw first frame immediately
-      ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
-      const { sx, sy, sw, sh } = coverFit(video.videoWidth||W, video.videoHeight||H, W, H);
-      try { ctx.drawImage(video, sx, sy, sw, sh, 0, 0, W, H); } catch(e) {}
-      drawLayers(ctx, W, H, sc.layers);
-
-      recorder.start(100);
-
-      const startWall = performance.now();
+      video.muted = true; video.loop = false;
       let animId;
 
       const drawLoop = () => {
-        if (exportCancelled) {
-          cancelAnimationFrame(animId);
-          video.pause();
-          if (recorder.state !== 'inactive') recorder.stop();
-          return;
-        }
-        const elapsed = (performance.now() - startWall) / 1000;
-
+        if (exportCancelled) { cancelAnimationFrame(animId); video.pause(); done(); return; }
+        const el = (performance.now() - startWall) / 1000;
         ctx.clearRect(0, 0, W, H);
         ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
-        const { sx: sx2, sy: sy2, sw: sw2, sh: sh2 } = coverFit(video.videoWidth||W, video.videoHeight||H, W, H);
-        try { ctx.drawImage(video, sx2, sy2, sw2, sh2, 0, 0, W, H); } catch(e) {}
+        const { sx, sy, sw, sh } = coverFit(video.videoWidth||W, video.videoHeight||H, W, H);
+        try { ctx.drawImage(video, sx, sy, sw, sh, 0, 0, W, H); } catch(_) {}
         drawLayers(ctx, W, H, sc.layers);
-
-        if (elapsed >= duration) {
-          cancelAnimationFrame(animId);
-          video.pause();
-          setTimeout(() => { if (recorder.state !== 'inactive') recorder.stop(); }, 200);
-          return;
-        }
+        if (el >= duration) { cancelAnimationFrame(animId); video.pause(); done(); return; }
         animId = requestAnimationFrame(drawLoop);
       };
 
-      video.play()
-        .then(() => { animId = requestAnimationFrame(drawLoop); })
-        .catch(() => {
-          // Play failed — fallback to static frame
-          setTimeout(() => { if (recorder.state !== 'inactive') recorder.stop(); }, duration * 1000 + 200);
-        });
+      let seekPlayCalled = false;
+      const seekAndPlay = () => {
+        if (seekPlayCalled) return; seekPlayCalled = true;
+        video.play()
+          .then(() => { animId = requestAnimationFrame(drawLoop); })
+          .catch(() => { setTimeout(done, duration * 1000); });
+        setTimeout(() => { cancelAnimationFrame(animId); video.pause(); done(); }, (duration + 5) * 1000);
+      };
 
-      // Hard timeout
-      setTimeout(() => {
-        if (animId) cancelAnimationFrame(animId);
-        video.pause();
-        if (recorder.state !== 'inactive') recorder.stop();
-      }, (duration + 6) * 1000);
+      video.addEventListener('seeked', seekAndPlay, { once: true });
+      video.currentTime = sc.trimStart || 0;
+      setTimeout(seekAndPlay, 2500);
 
     } else {
-      // IMAGE scene — static frame
       ctx.clearRect(0, 0, W, H);
       ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
       if (sc.imgEl) {
@@ -1518,11 +1426,7 @@ function recordScene(canvas, ctx, sc, W, H) {
         ctx.fillStyle = '#1a1a2a'; ctx.fillRect(0, 0, W, H);
       }
       drawLayers(ctx, W, H, sc.layers);
-
-      recorder.start();
-      setTimeout(() => {
-        if (recorder.state !== 'inactive') recorder.stop();
-      }, duration * 1000 + 150);
+      setTimeout(done, duration * 1000);
     }
   });
 }
@@ -1538,7 +1442,7 @@ function showExportOverlay() {
   const ov = document.getElementById('exp-ov');
   ov.style.display = 'flex';
   document.getElementById('exp-icon').textContent = '⚙️';
-  document.getElementById('exp-title').textContent = 'Exportando MP4';
+  document.getElementById('exp-title').textContent = 'Exportando Vídeo';
   document.getElementById('exp-bar').style.width = '0%';
   document.getElementById('exp-pct').textContent = '0%';
   document.getElementById('exp-log').textContent = 'aguardando...';
@@ -1553,7 +1457,6 @@ function closeExportOverlay() {
 function cancelExport() {
   exportCancelled = true;
   closeExportOverlay();
-  ffmpegInst = null; // Reset FFmpeg on cancel
   toast('Exportação cancelada', 'warn');
 }
 
