@@ -603,10 +603,21 @@ function setFormat(fmt) {
   state.format = fmt;
   document.querySelectorAll('.fmt-btn').forEach(b => b.classList.toggle('active', b.dataset.fmt === fmt));
   const c = document.getElementById('preview-canvas');
-  if (fmt === 'vertical') { c.width = 243; c.height = 432; }
-  else { c.width = 432; c.height = 243; }
-  // Resize preview-wrap to fit
-  document.getElementById('preview-wrap').style.width = c.width + 'px';
+  const wrap = document.getElementById('preview-wrap');
+
+  if (fmt === 'vertical') {
+    c.width = 243; c.height = 432;
+    c.style.width = ''; c.style.height = '';
+    wrap.style.width = '243px';
+  } else {
+    c.width = 432; c.height = 243;
+    // Scale canvas CSS to fit within the 258px available in the preview panel
+    const maxW = 258;
+    const dispH = Math.round(maxW * 243 / 432);
+    c.style.width = maxW + 'px';
+    c.style.height = dispH + 'px';
+    wrap.style.width = maxW + 'px';
+  }
   renderFrame();
 }
 
@@ -863,7 +874,7 @@ function renderLayersList(sc) {
       <div class="layer-item${isActive ? ' active' : ''}" id="li_${l.id}">
         <div class="layer-head" onclick="selectLayer('${l.id}')">
           <div class="layer-dot" style="background:${LAYER_COLORS[l.type] || '#6366f1'}"></div>
-          <span class="layer-lbl">${l.type.charAt(0).toUpperCase()+l.type.slice(1)}</span>
+          <span class="layer-lbl">${{text:'Texto',price:'Preço',image:'Imagem',shape:'Forma'}[l.type]||l.type}</span>
           <span class="layer-prev">${preview}</span>
           <button class="layer-del" onclick="event.stopPropagation();deleteLayer('${l.id}')">×</button>
         </div>
@@ -877,8 +888,8 @@ function renderLayerEditor(layer, sc) {
     <div>
       <div style="font-size:10px;color:var(--t3);font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px">Posição rápida</div>
       <div class="pos-grid">
-        ${['tl','tc','tr','ml','mc','mr','bl','bc','br'].map(p =>
-          `<div class="pos-cell${layer.pos===p?' active':''}" onclick="setPos('${layer.id}','${p}')" title="${p}">·</div>`
+        ${[['tl','↖'],['tc','↑'],['tr','↗'],['ml','←'],['mc','·'],['mr','→'],['bl','↙'],['bc','↓'],['br','↘']].map(([p,ic]) =>
+          `<div class="pos-cell${layer.pos===p?' active':''}" onclick="setPos('${layer.id}','${p}')" title="${p}">${ic}</div>`
         ).join('')}
       </div>
     </div>`;
