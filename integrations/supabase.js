@@ -150,6 +150,37 @@ async function getReports(limit = 10) {
   return data;
 }
 
+// ──────────────────────────────────────────
+// CUSTOS DE API (forge_costs)
+// ──────────────────────────────────────────
+
+/** Registra o custo de uma chamada de API. Nunca lança exceção. */
+async function logCost({ service, model, tokens_in, tokens_out, units, cost_usd, job_id }) {
+  try {
+    await supabase.from("forge_costs").insert({
+      service,
+      model: model || null,
+      tokens_in: tokens_in || null,
+      tokens_out: tokens_out || null,
+      units: units || null,
+      cost_usd: cost_usd || 0,
+      job_id: job_id || null,
+    });
+  } catch (_) {}
+}
+
+/** Busca custos dos últimos N dias, agrupados por serviço e dia */
+async function getCosts({ days = 30 } = {}) {
+  const since = new Date(Date.now() - days * 86400 * 1000).toISOString();
+  const { data, error } = await supabase
+    .from("forge_costs")
+    .select("service, model, cost_usd, created_at")
+    .gte("created_at", since)
+    .order("created_at", { ascending: true });
+  if (error) throw new Error(`[Supabase] getCosts: ${error.message}`);
+  return data || [];
+}
+
 module.exports = {
   supabase,
   saveMemory,
@@ -162,4 +193,6 @@ module.exports = {
   getTarefas,
   salvarReport,
   getReports,
+  logCost,
+  getCosts,
 };

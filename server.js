@@ -997,6 +997,14 @@ app.post("/api/narrar", async (req, res) => {
     }
 
     const buffer = Buffer.from(await r.arrayBuffer());
+    try {
+      const { logCost } = require('./integrations/supabase');
+      logCost({
+        service: 'elevenlabs', model: 'eleven_multilingual_v2',
+        units: textoLimpo.length,
+        cost_usd: textoLimpo.length * 0.0003,
+      });
+    } catch (_) {}
     res.json({ audio: buffer.toString("base64"), formato: "mp3" });
   } catch (e) {
     console.error("[/api/narrar]", e.message);
@@ -1267,6 +1275,39 @@ app.get('/api/dashboard/history/:sector', async (req, res) => {
     const { getHistory } = require('./core/departments');
     const history = await getHistory(session_id, sector, 50);
     res.json({ history });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ──────────────────────────────────────────
+// Gastos de API — forge_costs
+// ──────────────────────────────────────────
+
+app.get('/api/dashboard/costs', async (req, res) => {
+  try {
+    const days = parseInt(req.query.days || '30', 10);
+    const { getCosts } = require('./integrations/supabase');
+    const rows = await getCosts({ days });
+
+    // Agrupa por serviço
+    const byService = {};
+    for (const r of rows) {
+      if (!byService[r.service]) byService[r.service] = 0;
+      byService[r.service] += Number(r.cost_usd) || 0;
+    }
+
+    // Agrupa por dia (YYYY-MM-DD) e serviço
+    const byDay = {};
+    for (const r of rows) {
+      const day = r.created_at.slice(0, 10);
+      if (!byDay[day]) byDay[day] = {};
+      byDay[day][r.service] = (byDay[day][r.service] || 0) + (Number(r.cost_usd) || 0);
+    }
+
+    const totalUsd = Object.values(byService).reduce((a, b) => a + b, 0);
+    const usdBrl = 5.10; // taxa aproximada para exibição
+    res.json({ byService, byDay, totalUsd, totalBrl: totalUsd * usdBrl, days });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

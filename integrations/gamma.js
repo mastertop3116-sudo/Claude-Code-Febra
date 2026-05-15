@@ -82,6 +82,17 @@ async function gerarEntregavel(inputText, { formato = 'document', numCards = 10,
         }
       }
 
+      const creditsUsed = status.credits?.deducted || 0
+      if (creditsUsed > 0) {
+        try {
+          require('./supabase').logCost({
+            service: 'gamma', model: `${formato}`,
+            units: creditsUsed,
+            cost_usd: creditsUsed * 0.01,
+          })
+        } catch (_) {}
+      }
+
       return {
         generationId: status.generationId,
         gammaId:      status.gammaId,
@@ -90,7 +101,7 @@ async function gerarEntregavel(inputText, { formato = 'document', numCards = 10,
         url:          status.gammaUrl,
         export_url:   exportUrl,
         credits:      status.credits,
-        creditsUsed:  status.credits?.deducted,
+        creditsUsed,
       }
     }
 

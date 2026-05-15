@@ -357,6 +357,20 @@ body::after{content:'';position:fixed;inset:0;z-index:9990;pointer-events:none;o
 
 /* INTEGRATIONS */
 #view-integrations{background:var(--bg)}
+#view-gastos{background:var(--bg)}
+.gastos-scroll{overflow-y:auto;height:100%;padding:28px 32px 40px}
+.gastos-summary{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:28px}
+.gasto-card{background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:18px 18px 14px;position:relative;overflow:hidden}
+.gasto-card::before{content:'';position:absolute;inset:0 0 auto 0;height:3px;background:var(--gc-color,var(--nexus))}
+.gasto-card-service{font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--text-3);text-transform:uppercase;margin-bottom:6px}
+.gasto-card-val{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text-1);line-height:1}
+.gasto-card-sub{font-size:11px;color:var(--text-3);margin-top:4px}
+.gastos-chart-wrap{background:var(--bg-2);border:1px solid var(--border);border-radius:14px;padding:22px 24px 18px;margin-bottom:28px}
+.gastos-chart-title{font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.gastos-chart-title select{background:var(--bg-3);border:1px solid var(--border);border-radius:6px;color:var(--text-1);font-size:12px;padding:3px 8px;cursor:pointer}
+.gastos-canvas-wrap{height:220px;position:relative}
+.gastos-empty{text-align:center;padding:48px 0;color:var(--text-3);font-size:13px}
+.gastos-note{font-size:11px;color:var(--text-3);margin-top:20px;padding:14px 18px;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.15);border-radius:10px;line-height:1.6}
 .int-scroll{flex:1;overflow-y:auto;padding:28px}
 .int-summary{display:flex;align-items:center;gap:20px;background:var(--elevated);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 22px;margin-bottom:24px}
 .int-summary-stat{display:flex;flex-direction:column;gap:2px}
@@ -667,6 +681,7 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
     <div class="sb-item" data-view="brn-jiujitsu" style="--item-color:var(--brn)"><span class="sb-icon">🥋</span><span class="sb-label">Jiu-Jitsu</span></div>
     <div class="sb-item" data-view="brn-despluga" style="--item-color:var(--brn)"><span class="sb-icon">📚</span><span class="sb-label">Kit Despluga Pro</span></div>
     <div class="sb-group-label">SISTEMA</div>
+    <div class="sb-item" data-view="gastos" style="--item-color:#f59e0b"><span class="sb-icon">💸</span><span class="sb-label">Gastos de API</span></div>
     <div class="sb-item" data-view="integrations" style="--item-color:#64748b"><span class="sb-icon">🔌</span><span class="sb-label">Integrações</span></div>
   </nav>
   <div class="sb-bottom">
@@ -1027,6 +1042,39 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
   </div>
 
   <!-- INTEGRAÇÕES -->
+  <!-- GASTOS DE API -->
+  <div id="view-gastos" class="view">
+    <div class="topbar">
+      <span class="topbar-icon">💸</span>
+      <div><div class="topbar-title">Gastos de API</div><div class="topbar-desc">OpenAI · ElevenLabs · Gamma · DALL-E — rastreado automaticamente</div></div>
+      <div class="topbar-spacer"></div>
+      <span class="topbar-badge" style="color:#f59e0b;border-color:rgba(245,158,11,.3)" id="gastos-total-badge">CARREGANDO</span>
+    </div>
+    <div class="gastos-scroll">
+      <div class="section-heading">Total por Serviço</div>
+      <div class="gastos-summary" id="gastos-summary">
+        <div class="gasto-card skeleton" style="height:80px"></div>
+        <div class="gasto-card skeleton" style="height:80px"></div>
+        <div class="gasto-card skeleton" style="height:80px"></div>
+        <div class="gasto-card skeleton" style="height:80px"></div>
+      </div>
+      <div class="gastos-chart-wrap">
+        <div class="gastos-chart-title">
+          Gasto diário por serviço
+          <select id="gastos-days-select" onchange="loadGastos()">
+            <option value="7">Últimos 7 dias</option>
+            <option value="30" selected>Últimos 30 dias</option>
+            <option value="90">Últimos 90 dias</option>
+          </select>
+        </div>
+        <div class="gastos-canvas-wrap"><canvas id="gastos-chart"></canvas></div>
+      </div>
+      <div class="gastos-note">
+        💡 Os valores são calculados com base nos preços oficiais de cada API em maio/2025: OpenAI GPT-4o Mini ($0,15/1M tokens entrada · $0,60/1M saída), DALL-E 3 ($0,04/imagem), ElevenLabs (estimativa $0,0003/caractere), Gamma ($0,01/crédito). Taxa de câmbio aproximada: R$ 5,10/USD.
+      </div>
+    </div>
+  </div>
+
   <div id="view-integrations" class="view">
     <div class="topbar">
       <span class="topbar-icon">🔌</span>
@@ -1404,6 +1452,7 @@ function navigate(view){
   if(titleEl) titleEl.textContent = VIEW_TITLES[view] || (SECTOR_CFG[view]?.name || 'MAX');
   if(view==='briefing'){ loadMetrics(); loadBriefing(); }
   else if(view==='overview'){ loadMetrics(); }
+  else if(view==='gastos'){ loadGastos(); }
   else if(view==='integrations'){ if(!intLoaded) loadIntegrations(); }
   else if(view==='radar'){ loadRadar(); }
   else if(view==='pipeline'){ loadPipeline(); }
@@ -2019,6 +2068,102 @@ const INT_DEFS = {
   elevenlabs:{name:'ElevenLabs',emoji:'🎙️',color:'#f59e0b',bg:'rgba(245,158,11,.1)',desc:'Text-to-speech — narração de conteúdo'},
   supabase:{name:'Supabase',emoji:'🗄️',color:'#34d399',bg:'rgba(52,211,153,.1)',desc:'Banco de dados PostgreSQL'},
 };
+// ── Gastos de API ──
+let _gastosChart = null;
+const SERVICE_COLORS = {
+  openai:     '#10b981',
+  'dall-e-3': '#6366f1',
+  elevenlabs: '#f59e0b',
+  gamma:      '#8b5cf6',
+};
+const SERVICE_LABELS = {
+  openai: 'OpenAI (texto)',
+  'dall-e-3': 'DALL-E 3',
+  elevenlabs: 'ElevenLabs',
+  gamma: 'Gamma AI',
+};
+
+async function loadGastos() {
+  const days = parseInt(document.getElementById('gastos-days-select')?.value || '30', 10);
+  try {
+    const r = await fetch(`/api/dashboard/costs?days=${days}`);
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+
+    // Badge total
+    const badge = document.getElementById('gastos-total-badge');
+    if (badge) badge.textContent = `R$ ${(d.totalBrl || 0).toFixed(2)} / ${days}d`;
+
+    // Cards por serviço
+    const summary = document.getElementById('gastos-summary');
+    if (summary) {
+      const services = Object.keys(d.byService || {});
+      if (services.length === 0) {
+        summary.innerHTML = '<div class="gastos-empty">Nenhum gasto registrado ainda.<br>Os dados aparecem automaticamente após o primeiro uso do Forge.</div>';
+      } else {
+        const usdBrl = 5.10;
+        summary.innerHTML = services.map(svc => {
+          const usd = d.byService[svc] || 0;
+          const color = SERVICE_COLORS[svc] || '#64748b';
+          const label = SERVICE_LABELS[svc] || svc;
+          return `<div class="gasto-card" style="--gc-color:${color}">
+            <div class="gasto-card-service">${label}</div>
+            <div class="gasto-card-val">R$ ${(usd * usdBrl).toFixed(2)}</div>
+            <div class="gasto-card-sub">US$ ${usd.toFixed(4)}</div>
+          </div>`;
+        }).join('');
+      }
+    }
+
+    // Gráfico de barras empilhadas
+    const canvasEl = document.getElementById('gastos-chart');
+    if (!canvasEl) return;
+
+    const byDay = d.byDay || {};
+    const labels = Object.keys(byDay).sort();
+    const allServices = [...new Set(Object.values(byDay).flatMap(Object.keys))];
+
+    const datasets = allServices.map(svc => ({
+      label: SERVICE_LABELS[svc] || svc,
+      data: labels.map(day => Number(((byDay[day]?.[svc] || 0) * 5.10).toFixed(4))),
+      backgroundColor: SERVICE_COLORS[svc] || '#64748b',
+      borderRadius: 3,
+      borderSkipped: false,
+    }));
+
+    if (_gastosChart) _gastosChart.destroy();
+    _gastosChart = new Chart(canvasEl, {
+      type: 'bar',
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12 } },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ${ctx.dataset.label}: R$ ${ctx.parsed.y.toFixed(4)}`,
+              footer: items => `Total: R$ ${items.reduce((a, i) => a + i.parsed.y, 0).toFixed(4)}`
+            }
+          }
+        },
+        scales: {
+          x: { stacked: true, ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,.04)' } },
+          y: { stacked: true, ticks: { color: '#64748b', font: { size: 10 }, callback: v => 'R$' + v.toFixed(3) }, grid: { color: 'rgba(255,255,255,.04)' } }
+        }
+      }
+    });
+
+    if (labels.length === 0 && canvasEl.parentElement) {
+      canvasEl.parentElement.innerHTML = '<div class="gastos-empty">Nenhum dado ainda. Use o Forge para gerar entregáveis e os gastos aparecerão aqui.</div>';
+    }
+  } catch (e) {
+    console.error('[gastos]', e.message);
+    const badge = document.getElementById('gastos-total-badge');
+    if (badge) badge.textContent = 'ERRO';
+  }
+}
+
 let intData=null;
 const testingService={};
 
