@@ -330,6 +330,55 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'Outfit',
 .toast-ico{font-size:14px;flex-shrink:0}
 
 /* ══════════════════════════════════════════
+   HELP BUTTON + SHORTCUTS PANEL
+══════════════════════════════════════════ */
+.hd-help-wrap{position:relative;flex-shrink:0}
+.hd-help-btn{
+  width:24px;height:24px;border-radius:50%;
+  background:var(--bg3);border:1px solid var(--border2);
+  color:var(--t2);font-size:12px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .15s;font-family:var(--mono);
+}
+.hd-help-btn:hover{border-color:var(--nx3);color:var(--nx);background:var(--nx4)}
+.hd-help-btn.open{border-color:var(--nx);color:var(--nx);background:var(--nx4)}
+.hd-shortcuts-panel{
+  position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r10);
+  padding:12px 14px;min-width:240px;z-index:50;
+  box-shadow:0 8px 24px rgba(0,0,0,.5);
+  display:none;flex-direction:column;gap:6px;
+}
+.hd-shortcuts-panel.open{display:flex}
+.hd-shortcuts-panel::before{
+  content:'';position:absolute;top:-5px;left:50%;transform:translateX(-50%);
+  width:8px;height:8px;background:var(--bg2);border-left:1px solid var(--border2);
+  border-top:1px solid var(--border2);rotate:45deg;
+}
+.hsp-row{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--t2)}
+.hsp-row kbd{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;
+  padding:1px 5px;font-size:9px;font-family:var(--mono);color:var(--t1);white-space:nowrap}
+.hsp-row span{color:var(--t3);margin-left:auto}
+
+/* ── Duration wrap ── */
+.dur-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
+.dur-lbl{font-size:9px;color:var(--t3);font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.dur-row{display:flex;align-items:center;gap:3px}
+.dur-sfx{font-size:11px;color:var(--t3);font-family:var(--mono)}
+
+/* ── LP hints ── */
+.lp-hints{display:flex;flex-direction:column;gap:6px;margin-top:8px;width:100%;max-width:220px}
+.lp-hint-item{
+  font-size:11px;color:var(--t3);background:var(--bg3);border:1px solid var(--border);
+  border-radius:var(--r8);padding:6px 10px;text-align:left;
+  transition:border-color .15s;
+}
+
+/* ── Total duration header badge ── */
+#total-dur-badge{font-size:11px;color:var(--t2)}
+#total-dur-badge b{color:var(--green);font-family:var(--mono)}
+
+/* ══════════════════════════════════════════
    MISC
 ══════════════════════════════════════════ */
 .sep-h{height:1px;background:var(--border);margin:2px 0}
@@ -349,13 +398,22 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'Outfit',
     <button class="fmt-btn" data-fmt="horizontal" onclick="setFormat('horizontal')">16:9 Horizontal</button>
   </div>
   <div class="hd-sep"></div>
-  <div class="hd-shortcuts">
-    <kbd>Space</kbd> play&nbsp;&nbsp;<kbd>←→</kbd> seek&nbsp;&nbsp;<kbd>Del</kbd> excluir cena
+  <div class="hd-help-wrap">
+    <button class="hd-help-btn" id="hd-help-btn" onclick="toggleShortcutsPanel()" title="Atalhos de teclado">?</button>
+    <div class="hd-shortcuts-panel" id="hd-shortcuts-panel">
+      <div class="hsp-row"><kbd>Espaço</kbd><span>Play / Pause</span></div>
+      <div class="hsp-row"><kbd>←</kbd><kbd>→</kbd><span>Avançar / Voltar 0.5s</span></div>
+      <div class="hsp-row"><kbd>Shift + ←→</kbd><span>5 segundos</span></div>
+      <div class="hsp-row"><kbd>Del</kbd><span>Excluir cena selecionada</span></div>
+      <div class="hsp-row"><kbd>Ctrl+D</kbd><span>Duplicar cena</span></div>
+      <div class="hsp-row"><kbd>Esc</kbd><span>Parar / Fechar overlay</span></div>
+    </div>
   </div>
   <div class="hd-space"></div>
-  <div class="var-badge">Variações: <b id="var-count">0</b></div>
+  <div class="var-badge" title="Total de cenas no projeto">Cenas: <b id="var-count">0</b></div>
+  <div class="var-badge" id="total-dur-badge" style="display:none" title="Duração total do vídeo">⏱ <b id="hd-dur">0:00</b></div>
   <button class="btn-new" onclick="newProject()">Novo Projeto</button>
-  <button class="btn-export" id="btn-export" onclick="startExport()">
+  <button class="btn-export" id="btn-export" onclick="startExport()" disabled title="Adicione ao menos uma cena para exportar">
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
     Exportar Vídeo
   </button>
@@ -386,9 +444,15 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'Outfit',
     <!-- LAYERS -->
     <div id="lp">
       <div class="lp-empty" id="lp-empty">
-        <div class="lp-ico">🎬</div>
-        <div class="lp-title">Nenhuma cena selecionada</div>
-        <div class="lp-sub">Clique em uma cena na timeline para gerenciar camadas, trim e duração</div>
+        <div class="lp-ico" id="lp-empty-ico">🎬</div>
+        <div class="lp-title" id="lp-empty-title">Nenhuma cena selecionada</div>
+        <div class="lp-sub" id="lp-empty-sub">Clique em "＋ Adicionar Cena" para começar ou arraste vídeos e imagens na timeline</div>
+        <div class="lp-hints" id="lp-hints" style="display:none">
+          <div class="lp-hint-item">📝 Adicione texto sobre a imagem</div>
+          <div class="lp-hint-item">🏷 Sobreponha um preço em destaque</div>
+          <div class="lp-hint-item">🖼 Coloque uma logo ou imagem</div>
+          <div class="lp-hint-item">▬ Crie uma barra de cor sólida</div>
+        </div>
       </div>
       <div id="lp-content" style="display:none;flex-direction:column;gap:12px">
         <!-- Scene meta -->
@@ -442,7 +506,7 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'Outfit',
           <option value="TxGEqnHWrfWFTfGW9XjX">Josh</option>
         </select>
         <button class="at-btn" id="btn-gen" onclick="generateAudio()">⚡ Gerar</button>
-        <button class="at-btn sec" onclick="document.getElementById('audio-file-input').click()">⬆ Subir MP3</button>
+        <button class="at-btn sec" onclick="document.getElementById('audio-file-input').click()" title="MP3, WAV, OGG, M4A aceitos">⬆ Subir Áudio</button>
         <input type="file" id="audio-file-input" accept="audio/*" style="display:none" onchange="loadAudioFile(this)">
         <div class="at-meta">
           <label>Início: <input type="number" id="aud-start" min="0" step="0.1" value="0" style="width:50px"></label>
@@ -579,6 +643,10 @@ async function addScenes(input) {
     toast(`Cena "${sc.name}" adicionada`, 'ok');
   }
   renderStrip();
+  // Auto-select first scene when project has only one (first addition)
+  if (state.scenes.length === files.length && !state.selectedScene) {
+    selectScene(state.scenes[0].id);
+  }
   renderFrame();
   updateDuration();
 }
@@ -657,6 +725,12 @@ function updateDuration() {
   document.getElementById('total-dur').textContent = total.toFixed(1) + 's total';
   const sb = document.getElementById('seekbar');
   sb.max = total || 1;
+  // Header duration badge
+  const hasSc = state.scenes.length > 0;
+  document.getElementById('total-dur-badge').style.display = hasSc ? '' : 'none';
+  document.getElementById('hd-dur').textContent = fmtT(total);
+  // Export button: disabled when no scenes
+  document.getElementById('btn-export').disabled = !hasSc;
   updateTimeDisplay();
   renderSceneDots();
 }
@@ -732,7 +806,18 @@ function renderLP() {
   const sc = state.scenes.find(s => s.id === state.selectedScene);
   const empty = document.getElementById('lp-empty');
   const content = document.getElementById('lp-content');
-  if (!sc) { empty.style.display = ''; content.style.display = 'none'; return; }
+  if (!sc) {
+    empty.style.display = '';
+    content.style.display = 'none';
+    const hasScenes = state.scenes.length > 0;
+    document.getElementById('lp-empty-ico').textContent = hasScenes ? '👆' : '🎬';
+    document.getElementById('lp-empty-title').textContent = hasScenes ? 'Clique em uma cena para editar' : 'Nenhuma cena ainda';
+    document.getElementById('lp-empty-sub').textContent = hasScenes
+      ? 'Selecione uma cena na timeline abaixo para adicionar texto, preço, imagem ou forma'
+      : 'Clique em "＋ Adicionar Cena" ou arraste vídeos e imagens na timeline';
+    document.getElementById('lp-hints').style.display = hasScenes ? 'flex' : 'none';
+    return;
+  }
   empty.style.display = 'none';
   content.style.display = 'flex';
 
@@ -747,7 +832,7 @@ function renderLP() {
       <div class="lp-scene-name">${sc.name}</div>
       <div class="lp-scene-sub">${sc.type === 'video' ? 'Vídeo' : 'Imagem'} · ${getSceneDur(sc).toFixed(1)}s</div>
     </div>
-    ${sc.type === 'image' ? `<input class="dur-inp" type="number" value="${sc.duration}" min="0.5" step="0.5" title="Duração (s)" onchange="sc_setDur('${sc.id}',+this.value)">` : ''}
+    ${sc.type === 'image' ? `<div class="dur-wrap"><span class="dur-lbl">duração</span><div class="dur-row"><input class="dur-inp" type="number" value="${sc.duration}" min="0.5" step="0.5" title="Duração da cena em segundos" onchange="sc_setDur('${sc.id}',+this.value)"><span class="dur-sfx">s</span></div></div>` : ''}
   `;
 
   // Trim
@@ -1501,6 +1586,24 @@ document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.code === 'KeyD' && state.selectedScene) {
     e.preventDefault();
     duplicateScene(state.selectedScene);
+  }
+});
+
+// ════════════════════════════════════════════════════════════════
+// SHORTCUTS PANEL
+// ════════════════════════════════════════════════════════════════
+function toggleShortcutsPanel() {
+  const btn = document.getElementById('hd-help-btn');
+  const panel = document.getElementById('hd-shortcuts-panel');
+  const open = panel.classList.toggle('open');
+  btn.classList.toggle('open', open);
+}
+
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('hd-help-wrap') || e.target.closest('.hd-help-wrap');
+  if (!e.target.closest('.hd-help-wrap')) {
+    document.getElementById('hd-shortcuts-panel')?.classList.remove('open');
+    document.getElementById('hd-help-btn')?.classList.remove('open');
   }
 });
 
