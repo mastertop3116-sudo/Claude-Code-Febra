@@ -1021,6 +1021,11 @@ app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
+app.get('/editor', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.sendFile(path.join(__dirname, 'public', 'editor.html'));
+});
+
 app.get('/api/dashboard/config', (req, res) => {
   const { SECTORS, CONSELHO } = require('./core/departments');
   res.json({ sectors: SECTORS, conselho: CONSELHO });
