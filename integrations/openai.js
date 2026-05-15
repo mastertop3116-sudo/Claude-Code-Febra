@@ -49,20 +49,29 @@ async function openaiJson(prompt, systemInstruction = null) {
 }
 
 async function openaiImage(prompt, size = '1024x1024') {
-  const r = await _getClient().images.generate({
-    model: 'dall-e-3',
-    prompt,
-    n: 1,
-    size,
-    quality: 'standard',
-  })
+  // Try DALL-E 3 first; fall back to DALL-E 2 if the model isn't available on this key
+  let model = 'dall-e-3'
+  let effectiveSize = size
+  let r
+  try {
+    r = await _getClient().images.generate({ model, prompt, n: 1, size: effectiveSize, quality: 'standard' })
+  } catch (e) {
+    if (/does not exist/i.test(e.message) || e.status === 400) {
+      console.warn('[openai] DALL-E 3 indisponível — usando DALL-E 2 como fallback')
+      model = 'dall-e-2'
+      effectiveSize = '1024x1024'
+      r = await _getClient().images.generate({ model, prompt: prompt.slice(0, 1000), n: 1, size: effectiveSize })
+    } else {
+      throw e
+    }
+  }
   const url = r.data[0].url
   if (!url) throw new Error('DALL-E não retornou URL')
   const res = await fetch(url)
   if (!res.ok) throw new Error(`fetch imagem HTTP ${res.status}`)
   const buf = Buffer.from(await res.arrayBuffer())
   if (buf.length < 5000) throw new Error(`imagem suspeita: ${buf.length} bytes`)
-  _logCost({ service: 'openai', model: 'dall-e-3', units: 1, cost_usd: PRICE_IMG })
+  _logCost({ service: 'openai', model, units: 1, cost_usd: model === 'dall-e-3' ? PRICE_IMG : 0.018 })
   return buf
 }
 

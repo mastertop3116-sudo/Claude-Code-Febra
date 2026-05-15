@@ -71,13 +71,28 @@ async function run({ titulo, nicho, tema, tipo }) {
     'High-end editorial art direction, premium quality, fit for a paid digital product cover.',
   ].filter(Boolean).join(' ')
 
-  const response = await _getClient().images.generate({
-    model: 'dall-e-3',
-    prompt,
-    size: '1024x1792',
-    quality: 'standard',
-    n: 1,
-  })
+  let response
+  try {
+    response = await _getClient().images.generate({
+      model: 'dall-e-3',
+      prompt,
+      size: '1024x1792',
+      quality: 'standard',
+      n: 1,
+    })
+  } catch (e) {
+    if (/does not exist/i.test(e.message) || e.status === 400) {
+      console.warn('[capa] DALL-E 3 indisponível — usando DALL-E 2 como fallback (1024x1024)')
+      response = await _getClient().images.generate({
+        model: 'dall-e-2',
+        prompt: prompt.slice(0, 1000),
+        size: '1024x1024',
+        n: 1,
+      })
+    } else {
+      throw e
+    }
+  }
 
   const imageUrl = response.data[0].url
   const res = await fetch(imageUrl)
