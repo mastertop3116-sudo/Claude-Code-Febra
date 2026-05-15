@@ -5,9 +5,11 @@
 <title>NEXUS · Editor de Vídeo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
-<script src="https://unpkg.com/sortablejs@1.15.3/Sortable.min.js"></script>
-<script src="https://unpkg.com/wavesurfer.js@6.6.4/dist/wavesurfer.min.js"></script>
-<script src="https://unpkg.com/wavesurfer.js@6.6.4/dist/plugin/wavesurfer.regions.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/wavesurfer.js@6.6.4/dist/wavesurfer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/wavesurfer.js@6.6.4/dist/plugin/wavesurfer.regions.min.js"></script>
+<!-- FFmpeg.wasm pré-carregado para export rápido -->
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/umd/ffmpeg.js" defer></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -1295,17 +1297,26 @@ async function startExport() {
 
   try {
     // ── Load FFmpeg ──
-    setExp(2, 'Carregando FFmpeg.wasm...');
-    if (!window.FFmpeg) {
-      await loadScript('https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/umd/ffmpeg.js');
+    setExp(2, 'Verificando FFmpeg.wasm...');
+    // Script carregado via <script defer> no head — esperar se ainda não estiver pronto
+    if (!window.FFmpeg?.createFFmpeg) {
+      setExp(3, 'Aguardando FFmpeg carregar...');
+      await new Promise((res, rej) => {
+        let attempts = 0;
+        const check = () => {
+          if (window.FFmpeg?.createFFmpeg) return res();
+          if (++attempts > 40) return rej(new Error('FFmpeg.wasm não carregou. Verifique sua conexão e recarregue a página.'));
+          setTimeout(check, 250);
+        };
+        check();
+      });
     }
-    if (!window.FFmpeg?.createFFmpeg) throw new Error('FFmpeg não carregou corretamente. Tente recarregar a página.');
 
     const { createFFmpeg } = window.FFmpeg;
     if (!ffmpegInst) {
       ffmpegInst = createFFmpeg({
         log: false,
-        corePath: 'https://unpkg.com/@ffmpeg/core-st@0.11.1/dist/ffmpeg-core.js',
+        corePath: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core-st@0.11.1/dist/ffmpeg-core.js',
         logger: ({ message }) => {
           const m = message || '';
           const tm = m.match(/time=(\d+):(\d+):(\d+\.\d+)/);
