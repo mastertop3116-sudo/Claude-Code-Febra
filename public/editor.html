@@ -1447,20 +1447,32 @@ async function startExport() {
 
     if (exportCancelled) { closeExportOverlay(); return; }
 
-    setExp(97, 'Preparando download...');
-    const blob = new Blob(chunks, { type: mimeType });
-    const url = URL.createObjectURL(blob);
+    setExp(93, 'Convertendo para MP4...');
+    const webmBlob = new Blob(chunks, { type: mimeType });
+
+    const fd = new FormData();
+    fd.append('video', webmBlob, 'video.webm');
+
+    const resp = await fetch('/api/convert-mp4', { method: 'POST', body: fd });
+    if (!resp.ok) {
+      const txt = await resp.text().catch(() => resp.status);
+      throw new Error('Conversão falhou: ' + txt);
+    }
+
+    setExp(99, 'Baixando MP4...');
+    const mp4Blob = await resp.blob();
+    const url = URL.createObjectURL(mp4Blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `nexus-criativo-${Date.now()}.webm`;
+    a.href = url; a.download = `nexus-criativo-${Date.now()}.mp4`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 8000);
+    setTimeout(() => URL.revokeObjectURL(url), 15000);
 
     setExp(100, 'Exportação concluída!');
     document.getElementById('exp-icon').textContent = '✅';
-    document.getElementById('exp-title').textContent = 'Vídeo Exportado!';
+    document.getElementById('exp-title').textContent = 'MP4 Exportado!';
     document.getElementById('exp-cancel-btn').style.display = 'none';
     document.getElementById('exp-done-actions').style.display = 'flex';
-    toast('Vídeo exportado com sucesso!', 'ok');
+    toast('MP4 exportado com sucesso! ✅', 'ok');
 
   } catch (e) {
     if (audioSrc) { try { audioSrc.stop(); } catch(_) {} }
@@ -1538,7 +1550,7 @@ function showExportOverlay() {
   const ov = document.getElementById('exp-ov');
   ov.style.display = 'flex';
   document.getElementById('exp-icon').textContent = '⚙️';
-  document.getElementById('exp-title').textContent = 'Exportando Vídeo';
+  document.getElementById('exp-title').textContent = 'Exportando → MP4';
   document.getElementById('exp-bar').style.width = '0%';
   document.getElementById('exp-pct').textContent = '0%';
   document.getElementById('exp-log').textContent = 'aguardando...';

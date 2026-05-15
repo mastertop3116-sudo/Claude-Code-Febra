@@ -1026,6 +1026,61 @@ app.get('/editor', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'editor.html'));
 });
 
+// ──────────────────────────────────────────
+// Conversão WebM → MP4 (server-side FFmpeg)
+// ──────────────────────────────────────────
+(function setupVideoConvert() {
+  const multer = require('multer');
+  const ffmpeg = require('fluent-ffmpeg');
+  const ffmpegPath = require('ffmpeg-static');
+  const os = require('os');
+  const fs = require('fs');
+  ffmpeg.setFfmpegPath(ffmpegPath);
+
+  const upload = multer({
+    storage: multer.diskStorage({
+      destination: (req, file, cb) => cb(null, os.tmpdir()),
+      filename: (req, file, cb) => cb(null, `nexus_${Date.now()}_${file.fieldname}.webm`),
+    }),
+    limits: { fileSize: 500 * 1024 * 1024 }, // 500MB máx
+  });
+
+  app.post('/api/convert-mp4', upload.single('video'), (req, res) => {
+    if (!req.file) return res.status(400).json({ error: 'Nenhum arquivo enviado' });
+
+    const inputPath  = req.file.path;
+    const outputPath = inputPath.replace('.webm', '.mp4');
+
+    ffmpeg(inputPath)
+      .outputOptions([
+        '-c:v', 'libx264',
+        '-crf', '23',
+        '-preset', 'veryfast',
+        '-pix_fmt', 'yuv420p',
+        '-c:a', 'aac',
+        '-b:a', '128k',
+        '-movflags', '+faststart',
+      ])
+      .output(outputPath)
+      .on('end', () => {
+        res.setHeader('Content-Type', 'video/mp4');
+        res.setHeader('Content-Disposition', `attachment; filename="nexus-criativo-${Date.now()}.mp4"`);
+        const stream = fs.createReadStream(outputPath);
+        stream.pipe(res);
+        stream.on('close', () => {
+          fs.unlink(inputPath, () => {});
+          fs.unlink(outputPath, () => {});
+        });
+      })
+      .on('error', (err) => {
+        console.error('[convert-mp4]', err.message);
+        fs.unlink(inputPath, () => {});
+        res.status(500).json({ error: 'Falha na conversão: ' + err.message });
+      })
+      .run();
+  });
+})();
+
 app.get('/api/dashboard/config', (req, res) => {
   const { SECTORS, CONSELHO } = require('./core/departments');
   res.json({ sectors: SECTORS, conselho: CONSELHO });
