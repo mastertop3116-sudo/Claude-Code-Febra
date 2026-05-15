@@ -2110,13 +2110,27 @@ async function _generateCadernoColorir(params) {
   const { openaiImage } = require("../../integrations/openai");
 
   const imagens = new Array(total).fill(null);
+  let dalleDisponivel = true;
   for (let i = 0; i < total; i++) {
     const pg  = paginasList[i];
     const pct = 15 + Math.round(((i + 1) / total) * 55);
     await progress(pct, `🖌️ Desenhando ${pg.nome_pt} (${i + 1}/${total})...`);
-    const dallePrompt = `${pg.prompt_en}, simple coloring book page for children ages 4-8, thick black outlines only, NO color fill, NO shading, NO gray tones, pure white background, clean line art, cute friendly style, printable`;
-    imagens[i] = await openaiImage(dallePrompt, "1024x1024");
-    console.log(`[colorir] ✓ imagem ${i + 1}/${total} — ${pg.nome_pt} (${Math.round(imagens[i].length / 1024)}KB)`);
+    if (dalleDisponivel) {
+      try {
+        const dallePrompt = `${pg.prompt_en}, simple coloring book page for children ages 4-8, thick black outlines only, NO color fill, NO shading, NO gray tones, pure white background, clean line art, cute friendly style, printable`;
+        imagens[i] = await openaiImage(dallePrompt, "1024x1024");
+        console.log(`[colorir] ✓ imagem ${i + 1}/${total} — ${pg.nome_pt} (${Math.round(imagens[i].length / 1024)}KB)`);
+      } catch (imgErr) {
+        console.warn(`[colorir] ⚠️ DALL-E indisponível: ${imgErr.message} — usando placeholder para todas as páginas`);
+        dalleDisponivel = false;
+        imagens[i] = null;
+      }
+    } else {
+      imagens[i] = null;
+    }
+  }
+  if (!dalleDisponivel) {
+    console.log('[colorir] Modo placeholder: páginas com espaço para desenhar manualmente');
   }
 
   // Monta PDF
@@ -2216,7 +2230,7 @@ async function _generateCadernoColorir(params) {
       doc.save().dash(8, { space: 4 })
         .rect(imgX, imgY, imgSize, imgSize).stroke("#BBB").restore();
       doc.fillColor("#CCC").fontSize(14)
-        .text("✏️ Desenhe aqui!", imgX, imgY + imgSize / 2 - 10, { width: imgSize, align: "center" });
+        .text("Desenhe aqui!", imgX, imgY + imgSize / 2 - 10, { width: imgSize, align: "center" });
     }
 
     // Campo "Escreva o nome:"
