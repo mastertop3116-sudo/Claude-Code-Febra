@@ -181,6 +181,34 @@ async function getCosts({ days = 30 } = {}) {
   return data || [];
 }
 
+// ──────────────────────────────────────────
+// CÉREBRO — Base de Conhecimento da Nexus
+// ──────────────────────────────────────────
+
+async function saveCerebro({ tipo, titulo, conteudo }) {
+  const { error } = await supabase
+    .from('nexus_cerebro')
+    .insert({ tipo: tipo || 'geral', titulo: titulo || 'Sem título', conteudo });
+  if (error) throw new Error(`[Supabase] saveCerebro: ${error.message}`);
+}
+
+async function searchCerebro({ query = '', limit = 50 } = {}) {
+  let q = supabase
+    .from('nexus_cerebro')
+    .select('id, tipo, titulo, conteudo, created_at')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (query) q = q.ilike('conteudo', `%${query}%`);
+  const { data, error } = await q;
+  if (error) throw new Error(`[Supabase] searchCerebro: ${error.message}`);
+  return data || [];
+}
+
+async function deleteCerebro(id) {
+  const { error } = await supabase.from('nexus_cerebro').delete().eq('id', id);
+  if (error) throw new Error(`[Supabase] deleteCerebro: ${error.message}`);
+}
+
 module.exports = {
   supabase,
   saveMemory,
@@ -195,4 +223,7 @@ module.exports = {
   getReports,
   logCost,
   getCosts,
+  saveCerebro,
+  searchCerebro,
+  deleteCerebro,
 };

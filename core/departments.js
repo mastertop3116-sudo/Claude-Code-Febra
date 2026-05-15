@@ -229,8 +229,18 @@ async function chatWithSector(sector, message, history = []) {
   const cfg = SECTORS[sector];
   if (!cfg) throw new Error(`Setor desconhecido: ${sector}`);
 
+  let systemContent = cfg.systemPrompt;
+  try {
+    const { searchCerebro } = require('../integrations/supabase');
+    const cerebro = await searchCerebro({ limit: 5 });
+    if (cerebro.length > 0) {
+      const ctx = cerebro.map(e => `[${e.tipo.toUpperCase()}] ${e.titulo}: ${e.conteudo.slice(0, 600)}`).join('\n\n');
+      systemContent += `\n\n═══════════════════════════════════════\nBASE DE CONHECIMENTO DA NEXUS (use como contexto):\n═══════════════════════════════════════\n${ctx}`;
+    }
+  } catch (_) {}
+
   const messages = [
-    { role: 'system', content: cfg.systemPrompt },
+    { role: 'system', content: systemContent },
     ...history.map(h => ({ role: h.role, content: h.content })),
     { role: 'user', content: message },
   ];

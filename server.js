@@ -1284,6 +1284,33 @@ app.get('/api/dashboard/history/:sector', async (req, res) => {
 // Gastos de API — forge_costs
 // ──────────────────────────────────────────
 
+// ── CÉREBRO — Base de Conhecimento ───────────────────────────────────────
+app.get('/api/dashboard/cerebro', async (req, res) => {
+  try {
+    const { searchCerebro } = require('./integrations/supabase');
+    const items = await searchCerebro({ query: req.query.q || '', limit: 100 });
+    res.json(items);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/dashboard/cerebro', async (req, res) => {
+  try {
+    const { tipo, titulo, conteudo } = req.body;
+    if (!conteudo?.trim()) return res.status(400).json({ error: 'Conteúdo vazio' });
+    const { saveCerebro } = require('./integrations/supabase');
+    await saveCerebro({ tipo, titulo, conteudo });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/dashboard/cerebro/:id', async (req, res) => {
+  try {
+    const { deleteCerebro } = require('./integrations/supabase');
+    await deleteCerebro(req.params.id);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 app.get('/api/dashboard/costs', async (req, res) => {
   try {
     const days = parseInt(req.query.days || '30', 10);

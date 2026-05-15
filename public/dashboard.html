@@ -358,6 +358,36 @@ body::after{content:'';position:fixed;inset:0;z-index:9990;pointer-events:none;o
 /* INTEGRATIONS */
 #view-integrations{background:var(--bg)}
 #view-gastos{background:var(--bg)}
+/* CEREBRO */
+#view-cerebro{background:var(--bg)}
+.cerebro-scroll{overflow-y:auto;height:100%;padding:28px 32px 40px}
+.cerebro-form{background:var(--bg-2);border:1px solid var(--border);border-radius:14px;padding:22px 24px;margin-bottom:24px}
+.cerebro-form-title{font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.cerebro-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.cerebro-input{width:100%;background:var(--bg-3);border:1px solid var(--border);border-radius:8px;color:var(--text-1);font-family:'Outfit',sans-serif;font-size:13px;padding:9px 12px;box-sizing:border-box;outline:none;transition:border-color .2s}
+.cerebro-input:focus{border-color:var(--nexus)}
+.cerebro-select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2364748b' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.cerebro-textarea{width:100%;background:var(--bg-3);border:1px solid var(--border);border-radius:8px;color:var(--text-1);font-family:'Outfit',sans-serif;font-size:13px;padding:9px 12px;box-sizing:border-box;outline:none;resize:vertical;min-height:120px;transition:border-color .2s}
+.cerebro-textarea:focus{border-color:var(--nexus)}
+.cerebro-save-btn{background:var(--nexus);color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:opacity .2s}
+.cerebro-save-btn:hover{opacity:.85}
+.cerebro-list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cerebro-list-title{font-size:13px;font-weight:600;color:var(--text-2)}
+.cerebro-search{background:var(--bg-3);border:1px solid var(--border);border-radius:8px;color:var(--text-1);font-size:13px;padding:7px 12px;outline:none;font-family:'Outfit',sans-serif;width:220px;transition:border-color .2s}
+.cerebro-search:focus{border-color:var(--nexus)}
+.cerebro-items{display:grid;gap:10px}
+.cerebro-item{background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden;transition:border-color .2s}
+.cerebro-item:hover{border-color:rgba(99,102,241,.4)}
+.cerebro-item::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--ci-color,var(--nexus))}
+.cerebro-item-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.cerebro-item-tag{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ci-color,var(--nexus));background:rgba(99,102,241,.08);border-radius:4px;padding:2px 7px}
+.cerebro-item-titulo{font-size:13px;font-weight:600;color:var(--text-1)}
+.cerebro-item-content{font-size:12px;color:var(--text-3);line-height:1.5;white-space:pre-wrap;max-height:80px;overflow:hidden;text-overflow:ellipsis}
+.cerebro-item-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.cerebro-item-date{font-size:10px;color:var(--text-3)}
+.cerebro-del-btn{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#ef4444;border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:'Outfit',sans-serif;transition:opacity .2s}
+.cerebro-del-btn:hover{opacity:.7}
+.cerebro-empty{text-align:center;padding:48px 0;color:var(--text-3);font-size:13px}
 .gastos-scroll{overflow-y:auto;height:100%;padding:28px 32px 40px}
 .gastos-summary{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:28px}
 .gasto-card{background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:18px 18px 14px;position:relative;overflow:hidden}
@@ -666,6 +696,7 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
     <div class="sb-item" data-view="radar" style="--item-color:var(--c-grow)"><span class="sb-icon">🎯</span><span class="sb-label">Radar</span></div>
     <div class="sb-item" data-view="pipeline" style="--item-color:var(--c-mono)"><span class="sb-icon">📦</span><span class="sb-label">Pipeline</span></div>
     <div class="sb-item" data-view="biblioteca" style="--item-color:var(--c-cont)"><span class="sb-icon">🗂️</span><span class="sb-label">Biblioteca</span></div>
+    <div class="sb-item" data-view="cerebro" style="--item-color:var(--nexus)"><span class="sb-icon">🧠</span><span class="sb-label">Cérebro</span></div>
     <div class="sb-item" data-view="board" style="--item-color:#f472b6"><span class="sb-icon">🃏</span><span class="sb-label">Board de Ofertas</span></div>
     <div class="sb-group-label">SETORES · MAX</div>
     <div class="sb-item" data-view="fabrica-produtos" style="--item-color:var(--c-prod)"><span class="sb-icon">🏭</span><span class="sb-label">Fábrica de Produtos</span></div>
@@ -874,6 +905,44 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
       </div>
       <div class="bib-list" id="bib-list">
         <div class="bib-empty">Nenhuma resposta salva ainda.<br>Clique em "Salvar" em qualquer resposta do MAX para guardar aqui.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CEREBRO -->
+  <div id="view-cerebro" class="view">
+    <div class="topbar">
+      <span class="topbar-icon">🧠</span>
+      <div><div class="topbar-title">Cérebro</div><div class="topbar-desc">Base de conhecimento injetada no MAX e nos setores</div></div>
+      <div class="topbar-spacer"></div>
+      <span class="topbar-badge" style="color:var(--nexus);border-color:rgba(99,102,241,.3)" id="cerebro-count-badge">0 documentos</span>
+    </div>
+    <div class="cerebro-scroll">
+      <div class="cerebro-form">
+        <div class="cerebro-form-title">📄 Adicionar conhecimento</div>
+        <div class="cerebro-row">
+          <select id="cerebro-tipo" class="cerebro-input cerebro-select">
+            <option value="avatar">Avatar / Público</option>
+            <option value="script">Script / Roteiro</option>
+            <option value="pesquisa">Pesquisa de Mercado</option>
+            <option value="depoimento">Depoimento / Prova Social</option>
+            <option value="estrategia">Estratégia</option>
+            <option value="geral">Geral</option>
+          </select>
+          <input id="cerebro-titulo" class="cerebro-input" placeholder="Título (ex: Avatar Mãe Jiu-Jitsu)" maxlength="120">
+        </div>
+        <textarea id="cerebro-conteudo" class="cerebro-textarea" placeholder="Cole aqui o conteúdo: descrição de avatar, pesquisa, depoimento, script... O MAX vai usar isso como contexto nas respostas."></textarea>
+        <div style="margin-top:12px;display:flex;align-items:center;gap:12px">
+          <button class="cerebro-save-btn" onclick="saveCerebro()">Salvar no Cérebro</button>
+          <span id="cerebro-save-msg" style="font-size:12px;color:var(--text-3)"></span>
+        </div>
+      </div>
+      <div class="cerebro-list-header">
+        <span class="cerebro-list-title">Documentos salvos</span>
+        <input class="cerebro-search" id="cerebro-search" placeholder="Buscar..." oninput="loadCerebro(this.value)">
+      </div>
+      <div class="cerebro-items" id="cerebro-list">
+        <div class="cerebro-empty">Nenhum documento ainda.</div>
       </div>
     </div>
   </div>
@@ -1333,7 +1402,7 @@ const CONSELHO_CFG = {
   paulo: {name:'Paulo Vieira',emoji:'🎯',color:'#a855f7'},
 };
 
-const STATIC_VIEWS = new Set(['briefing','overview','integrations','all-sectors','conselho','brn-overview','brn-jiujitsu','brn-despluga','radar','pipeline','biblioteca','board']);
+const STATIC_VIEWS = new Set(['briefing','overview','integrations','all-sectors','conselho','brn-overview','brn-jiujitsu','brn-despluga','radar','pipeline','biblioteca','board','cerebro']);
 
 // ─── STATE ─────────────────────────────────────
 let currentView = 'briefing';
@@ -1434,7 +1503,7 @@ updateClock(); setInterval(updateClock,1000);
 // ─── NAVIGATION ────────────────────────────────
 const VIEW_TITLES = {
   briefing:'Briefing do Dia',overview:'Métricas',radar:'Radar de Oportunidades',
-  pipeline:'Pipeline',biblioteca:'Biblioteca',
+  pipeline:'Pipeline',biblioteca:'Biblioteca',cerebro:'Cérebro',
   'all-sectors':'Todos os Setores',conselho:'Conselho de Titãs',
   integrations:'Integrações','brn-overview':'BRN VENDAS',
   'brn-jiujitsu':'Jiu-Jitsu','brn-despluga':'Kit Despluga Pro',
@@ -1457,6 +1526,7 @@ function navigate(view){
   else if(view==='radar'){ loadRadar(); }
   else if(view==='pipeline'){ loadPipeline(); }
   else if(view==='biblioteca'){ loadBiblioteca(); }
+  else if(view==='cerebro'){ loadCerebro(); }
   else if(view==='board'){ loadBoard(); }
   else if(view==='all-sectors'){ loadNotas(); }
   else if(!STATIC_VIEWS.has(view) && !historyLoaded[view]){ loadHistory(view); }
@@ -2497,6 +2567,72 @@ const BOARD_LABELS = [
 ];
 const COVER_COLORS = ['#1a0a2e','#0d2137','#14532d','#451a0a','#1e1b4b','#0f2027','#2d1b69','#1a1a1a'];
 let boardData = null;
+// ──────────────────────────────────────────
+// CÉREBRO — Base de Conhecimento
+// ──────────────────────────────────────────
+const CEREBRO_COLORS = {
+  avatar:'#6366f1',script:'#a78bfa',pesquisa:'#34d399',
+  depoimento:'#f59e0b',estrategia:'#f472b6',geral:'#64748b'
+};
+
+async function loadCerebro(query=''){
+  const list = document.getElementById('cerebro-list');
+  const badge = document.getElementById('cerebro-count-badge');
+  if(!list) return;
+  list.innerHTML = '<div class="cerebro-empty" style="opacity:.5">Carregando...</div>';
+  try {
+    const url = '/api/dashboard/cerebro' + (query ? `?q=${encodeURIComponent(query)}` : '');
+    const items = await fetch(url).then(r=>r.json());
+    if(badge) badge.textContent = items.length + ' documento' + (items.length===1?'':'s');
+    if(!items.length){ list.innerHTML='<div class="cerebro-empty">Nenhum documento ainda.</div>'; return; }
+    list.innerHTML = items.map(it => {
+      const color = CEREBRO_COLORS[it.tipo] || '#64748b';
+      const d = new Date(it.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'2-digit'});
+      const preview = (it.conteudo||'').slice(0,200);
+      return `<div class="cerebro-item" style="--ci-color:${color}">
+        <div class="cerebro-item-head">
+          <span class="cerebro-item-tag">${it.tipo}</span>
+          <span class="cerebro-item-titulo">${it.titulo}</span>
+        </div>
+        <div class="cerebro-item-content">${preview}${it.conteudo.length>200?'…':''}</div>
+        <div class="cerebro-item-footer">
+          <span class="cerebro-item-date">${d}</span>
+          <button class="cerebro-del-btn" onclick="deleteCerebroItem('${it.id}')">Remover</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = `<div class="cerebro-empty" style="color:#ef4444">Erro: ${e.message}</div>`;
+  }
+}
+
+async function saveCerebro(){
+  const tipo = document.getElementById('cerebro-tipo')?.value || 'geral';
+  const titulo = document.getElementById('cerebro-titulo')?.value?.trim() || 'Sem título';
+  const conteudo = document.getElementById('cerebro-conteudo')?.value?.trim();
+  const msg = document.getElementById('cerebro-save-msg');
+  if(!conteudo){ if(msg) msg.textContent='Conteúdo não pode estar vazio.'; return; }
+  if(msg) msg.textContent='Salvando...';
+  try {
+    const r = await fetch('/api/dashboard/cerebro',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tipo,titulo,conteudo})});
+    if(!r.ok) throw new Error((await r.json()).error);
+    if(msg){ msg.textContent='Salvo!'; setTimeout(()=>msg.textContent='',2000); }
+    document.getElementById('cerebro-conteudo').value='';
+    document.getElementById('cerebro-titulo').value='';
+    loadCerebro();
+  } catch(e) {
+    if(msg) msg.textContent='Erro: '+e.message;
+  }
+}
+
+async function deleteCerebroItem(id){
+  if(!confirm('Remover este documento do Cérebro?')) return;
+  try {
+    await fetch(`/api/dashboard/cerebro/${id}`,{method:'DELETE'});
+    loadCerebro(document.getElementById('cerebro-search')?.value||'');
+  } catch(e){ alert('Erro: '+e.message); }
+}
+
 let currentCardId = null;
 let boardDragId = null;
 
