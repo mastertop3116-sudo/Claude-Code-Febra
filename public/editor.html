@@ -743,6 +743,16 @@ function selectScene(id) {
   state.selectedScene = id;
   state.selectedLayer = null;
   document.querySelectorAll('.sc').forEach(c => c.classList.toggle('active', c.dataset.id === id));
+  // Jump playhead to start of selected scene
+  let t = 0;
+  for (const sc of state.scenes) {
+    if (sc.id === id) break;
+    t += getSceneDur(sc);
+  }
+  state.currentTime = t;
+  const sb = document.getElementById('seekbar');
+  if (sb) { sb.value = t; sb.style.setProperty('--pct', (t / Math.max(parseFloat(sb.max), 0.01) * 100) + '%'); }
+  updateTimeDisplay();
   renderLP();
   renderFrame();
 }
