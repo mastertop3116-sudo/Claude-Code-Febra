@@ -78,8 +78,8 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'Outfit',
    PREVIEW
 ══════════════════════════════════════════ */
 #preview-panel{
-  width:286px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);
-  display:flex;flex-direction:column;align-items:center;padding:16px 14px 12px;gap:10px;
+  width:320px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;padding:14px 14px 10px;gap:8px;
 }
 #preview-wrap{
   background:#000;border-radius:var(--r10);overflow:hidden;position:relative;
@@ -311,6 +311,13 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'Outfit',
   cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;border:1px solid var(--border2)}
 #exp-close-btn{background:var(--nx);border-color:var(--nx);color:#fff;font-weight:600}
 #exp-close-btn:hover{opacity:.85}
+.exp-phases{display:flex;align-items:center;justify-content:center;gap:6px;
+  margin-bottom:14px;flex-wrap:wrap}
+.exp-phase{font-size:11px;color:var(--t3);padding:4px 10px;border-radius:20px;
+  background:var(--bg3);border:1px solid var(--border);transition:all .3s;white-space:nowrap}
+.exp-phase.active{color:var(--nx);border-color:var(--nx3);background:var(--nx4);font-weight:600}
+.exp-phase.done{color:var(--green);border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.06)}
+.exp-phase-sep{font-size:10px;color:var(--t3)}
 
 /* ══════════════════════════════════════════
    TOASTS
@@ -415,7 +422,7 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'Outfit',
   <button class="btn-new" onclick="newProject()">Novo Projeto</button>
   <button class="btn-export" id="btn-export" onclick="startExport()" disabled title="Adicione ao menos uma cena para exportar">
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    Exportar Vídeo
+    Exportar MP4
   </button>
 </div>
 
@@ -426,7 +433,7 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'Outfit',
     <!-- PREVIEW -->
     <div id="preview-panel">
       <div id="preview-wrap">
-        <canvas id="preview-canvas" width="243" height="432"></canvas>
+        <canvas id="preview-canvas" width="270" height="480"></canvas>
         <div id="scene-indicator"></div>
       </div>
       <div id="preview-controls">
@@ -552,6 +559,13 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'Outfit',
     <div class="exp-sub" id="exp-sub">Preparando...</div>
     <div class="exp-bar-wrap"><div class="exp-bar" id="exp-bar"></div></div>
     <div class="exp-pct" id="exp-pct">0%</div>
+    <div class="exp-phases" id="exp-phases">
+      <div class="exp-phase" id="exp-ph1">① Gravando cenas</div>
+      <div class="exp-phase-sep">→</div>
+      <div class="exp-phase" id="exp-ph2">② Convertendo MP4</div>
+      <div class="exp-phase-sep">→</div>
+      <div class="exp-phase" id="exp-ph3">③ Download</div>
+    </div>
     <div class="exp-log" id="exp-log">aguardando...</div>
     <button class="exp-cancel" id="exp-cancel-btn" onclick="cancelExport()">Cancelar</button>
     <div class="exp-done-actions" id="exp-done-actions" style="display:none">
@@ -606,14 +620,13 @@ function setFormat(fmt) {
   const wrap = document.getElementById('preview-wrap');
 
   if (fmt === 'vertical') {
-    c.width = 243; c.height = 432;
+    c.width = 270; c.height = 480;
     c.style.width = ''; c.style.height = '';
-    wrap.style.width = '243px';
+    wrap.style.width = '270px';
   } else {
-    c.width = 432; c.height = 243;
-    // Scale canvas CSS to fit within the 258px available in the preview panel
-    const maxW = 258;
-    const dispH = Math.round(maxW * 243 / 432);
+    c.width = 480; c.height = 270;
+    const maxW = 290;
+    const dispH = Math.round(maxW * 270 / 480);
     c.style.width = maxW + 'px';
     c.style.height = dispH + 'px';
     wrap.style.width = maxW + 'px';
@@ -1544,6 +1557,23 @@ function setExp(pct, msg) {
   document.getElementById('exp-sub').textContent = msg;
   document.getElementById('exp-log').textContent = msg;
   document.getElementById('exp-pct').textContent = Math.round(pct) + '%';
+  // Activate phase indicators based on progress
+  const ph1 = document.getElementById('exp-ph1');
+  const ph2 = document.getElementById('exp-ph2');
+  const ph3 = document.getElementById('exp-ph3');
+  if (pct < 93) {
+    ph1.className = 'exp-phase active';
+    ph2.className = 'exp-phase';
+    ph3.className = 'exp-phase';
+  } else if (pct < 99) {
+    ph1.className = 'exp-phase done';
+    ph2.className = 'exp-phase active';
+    ph3.className = 'exp-phase';
+  } else {
+    ph1.className = 'exp-phase done';
+    ph2.className = 'exp-phase done';
+    ph3.className = 'exp-phase active';
+  }
 }
 
 function showExportOverlay() {
@@ -1554,6 +1584,9 @@ function showExportOverlay() {
   document.getElementById('exp-bar').style.width = '0%';
   document.getElementById('exp-pct').textContent = '0%';
   document.getElementById('exp-log').textContent = 'aguardando...';
+  document.getElementById('exp-ph1').className = 'exp-phase';
+  document.getElementById('exp-ph2').className = 'exp-phase';
+  document.getElementById('exp-ph3').className = 'exp-phase';
   document.getElementById('btn-export').disabled = true;
 }
 
@@ -1654,6 +1687,7 @@ function loadScript(src) {
 
 function newProject() {
   if (state.scenes.length && !confirm('Criar novo projeto? O projeto atual será perdido.')) return;
+  localStorage.removeItem(SAVE_KEY);
   state.scenes = []; state.selectedScene = null; state.selectedLayer = null;
   state.audio = { blob:null, url:null, totalDuration:0, start:0, end:null, speed:1 };
   state.currentTime = 0;
@@ -1665,6 +1699,46 @@ function newProject() {
   renderLP();
   renderFrame();
   updateDuration();
+}
+
+// ════════════════════════════════════════════════════════════════
+// AUTO-SAVE (layers + format — blobs cannot be serialized)
+// ════════════════════════════════════════════════════════════════
+const SAVE_KEY = 'nxs_editor_v1';
+let saveTimer = null;
+
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveProject, 1200);
+}
+
+function saveProject() {
+  try {
+    const snapshot = {
+      format: state.format,
+      scenes: state.scenes.map(sc => ({
+        id: sc.id, name: sc.name, type: sc.type,
+        duration: sc.duration, trimStart: sc.trimStart, trimEnd: sc.trimEnd,
+        layers: sc.layers,
+      })),
+    };
+    localStorage.setItem(SAVE_KEY, JSON.stringify(snapshot));
+  } catch(e) {}
+}
+
+// Hook save into every state-mutating action
+const _origRenderStrip = renderStrip;
+renderStrip = function() { _origRenderStrip(); scheduleSave(); };
+const _origRenderLP = renderLP;
+renderLP = function() { _origRenderLP(); scheduleSave(); };
+
+// Show save indicator in header
+function showSaved() {
+  const badge = document.getElementById('var-count');
+  if (!badge) return;
+  const orig = badge.parentElement.textContent;
+  badge.parentElement.style.opacity = '.5';
+  setTimeout(() => { badge.parentElement.style.opacity = ''; }, 800);
 }
 
 // ════════════════════════════════════════════════════════════════
