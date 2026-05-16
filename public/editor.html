@@ -128,15 +128,15 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'Outfit',
 .lp-empty .lp-ico{font-size:36px;opacity:.3;line-height:1}
 .lp-empty .lp-title{font-size:14px;font-weight:600;color:var(--t2)}
 .lp-empty .lp-sub{font-size:12px;line-height:1.5}
-.lp-section-title{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--t3);
-  text-transform:uppercase;margin-bottom:6px}
+.lp-section-title{font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--t2);
+  margin-bottom:6px}
 
 /* Scene meta card */
 .lp-scene-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r10);
   padding:12px;display:flex;align-items:center;gap:10px}
-.lp-thumb{width:44px;height:44px;border-radius:var(--r6);object-fit:cover;
+.lp-thumb{width:64px;height:64px;border-radius:var(--r8);object-fit:cover;
   background:var(--bg4);flex-shrink:0;display:flex;align-items:center;
-  justify-content:center;font-size:18px;color:var(--t3)}
+  justify-content:center;font-size:22px;color:var(--t3)}
 .lp-thumb img{width:100%;height:100%;object-fit:cover;border-radius:var(--r6)}
 .lp-scene-info{flex:1;min-width:0}
 .lp-scene-name{font-size:12px;font-weight:600;color:var(--t1);
@@ -183,8 +183,8 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'Outfit',
 .lf-row{display:grid;gap:7px}
 .lf-2{grid-template-columns:1fr 1fr}
 .lf-3{grid-template-columns:1fr 1fr 1fr}
-.lf label{display:block;font-size:10px;color:var(--t3);font-weight:600;
-  letter-spacing:.05em;margin-bottom:3px;text-transform:uppercase}
+.lf label{display:block;font-size:10px;color:var(--t2);font-weight:500;
+  letter-spacing:.01em;margin-bottom:3px}
 .lf input,.lf textarea,.lf select{width:100%;background:var(--bg4);border:1px solid var(--border);
   border-radius:var(--r6);color:var(--t1);font-family:'Outfit',sans-serif;font-size:12px;
   padding:6px 8px;outline:none;transition:border-color .15s}
@@ -374,7 +374,7 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'Outfit',
 
 /* ── Duration wrap ── */
 .dur-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
-.dur-lbl{font-size:9px;color:var(--t3);font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.dur-lbl{font-size:9px;color:var(--t2);font-weight:500;letter-spacing:.01em}
 .dur-row{display:flex;align-items:center;gap:3px}
 .dur-sfx{font-size:11px;color:var(--t3);font-family:var(--mono)}
 
@@ -938,7 +938,7 @@ function renderLayersList(sc) {
 function renderLayerEditor(layer, sc) {
   const posGrid = `
     <div>
-      <div style="font-size:10px;color:var(--t3);font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px">Posição rápida</div>
+      <div style="font-size:10px;color:var(--t2);font-weight:500;letter-spacing:.01em;margin-bottom:4px">Posição rápida</div>
       <div class="pos-grid">
         ${[['tl','↖'],['tc','↑'],['tr','↗'],['ml','←'],['mc','·'],['mr','→'],['bl','↙'],['bc','↓'],['br','↘']].map(([p,ic]) =>
           `<div class="pos-cell${layer.pos===p?' active':''}" onclick="setPos('${layer.id}','${p}')" title="${p}">${ic}</div>`
