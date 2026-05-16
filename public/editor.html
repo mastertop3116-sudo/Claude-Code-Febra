@@ -168,11 +168,16 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'Outfit',
 .layer-head{display:flex;align-items:center;gap:8px;padding:9px 12px}
 .layer-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .layer-lbl{flex:1;font-size:12px;font-weight:500;color:var(--t1)}
-.layer-prev{font-size:11px;color:var(--t3);max-width:100px;white-space:nowrap;
+.layer-prev{font-size:11px;color:var(--t3);max-width:90px;white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis}
+.layer-chevron{font-size:10px;color:var(--t3);transition:transform .18s;flex-shrink:0}
+.layer-item.active .layer-chevron{transform:rotate(180deg);color:var(--nx)}
 .layer-del{background:none;border:none;color:var(--t3);cursor:pointer;font-size:15px;
   padding:1px 4px;border-radius:4px;transition:color .15s;line-height:1;flex-shrink:0}
 .layer-del:hover{color:var(--red)}
+.layer-dot{cursor:grab}
+.layer-dot:active{cursor:grabbing}
+.layer-item-ghost{opacity:.4;border:1px dashed var(--nx3)!important}
 .layer-body{padding:10px 12px 12px;border-top:1px solid var(--border);
   display:flex;flex-direction:column;gap:8px}
 .lf-row{display:grid;gap:7px}
@@ -188,8 +193,8 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'Outfit',
 .lf input[type=color]{padding:2px 4px;height:30px;cursor:pointer}
 .pos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
 .pos-cell{background:var(--bg4);border:1px solid var(--border);border-radius:4px;
-  height:22px;cursor:pointer;transition:all .12s;display:flex;align-items:center;
-  justify-content:center;font-size:8px;color:var(--t3)}
+  height:24px;cursor:pointer;transition:all .12s;display:flex;align-items:center;
+  justify-content:center;font-size:11px;color:var(--t2)}
 .pos-cell:hover{background:var(--nx2);border-color:var(--nx3);color:var(--nx)}
 .pos-cell.active{background:var(--nx);border-color:var(--nx);color:#fff}
 
@@ -483,7 +488,7 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'Outfit',
           <div class="lp-section-title">Adicionar camada</div>
           <div class="add-btns">
             <button class="add-btn" onclick="addLayer('text')"><span>T</span> Texto</button>
-            <button class="add-btn" onclick="addLayer('price')"><span>₴</span> Preço</button>
+            <button class="add-btn" onclick="addLayer('price')"><span>R$</span> Preço</button>
             <button class="add-btn" onclick="addLayer('image')"><span>🖼</span> Imagem</button>
             <button class="add-btn" onclick="addLayer('shape')"><span>▬</span> Forma</button>
           </div>
@@ -504,7 +509,7 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'Outfit',
     <div id="at">
       <div class="at-top">
         <span class="tl-lbl">🎙 Narração</span>
-        <input id="narr-text" type="text" placeholder="Digite o texto para gerar narração com ElevenLabs...">
+        <input id="narr-text" type="text" placeholder="Digite o texto para gerar narração com ElevenLabs..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();generateAudio();}">
         <select id="narr-voice">
           <option value="pNInz6obpgDQGcFmaJgB">Rachel (PT)</option>
           <option value="ErXwobaYiN019PkySvjV">Antoni</option>
@@ -517,7 +522,7 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'Outfit',
         <input type="file" id="audio-file-input" accept="audio/*" style="display:none" onchange="loadAudioFile(this)">
         <div class="at-meta">
           <label>Início: <input type="number" id="aud-start" min="0" step="0.1" value="0" style="width:50px"></label>
-          <label>Fim: <input type="number" id="aud-end" min="0" step="0.1" style="width:50px" placeholder="auto"></label>
+          <label>Fim: <input type="number" id="aud-end" min="0" step="0.1" style="width:58px" placeholder="auto"></label>
           <label>Vel.:
             <select id="aud-speed">
               <option value="0.75">0.75×</option>
@@ -618,18 +623,21 @@ function setFormat(fmt) {
   document.querySelectorAll('.fmt-btn').forEach(b => b.classList.toggle('active', b.dataset.fmt === fmt));
   const c = document.getElementById('preview-canvas');
   const wrap = document.getElementById('preview-wrap');
+  const panel = document.getElementById('preview-panel');
 
   if (fmt === 'vertical') {
     c.width = 270; c.height = 480;
     c.style.width = ''; c.style.height = '';
     wrap.style.width = '270px';
+    panel.style.width = '320px';
   } else {
     c.width = 480; c.height = 270;
-    const maxW = 290;
+    const maxW = 350;
     const dispH = Math.round(maxW * 270 / 480);
     c.style.width = maxW + 'px';
     c.style.height = dispH + 'px';
     wrap.style.width = maxW + 'px';
+    panel.style.width = '380px';
   }
   renderFrame();
 }
@@ -884,16 +892,33 @@ function renderLayersList(sc) {
     const preview = l.content ? l.content.slice(0, 18) : (l.src ? '🖼 imagem' : '');
     const bodyHtml = isActive ? renderLayerEditor(l, sc) : '';
     return `
-      <div class="layer-item${isActive ? ' active' : ''}" id="li_${l.id}">
+      <div class="layer-item${isActive ? ' active' : ''}" id="li_${l.id}" data-lid="${l.id}">
         <div class="layer-head" onclick="selectLayer('${l.id}')">
           <div class="layer-dot" style="background:${LAYER_COLORS[l.type] || '#6366f1'}"></div>
           <span class="layer-lbl">${{text:'Texto',price:'Preço',image:'Imagem',shape:'Forma'}[l.type]||l.type}</span>
           <span class="layer-prev">${preview}</span>
-          <button class="layer-del" onclick="event.stopPropagation();deleteLayer('${l.id}')">×</button>
+          <span class="layer-chevron">▾</span>
+          <button class="layer-del" onclick="event.stopPropagation();deleteLayer('${l.id}')" title="Excluir camada">×</button>
         </div>
         ${isActive ? `<div class="layer-body">${bodyHtml}</div>` : ''}
       </div>`;
   }).join('');
+
+  // Drag-and-drop layer reordering
+  if (sc.layers.length > 1 && typeof Sortable !== 'undefined') {
+    Sortable.create(list, {
+      animation: 120, handle: '.layer-dot',
+      ghostClass: 'layer-item-ghost',
+      onEnd(evt) {
+        const sc2 = state.scenes.find(s => s.id === state.selectedScene);
+        if (!sc2) return;
+        const moved = sc2.layers.splice(evt.oldIndex, 1)[0];
+        sc2.layers.splice(evt.newIndex, 0, moved);
+        renderFrame();
+        scheduleSave();
+      }
+    });
+  }
 }
 
 function renderLayerEditor(layer, sc) {
@@ -1181,6 +1206,13 @@ function renderSceneDots() {
   const ind = document.getElementById('scene-indicator');
   if (state.scenes.length <= 1) { ind.innerHTML = ''; return; }
   const { sc } = getSceneAtTime(state.currentTime);
+  const idx = state.scenes.indexOf(sc) + 1;
+  if (state.scenes.length > 8) {
+    ind.innerHTML = `<div style="font-size:10px;font-family:var(--mono);color:rgba(255,255,255,.7);
+      background:rgba(0,0,0,.55);padding:2px 7px;border-radius:20px;letter-spacing:.04em">
+      ${idx}/${state.scenes.length}</div>`;
+    return;
+  }
   ind.innerHTML = state.scenes.map(s =>
     `<div class="scene-dot${s === sc ? ' active' : ''}"></div>`
   ).join('');
@@ -1723,6 +1755,7 @@ function saveProject() {
       })),
     };
     localStorage.setItem(SAVE_KEY, JSON.stringify(snapshot));
+    showSaved();
   } catch(e) {}
 }
 
