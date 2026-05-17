@@ -1027,6 +1027,29 @@ app.get('/editor', (req, res) => {
 });
 
 // ──────────────────────────────────────────
+// Materiais Imprimíveis — Order Bumps Kit Despluga
+// ──────────────────────────────────────────
+app.post("/api/materiais", async (req, res) => {
+  const { tipo } = req.body;
+  const { gerarCertificados, gerarPassaporte, gerarFichas } = require("./departments/creative/materiais_generator");
+  const map = {
+    certificados: { fn: gerarCertificados, filename: "certificados-conquista.pdf" },
+    passaporte:   { fn: gerarPassaporte,   filename: "passaporte-explorador.pdf"  },
+    fichas:       { fn: gerarFichas,       filename: "fichas-acompanhamento.pdf"  },
+  };
+  if (!map[tipo]) return res.status(400).json({ error: "tipo inválido. Use: certificados | passaporte | fichas" });
+  try {
+    const buffer = await map[tipo].fn();
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${map[tipo].filename}"`);
+    res.send(buffer);
+  } catch (e) {
+    console.error("[/api/materiais]", e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ──────────────────────────────────────────
 // Conversão WebM → MP4 (server-side FFmpeg)
 // ──────────────────────────────────────────
 (function setupVideoConvert() {
