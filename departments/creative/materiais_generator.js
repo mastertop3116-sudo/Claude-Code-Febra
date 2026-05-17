@@ -333,22 +333,24 @@ async function gerarPassaporte() {
     .text("Minhas Missões", M + 28, progY, { width: W - M*2 - 28 });
 
   const missions = [
-    { nome: "Algoritmos", cor: "#E8EAF6", abbr: "ALG" },
-    { nome: "Padrões", cor: "#E8EAF6", abbr: "PAD" },
+    { nome: "Algoritmos",   cor: "#E8EAF6", abbr: "ALG" },
+    { nome: "Padrões",      cor: "#E8EAF6", abbr: "PAD" },
     { nome: "Decomposição", cor: "#F3E5F5", abbr: "DEC" },
-    { nome: "Abstração", cor: "#F3E5F5", abbr: "ABS" },
+    { nome: "Abstração",    cor: "#F3E5F5", abbr: "ABS" },
+    { nome: "Automação",    cor: "#E8F5E9", abbr: "AUT" },
   ];
   const cols = 2, mW = (W - M*2 - 20) / cols;
   for (let i = 0; i < missions.length; i++) {
-    const mx = M + (i % cols) * (mW + 20);
+    const isLast = i === missions.length - 1 && missions.length % 2 !== 0;
+    const cardW = isLast ? W - M*2 : mW;
+    const mx = isLast ? M : M + (i % cols) * (mW + 20);
     const my = progY + 30 + Math.floor(i / cols) * 50;
-    doc.roundedRect(mx, my, mW, 38, 6).fill(missions[i].cor);
-    // Mini badge
+    doc.roundedRect(mx, my, cardW, 38, 6).fill(missions[i].cor);
     doc.circle(mx + 14, my + 10, 8).fill("#1A237E");
     doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(6)
       .text(missions[i].abbr, mx + 6, my + 7, { width: 16, align: "center" });
-    doc.fillColor("#1A237E").font("Nunito-Bold").fontSize(10).text(missions[i].nome, mx + 28, my + 5, { width: mW - 36 });
-    doc.fillColor("#9E9E9E").font("Nunito").fontSize(8).text("Missões concluídas: ___ / 5", mx + 28, my + 20, { width: mW - 36 });
+    doc.fillColor("#1A237E").font("Nunito-Bold").fontSize(10).text(missions[i].nome, mx + 28, my + 5, { width: cardW - 36 });
+    doc.fillColor("#9E9E9E").font("Nunito").fontSize(8).text("Missões concluídas: ___ / 5", mx + 28, my + 20, { width: cardW - 36 });
   }
 
   doc.fillColor("#9E9E9E").font("Nunito").fontSize(8)
