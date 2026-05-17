@@ -1,6 +1,7 @@
 // ============================================================
 // NEXUS — Gerador de Materiais Imprimíveis para Sala de Aula
 // PDFKit direto — sem IA, conteúdo 100% curado e específico
+// NOTA: Emojis não renderizam em PDFKit — usar formas geométricas
 // ============================================================
 
 const PDFDocument = require("pdfkit");
@@ -9,33 +10,23 @@ const fs   = require("fs");
 
 const FONTS_DIR = path.join(__dirname, "../../assets/fonts");
 
-// ── Paletas por tipo ───────────────────────────────────────
 const COLORS = {
-  purple : "#6C3FC5",
-  gold   : "#F5A623",
-  green  : "#2E7D32",
-  teal   : "#00838F",
-  red    : "#C62828",
-  blue   : "#1565C0",
-  orange : "#E65100",
-  pink   : "#AD1457",
-  white  : "#FFFFFF",
-  offwhite: "#FAFAFA",
-  dark   : "#1A1A2E",
-  gray   : "#616161",
+  white    : "#FFFFFF",
+  offwhite : "#FFFDF4",
+  dark     : "#1A1A2E",
+  gray     : "#616161",
   lightgray: "#EEEEEE",
 };
 
-// Paleta por certificado
 const CERT_PALETTES = [
-  { primary: "#6C3FC5", accent: "#F5A623", label: "Algoritmos"   },
-  { primary: "#00838F", accent: "#FFD740", label: "Padrões"       },
-  { primary: "#2E7D32", accent: "#AED581", label: "Decomposição"  },
-  { primary: "#AD1457", accent: "#F48FB1", label: "Abstração"     },
-  { primary: "#E65100", accent: "#FFB74D", label: "Kit Completo"  },
-  { primary: "#1565C0", accent: "#90CAF9", label: "Explorador"    },
-  { primary: "#4A148C", accent: "#CE93D8", label: "Lógica"        },
-  { primary: "#004D40", accent: "#80CBC4", label: "Criatividade"  },
+  { primary: "#6C3FC5", accent: "#F5A623", abbr: "ALG" },
+  { primary: "#00838F", accent: "#FFD740", abbr: "PAD" },
+  { primary: "#2E7D32", accent: "#AED581", abbr: "DEC" },
+  { primary: "#AD1457", accent: "#F48FB1", abbr: "ABS" },
+  { primary: "#E65100", accent: "#FFB74D", abbr: "KIT" },
+  { primary: "#1565C0", accent: "#90CAF9", abbr: "EXP" },
+  { primary: "#4A148C", accent: "#CE93D8", abbr: "LOG" },
+  { primary: "#004D40", accent: "#80CBC4", abbr: "CRI" },
 ];
 
 // ── Helpers de fonte ───────────────────────────────────────
@@ -44,62 +35,66 @@ function registerFonts(doc) {
     const p = path.join(FONTS_DIR, file);
     if (fs.existsSync(p)) doc.registerFont(name, p);
   };
-  reg("Nunito",         "Nunito-Regular.ttf");
-  reg("Nunito-Bold",    "Nunito-Bold.ttf");
-  reg("DancingScript",  "DancingScript-Regular.ttf");
+  reg("Nunito",          "Nunito-Regular.ttf");
+  reg("Nunito-Bold",     "Nunito-Bold.ttf");
+  reg("DancingScript",   "DancingScript-Regular.ttf");
   reg("DancingScript-Bold", "DancingScript-Bold.ttf");
-  reg("GreatVibes",     "GreatVibes-Regular.ttf");
-  reg("Raleway",        "Raleway-Regular.ttf");
-  reg("Raleway-Bold",   "Raleway-Bold.ttf");
-  reg("Poppins",        "Poppins-Regular.ttf");
-  reg("Poppins-Bold",   "Poppins-SemiBold.ttf");
-  reg("Lora",           "Lora-Regular.ttf");
-  reg("Lora-Bold",      "Lora-Bold.ttf");
+  reg("GreatVibes",      "GreatVibes-Regular.ttf");
+  reg("Raleway",         "Raleway-Regular.ttf");
+  reg("Raleway-Bold",    "Raleway-Bold.ttf");
+  reg("Poppins",         "Poppins-Regular.ttf");
+  reg("Poppins-Bold",    "Poppins-SemiBold.ttf");
+  reg("Lora",            "Lora-Regular.ttf");
+  reg("Lora-Bold",       "Lora-Bold.ttf");
 }
 
-// ── Stars helper ──────────────────────────────────────────
-function drawStar(doc, cx, cy, r, color) {
-  const pts = 5;
-  const inner = r * 0.4;
-  doc.save();
-  doc.fillColor(color);
-  let path_d = "";
-  for (let i = 0; i < pts * 2; i++) {
-    const angle = (i * Math.PI) / pts - Math.PI / 2;
-    const rad = i % 2 === 0 ? r : inner;
-    const x = cx + rad * Math.cos(angle);
-    const y = cy + rad * Math.sin(angle);
-    path_d += (i === 0 ? "M" : "L") + `${x},${y}`;
+// ── Badge circular com sigla (substitui emojis nos certificados) ──
+function drawSkillBadge(doc, cx, cy, abbr, primary, accent) {
+  // Anel externo (accent)
+  doc.circle(cx, cy, 36).fill(accent);
+  // Círculo interno (primary)
+  doc.circle(cx, cy, 30).fill(primary);
+  // Texto da sigla
+  doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(14)
+    .text(abbr, cx - 30, cy - 9, { width: 60, align: "center" });
+}
+
+// ── Estrelas decorativas (substitui ⭐) ───────────────────
+function drawStars(doc, cx, y, n, color, r = 7) {
+  const gap = r * 2 + 10;
+  const totalW = n * (r * 2) + (n - 1) * 10;
+  let sx = cx - totalW / 2 + r;
+  for (let i = 0; i < n; i++) {
+    doc.circle(sx, y, r).fill(color);
+    // Ponto interno branco para dar efeito de estrela
+    doc.circle(sx, y, r * 0.38).fill(COLORS.white);
+    sx += gap;
   }
-  path_d += "Z";
-  // Draw stars as circles (PDFKit doesn't parse SVG path strings this way — use circles as fallback)
-  doc.circle(cx, cy, r * 0.6).fill();
-  doc.restore();
 }
 
-// ── Decorative border ─────────────────────────────────────
-function drawCertBorder(doc, W, H, primary, accent) {
-  // Outer fill
-  doc.rect(0, 0, W, H).fill("#FFFDF4");
+// ── Marcador de seção colorido (substitui emojis de seção) ──
+function drawSectionDot(doc, x, y, color) {
+  doc.circle(x + 6, y + 6, 5).fill(color);
+  return x + 18; // retorna x para o texto começar
+}
 
-  // Thick outer border
+// ── Borda decorativa do certificado ──────────────────────
+function drawCertBorder(doc, W, H, primary, accent) {
+  doc.rect(0, 0, W, H).fill(COLORS.offwhite);
   doc.rect(12, 12, W - 24, H - 24).lineWidth(5).strokeColor(primary).stroke();
-  // Thin inner border
   doc.rect(20, 20, W - 40, H - 40).lineWidth(1.5).strokeColor(accent).stroke();
 
-  // Corner decorations — filled squares
   const cs = 14;
   for (const [x, y] of [[12,12],[W-12-cs,12],[12,H-12-cs],[W-12-cs,H-12-cs]]) {
     doc.rect(x, y, cs, cs).fill(primary);
     doc.rect(x+2, y+2, cs-4, cs-4).fill(accent);
   }
 
-  // Top decorative bar
   doc.rect(12, 12, W - 24, 5).fill(primary);
   doc.rect(12, H - 17, W - 24, 5).fill(primary);
 }
 
-// ── Linha para assinar/preencher ──────────────────────────
+// ── Linha de assinatura ──────────────────────────────────
 function signLine(doc, x, y, w, label, color = COLORS.gray) {
   doc.moveTo(x, y).lineTo(x + w, y).lineWidth(0.8).strokeColor(color).stroke();
   doc.fillColor(color).font("Nunito").fontSize(8)
@@ -112,64 +107,55 @@ function signLine(doc, x, y, w, label, color = COLORS.gray) {
 const CERTIFICATES = [
   {
     titulo:    "Mestre dos Algoritmos",
-    emoji:     "🤖",
     conquista: "Completou as atividades de Algoritmos",
     descricao: "Demonstrou habilidade em criar sequências ordenadas\nde passos para resolver problemas — assim como um programador!",
     habilidade: "EF15CO01",
   },
   {
     titulo:    "Detetive de Padrões",
-    emoji:     "🔍",
     conquista: "Identificou padrões e sequências",
     descricao: "Encontrou regularidades escondidas em sequências e desafios,\nmostrando um olhar atento e investigador!",
     habilidade: "EF15CO03",
   },
   {
     titulo:    "Engenheiro Desplugado",
-    emoji:     "🧩",
     conquista: "Dominou a Decomposição de Problemas",
     descricao: "Provou que problemas grandes ficam pequenos\nquando divididos em partes — um verdadeiro engenheiro!",
     habilidade: "EF15CO02",
   },
   {
     titulo:    "Pensador Abstrato",
-    emoji:     "🌐",
     conquista: "Praticou Abstração com Excelência",
     descricao: "Aprendeu a identificar o que é essencial em um problema,\nfocando no que realmente importa!",
     habilidade: "EF15CO04",
   },
   {
     titulo:    "Super Programador Sem Computador",
-    emoji:     "🏆",
     conquista: "Concluiu o Kit Despluga Pro Completo",
     descricao: "Completou todas as atividades de Pensamento Computacional\ne provou que a tecnologia começa na mente!",
     habilidade: "EF15CO01–CO05",
   },
   {
     titulo:    "Explorador Digital",
-    emoji:     "🧭",
     conquista: "Participou das Dinâmicas Desplugadas",
     descricao: "Explorou o mundo do Pensamento Computacional\ncom curiosidade, coragem e muita criatividade!",
     habilidade: "EF15CO01–CO05",
   },
   {
     titulo:    "Campeão da Lógica",
-    emoji:     "⚡",
     conquista: "Resolveu Desafios de Raciocínio Lógico",
     descricao: "Mostrou raciocínio afiado ao resolver desafios\nque exigem lógica, sequência e organização de ideias!",
     habilidade: "EF15CO01",
   },
   {
     titulo:    "Criador de Soluções",
-    emoji:     "💡",
     conquista: "Resolveu Problemas com Criatividade",
-    descricao: "Encontrou soluções únicas e criativas para desafios\nmostrando que o Pensamento Computacional inspira a inovação!",
+    descricao: "Encontrou soluções únicas e criativas para desafios,\nmostrando que o Pensamento Computacional inspira a inovação!",
     habilidade: "EF15CO02–CO04",
   },
 ];
 
 async function gerarCertificados() {
-  // A4 landscape: 841.89 x 595.28
   const doc = new PDFDocument({ size: "A4", layout: "landscape", margin: 0, autoFirstPage: false });
   registerFonts(doc);
 
@@ -178,64 +164,59 @@ async function gerarCertificados() {
 
   for (let i = 0; i < CERTIFICATES.length; i++) {
     const cert = CERTIFICATES[i];
-    const pal = CERT_PALETTES[i];
+    const pal  = CERT_PALETTES[i];
 
     doc.addPage();
     drawCertBorder(doc, W, H, pal.primary, pal.accent);
 
-    // Emoji grande como elemento visual
-    doc.fillColor(pal.primary).font("Nunito-Bold").fontSize(52)
-      .text(cert.emoji, CX - 50, 40, { width: 100, align: "center" });
+    // Badge circular com sigla (substitui emoji)
+    drawSkillBadge(doc, CX, 80, pal.abbr, pal.primary, pal.accent);
 
     // Label "CERTIFICADO DE CONQUISTA"
     doc.fillColor(pal.primary).font("Raleway-Bold").fontSize(11)
-      .text("C  E  R  T  I  F  I  C  A  D  O  D  E  C  O  N  Q  U  I  S  T  A", 30, 120, { width: W - 60, align: "center", characterSpacing: 1 });
+      .text("C  E  R  T  I  F  I  C  A  D  O   D  E   C  O  N  Q  U  I  S  T  A",
+        30, 128, { width: W - 60, align: "center" });
 
-    // Divider line
-    const lineY = 138;
+    // Divider
+    const lineY = 146;
     doc.moveTo(CX - 160, lineY).lineTo(CX + 160, lineY).lineWidth(1).strokeColor(pal.accent).stroke();
 
     // Título do certificado
-    doc.fillColor(pal.primary).font("Nunito-Bold").fontSize(32)
-      .text(cert.titulo, 30, 150, { width: W - 60, align: "center" });
+    doc.fillColor(pal.primary).font("Nunito-Bold").fontSize(30)
+      .text(cert.titulo, 30, 158, { width: W - 60, align: "center" });
 
-    // "Concedido a" text
+    // "Concedido a"
     doc.fillColor(COLORS.gray).font("Lora").fontSize(12)
-      .text("Concedido a", 30, 200, { width: W - 60, align: "center" });
+      .text("Concedido a", 30, 205, { width: W - 60, align: "center" });
 
-    // Nome do aluno — linha para preencher
-    const nameLineY = 240;
+    // Linha do nome do aluno
+    const nameLineY = 245;
     doc.moveTo(CX - 200, nameLineY).lineTo(CX + 200, nameLineY).lineWidth(1.5).strokeColor(pal.primary).stroke();
     doc.fillColor(COLORS.gray).font("Nunito").fontSize(9)
       .text("(nome do aluno)", CX - 100, nameLineY + 4, { width: 200, align: "center" });
 
     // Conquista
     doc.fillColor(COLORS.dark).font("Poppins-Bold").fontSize(13)
-      .text(cert.conquista, 30, 265, { width: W - 60, align: "center" });
+      .text(cert.conquista, 30, 268, { width: W - 60, align: "center" });
 
     // Descrição
     doc.fillColor(COLORS.gray).font("Lora").fontSize(10.5)
-      .text(cert.descricao, 80, 293, { width: W - 160, align: "center", lineGap: 3 });
+      .text(cert.descricao, 80, 295, { width: W - 160, align: "center", lineGap: 3 });
 
-    // Habilidade BNCC
-    const badgeW = 160, badgeH = 18, badgeX = CX - badgeW / 2, badgeY = 345;
-    doc.roundedRect(badgeX, badgeY, badgeW, badgeH, 9).fill(pal.accent);
-    doc.fillColor(COLORS.dark).font("Nunito-Bold").fontSize(8)
-      .text(`Habilidade BNCC: ${cert.habilidade}`, badgeX, badgeY + 4, { width: badgeW, align: "center" });
+    // Badge BNCC
+    const badgeW = 170, badgeH = 20, badgeX = CX - badgeW / 2, badgeY = 348;
+    doc.roundedRect(badgeX, badgeY, badgeW, badgeH, 10).fill(pal.accent);
+    doc.fillColor(COLORS.dark).font("Nunito-Bold").fontSize(8.5)
+      .text(`Habilidade BNCC: ${cert.habilidade}`, badgeX, badgeY + 5, { width: badgeW, align: "center" });
 
-    // Assinaturas e data — linha base y=400
-    const sigY = 395;
-    // Professora (esquerda)
+    // Linhas de assinatura
+    const sigY = 398;
     signLine(doc, 80, sigY, 200, "Professora / Escola", pal.primary);
-    // Data (centro)
     signLine(doc, CX - 50, sigY, 100, "Data", pal.primary);
-    // Nota / obs (direita)
     signLine(doc, W - 280, sigY, 200, "Observação especial", pal.primary);
 
-    // Stars decorativos no rodapé
-    const stars = ["⭐", "⭐", "⭐", "⭐", "⭐"];
-    doc.fillColor(pal.accent).font("Nunito").fontSize(18)
-      .text(stars.join("  "), 30, 418, { width: W - 60, align: "center" });
+    // Decoração de estrelas no rodapé (círculos coloridos)
+    drawStars(doc, CX, 428, 5, pal.accent, 8);
 
     // Rodapé
     doc.fillColor(COLORS.lightgray).font("Nunito").fontSize(7.5)
@@ -252,39 +233,39 @@ async function gerarCertificados() {
 const PASSPORT_SKILLS = [
   {
     nome: "Algoritmos",
-    emoji: "🤖",
     codigo: "EF15CO01",
     descricao_crianca: "É como uma receita! Uma lista de passos em ordem certa para fazer algo.",
-    exemplo: "Algoritmo do Sanduíche: dite os passos para um amigo montar o lanche!",
+    exemplo: "Atividade: dite os passos para um amigo montar um sanduíche sem ele poder perguntar nada!",
     cor: "#6C3FC5",
     corLight: "#EDE7F6",
+    abbr: "ALG",
   },
   {
     nome: "Padrões",
-    emoji: "🔍",
     codigo: "EF15CO03",
     descricao_crianca: "Padrões são repetições! Quando algo segue uma regra que se repete.",
-    exemplo: "Caça ao Padrão: descubra a regra escondida na sequência de cartas!",
+    exemplo: "Atividade: descubra a regra escondida na sequência de cartas e complete o padrão!",
     cor: "#00838F",
     corLight: "#E0F7FA",
+    abbr: "PAD",
   },
   {
     nome: "Decomposição",
-    emoji: "🧩",
     codigo: "EF15CO02",
     descricao_crianca: "Dividir um problema grande em partes menores para resolver mais fácil!",
-    exemplo: "Monte o Robô: cada grupo faz uma parte — depois montamos juntos!",
+    exemplo: "Atividade: cada grupo faz uma parte do robô — depois montamos juntos!",
     cor: "#2E7D32",
     corLight: "#E8F5E9",
+    abbr: "DEC",
   },
   {
     nome: "Abstração",
-    emoji: "🌐",
     codigo: "EF15CO04",
     descricao_crianca: "Focar só no que importa! Ignorar os detalhes que não ajudam.",
-    exemplo: "Mapa Essencial: desenhe a escola usando SÓ 5 elementos essenciais!",
+    exemplo: "Atividade: desenhe a escola usando SÓ 5 elementos essenciais!",
     cor: "#AD1457",
     corLight: "#FCE4EC",
+    abbr: "ABS",
   },
 ];
 
@@ -293,190 +274,219 @@ async function gerarPassaporte() {
   registerFonts(doc);
   const W = 595.28, H = 841.89;
   const CX = W / 2;
-  const M = 36; // margin
+  const M = 36;
 
   // ── CAPA ──────────────────────────────────────────────────
   doc.addPage();
 
-  // Background gradient effect (top stripe)
   doc.rect(0, 0, W, 280).fill("#1A237E");
+  doc.rect(0, 265, W, 30).fill("#283593");
   doc.rect(0, 280, W, H - 280).fill("#FAFAFA");
 
-  // Wave divider (simplified — rectangle with curve illusion)
-  doc.rect(0, 265, W, 30).fill("#283593");
+  doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(11)
+    .text("K I T   D E S P L U G A   P R O", M, 48, { width: W - M*2, align: "center", characterSpacing: 2 });
 
-  // Título
-  doc.fillColor("#FFFFFF").font("Nunito-Bold").fontSize(11)
-    .text("K I T   D E S P L U G A   P R O", M, 55, { width: W - M*2, align: "center", characterSpacing: 2 });
+  doc.fillColor("#FFD740").font("Nunito-Bold").fontSize(38)
+    .text("PASSAPORTE DO", M, 76, { width: W - M*2, align: "center" });
+  doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(38)
+    .text("EXPLORADOR", M, 116, { width: W - M*2, align: "center" });
+  doc.fillColor("#FFD740").font("Nunito-Bold").fontSize(28)
+    .text("DESPLUGADO", M, 158, { width: W - M*2, align: "center" });
 
-  doc.fillColor("#FFD740").font("Nunito-Bold").fontSize(36)
-    .text("PASSAPORTE DO", M, 80, { width: W - M*2, align: "center" });
-  doc.fillColor("#FFFFFF").font("Nunito-Bold").fontSize(36)
-    .text("EXPLORADOR", M, 118, { width: W - M*2, align: "center" });
-  doc.fillColor("#FFD740").font("Nunito-Bold").fontSize(26)
-    .text("DESPLUGADO 🧭", M, 155, { width: W - M*2, align: "center" });
+  // Estrela decorativa ao lado do título (círculos)
+  drawStars(doc, CX, 196, 5, "#FFD740", 6);
 
-  // Subtitle
   doc.fillColor("#B3C0F7").font("Nunito").fontSize(10.5)
-    .text("Meu registro de missões de Pensamento Computacional", M, 205, { width: W - M*2, align: "center" });
+    .text("Meu registro de missões de Pensamento Computacional", M, 218, { width: W - M*2, align: "center" });
 
-  // Caixa de dados do aluno
+  // Caixa dados do aluno
   const boxY = 295, boxH = 200, boxX = M + 10;
-  doc.roundedRect(boxX, boxY, W - (M+10)*2, boxH, 12).fill("#FFFFFF");
-  doc.roundedRect(boxX, boxY, W - (M+10)*2, boxH, 12).lineWidth(2).strokeColor("#1A237E").stroke();
+  const boxW = W - (M + 10) * 2;
+  doc.roundedRect(boxX, boxY, boxW, boxH, 12).fill(COLORS.white);
+  doc.roundedRect(boxX, boxY, boxW, boxH, 12).lineWidth(2).strokeColor("#1A237E").stroke();
 
+  // Header da caixa com ponto colorido
+  doc.circle(boxX + 18, boxY + 22, 7).fill("#1A237E");
   doc.fillColor("#1A237E").font("Nunito-Bold").fontSize(12)
-    .text("📋  DADOS DO EXPLORADOR", boxX + 20, boxY + 18, { width: W - (M+10)*2 - 40 });
+    .text("DADOS DO EXPLORADOR", boxX + 32, boxY + 15, { width: boxW - 44 });
 
-  // Foto placeholder
-  const fotoX = W - M - 10 - 100, fotoY = boxY + 18;
-  doc.roundedRect(fotoX, fotoY, 95, 120, 8).fill("#EEF0FF").stroke();
+  // Placeholder de foto
+  const fotoX = W - M - 10 - 100, fotoY = boxY + 16;
+  doc.roundedRect(fotoX, fotoY, 95, 120, 8).fill("#EEF0FF");
+  doc.roundedRect(fotoX, fotoY, 95, 120, 8).lineWidth(1).strokeColor("#9FA8DA").stroke();
   doc.fillColor("#9FA8DA").font("Nunito").fontSize(9)
-    .text("📸 Cole sua\nfoto aqui", fotoX, fotoY + 48, { width: 95, align: "center" });
+    .text("Cole sua\nfoto aqui", fotoX, fotoY + 50, { width: 95, align: "center" });
 
   const fieldW = fotoX - boxX - 40;
-  const fields = [
-    ["Nome:", ""],
-    ["Turma:", ""],
-    ["Escola:", ""],
-    ["Professora:", ""],
-  ];
+  const fields = ["Nome:", "Turma:", "Escola:", "Professora:"];
   let fy = boxY + 50;
-  for (const [label] of fields) {
+  for (const label of fields) {
     doc.fillColor("#616161").font("Nunito-Bold").fontSize(10).text(label, boxX + 20, fy, { width: 80 });
     doc.moveTo(boxX + 105, fy + 12).lineTo(boxX + 105 + fieldW, fy + 12).lineWidth(0.8).strokeColor("#9FA8DA").stroke();
     fy += 32;
   }
 
-  // Progresso das missões
+  // Minhas Missões
   const progY = boxY + boxH + 20;
+  drawStars(doc, M + 16, progY + 6, 1, "#FFD740", 6);
   doc.fillColor("#1A237E").font("Nunito-Bold").fontSize(13)
-    .text("⭐ Minhas Missões", M, progY, { width: W - M*2, align: "center" });
+    .text("Minhas Missões", M + 28, progY, { width: W - M*2 - 28 });
 
-  const missions = ["Algoritmos 🤖", "Padrões 🔍", "Decomposição 🧩", "Abstração 🌐"];
+  const missions = [
+    { nome: "Algoritmos", cor: "#E8EAF6", abbr: "ALG" },
+    { nome: "Padrões", cor: "#E8EAF6", abbr: "PAD" },
+    { nome: "Decomposição", cor: "#F3E5F5", abbr: "DEC" },
+    { nome: "Abstração", cor: "#F3E5F5", abbr: "ABS" },
+  ];
   const cols = 2, mW = (W - M*2 - 20) / cols;
   for (let i = 0; i < missions.length; i++) {
     const mx = M + (i % cols) * (mW + 20);
     const my = progY + 30 + Math.floor(i / cols) * 50;
-    doc.roundedRect(mx, my, mW, 38, 6).fill(i < 2 ? "#E8EAF6" : "#F3E5F5");
-    doc.fillColor("#1A237E").font("Nunito-Bold").fontSize(10).text(missions[i], mx + 8, my + 6, { width: mW - 16 });
-    doc.fillColor("#9E9E9E").font("Nunito").fontSize(8).text("Missões concluídas: ___ / 5", mx + 8, my + 22, { width: mW - 16 });
+    doc.roundedRect(mx, my, mW, 38, 6).fill(missions[i].cor);
+    // Mini badge
+    doc.circle(mx + 14, my + 10, 8).fill("#1A237E");
+    doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(6)
+      .text(missions[i].abbr, mx + 6, my + 7, { width: 16, align: "center" });
+    doc.fillColor("#1A237E").font("Nunito-Bold").fontSize(10).text(missions[i].nome, mx + 28, my + 5, { width: mW - 36 });
+    doc.fillColor("#9E9E9E").font("Nunito").fontSize(8).text("Missões concluídas: ___ / 5", mx + 28, my + 20, { width: mW - 36 });
   }
 
-  // Rodapé
   doc.fillColor("#9E9E9E").font("Nunito").fontSize(8)
     .text("Kit Despluga Pro • Pensamento Computacional Desplugado • BNCC 2022", M, H - 30, { width: W - M*2, align: "center" });
 
-  // ── PÁGINAS DE HABILIDADE (4 páginas) ─────────────────────
+  // ── PÁGINAS DE HABILIDADE ──────────────────────────────────
   for (const skill of PASSPORT_SKILLS) {
     doc.addPage();
 
     // Header colorido
     doc.rect(0, 0, W, 130).fill(skill.cor);
-    doc.fillColor("#FFFFFF").font("Nunito").fontSize(10)
-      .text(`HABILIDADE BNCC: ${skill.codigo}`, M, 20, { width: W - M*2, characterSpacing: 1 });
-    doc.fillColor("#FFFFFF").font("Nunito-Bold").fontSize(34)
-      .text(`${skill.emoji}  ${skill.nome}`, M, 45, { width: W - M*2 });
+
+    // Badge circular no header
+    drawSkillBadge(doc, M + 28, 65, skill.abbr, skill.cor, skill.corLight);
+
+    doc.fillColor(COLORS.white).font("Nunito").fontSize(10)
+      .text(`HABILIDADE BNCC: ${skill.codigo}`, M + 64, 18, { width: W - M - 64, characterSpacing: 1 });
+    doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(32)
+      .text(skill.nome, M + 64, 42, { width: W - M - 64 });
     doc.fillColor(skill.corLight).font("Lora").fontSize(11)
-      .text(skill.descricao_crianca, M, 95, { width: W - M*2 });
+      .text(skill.descricao_crianca, M + 64, 88, { width: W - M*2 - 64 });
 
     // Exemplo de atividade
-    const exY = 150;
-    doc.roundedRect(M, exY, W - M*2, 50, 8).fill(skill.corLight);
+    const exY = 148;
+    doc.roundedRect(M, exY, W - M*2, 52, 8).fill(skill.corLight);
+    doc.circle(M + 14, exY + 14, 8).fill(skill.cor);
+    doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(8)
+      .text("!", M + 11, exY + 10, { width: 6, align: "center" });
     doc.fillColor(skill.cor).font("Nunito-Bold").fontSize(10)
-      .text("💡 ATIVIDADE DE EXEMPLO:", M + 12, exY + 10, { width: W - M*2 - 24 });
+      .text("ATIVIDADE DE EXEMPLO:", M + 28, exY + 8, { width: W - M*2 - 28 });
     doc.fillColor("#424242").font("Nunito").fontSize(10)
-      .text(skill.exemplo, M + 12, exY + 26, { width: W - M*2 - 24 });
+      .text(skill.exemplo, M + 28, exY + 24, { width: W - M*2 - 28 });
 
-    // Stamps de missões completadas
+    // Zona de carimbos/missões
     const stampY = 220;
-    doc.fillColor(skill.cor).font("Nunito-Bold").fontSize(13)
-      .text("🏅 MISSÕES CONCLUÍDAS — Cole seu carimbo ou desenhe uma estrela!", M, stampY, { width: W - M*2 });
+    doc.fillColor(skill.cor).font("Nunito-Bold").fontSize(12)
+      .text("MISSOES CONCLUIDAS — Cole seu carimbo ou desenhe uma estrela!", M, stampY, { width: W - M*2 });
 
-    const stampsPerRow = 5, stampSize = 70, stampGap = 18;
-    const totalW = stampsPerRow * stampSize + (stampsPerRow - 1) * stampGap;
-    const startX = (W - totalW) / 2;
+    const stampsPerRow = 5, stampSize = 68, stampGap = 16;
+    const totalStampW = stampsPerRow * stampSize + (stampsPerRow - 1) * stampGap;
+    const startX = (W - totalStampW) / 2;
     for (let s = 0; s < stampsPerRow; s++) {
       const sx = startX + s * (stampSize + stampGap);
-      const sy = stampY + 28;
-      doc.roundedRect(sx, sy, stampSize, stampSize, 10).fill(skill.corLight).stroke();
+      const sy = stampY + 26;
+      doc.roundedRect(sx, sy, stampSize, stampSize, 10).fill(skill.corLight);
       doc.roundedRect(sx, sy, stampSize, stampSize, 10).lineWidth(1.5).strokeColor(skill.cor).stroke();
-      doc.fillColor(skill.cor).font("Nunito-Bold").fontSize(8)
-        .text(`Missão ${s + 1}`, sx, sy + stampSize - 16, { width: stampSize, align: "center" });
+      // Numero da missão
+      doc.circle(sx + stampSize / 2, sy + 14, 11).fill(skill.cor);
+      doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(10)
+        .text(String(s + 1), sx + stampSize / 2 - 11, sy + 9, { width: 22, align: "center" });
+      doc.fillColor(skill.cor).font("Nunito").fontSize(7.5)
+        .text("Missão", sx, sy + stampSize - 16, { width: stampSize, align: "center" });
     }
 
-    // Seção "O que aprendi"
-    const learnY = 330;
+    // O que aprendi
+    const learnY = 328;
+    doc.circle(M + 8, learnY + 7, 6).fill(skill.cor);
     doc.fillColor(skill.cor).font("Nunito-Bold").fontSize(12)
-      .text("✏️ O QUE EU APRENDI:", M, learnY, { width: W - M*2 });
-    doc.moveTo(M, learnY + 28).lineTo(W - M, learnY + 28).lineWidth(0.6).strokeColor("#BDBDBD").stroke();
-    doc.moveTo(M, learnY + 58).lineTo(W - M, learnY + 58).lineWidth(0.6).strokeColor("#BDBDBD").stroke();
-    doc.moveTo(M, learnY + 88).lineTo(W - M, learnY + 88).lineWidth(0.6).strokeColor("#BDBDBD").stroke();
+      .text("O QUE EU APRENDI:", M + 20, learnY, { width: W - M*2 - 20 });
+    doc.moveTo(M, learnY + 26).lineTo(W - M, learnY + 26).lineWidth(0.6).strokeColor("#BDBDBD").stroke();
+    doc.moveTo(M, learnY + 56).lineTo(W - M, learnY + 56).lineWidth(0.6).strokeColor("#BDBDBD").stroke();
+    doc.moveTo(M, learnY + 86).lineTo(W - M, learnY + 86).lineWidth(0.6).strokeColor("#BDBDBD").stroke();
 
-    // Mini espaço para desenhar
+    // Área de desenho
     const drawY = learnY + 110;
+    doc.circle(M + 8, drawY + 7, 6).fill(skill.cor);
     doc.fillColor(skill.cor).font("Nunito-Bold").fontSize(12)
-      .text("🎨 MINHA ILUSTRAÇÃO DA ATIVIDADE:", M, drawY, { width: W - M*2 });
+      .text("MINHA ILUSTRACAO DA ATIVIDADE:", M + 20, drawY, { width: W - M*2 - 20 });
     const drawBoxH = 220;
     doc.roundedRect(M, drawY + 22, W - M*2, drawBoxH, 8).fill(skill.corLight);
     doc.roundedRect(M, drawY + 22, W - M*2, drawBoxH, 8).lineWidth(1).strokeColor(skill.cor).stroke();
     doc.fillColor(skill.cor).font("Nunito").fontSize(10).opacity(0.4)
-      .text("Desenhe aqui o que você fez na atividade 😊", M, drawY + 22 + drawBoxH/2 - 10, { width: W - M*2, align: "center" });
+      .text("Desenhe aqui o que voce fez na atividade!", M, drawY + 22 + drawBoxH / 2 - 10, { width: W - M*2, align: "center" });
     doc.opacity(1);
 
-    // Page footer
     doc.fillColor("#9E9E9E").font("Nunito").fontSize(8)
       .text(`Kit Despluga Pro • ${skill.nome} • ${skill.codigo}`, M, H - 30, { width: W - M*2, align: "center" });
   }
 
-  // ── PÁGINA MINHAS CONQUISTAS ───────────────────────────────
+  // ── MINHAS CONQUISTAS ──────────────────────────────────────
   doc.addPage();
   doc.rect(0, 0, W, 80).fill("#37474F");
-  doc.fillColor("#FFFFFF").font("Nunito-Bold").fontSize(28)
-    .text("🏆 MINHAS CONQUISTAS", M, 25, { width: W - M*2, align: "center" });
+
+  // Troféu desenhado: círculo + retângulo (substitui 🏆)
+  const trofY = 28;
+  doc.circle(M + 20, trofY + 14, 14).fill("#FFD740");
+  doc.rect(M + 13, trofY + 22, 14, 5).fill("#FF8F00");
+
+  doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(26)
+    .text("MINHAS CONQUISTAS", M + 44, 26, { width: W - M - 44, align: "center" });
 
   const congY = 100;
   doc.fillColor("#37474F").font("Nunito-Bold").fontSize(11)
     .text("Cole aqui seus certificados, adesivos ou escreva suas conquistas:", M, congY, { width: W - M*2 });
 
-  // 6 caixas para conquistas
-  const cols2 = 2, rows2 = 3, cW = (W - M*2 - 20) / cols2, cH = 120;
+  const cols2 = 2, rows2 = 3, cW2 = (W - M*2 - 20) / cols2, cH2 = 120;
   for (let i = 0; i < cols2 * rows2; i++) {
-    const cx = M + (i % cols2) * (cW + 20);
-    const cy = congY + 28 + Math.floor(i / cols2) * (cH + 12);
-    doc.roundedRect(cx, cy, cW, cH, 8).fill("#ECEFF1").stroke();
+    const cx2 = M + (i % cols2) * (cW2 + 20);
+    const cy2 = congY + 28 + Math.floor(i / cols2) * (cH2 + 12);
+    doc.roundedRect(cx2, cy2, cW2, cH2, 8).fill("#ECEFF1");
+    doc.roundedRect(cx2, cy2, cW2, cH2, 8).lineWidth(0.8).strokeColor("#B0BEC5").stroke();
+    // Número da conquista
+    doc.circle(cx2 + 16, cy2 + 16, 11).fill("#37474F");
+    doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(9)
+      .text(String(i + 1), cx2 + 5, cy2 + 12, { width: 22, align: "center" });
     doc.fillColor("#B0BEC5").font("Nunito").fontSize(9)
-      .text(`Conquista ${i + 1}`, cx + 8, cy + cH - 20, { width: cW - 16 });
+      .text("Conquista " + (i + 1), cx2 + 34, cy2 + 10, { width: cW2 - 44 });
   }
+
   doc.fillColor("#9E9E9E").font("Nunito").fontSize(8)
     .text("Kit Despluga Pro • Pensamento Computacional Desplugado", M, H - 30, { width: W - M*2, align: "center" });
 
-  // ── PÁGINA ATIVIDADE FAVORITA ──────────────────────────────
+  // ── ATIVIDADE FAVORITA ─────────────────────────────────────
   doc.addPage();
   doc.rect(0, 0, W, 80).fill("#F57F17");
-  doc.fillColor("#FFFFFF").font("Nunito-Bold").fontSize(26)
-    .text("⭐ MINHA ATIVIDADE FAVORITA", M, 27, { width: W - M*2, align: "center" });
+  drawStars(doc, M + 26, 38, 1, "#FFCA28", 12);
+  doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(24)
+    .text("MINHA ATIVIDADE FAVORITA", M + 48, 28, { width: W - M - 48, align: "center" });
 
   doc.fillColor("#F57F17").font("Nunito-Bold").fontSize(12)
     .text("Qual atividade você mais gostou? Escreva e desenhe aqui:", M, 100, { width: W - M*2 });
 
   const favFields = ["Nome da atividade:", "Por que eu gostei:", "O que aprendi:"];
-  let ffY = 125;
+  let ffY = 124;
   for (const f of favFields) {
     doc.fillColor("#424242").font("Nunito-Bold").fontSize(10).text(f, M, ffY, { width: 180 });
     doc.moveTo(M + 185, ffY + 11).lineTo(W - M, ffY + 11).lineWidth(0.8).strokeColor("#FFB300").stroke();
     ffY += 35;
   }
 
-  // Espaço para desenho
+  doc.circle(M + 8, ffY + 17, 6).fill("#F57F17");
   doc.fillColor("#F57F17").font("Nunito-Bold").fontSize(12)
-    .text("🎨 DESENHO DA MINHA ATIVIDADE FAVORITA:", M, ffY + 10, { width: W - M*2 });
+    .text("ESPACO PARA DESENHAR:", M + 20, ffY + 10, { width: W - M*2 - 20 });
   const favDrawH = 340;
   doc.roundedRect(M, ffY + 32, W - M*2, favDrawH, 8).fill("#FFF8E1");
   doc.roundedRect(M, ffY + 32, W - M*2, favDrawH, 8).lineWidth(1.5).strokeColor("#FFB300").stroke();
-
   doc.fillColor("#FFB300").font("Nunito").fontSize(11).opacity(0.5)
-    .text("✏️ Solte a criatividade!", M, ffY + 32 + favDrawH/2 - 10, { width: W - M*2, align: "center" });
+    .text("Solte a criatividade!", M, ffY + 32 + favDrawH / 2 - 10, { width: W - M*2, align: "center" });
   doc.opacity(1);
 
   doc.fillColor("#9E9E9E").font("Nunito").fontSize(8)
@@ -497,12 +507,14 @@ async function gerarFichas() {
 
   // ── FICHA 1: REGISTRO DE TURMA ────────────────────────────
   doc.addPage();
-  // Header
   doc.rect(0, 0, W, 70).fill("#1565C0");
-  doc.fillColor("#FFFFFF").font("Nunito-Bold").fontSize(8)
+  doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(8)
     .text("KIT DESPLUGA PRO — FICHAS DE ACOMPANHAMENTO", M, 14, { width: CW, characterSpacing: 1 });
-  doc.fillColor("#FFFFFF").font("Nunito-Bold").fontSize(20)
-    .text("📋 Ficha 1 — Registro de Turma", M, 34, { width: CW });
+  // Badge número da ficha
+  doc.roundedRect(M, 33, 24, 22, 4).fill(COLORS.white);
+  doc.fillColor("#1565C0").font("Nunito-Bold").fontSize(13).text("1", M, 37, { width: 24, align: "center" });
+  doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(18)
+    .text("Ficha 1 — Registro de Turma", M + 32, 36, { width: CW - 32 });
 
   // Info da aula
   let y = 85;
@@ -522,39 +534,33 @@ async function gerarFichas() {
   // Tabela
   y += 24;
   const cols = [
-    { label: "Nº", w: 28 },
+    { label: "N", w: 28 },
     { label: "Nome do Aluno", w: 165 },
     { label: "Participou?", w: 65 },
     { label: "Concluiu a Atividade?", w: 95 },
     { label: "Dificuldade", w: 65 },
     { label: "Conceito\n(A/B/C)", w: 48 },
-    { label: "Observações", w: 57 },
+    { label: "Observacoes", w: 57 },
   ];
   const totalColW = cols.reduce((s, c) => s + c.w, 0);
   const rowH = 20, headerH = 28, nRows = 25;
 
-  // Header da tabela
   let cx = M;
   doc.rect(M, y, totalColW, headerH).fill("#1565C0");
   for (const col of cols) {
-    doc.fillColor("#FFFFFF").font("Nunito-Bold").fontSize(7.5)
+    doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(7.5)
       .text(col.label, cx + 3, y + (col.label.includes("\n") ? 5 : 9), { width: col.w - 6, align: "center" });
     cx += col.w;
   }
 
-  // Rows
   for (let r = 0; r < nRows; r++) {
     const ry = y + headerH + r * rowH;
-    const bg = r % 2 === 0 ? "#EEF5FB" : "#FFFFFF";
+    const bg = r % 2 === 0 ? "#EEF5FB" : COLORS.white;
     doc.rect(M, ry, totalColW, rowH).fill(bg);
-    // Row lines
     doc.rect(M, ry, totalColW, rowH).lineWidth(0.3).strokeColor("#BBDEFB").stroke();
-
-    // Número da linha
     doc.fillColor("#616161").font("Nunito").fontSize(8)
       .text(String(r + 1), M, ry + 6, { width: cols[0].w, align: "center" });
 
-    // Checkboxes em "Participou" e "Concluiu"
     let ccx = M + cols[0].w + cols[1].w;
     for (let k = 0; k < 2; k++) {
       const boxS = 9;
@@ -568,18 +574,19 @@ async function gerarFichas() {
     }
   }
 
-  // Rodapé
   const footY = y + headerH + nRows * rowH + 10;
   doc.fillColor("#9E9E9E").font("Nunito").fontSize(8)
-    .text("A = Avançado  •  B = Em Desenvolvimento  •  C = Iniciando  |  Kit Despluga Pro — Fichas de Acompanhamento", M, footY, { width: CW, align: "center" });
+    .text("A = Avancado  •  B = Em Desenvolvimento  •  C = Iniciando  |  Kit Despluga Pro — Fichas de Acompanhamento", M, footY, { width: CW, align: "center" });
 
-  // ── FICHA 2: ACOMPANHAMENTO SEMANAL ────────────────────────
+  // ── FICHA 2: PLANNER SEMANAL ───────────────────────────────
   doc.addPage();
   doc.rect(0, 0, W, 70).fill("#2E7D32");
-  doc.fillColor("#FFFFFF").font("Nunito-Bold").fontSize(8)
+  doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(8)
     .text("KIT DESPLUGA PRO — FICHAS DE ACOMPANHAMENTO", M, 14, { width: CW, characterSpacing: 1 });
-  doc.fillColor("#FFFFFF").font("Nunito-Bold").fontSize(20)
-    .text("📅 Ficha 2 — Planner Semanal de Atividades", M, 34, { width: CW });
+  doc.roundedRect(M, 33, 24, 22, 4).fill(COLORS.white);
+  doc.fillColor("#2E7D32").font("Nunito-Bold").fontSize(13).text("2", M, 37, { width: 24, align: "center" });
+  doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(18)
+    .text("Ficha 2 — Planner Semanal de Atividades", M + 32, 36, { width: CW - 32 });
 
   y = 85;
   doc.fillColor("#424242").font("Nunito-Bold").fontSize(9).text("Semana:", M, y);
@@ -590,16 +597,15 @@ async function gerarFichas() {
   doc.moveTo(M + 348, y + 11).lineTo(M + 440, y + 11).lineWidth(0.7).strokeColor("#A5D6A7").stroke();
 
   y += 24;
-  const days = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+  const days = ["Segunda", "Terca", "Quarta", "Quinta", "Sexta"];
   const dayW = CW / days.length;
-  const sectionFields = ["Turma(s):", "Atividade\nUsada:", "Habilidade\nBNCC:", "Tempo:", "Materiais:", "Observações:"];
+  const sectionFields = ["Turma(s):", "Atividade\nUsada:", "Habilidade\nBNCC:", "Tempo:", "Materiais:", "Observacoes:"];
   const sectionH = 22 * sectionFields.length + 10;
 
-  // Day headers
   for (let d = 0; d < days.length; d++) {
     const dx = M + d * dayW;
     doc.rect(dx, y, dayW - 3, 22).fill("#2E7D32");
-    doc.fillColor("#FFFFFF").font("Nunito-Bold").fontSize(10)
+    doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(10)
       .text(days[d], dx, y + 5, { width: dayW - 3, align: "center" });
   }
   y += 22;
@@ -608,7 +614,6 @@ async function gerarFichas() {
     const dx = M + d * dayW;
     doc.rect(dx, y, dayW - 3, sectionH).fill(d % 2 === 0 ? "#E8F5E9" : "#F1F8E9");
     doc.rect(dx, y, dayW - 3, sectionH).lineWidth(0.4).strokeColor("#A5D6A7").stroke();
-
     let fy2 = y + 6;
     for (const field of sectionFields) {
       doc.fillColor("#388E3C").font("Nunito-Bold").fontSize(7)
@@ -618,18 +623,19 @@ async function gerarFichas() {
       fy2 += 22;
     }
   }
-
   y += sectionH + 14;
 
   // Meta da semana
+  doc.circle(M + 8, y + 8, 6).fill("#2E7D32");
   doc.fillColor("#2E7D32").font("Nunito-Bold").fontSize(12)
-    .text("🎯 Meta da Semana", M, y, { width: CW });
+    .text("Meta da Semana", M + 20, y + 1, { width: CW - 20 });
   y += 18;
   doc.moveTo(M, y).lineTo(W - M, y).lineWidth(0.7).strokeColor("#A5D6A7").stroke(); y += 22;
   doc.moveTo(M, y).lineTo(W - M, y).lineWidth(0.7).strokeColor("#A5D6A7").stroke(); y += 22;
 
+  doc.circle(M + 8, y + 10, 6).fill("#2E7D32");
   doc.fillColor("#2E7D32").font("Nunito-Bold").fontSize(12)
-    .text("📝 Reflexão da Semana", M, y + 4, { width: CW });
+    .text("Reflexao da Semana", M + 20, y + 4, { width: CW - 20 });
   y += 26;
   for (let i = 0; i < 4; i++) {
     doc.moveTo(M, y).lineTo(W - M, y).lineWidth(0.7).strokeColor("#A5D6A7").stroke();
@@ -637,21 +643,20 @@ async function gerarFichas() {
   }
 
   doc.fillColor("#9E9E9E").font("Nunito").fontSize(8)
-    .text("Kit Despluga Pro — Fichas de Acompanhamento | Resolução BNCC CNE/CP nº 2/2022", M, H - 30, { width: CW, align: "center" });
+    .text("Kit Despluga Pro — Fichas de Acompanhamento | Resolucao BNCC CNE/CP 2/2022", M, H - 30, { width: CW, align: "center" });
 
-  // ── FICHA 3: AVALIAÇÃO INDIVIDUAL DO ALUNO ─────────────────
+  // ── FICHA 3: AVALIAÇÃO INDIVIDUAL ─────────────────────────
   doc.addPage();
   doc.rect(0, 0, W, 70).fill("#6A1B9A");
-  doc.fillColor("#FFFFFF").font("Nunito-Bold").fontSize(8)
+  doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(8)
     .text("KIT DESPLUGA PRO — FICHAS DE ACOMPANHAMENTO", M, 14, { width: CW, characterSpacing: 1 });
-  doc.fillColor("#FFFFFF").font("Nunito-Bold").fontSize(20)
-    .text("👤 Ficha 3 — Avaliação Individual do Aluno", M, 34, { width: CW });
+  doc.roundedRect(M, 33, 24, 22, 4).fill(COLORS.white);
+  doc.fillColor("#6A1B9A").font("Nunito-Bold").fontSize(13).text("3", M, 37, { width: 24, align: "center" });
+  doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(18)
+    .text("Ficha 3 — Avaliacao Individual do Aluno", M + 32, 36, { width: CW - 32 });
 
   y = 85;
-  // Dados do aluno
-  const alunoFields = [
-    ["Nome do Aluno:", 250], ["Turma:", 100], ["Data:", 120],
-  ];
+  const alunoFields = [["Nome do Aluno:", 250], ["Turma:", 100], ["Data:", 120]];
   ix = M;
   for (const [label, fw] of alunoFields) {
     doc.fillColor("#424242").font("Nunito-Bold").fontSize(9).text(label, ix, y, { width: 110 });
@@ -660,25 +665,25 @@ async function gerarFichas() {
   }
 
   y += 26;
+  doc.circle(M + 8, y + 8, 6).fill("#6A1B9A");
   doc.fillColor("#6A1B9A").font("Nunito-Bold").fontSize(12)
-    .text("🧠 Habilidades de Pensamento Computacional", M, y);
+    .text("Habilidades de Pensamento Computacional", M + 20, y + 1);
   y += 18;
 
   const habilidades = [
     ["EF15CO01", "Algoritmos", "Cria sequências ordenadas de passos para resolver problemas"],
-    ["EF15CO02", "Decomposição", "Divide problemas grandes em partes menores"],
-    ["EF15CO03", "Padrões", "Identifica regularidades e sequências"],
-    ["EF15CO04", "Abstração", "Foca nos aspectos essenciais, ignora detalhes desnecessários"],
-    ["EF15CO05", "Automação", "Compreende como instruções repetidas realizam tarefas"],
+    ["EF15CO02", "Decomposicao", "Divide problemas grandes em partes menores"],
+    ["EF15CO03", "Padroes", "Identifica regularidades e sequências"],
+    ["EF15CO04", "Abstracao", "Foca nos aspectos essenciais, ignora detalhes desnecessários"],
+    ["EF15CO05", "Automacao", "Compreende como instruções repetidas realizam tarefas"],
   ];
 
-  // Header tabela
   const hCols = [55, 90, 220, 50, 50, 50];
-  const hLabels = ["Código", "Habilidade", "Descrição", "Iniciando", "Desenvolvendo", "Avançado"];
+  const hLabels = ["Codigo", "Habilidade", "Descricao", "Iniciando", "Desenvolvendo", "Avancado"];
   cx = M;
   doc.rect(M, y, hCols.reduce((s, c) => s + c, 0), 22).fill("#6A1B9A");
   for (let k = 0; k < hLabels.length; k++) {
-    doc.fillColor("#FFFFFF").font("Nunito-Bold").fontSize(7.5)
+    doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(7.5)
       .text(hLabels[k], cx + 3, y + 7, { width: hCols[k] - 6, align: "center" });
     cx += hCols[k];
   }
@@ -686,7 +691,7 @@ async function gerarFichas() {
 
   for (let h = 0; h < habilidades.length; h++) {
     const [cod, nome, desc] = habilidades[h];
-    const bg = h % 2 === 0 ? "#F3E5F5" : "#FFFFFF";
+    const bg = h % 2 === 0 ? "#F3E5F5" : COLORS.white;
     const hRow = 28;
     doc.rect(M, y, hCols.reduce((s, c) => s + c, 0), hRow).fill(bg);
     cx = M;
@@ -696,7 +701,6 @@ async function gerarFichas() {
         .text(rowData[k], cx + 3, y + (k < 2 ? 9 : 5), { width: hCols[k] - 6, align: k === 0 ? "center" : "left", lineGap: 1 });
       cx += hCols[k];
     }
-    // Checkboxes para níveis
     for (let n = 0; n < 3; n++) {
       const bSize = 12, bx = cx + (hCols[3 + n] - bSize) / 2, by = y + (hRow - bSize) / 2;
       doc.roundedRect(bx, by, bSize, bSize, 2).lineWidth(0.7).strokeColor("#9C27B0").stroke();
@@ -707,16 +711,19 @@ async function gerarFichas() {
   }
 
   y += 14;
-  // Comportamento em grupo
-  doc.fillColor("#6A1B9A").font("Nunito-Bold").fontSize(12).text("👥 Comportamento e Participação em Grupo", M, y);
+  doc.circle(M + 8, y + 8, 6).fill("#6A1B9A");
+  doc.fillColor("#6A1B9A").font("Nunito-Bold").fontSize(12).text("Comportamento e Participacao em Grupo", M + 20, y + 1);
   y += 18;
-  const compItems = ["Participa ativamente das atividades", "Colabora com os colegas", "Respeita as regras da dinâmica", "Demonstra autonomia na resolução"];
+  const compItems = [
+    "Participa ativamente das atividades",
+    "Colabora com os colegas",
+    "Respeita as regras da dinamica",
+    "Demonstra autonomia na resolucao",
+  ];
   for (const item of compItems) {
-    const bx = M, by = y + 2, bSize = 11;
-    doc.roundedRect(bx, by, bSize, bSize, 2).lineWidth(0.7).strokeColor("#9C27B0").stroke();
+    const bSize = 11;
+    doc.roundedRect(M, y + 2, bSize, bSize, 2).lineWidth(0.7).strokeColor("#9C27B0").stroke();
     doc.fillColor("#424242").font("Nunito").fontSize(9).text(item, M + 18, y + 1, { width: 280 });
-
-    // Mini rating
     for (let s = 0; s < 5; s++) {
       doc.fillColor(s < 3 ? "#FFD740" : "#E0E0E0").circle(M + 330 + s * 20, y + 7, 7).fill();
     }
@@ -725,7 +732,8 @@ async function gerarFichas() {
   }
 
   y += 10;
-  doc.fillColor("#6A1B9A").font("Nunito-Bold").fontSize(12).text("📝 Observações e Próximos Passos:", M, y);
+  doc.circle(M + 8, y + 8, 6).fill("#6A1B9A");
+  doc.fillColor("#6A1B9A").font("Nunito-Bold").fontSize(12).text("Observacoes e Proximos Passos:", M + 20, y + 1);
   y += 18;
   for (let i = 0; i < 4; i++) {
     doc.moveTo(M, y).lineTo(W - M, y).lineWidth(0.6).strokeColor("#CE93D8").stroke();
@@ -733,30 +741,32 @@ async function gerarFichas() {
   }
 
   doc.fillColor("#9E9E9E").font("Nunito").fontSize(8)
-    .text("Kit Despluga Pro — Fichas de Acompanhamento | Resolução BNCC CNE/CP nº 2/2022", M, H - 30, { width: CW, align: "center" });
+    .text("Kit Despluga Pro — Fichas de Acompanhamento | Resolucao BNCC CNE/CP 2/2022", M, H - 30, { width: CW, align: "center" });
 
   // ── FICHA 4: RELATÓRIO MENSAL ──────────────────────────────
   doc.addPage();
   doc.rect(0, 0, W, 70).fill("#E65100");
-  doc.fillColor("#FFFFFF").font("Nunito-Bold").fontSize(8)
+  doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(8)
     .text("KIT DESPLUGA PRO — FICHAS DE ACOMPANHAMENTO", M, 14, { width: CW, characterSpacing: 1 });
-  doc.fillColor("#FFFFFF").font("Nunito-Bold").fontSize(20)
-    .text("📊 Ficha 4 — Relatório Mensal Simplificado", M, 34, { width: CW });
+  doc.roundedRect(M, 33, 24, 22, 4).fill(COLORS.white);
+  doc.fillColor("#E65100").font("Nunito-Bold").fontSize(13).text("4", M, 37, { width: 24, align: "center" });
+  doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(18)
+    .text("Ficha 4 — Relatorio Mensal Simplificado", M + 32, 36, { width: CW - 32 });
 
   y = 85;
-  doc.fillColor("#424242").font("Nunito-Bold").fontSize(9).text("Mês/Ano:", M, y);
+  doc.fillColor("#424242").font("Nunito-Bold").fontSize(9).text("Mes/Ano:", M, y);
   doc.moveTo(M + 60, y + 11).lineTo(M + 180, y + 11).lineWidth(0.7).strokeColor("#FFAB91").stroke();
   doc.fillColor("#424242").font("Nunito-Bold").fontSize(9).text("Professora:", M + 200, y);
   doc.moveTo(M + 264, y + 11).lineTo(W - M, y + 11).lineWidth(0.7).strokeColor("#FFAB91").stroke();
 
   y += 24;
 
-  // Cards de resumo
+  // Cards de resumo (sem emojis — usa círculo colorido com letra)
   const cards = [
-    { label: "Total de Atividades Realizadas", icon: "📚", color: "#E65100" },
-    { label: "Habilidades BNCC Trabalhadas", icon: "🎯", color: "#1565C0" },
-    { label: "Turmas Atendidas", icon: "👥", color: "#2E7D32" },
-    { label: "% da Turma com Conceito A", icon: "⭐", color: "#6A1B9A" },
+    { label: "Total de Atividades Realizadas", abbr: "AT", color: "#E65100" },
+    { label: "Habilidades BNCC Trabalhadas",   abbr: "BC", color: "#1565C0" },
+    { label: "Turmas Atendidas",               abbr: "TU", color: "#2E7D32" },
+    { label: "% Turma com Conceito A",         abbr: "A+", color: "#6A1B9A" },
   ];
   const cardW = (CW - 15) / 2, cardH = 55;
   for (let c = 0; c < cards.length; c++) {
@@ -765,17 +775,27 @@ async function gerarFichas() {
     const cy2 = y + Math.floor(c / 2) * (cardH + 12);
     doc.roundedRect(cx2, cy2, cardW, cardH, 8).fill("#FFF3E0");
     doc.rect(cx2, cy2, 5, cardH).fill(card.color);
-    doc.fillColor("#424242").font("Nunito-Bold").fontSize(9).text(`${card.icon}  ${card.label}`, cx2 + 14, cy2 + 8, { width: cardW - 24 });
-    doc.moveTo(cx2 + 14, cy2 + 32).lineTo(cx2 + cardW - 14, cy2 + 32).lineWidth(1).strokeColor(card.color).stroke();
-    doc.fillColor("#9E9E9E").font("Nunito").fontSize(8).text("Preencher:", cx2 + 14, cy2 + 36, { width: cardW - 24 });
+    // Mini badge com abbr
+    doc.circle(cx2 + 22, cy2 + 16, 11).fill(card.color);
+    doc.fillColor(COLORS.white).font("Nunito-Bold").fontSize(8)
+      .text(card.abbr, cx2 + 11, cy2 + 12, { width: 22, align: "center" });
+    doc.fillColor("#424242").font("Nunito-Bold").fontSize(9)
+      .text(card.label, cx2 + 40, cy2 + 8, { width: cardW - 50 });
+    doc.moveTo(cx2 + 14, cy2 + 36).lineTo(cx2 + cardW - 14, cy2 + 36).lineWidth(1).strokeColor(card.color).stroke();
+    doc.fillColor("#9E9E9E").font("Nunito").fontSize(8).text("Preencher:", cx2 + 14, cy2 + 40, { width: cardW - 24 });
   }
 
   y += 2 * (cardH + 12) + 14;
 
-  // Habilidades BNCC trabalhadas
-  doc.fillColor("#E65100").font("Nunito-Bold").fontSize(12).text("✅ Quais Habilidades BNCC foram trabalhadas neste mês?", M, y);
+  // Habilidades BNCC
+  doc.circle(M + 8, y + 8, 6).fill("#E65100");
+  doc.fillColor("#E65100").font("Nunito-Bold").fontSize(12)
+    .text("Quais Habilidades BNCC foram trabalhadas neste mes?", M + 20, y + 1, { width: CW - 20 });
   y += 18;
-  const bnccItems = ["EF15CO01 — Algoritmos", "EF15CO02 — Decomposição", "EF15CO03 — Padrões", "EF15CO04 — Abstração", "EF15CO05 — Automação"];
+  const bnccItems = [
+    "EF15CO01 — Algoritmos", "EF15CO02 — Decomposicao",
+    "EF15CO03 — Padroes",    "EF15CO04 — Abstracao", "EF15CO05 — Automacao",
+  ];
   const bncCols = 3, bncW = CW / bncCols;
   for (let b = 0; b < bnccItems.length; b++) {
     const bx2 = M + (b % bncCols) * bncW;
@@ -785,20 +805,23 @@ async function gerarFichas() {
   }
   y += Math.ceil(bnccItems.length / bncCols) * 22 + 12;
 
-  // Destaques e dificuldades
-  doc.fillColor("#E65100").font("Nunito-Bold").fontSize(12).text("🌟 Destaques do Mês", M, y); y += 18;
-  for (let i = 0; i < 3; i++) { doc.moveTo(M, y).lineTo(W - M, y).lineWidth(0.6).strokeColor("#FFAB91").stroke(); y += 22; }
-
-  y += 4;
-  doc.fillColor("#E65100").font("Nunito-Bold").fontSize(12).text("⚠️ Dificuldades Observadas", M, y); y += 18;
-  for (let i = 0; i < 3; i++) { doc.moveTo(M, y).lineTo(W - M, y).lineWidth(0.6).strokeColor("#FFAB91").stroke(); y += 22; }
-
-  y += 4;
-  doc.fillColor("#E65100").font("Nunito-Bold").fontSize(12).text("📌 Planejamento do Próximo Mês", M, y); y += 18;
-  for (let i = 0; i < 3; i++) { doc.moveTo(M, y).lineTo(W - M, y).lineWidth(0.6).strokeColor("#FFAB91").stroke(); y += 22; }
+  // Seções de texto
+  const sections = [
+    { label: "Destaques do Mes", color: "#E65100" },
+    { label: "Dificuldades Observadas", color: "#C62828" },
+    { label: "Planejamento do Proximo Mes", color: "#E65100" },
+  ];
+  for (const sec of sections) {
+    doc.circle(M + 8, y + 8, 6).fill(sec.color);
+    doc.fillColor(sec.color).font("Nunito-Bold").fontSize(12).text(sec.label, M + 20, y + 1); y += 18;
+    for (let i = 0; i < 3; i++) {
+      doc.moveTo(M, y).lineTo(W - M, y).lineWidth(0.6).strokeColor("#FFAB91").stroke(); y += 22;
+    }
+    y += 4;
+  }
 
   doc.fillColor("#9E9E9E").font("Nunito").fontSize(8)
-    .text("Kit Despluga Pro — Fichas de Acompanhamento | Resolução BNCC CNE/CP nº 2/2022", M, H - 30, { width: CW, align: "center" });
+    .text("Kit Despluga Pro — Fichas de Acompanhamento | Resolucao BNCC CNE/CP 2/2022", M, H - 30, { width: CW, align: "center" });
 
   return bufferFromDoc(doc);
 }
@@ -814,5 +837,4 @@ function bufferFromDoc(doc) {
   });
 }
 
-// ── Exports ────────────────────────────────────────────────
 module.exports = { gerarCertificados, gerarPassaporte, gerarFichas };
