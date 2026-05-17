@@ -317,12 +317,13 @@ async function gerarPassaporte() {
   doc.fillColor("#9FA8DA").font("Nunito").fontSize(9)
     .text("Cole sua\nfoto aqui", fotoX, fotoY + 50, { width: 95, align: "center" });
 
-  const fieldW = fotoX - boxX - 40;
+  const photoEndY = fotoY + 120;
   const fields = ["Nome:", "Turma:", "Escola:", "Professora:"];
   let fy = boxY + 50;
   for (const label of fields) {
+    const lineEnd = (fy + 12 < photoEndY) ? fotoX - 8 : boxX + boxW - 20;
     doc.fillColor("#616161").font("Nunito-Bold").fontSize(10).text(label, boxX + 20, fy, { width: 80 });
-    doc.moveTo(boxX + 105, fy + 12).lineTo(boxX + 105 + fieldW, fy + 12).lineWidth(0.8).strokeColor("#9FA8DA").stroke();
+    doc.moveTo(boxX + 105, fy + 12).lineTo(lineEnd, fy + 12).lineWidth(0.8).strokeColor("#9FA8DA").stroke();
     fy += 32;
   }
 
