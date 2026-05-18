@@ -1049,6 +1049,39 @@ app.post("/api/materiais", async (req, res) => {
   }
 });
 
+// ══════════════════════════════════════════
+// NexusPDF — Motor Universal de PDF + IA
+// POST /api/gerar-pdf
+//   { prompt }         → MAX gera config → PDF
+//   { config }         → direto → PDF
+//   { prompt, config } → config tem prioridade
+// ══════════════════════════════════════════
+app.post("/api/gerar-pdf", async (req, res) => {
+  try {
+    const { render }         = require("./departments/creative/pdf_engine");
+    const { generateConfig } = require("./departments/creative/pdf_ai");
+
+    let config = req.body.config || null;
+
+    if (!config) {
+      const prompt = req.body.prompt;
+      if (!prompt) return res.status(400).json({ error: "Envie 'prompt' ou 'config' no body." });
+      config = await generateConfig(prompt);
+    }
+
+    const buffer   = await render(config);
+    const template = config.template || "documento";
+    const filename = `nexus-${template}-${Date.now()}.pdf`;
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.send(buffer);
+  } catch (e) {
+    console.error("[/api/gerar-pdf]", e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ──────────────────────────────────────────
 // Conversão WebM → MP4 (server-side FFmpeg)
 // ──────────────────────────────────────────
