@@ -147,17 +147,22 @@ function renderBorder(doc, el, ctx) {
 }
 
 function renderFields(doc, el, ctx) {
-  const { M, palette } = ctx;
+  const { M, W, palette } = ctx;
+  const maxX = W - M;
   let x = M;
   for (const field of (el.items || [])) {
+    if (x + (field.labelW || 70) >= maxX) break;
     const lw = field.labelW || 70;
+    const availW = Math.min(field.w, maxX - x);
     doc.fillColor(col(el.labelColor || "text", palette)).font(font("bold")).fontSize(el.labelSize || 9)
       .text(field.label, x, ctx.y, { width: lw });
     const lx = x + lw + 4;
-    const fw = field.w - lw - 4;
-    doc.moveTo(lx, ctx.y + 11).lineTo(lx + fw, ctx.y + 11)
-      .lineWidth(0.8).strokeColor(col(el.color || "subtle", palette)).stroke();
-    x += field.w + (el.gap || 8);
+    const fw = availW - lw - 4;
+    if (fw > 0) {
+      doc.moveTo(lx, ctx.y + 11).lineTo(lx + fw, ctx.y + 11)
+        .lineWidth(0.8).strokeColor(col(el.color || "subtle", palette)).stroke();
+    }
+    x += availW + (el.gap || 8);
   }
   ctx.y += (el.rowH || 22) + (el.vgap || 4);
 }
@@ -206,8 +211,9 @@ function renderTable(doc, el, ctx) {
         for (let o = 0; o < opts.length; o++) {
           const bx = cx + 3 + o * 15;
           const by = ctx.y + rowH / 2 - 5;
+          const lbl = opts[o].length > 2 ? opts[o][0].toUpperCase() : opts[o];
           doc.rect(bx, by, 10, 10).lineWidth(0.6).strokeColor(borderColor).stroke();
-          doc.fillColor("#9E9E9E").font(font("regular")).fontSize(6).text(opts[o], bx + 2, by + 2);
+          doc.fillColor("#9E9E9E").font(font("regular")).fontSize(6).text(lbl, bx, by + 2, { width: 10, align: "center" });
         }
       }
       cx += c.w;

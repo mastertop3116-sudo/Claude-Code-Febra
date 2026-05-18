@@ -1,10 +1,10 @@
 // ============================================================
-// NexusPDF AI — Claude gera configs para o pdf_engine
+// NexusPDF AI — GPT-4o gera configs para o pdf_engine
 // ============================================================
-const Anthropic = require("@anthropic-ai/sdk");
+const OpenAI = require("openai");
 const { jsonrepair } = require("jsonrepair");
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const SYSTEM = `Você é um designer especialista em documentos PDF profissionais e entregáveis de alto valor.
 Você gera configurações JSON para o motor NexusPDF, que cria PDFs a partir de configs estruturadas.
@@ -76,6 +76,7 @@ ELEMENTOS DISPONÍVEIS
     { "label": "Concluiu?", "w": 65, "type": "checkbox_yn" },
     { "label": "Nota", "w": 55, "type": "checkbox_abc", "options": ["A","B","C"] }
   ], "rows": 20, "rowH": 20, "headerH": 26, "headerColor": "primary", "evenColor": "light", "borderColor": "subtle", "gap": 10 }
+→ IMPORTANTE: options de checkbox_abc devem ter NO MÁXIMO 1 caractere (ex: "B","M","A" — NUNCA "Baixa","Média","Alta")
 
 { "type": "cards", "cols": 2, "cardH": 55, "bgColor": "light", "items": [
     { "label": "Total de Sessões", "abbr": "TS", "color": "primary", "hint": "Preencher:" }
@@ -165,14 +166,16 @@ EXEMPLOS COMPLETOS
 }`;
 
 async function generateConfig(userPrompt) {
-  const response = await client.messages.create({
-    model: "claude-opus-4-7",
+  const response = await client.chat.completions.create({
+    model: "gpt-4o",
     max_tokens: 4096,
-    system: SYSTEM,
-    messages: [{ role: "user", content: userPrompt }],
+    messages: [
+      { role: "system", content: SYSTEM },
+      { role: "user", content: userPrompt },
+    ],
   });
 
-  let raw = response.content[0].text.trim()
+  let raw = response.choices[0].message.content.trim()
     .replace(/^```(?:json)?\n?/i, "")
     .replace(/\n?```$/i, "")
     .trim();
