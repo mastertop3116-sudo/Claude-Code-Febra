@@ -15,9 +15,10 @@ async function getBrowser() {
     try { await _browser.version(); return _browser; } catch {}
     _browser = null;
   }
+  const executablePath = await puppeteer.executablePath().catch(() => undefined);
   _browser = await puppeteer.launch({
     headless: "new",
-    executablePath: puppeteer.executablePath(),
+    ...(executablePath ? { executablePath } : {}),
     args: [
       "--no-sandbox",
       "--disable-setuid-sandbox",
