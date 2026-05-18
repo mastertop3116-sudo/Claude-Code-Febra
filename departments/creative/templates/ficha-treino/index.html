@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --p: {{cor_primaria}}; --a: {{cor_acento}}; --light: color-mix(in srgb, var(--p) 8%, white); }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  @page { size: A4 portrait; margin: 0; }
+  html { width: 210mm; height: 297mm; }
+
+  body {
+    width: 210mm; height: 297mm;
+    background: #fff;
+    overflow: hidden;
+    font-family: 'Barlow', sans-serif;
+    font-size: 10px;
+  }
+
+  /* Header band */
+  .header {
+    background: var(--p);
+    padding: 0 20px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    right: -20px;
+    top: -20px;
+    width: 120px;
+    height: 120px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+  }
+
+  .header-left { display: flex; flex-direction: column; gap: 2px; }
+
+  .header-tag {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--a);
+  }
+
+  .header-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: 0.5px;
+    line-height: 1;
+  }
+
+  .header-badge {
+    background: var(--a);
+    color: #212121;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 4px;
+  }
+
+  /* Fields row */
+  .fields-row {
+    display: flex;
+    gap: 0;
+    padding: 12px 20px 10px;
+    border-bottom: 1px solid #F0F0F0;
+  }
+
+  .field-item {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex: 1;
+  }
+
+  .field-item + .field-item {
+    border-left: 1px solid #F0F0F0;
+    padding-left: 16px;
+    margin-left: 16px;
+  }
+
+  .field-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #9E9E9E;
+    flex-shrink: 0;
+  }
+
+  .field-line {
+    flex: 1;
+    border-bottom: 1px solid #BDBDBD;
+    height: 16px;
+  }
+
+  /* Section title */
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px 6px;
+  }
+
+  .section-dot {
+    width: 8px; height: 8px;
+    background: var(--p);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .section-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--p);
+  }
+
+  .section-line { flex: 1; height: 1px; background: #F0F0F0; }
+
+  /* Table */
+  .table-wrap { padding: 0 20px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9px;
+  }
+
+  thead tr {
+    background: var(--p);
+  }
+
+  thead th {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: white;
+    padding: 7px 6px;
+    text-align: center;
+    border-right: 1px solid rgba(255,255,255,0.1);
+  }
+
+  thead th:first-child { text-align: left; padding-left: 10px; }
+
+  tbody tr:nth-child(even) { background: var(--light); }
+  tbody tr { border-bottom: 1px solid #F0F0F0; }
+
+  tbody td {
+    padding: 7px 6px;
+    color: #424242;
+    border-right: 1px solid #F5F5F5;
+    text-align: center;
+    height: 22px;
+  }
+
+  tbody td:first-child { text-align: left; padding-left: 10px; }
+
+  .cb-yn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .cb-box {
+    width: 10px; height: 10px;
+    border: 1px solid #BDBDBD;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .cb-lbl {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 7px;
+    color: #BDBDBD;
+    font-weight: 600;
+  }
+
+  .inten {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+  }
+
+  .inten-pill {
+    width: 18px; height: 12px;
+    border: 1px solid #BDBDBD;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 6.5px;
+    font-weight: 700;
+    color: #BDBDBD;
+  }
+
+  /* Notes section */
+  .notes-section { padding: 8px 20px 0; }
+
+  .write-line {
+    border-bottom: 0.7px solid #E0E0E0;
+    height: 22px;
+    width: 100%;
+    margin-bottom: 2px;
+  }
+
+  /* Signatures */
+  .sigs {
+    display: flex;
+    gap: 16px;
+    padding: 10px 20px;
+    align-items: flex-end;
+  }
+
+  .sig { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+  .sig-line-el { border-bottom: 1px solid var(--p); height: 16px; width: 100%; }
+  .sig-lbl {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 7.5px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #9E9E9E;
+    text-align: center;
+  }
+
+  /* Footer */
+  .footer {
+    position: absolute;
+    bottom: 18px;
+    left: 0; right: 0;
+    text-align: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 7px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #D0D0D0;
+  }
+
+  .footer-accent { color: var(--a); }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-tag">{{academia}} — Ficha de Treino</div>
+    <div class="header-title">{{tipo_treino}}</div>
+  </div>
+  <div class="header-badge">Registro de Evolução</div>
+</div>
+
+<!-- Fields -->
+<div class="fields-row">
+  <div class="field-item">
+    <span class="field-label">Aluno:</span>
+    <div class="field-line"></div>
+  </div>
+  <div class="field-item">
+    <span class="field-label">Data:</span>
+    <div class="field-line" style="max-width:90px"></div>
+  </div>
+  <div class="field-item">
+    <span class="field-label">Semana:</span>
+    <div class="field-line" style="max-width:70px"></div>
+  </div>
+  <div class="field-item">
+    <span class="field-label">Objetivo:</span>
+    <div class="field-line"></div>
+  </div>
+</div>
+
+<!-- Exercise table -->
+<div class="section-title">
+  <div class="section-dot"></div>
+  <div class="section-label">Exercícios</div>
+  <div class="section-line"></div>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th style="width:34%">Exercício</th>
+        <th style="width:9%">Séries</th>
+        <th style="width:9%">Reps</th>
+        <th style="width:11%">Carga kg</th>
+        <th style="width:12%">Executado</th>
+        <th style="width:14%">Intensidade</th>
+        <th style="width:11%">Obs.</th>
+      </tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+</div>
+
+<!-- Notes -->
+<div class="section-title" style="margin-top:8px">
+  <div class="section-dot"></div>
+  <div class="section-label">Observações do Treino</div>
+  <div class="section-line"></div>
+</div>
+
+<div class="notes-section">
+  <div class="write-line"></div>
+  <div class="write-line"></div>
+  <div class="write-line"></div>
+  <div class="write-line"></div>
+</div>
+
+<!-- Medidas -->
+<div class="section-title" style="margin-top:8px">
+  <div class="section-dot"></div>
+  <div class="section-label">Evolução de Medidas</div>
+  <div class="section-line"></div>
+</div>
+
+<div class="fields-row" style="border-top:none">
+  <div class="field-item"><span class="field-label">Peso:</span><div class="field-line" style="max-width:60px"></div></div>
+  <div class="field-item"><span class="field-label">Braço:</span><div class="field-line" style="max-width:60px"></div></div>
+  <div class="field-item"><span class="field-label">Cintura:</span><div class="field-line" style="max-width:60px"></div></div>
+  <div class="field-item"><span class="field-label">Coxa:</span><div class="field-line" style="max-width:60px"></div></div>
+  <div class="field-item"><span class="field-label">Peito:</span><div class="field-line" style="max-width:60px"></div></div>
+</div>
+
+<!-- Signatures -->
+<div class="sigs">
+  <div class="sig">
+    <div class="sig-line-el"></div>
+    <div class="sig-lbl">Personal Trainer</div>
+  </div>
+  <div class="sig">
+    <div class="sig-line-el"></div>
+    <div class="sig-lbl">Data</div>
+  </div>
+  <div class="sig">
+    <div class="sig-line-el"></div>
+    <div class="sig-lbl">Aluno</div>
+  </div>
+</div>
+
+<div class="footer">
+  <span class="footer-accent">{{academia}}</span>  •  Evolução com Ciência e Dedicação
+</div>
+
+<script>
+const n = parseInt('{{n_exercicios}}') || 12;
+const tbody = document.getElementById('rows');
+for (let i = 0; i < n; i++) {
+  const even = i % 2 === 0;
+  tbody.innerHTML += `<tr>
+    <td></td><td></td><td></td><td></td>
+    <td><div class="cb-yn"><div class="cb-box"></div><span class="cb-lbl">S</span><div class="cb-box"></div><span class="cb-lbl">N</span></div></td>
+    <td><div class="inten"><div class="inten-pill">B</div><div class="inten-pill">M</div><div class="inten-pill">A</div></div></td>
+    <td></td>
+  </tr>`;
+}
+</script>
+</body>
+</html>

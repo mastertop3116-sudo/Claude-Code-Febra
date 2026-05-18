@@ -1,0 +1,16 @@
+{
+  "id": "ficha-coach",
+  "name": "Plano de Coaching",
+  "category": "planner",
+  "icon": "🎯",
+  "description": "Ficha de coaching executivo com metas, plano de ação semanal e espaço de reflexão.",
+  "layout": "portrait",
+  "cost": 0,
+  "vars": [
+    { "id": "cor_primaria", "label": "Cor Principal",   "type": "color", "default": "#1a237e" },
+    { "id": "cor_acento",   "label": "Cor de Destaque", "type": "color", "default": "#ffd600" },
+    { "id": "coach",        "label": "Nome do Coach",   "type": "text",  "default": "Coach Rodrigo" },
+    { "id": "programa",     "label": "Nome do Programa","type": "text",  "default": "Mentoria de Alta Performance" },
+    { "id": "mes",          "label": "Mês / Período",   "type": "text",  "default": "Maio 2026" }
+  ]
+}

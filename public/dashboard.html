@@ -711,6 +711,8 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
     <div class="sb-item" data-view="brn-overview" style="--item-color:var(--brn)"><span class="sb-icon">🤝</span><span class="sb-label">Visão Geral</span></div>
     <div class="sb-item" data-view="brn-jiujitsu" style="--item-color:var(--brn)"><span class="sb-icon">🥋</span><span class="sb-label">Jiu-Jitsu</span></div>
     <div class="sb-item" data-view="brn-despluga" style="--item-color:var(--brn)"><span class="sb-icon">📚</span><span class="sb-label">Kit Despluga Pro</span></div>
+    <div class="sb-group-label">NEXUSPDF</div>
+    <div class="sb-item" data-view="nexuspdf" style="--item-color:#a855f7"><span class="sb-icon">📄</span><span class="sb-label">Gerador de PDFs</span></div>
     <div class="sb-group-label">SISTEMA</div>
     <div class="sb-item" data-view="gastos" style="--item-color:#f59e0b"><span class="sb-icon">💸</span><span class="sb-label">Gastos de API</span></div>
     <div class="sb-item" data-view="integrations" style="--item-color:#64748b"><span class="sb-icon">🔌</span><span class="sb-label">Integrações</span></div>
@@ -1108,6 +1110,70 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
         <div class="info-card"><div class="ic-label">Senha de Acesso</div><div class="ic-value" style="color:var(--brn);font-size:18px;font-weight:700">2026</div><div class="ic-copy" onclick="copyText('2026')">📋 Copiar senha</div></div>
         <div class="info-card" style="grid-column:1/-1"><div class="ic-label">Bônus do Kit Completo</div><div style="margin-top:6px;display:flex;gap:10px;flex-wrap:wrap"><span class="bt">🌐 Ponte Digital</span><span class="bt">🎥 Práticas Avançadas (AR + Chroma Key)</span><span class="bt">📖 Storytelling &amp; Lógica</span><span class="bt">📋 Guia BNCC Comentado</span></div></div>
       </div>
+    </div>
+  </div>
+
+  <!-- NEXUSPDF ADM -->
+  <div id="view-nexuspdf" class="view">
+    <div class="topbar">
+      <span class="topbar-icon">📄</span>
+      <div><div class="topbar-title">NexusPDF — Gerador de Entregáveis</div><div class="topbar-desc">Motor HTML+Puppeteer · Templates prontos · Gerar e baixar PDF</div></div>
+      <div class="topbar-spacer"></div>
+      <span class="topbar-badge" style="color:#a855f7;border-color:rgba(168,85,247,.3)" id="npdf-badge">$0,00 hoje</span>
+    </div>
+    <div class="overview-scroll">
+
+      <!-- STATS ROW -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+        <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-2)">Hoje</div>
+          <div id="npdf-stat-today" style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:#a855f7">—</div>
+          <div style="font-size:11px;color:var(--text-3)">documentos gerados</div>
+        </div>
+        <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-2)">Total</div>
+          <div id="npdf-stat-total" style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--text)">—</div>
+          <div style="font-size:11px;color:var(--text-3)">documentos gerados</div>
+        </div>
+        <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-2)">Custo Hoje</div>
+          <div id="npdf-stat-cost" style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:#10b981">$0,00</div>
+          <div style="font-size:11px;color:var(--text-3)">templates = custo zero</div>
+        </div>
+        <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-2)">Templates</div>
+          <div id="npdf-stat-tmpl" style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--text)">—</div>
+          <div style="font-size:11px;color:var(--text-3)">disponíveis</div>
+        </div>
+      </div>
+
+      <!-- TEMPLATE GALLERY -->
+      <div class="section-heading" style="margin-bottom:12px">Escolha o Template</div>
+      <div id="npdf-gallery" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:24px">
+        <div style="color:var(--text-3);font-size:12px;padding:20px">Carregando templates...</div>
+      </div>
+
+      <!-- GENERATOR PANEL -->
+      <div id="npdf-gen-panel" style="display:none">
+        <div class="section-heading" style="margin-bottom:12px">Personalizar: <span id="npdf-tmpl-name" style="color:#a855f7"></span></div>
+        <div class="card" style="padding:20px;margin-bottom:20px">
+          <div id="npdf-vars-form" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:18px"></div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <button onclick="npdfGerar()" id="npdf-btn-gerar" style="font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;padding:10px 24px;border-radius:10px;border:none;background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s">
+              <span>✦</span><span id="npdf-btn-txt">Gerar PDF</span>
+            </button>
+            <button onclick="npdfCancel()" style="font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;padding:10px 18px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text-2);cursor:pointer">Cancelar</button>
+            <div id="npdf-status" style="font-size:12px;color:var(--text-3)"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECENT -->
+      <div class="section-heading" style="margin-bottom:12px">Gerados Recentemente</div>
+      <div id="npdf-recent" style="display:flex;flex-direction:column;gap:8px">
+        <div style="color:var(--text-3);font-size:12px;padding:12px 0">Nenhum documento gerado ainda nesta sessão.</div>
+      </div>
+
     </div>
   </div>
 
@@ -2910,6 +2976,221 @@ loadPipeline();
 loadBiblioteca();
 loadBoard();
 if(localStorage.getItem('nxs_sb_collapsed')==='1') document.getElementById('sidebar').classList.add('collapsed');
+
+})();
+</script>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- NEXUSPDF ADM PANEL                            -->
+<!-- ══════════════════════════════════════════════ -->
+<script>
+(function() {
+  let npdfTemplates = [];
+  let npdfSelected  = null;
+  let npdfSession   = [];
+
+  // ── LOAD on view switch ─────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.sb-item[data-view="nexuspdf"]').forEach(el => {
+      el.addEventListener('click', () => {
+        npdfInit();
+      });
+    });
+  });
+
+  async function npdfInit() {
+    await Promise.all([npdfLoadStats(), npdfLoadTemplates()]);
+  }
+
+  // ── STATS ────────────────────────────────────
+  async function npdfLoadStats() {
+    try {
+      const s = await fetch('/api/nexuspdf/stats').then(r => r.json());
+      document.getElementById('npdf-stat-today').textContent = s.today ?? 0;
+      document.getElementById('npdf-stat-total').textContent = s.total ?? 0;
+      const costH = (s.cost_today || 0).toFixed(4);
+      document.getElementById('npdf-stat-cost').textContent = '$' + costH;
+      document.getElementById('npdf-badge').textContent = '$' + costH + ' hoje';
+    } catch {}
+  }
+
+  // ── TEMPLATES ────────────────────────────────
+  async function npdfLoadTemplates() {
+    try {
+      npdfTemplates = await fetch('/api/nexuspdf/templates').then(r => r.json());
+      document.getElementById('npdf-stat-tmpl').textContent = npdfTemplates.length;
+      renderGallery();
+    } catch(e) {
+      document.getElementById('npdf-gallery').innerHTML = `<div style="color:#f87171;font-size:12px">Erro ao carregar templates: ${e.message}</div>`;
+    }
+  }
+
+  const CAT_COLORS = {
+    certificado : '#f59e0b',
+    tracker     : '#ef4444',
+    planner     : '#10b981',
+    guide       : '#6366f1',
+    report      : '#3b82f6',
+  };
+
+  function renderGallery() {
+    const gallery = document.getElementById('npdf-gallery');
+    if (!npdfTemplates.length) {
+      gallery.innerHTML = '<div style="color:var(--text-3);font-size:12px">Nenhum template encontrado.</div>';
+      return;
+    }
+    gallery.innerHTML = npdfTemplates.map(t => {
+      const cc = CAT_COLORS[t.category] || '#a855f7';
+      return `<div onclick="npdfSelect('${t.id}')" style="
+        background:var(--surface);border:1px solid var(--border);border-radius:12px;
+        padding:16px;cursor:pointer;transition:all .18s;display:flex;flex-direction:column;gap:10px;
+        position:relative;overflow:hidden;
+      " onmouseover="this.style.borderColor='${cc}33';this.style.transform='translateY(-2px)'"
+         onmouseout="this.style.borderColor='';this.style.transform=''">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:${cc}"></div>
+        <div style="font-size:28px;line-height:1">${t.icon || '📄'}</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">${t.name}</div>
+          <div style="font-size:11px;color:var(--text-3);line-height:1.4">${t.description || ''}</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+            color:${cc};background:${cc}18;border-radius:20px;padding:2px 8px">${t.category || ''}</span>
+          <span style="font-size:9px;color:var(--text-3)">${t.layout || 'portrait'}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  window.npdfSelect = function(id) {
+    npdfSelected = npdfTemplates.find(t => t.id === id);
+    if (!npdfSelected) return;
+    document.getElementById('npdf-tmpl-name').textContent = npdfSelected.name;
+    renderVarsForm(npdfSelected.vars || []);
+    document.getElementById('npdf-gen-panel').style.display = 'block';
+    document.getElementById('npdf-gen-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  window.npdfCancel = function() {
+    document.getElementById('npdf-gen-panel').style.display = 'none';
+    npdfSelected = null;
+  };
+
+  function renderVarsForm(vars) {
+    const form = document.getElementById('npdf-vars-form');
+    form.innerHTML = vars.map(v => {
+      const val = v.default || '';
+      if (v.type === 'color') {
+        return `<div style="display:flex;flex-direction:column;gap:5px">
+          <label style="font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-2)">${v.label}</label>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input type="color" id="npdf-var-${v.id}" value="${val}" style="width:36px;height:30px;border:none;border-radius:6px;cursor:pointer;background:transparent">
+            <input type="text" id="npdf-var-${v.id}-txt" value="${val}" placeholder="#hex" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;padding:6px 10px;font-family:'JetBrains Mono',monospace"
+              onchange="document.getElementById('npdf-var-${v.id}').value=this.value">
+          </div>
+        </div>`;
+      }
+      if (v.type === 'textarea') {
+        return `<div style="display:flex;flex-direction:column;gap:5px;grid-column:1/-1">
+          <label style="font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-2)">${v.label}</label>
+          <textarea id="npdf-var-${v.id}" rows="2" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;padding:8px 12px;font-family:'Outfit',sans-serif;resize:vertical">${val}</textarea>
+        </div>`;
+      }
+      return `<div style="display:flex;flex-direction:column;gap:5px">
+        <label style="font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-2)">${v.label}</label>
+        <input type="${v.type === 'number' ? 'number' : 'text'}" id="npdf-var-${v.id}" value="${val}" placeholder="${v.placeholder || ''}"
+          style="background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;padding:8px 12px;font-family:'Outfit',sans-serif">
+      </div>`;
+    }).join('');
+  }
+
+  // ── GENERATE ─────────────────────────────────
+  window.npdfGerar = async function() {
+    if (!npdfSelected) return;
+    const btn  = document.getElementById('npdf-btn-gerar');
+    const btxt = document.getElementById('npdf-btn-txt');
+    const stat = document.getElementById('npdf-status');
+    btn.disabled = true;
+    btxt.textContent = 'Gerando...';
+    stat.textContent = '⏳ Renderizando com Puppeteer...';
+    stat.style.color = '#a855f7';
+
+    // Collect vars
+    const vars = {};
+    for (const v of (npdfSelected.vars || [])) {
+      let el = document.getElementById(`npdf-var-${v.id}`);
+      if (!el) continue;
+      let val = el.value;
+      // For color, also check if txt field was edited
+      const txtEl = document.getElementById(`npdf-var-${v.id}-txt`);
+      if (txtEl) val = txtEl.value || val;
+      vars[v.id] = val;
+    }
+
+    try {
+      const res = await fetch('/api/nexuspdf/gerar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ templateId: npdfSelected.id, vars }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+        throw new Error(err.error || 'Erro desconhecido');
+      }
+
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      const filename = `nexus-${npdfSelected.id}-${Date.now()}.pdf`;
+
+      stat.textContent = `✅ Pronto! ${(blob.size/1024).toFixed(0)} KB`;
+      stat.style.color = '#10b981';
+
+      // Add to recent
+      npdfAddRecent({ tmpl: npdfSelected, url, filename, size: blob.size });
+      npdfLoadStats();
+
+    } catch(e) {
+      stat.textContent = '❌ ' + e.message;
+      stat.style.color = '#f87171';
+    } finally {
+      btn.disabled = false;
+      btxt.textContent = 'Gerar PDF';
+    }
+  };
+
+  // ── RECENT LIST ──────────────────────────────
+  function npdfAddRecent({ tmpl, url, filename, size }) {
+    npdfSession.unshift({ tmpl, url, filename, size, ts: Date.now() });
+    renderRecent();
+  }
+
+  function renderRecent() {
+    const el = document.getElementById('npdf-recent');
+    if (!npdfSession.length) {
+      el.innerHTML = '<div style="color:var(--text-3);font-size:12px;padding:12px 0">Nenhum documento gerado ainda nesta sessão.</div>';
+      return;
+    }
+    el.innerHTML = npdfSession.map(e => `
+      <div style="display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px">
+        <span style="font-size:20px">${e.tmpl.icon || '📄'}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--text)">${e.tmpl.name}</div>
+          <div style="font-size:11px;color:var(--text-3);font-family:'JetBrains Mono',monospace">
+            ${new Date(e.ts).toLocaleTimeString('pt-BR')} · ${(e.size/1024).toFixed(0)} KB · $0,0000
+          </div>
+        </div>
+        <a href="${e.url}" download="${e.filename}" style="
+          font-size:11px;font-weight:600;padding:7px 16px;border-radius:8px;
+          background:rgba(168,85,247,0.15);color:#a855f7;border:1px solid rgba(168,85,247,0.3);
+          text-decoration:none;transition:all .15s;white-space:nowrap
+        " onmouseover="this.style.background='rgba(168,85,247,0.25)'"
+           onmouseout="this.style.background='rgba(168,85,247,0.15)'">
+          ⬇ Baixar PDF
+        </a>
+      </div>
+    `).join('');
+  }
 
 })();
 </script>

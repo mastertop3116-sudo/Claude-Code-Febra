@@ -1,0 +1,23 @@
+{
+  "id": "cert-corp",
+  "name": "Certificado Corporativo",
+  "category": "certificado",
+  "icon": "💼",
+  "description": "Certificado moderno e minimalista para cursos, treinamentos e empresas.",
+  "layout": "landscape",
+  "cost": 0,
+  "vars": [
+    { "id": "cor_primaria",  "label": "Cor Principal",    "type": "color",   "default": "#1a1a2e" },
+    { "id": "cor_acento",    "label": "Cor de Destaque",  "type": "color",   "default": "#e94560" },
+    { "id": "empresa",       "label": "Nome da Empresa",  "type": "text",    "default": "Nexus Digital" },
+    { "id": "subtitulo",     "label": "Tipo de Certificado","type":"text",   "default": "CERTIFICADO DE CONCLUSÃO" },
+    { "id": "titulo",        "label": "Curso / Programa", "type": "text",    "default": "Marketing Digital Avançado" },
+    { "id": "nome_aluno",    "label": "Nome do Aluno",    "type": "text",    "default": "Nome do Participante" },
+    { "id": "carga_horaria", "label": "Carga Horária",   "type": "text",    "default": "40 horas" },
+    { "id": "texto_corpo",   "label": "Texto complementar","type":"textarea","default": "Concluiu com êxito o programa de capacitação e demonstrou domínio dos conteúdos apresentados." },
+    { "id": "label_ass1",    "label": "Assinatura 1",     "type": "text",    "default": "Diretor Executivo" },
+    { "id": "label_ass2",    "label": "Assinatura 2",     "type": "text",    "default": "Coordenador Pedagógico" },
+    { "id": "data",          "label": "Data",             "type": "text",    "default": "Maio de 2026" },
+    { "id": "rodape",        "label": "Rodapé",           "type": "text",    "default": "Este certificado atesta a conclusão do programa conforme registros da instituição." }
+  ]
+}

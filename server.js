@@ -1082,6 +1082,44 @@ app.post("/api/gerar-pdf", async (req, res) => {
   }
 });
 
+// ══════════════════════════════════════════
+// NexusPDF Puppeteer — Templates HTML premium
+// GET  /api/nexuspdf/templates  → lista
+// POST /api/nexuspdf/gerar      → { templateId, vars } → PDF
+// GET  /api/nexuspdf/stats      → custos e contagens
+// ══════════════════════════════════════════
+(function setupNexusPDF() {
+  const { renderTemplate, listTemplates, getStats } = require("./departments/creative/pdf_puppeteer");
+
+  app.get("/api/nexuspdf/templates", (req, res) => {
+    try { res.json(listTemplates()); }
+    catch (e) { res.status(500).json({ error: e.message }); }
+  });
+
+  app.post("/api/nexuspdf/gerar", async (req, res) => {
+    try {
+      const { templateId, vars = {} } = req.body;
+      if (!templateId) return res.status(400).json({ error: "templateId obrigatório." });
+
+      const { buffer, meta } = await renderTemplate(templateId, vars);
+      const filename = `nexus-${templateId}-${Date.now()}.pdf`;
+
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+      res.setHeader("X-Template-Name", meta.name || templateId);
+      res.send(buffer);
+    } catch (e) {
+      console.error("[/api/nexuspdf/gerar]", e.message);
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  app.get("/api/nexuspdf/stats", (req, res) => {
+    try { res.json(getStats()); }
+    catch (e) { res.status(500).json({ error: e.message }); }
+  });
+})();
+
 // ──────────────────────────────────────────
 // Conversão WebM → MP4 (server-side FFmpeg)
 // ──────────────────────────────────────────

@@ -1,0 +1,16 @@
+{
+  "id": "planner-nutri",
+  "name": "Planner Alimentar",
+  "category": "planner",
+  "icon": "🥗",
+  "description": "Planner semanal para nutricionistas. Grade de Segunda a Domingo com campos de refeições.",
+  "layout": "portrait",
+  "cost": 0,
+  "vars": [
+    { "id": "cor_primaria", "label": "Cor Principal",    "type": "color", "default": "#2e7d32" },
+    { "id": "cor_acento",   "label": "Cor de Destaque",  "type": "color", "default": "#aed581" },
+    { "id": "clinica",      "label": "Nome da Clínica",  "type": "text",  "default": "Clínica Nutrição Ativa" },
+    { "id": "nutricionista","label": "Nutricionista",     "type": "text",  "default": "Dra. Ana Clara" },
+    { "id": "semana",       "label": "Semana de",        "type": "text",  "default": "" }
+  ]
+}

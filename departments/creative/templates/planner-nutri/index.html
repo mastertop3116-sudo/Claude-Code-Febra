@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root { --p: {{cor_primaria}}; --a: {{cor_acento}}; --light: color-mix(in srgb, var(--p) 7%, white); }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  @page { size: A4 portrait; margin: 0; }
+  html { width: 210mm; height: 297mm; }
+
+  body {
+    width: 210mm; height: 297mm;
+    background: #FAFAFA;
+    overflow: hidden;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+  }
+
+  /* Header */
+  .header {
+    background: var(--p);
+    height: 70px;
+    padding: 0 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    border: 12px solid rgba(255,255,255,0.08);
+  }
+
+  .header-left { display: flex; flex-direction: column; gap: 2px; }
+
+  .header-sup {
+    font-size: 8px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--a);
+  }
+
+  .header-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: white;
+    line-height: 1.1;
+  }
+
+  .header-right {
+    text-align: right;
+    color: rgba(255,255,255,0.6);
+    font-size: 8px;
+    line-height: 1.6;
+  }
+
+  /* Client info */
+  .client-row {
+    display: flex;
+    gap: 0;
+    padding: 10px 22px 8px;
+    background: white;
+    border-bottom: 2px solid var(--light);
+  }
+
+  .cf { display: flex; align-items: baseline; gap: 5px; flex: 1; }
+  .cf + .cf { border-left: 1px solid #F0F0F0; padding-left: 14px; margin-left: 14px; }
+  .cf-lbl { font-size: 7.5px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #BDBDBD; flex-shrink: 0; }
+  .cf-line { flex: 1; border-bottom: 1px solid #E0E0E0; height: 16px; max-width: 120px; }
+
+  /* Daygrid */
+  .daygrid { padding: 8px 22px; flex: 1; }
+
+  .days-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+
+  .day-hdr {
+    background: var(--p);
+    color: white;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 6px 0;
+    border-radius: 4px 4px 0 0;
+  }
+
+  .days-body {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .day-col {
+    background: white;
+    border: 1px solid #E8E8E8;
+    border-radius: 0 0 6px 6px;
+    overflow: hidden;
+  }
+
+  .day-col:nth-child(even) { background: var(--light); }
+
+  .meal-row {
+    padding: 5px 6px 4px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+
+  .meal-label {
+    font-size: 6.5px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--p);
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+
+  .meal-line { border-bottom: 0.6px solid #D0D0D0; height: 12px; }
+  .meal-line2 { border-bottom: 0.6px solid #D0D0D0; height: 12px; margin-top: 4px; }
+
+  /* Section */
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 22px 5px;
+  }
+
+  .section-dot { width: 7px; height: 7px; background: var(--p); border-radius: 50%; }
+  .section-lbl { font-size: 8px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--p); }
+  .section-line { flex: 1; height: 1px; background: #E8E8E8; }
+
+  /* Write lines */
+  .write-wrap { padding: 0 22px; }
+  .write-line { border-bottom: 0.6px solid #D5D5D5; height: 22px; }
+
+  /* Footer */
+  .footer {
+    position: absolute;
+    bottom: 18px;
+    left: 0; right: 0;
+    text-align: center;
+    font-size: 7px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #C0C0C0;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-sup">Nutrição Clínica — Controle Semanal</div>
+    <div class="header-title">Planner Alimentar da Semana</div>
+  </div>
+  <div class="header-right">
+    {{clinica}}<br>
+    {{nutricionista}}
+  </div>
+</div>
+
+<div class="client-row">
+  <div class="cf"><span class="cf-lbl">Paciente:</span><div class="cf-line" style="max-width:160px"></div></div>
+  <div class="cf"><span class="cf-lbl">Semana de:</span><div class="cf-line" style="max-width:100px">{{semana}}</div></div>
+  <div class="cf"><span class="cf-lbl">Objetivo:</span><div class="cf-line"></div></div>
+  <div class="cf"><span class="cf-lbl">Calorias:</span><div class="cf-line" style="max-width:70px"></div></div>
+</div>
+
+<div class="daygrid">
+  <div class="days-header">
+    <div class="day-hdr">Seg</div>
+    <div class="day-hdr">Ter</div>
+    <div class="day-hdr">Qua</div>
+    <div class="day-hdr">Qui</div>
+    <div class="day-hdr">Sex</div>
+    <div class="day-hdr">Sáb</div>
+    <div class="day-hdr">Dom</div>
+  </div>
+  <div class="days-body">
+    <script>document.write(Array(7).fill(0).map(()=>`
+      <div class="day-col">
+        <div class="meal-row"><div class="meal-label">Café</div><div class="meal-line"></div><div class="meal-line2"></div></div>
+        <div class="meal-row"><div class="meal-label">Almoço</div><div class="meal-line"></div><div class="meal-line2"></div><div class="meal-line2"></div></div>
+        <div class="meal-row"><div class="meal-label">Lanche</div><div class="meal-line"></div><div class="meal-line2"></div></div>
+        <div class="meal-row" style="border:none"><div class="meal-label">Jantar</div><div class="meal-line"></div><div class="meal-line2"></div></div>
+      </div>
+    `).join(''))</script>
+  </div>
+</div>
+
+<div class="section-title">
+  <div class="section-dot"></div>
+  <div class="section-lbl">Observações e Ajustes da Semana</div>
+  <div class="section-line"></div>
+</div>
+
+<div class="write-wrap">
+  <div class="write-line"></div>
+  <div class="write-line"></div>
+  <div class="write-line"></div>
+  <div class="write-line"></div>
+</div>
+
+<div class="footer">
+  {{clinica}}  •  Planner Alimentar  •  Acompanhamento Individualizado
+</div>
+
+</body>
+</html>

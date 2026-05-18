@@ -1,0 +1,16 @@
+{
+  "id": "ficha-treino",
+  "name": "Ficha de Treino",
+  "category": "tracker",
+  "icon": "🏋️",
+  "description": "Ficha de acompanhamento de treino para personal trainer. Tabela de exercícios com séries, reps, carga e intensidade.",
+  "layout": "portrait",
+  "cost": 0,
+  "vars": [
+    { "id": "cor_primaria", "label": "Cor Principal",  "type": "color", "default": "#c62828" },
+    { "id": "cor_acento",   "label": "Cor de Destaque","type": "color", "default": "#ff8f00" },
+    { "id": "academia",     "label": "Nome da Academia","type": "text",  "default": "Personal Training Pro" },
+    { "id": "tipo_treino",  "label": "Tipo de Treino", "type": "text",  "default": "Treino A — Superior" },
+    { "id": "n_exercicios", "label": "Nº de linhas",   "type": "number","default": "12" }
+  ]
+}

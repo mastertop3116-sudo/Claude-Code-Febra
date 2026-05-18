@@ -1,0 +1,23 @@
+{
+  "id": "cert-premium",
+  "name": "Certificado Premium",
+  "category": "certificado",
+  "icon": "🏆",
+  "description": "Certificado ornamental para academias, cursos e eventos. Fundo marfim com borda decorativa.",
+  "layout": "landscape",
+  "cost": 0,
+  "vars": [
+    { "id": "cor_primaria",     "label": "Cor Principal",     "type": "color",  "default": "#8B0000" },
+    { "id": "cor_acento",       "label": "Cor de Destaque",   "type": "color",  "default": "#D4AF37" },
+    { "id": "abbr",             "label": "Sigla (emblema)",   "type": "text",   "default": "AM",    "placeholder": "Ex: BJJ, AC" },
+    { "id": "subtitulo",        "label": "Subtítulo acima",   "type": "text",   "default": "CERTIFICADO DE CONQUISTA" },
+    { "id": "titulo",           "label": "Título principal",  "type": "text",   "default": "Conquista de Faixa Preta" },
+    { "id": "nome_aluno",       "label": "Nome do aluno",     "type": "text",   "default": "Nome do Aluno",   "placeholder": "Deixe em branco para linha" },
+    { "id": "texto_corpo",      "label": "Texto de honra",    "type": "textarea","default": "Em reconhecimento à dedicação, disciplina e excelência demonstradas nas artes marciais." },
+    { "id": "tag",              "label": "Tag / Nível",       "type": "text",   "default": "Artes Marciais  •  Faixa Preta" },
+    { "id": "label_ass1",       "label": "Assinatura 1",      "type": "text",   "default": "Mestre" },
+    { "id": "label_ass2",       "label": "Assinatura 2",      "type": "text",   "default": "Data" },
+    { "id": "label_ass3",       "label": "Assinatura 3",      "type": "text",   "default": "Academia" },
+    { "id": "rodape",           "label": "Rodapé",            "type": "text",   "default": "Academia de Artes Marciais  •  Força  •  Honra  •  Espírito" }
+  ]
+}

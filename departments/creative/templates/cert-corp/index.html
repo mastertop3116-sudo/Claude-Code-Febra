@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --p: {{cor_primaria}}; --a: {{cor_acento}}; }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  @page { size: A4 landscape; margin: 0; }
+  html { width: 297mm; height: 210mm; }
+
+  body {
+    width: 297mm; height: 210mm;
+    background: #fff;
+    overflow: hidden;
+    position: relative;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+  }
+
+  /* Left accent panel */
+  .left-panel {
+    width: 72px;
+    height: 100%;
+    background: var(--p);
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .left-panel-text {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-family: 'Raleway', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .left-accent-line {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: var(--a);
+  }
+
+  /* Right content */
+  .right-content {
+    flex: 1;
+    padding: 36px 48px 28px 36px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Background geometric */
+  .geo-bg {
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 300px;
+    height: 300px;
+    border: 60px solid var(--p);
+    border-radius: 50%;
+    opacity: 0.04;
+  }
+
+  .geo-bg2 {
+    position: absolute;
+    bottom: -60px;
+    left: -20px;
+    width: 200px;
+    height: 200px;
+    background: var(--a);
+    opacity: 0.06;
+    transform: rotate(45deg);
+  }
+
+  /* Top bar */
+  .top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .company-name {
+    font-family: 'Raleway', sans-serif;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--p);
+  }
+
+  .cert-type {
+    font-family: 'Raleway', sans-serif;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #9E9E9E;
+    margin-top: 3px;
+  }
+
+  .accent-bar {
+    width: 50px;
+    height: 3px;
+    background: var(--a);
+    margin-top: 8px;
+  }
+
+  .carga-badge {
+    background: var(--p);
+    color: white;
+    font-family: 'Raleway', sans-serif;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 4px;
+  }
+
+  /* Middle */
+  .mid-content { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 1; }
+
+  .apresenta {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    color: #BDBDBD;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .recipient-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 44px;
+    font-weight: 700;
+    color: var(--p);
+    line-height: 1;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+  }
+
+  .h-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .h-div-line { width: 40px; height: 2px; background: var(--a); }
+  .h-div-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--a); }
+
+  .course-title {
+    font-family: 'Raleway', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #212121;
+    margin-bottom: 6px;
+    letter-spacing: 0.3px;
+  }
+
+  .body-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    color: #757575;
+    line-height: 1.6;
+    max-width: 420px;
+  }
+
+  /* Signatures */
+  .signatures {
+    display: flex;
+    gap: 48px;
+    margin-top: 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .sig-item { display: flex; flex-direction: column; gap: 5px; }
+
+  .sig-line {
+    width: 140px;
+    height: 1px;
+    background: #BDBDBD;
+  }
+
+  .sig-line-accent {
+    width: 30px;
+    height: 2px;
+    background: var(--a);
+  }
+
+  .sig-label {
+    font-family: 'Raleway', sans-serif;
+    font-size: 7.5px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #9E9E9E;
+  }
+
+  /* Footer */
+  .footer-row {
+    position: absolute;
+    bottom: 20px;
+    right: 48px;
+    font-family: 'Inter', sans-serif;
+    font-size: 7px;
+    color: #E0E0E0;
+    text-align: right;
+    max-width: 380px;
+    line-height: 1.5;
+    z-index: 1;
+  }
+
+  /* Date badge */
+  .date-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #F5F5F5;
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 8px;
+    font-weight: 600;
+    color: #757575;
+    letter-spacing: 1px;
+    margin-top: 8px;
+  }
+
+  .date-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--a); }
+</style>
+</head>
+<body>
+
+<!-- Left panel -->
+<div class="left-panel">
+  <div class="left-panel-text">{{empresa}}</div>
+  <div class="left-accent-line"></div>
+</div>
+
+<!-- Right content -->
+<div class="right-content">
+  <div class="geo-bg"></div>
+  <div class="geo-bg2"></div>
+
+  <div class="top-row">
+    <div>
+      <div class="company-name">{{empresa}}</div>
+      <div class="cert-type">{{subtitulo}}</div>
+      <div class="accent-bar"></div>
+    </div>
+    <div class="carga-badge">{{carga_horaria}}</div>
+  </div>
+
+  <div class="mid-content">
+    <div class="apresenta">Certificamos que</div>
+    <div class="recipient-name">{{nome_aluno}}</div>
+    <div class="h-divider">
+      <div class="h-div-line"></div>
+      <div class="h-div-dot"></div>
+    </div>
+    <div class="course-title">{{titulo}}</div>
+    <div class="body-text">{{texto_corpo}}</div>
+    <div class="date-chip"><div class="date-dot"></div>{{data}}</div>
+  </div>
+
+  <div class="signatures">
+    <div class="sig-item">
+      <div class="sig-line"></div>
+      <div class="sig-line-accent"></div>
+      <div class="sig-label">{{label_ass1}}</div>
+    </div>
+    <div class="sig-item">
+      <div class="sig-line"></div>
+      <div class="sig-line-accent"></div>
+      <div class="sig-label">{{label_ass2}}</div>
+    </div>
+  </div>
+
+  <div class="footer-row">{{rodape}}</div>
+</div>
+
+</body>
+</html>
