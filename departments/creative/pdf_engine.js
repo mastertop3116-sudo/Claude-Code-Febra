@@ -96,25 +96,71 @@ function renderBadge(doc, el, ctx) {
   const { W, palette } = ctx;
   const cx = el.cx || W / 2;
   const r  = el.r || 36;
-  const cy = ctx.y + r + 6;
-  doc.circle(cx, cy, r + 6).fill(col(el.accent || "accent", palette));
-  doc.circle(cx, cy, r).fill(col(el.primary || "primary", palette));
+  const cy = ctx.y + r + 10;
+  const p  = col(el.primary || "primary", palette);
+  const a  = col(el.accent  || "accent",  palette);
+
+  // Outer glow ring
+  doc.circle(cx, cy, r + 12).fillOpacity(0.15).fill(a).fillOpacity(1);
+  // Accent ring
+  doc.circle(cx, cy, r + 9).fill(a);
+  // Thin white gap
+  doc.circle(cx, cy, r + 6).fill("#fff");
+  // Primary ring
+  doc.circle(cx, cy, r + 4).fill(p);
+  // Sunburst radiating lines
+  const nLines = 24;
+  for (let i = 0; i < nLines; i++) {
+    const ang = (i / nLines) * Math.PI * 2;
+    const x1 = cx + Math.cos(ang) * (r * 0.55);
+    const y1 = cy + Math.sin(ang) * (r * 0.55);
+    const x2 = cx + Math.cos(ang) * (r + 2);
+    const y2 = cy + Math.sin(ang) * (r + 2);
+    doc.moveTo(x1, y1).lineTo(x2, y2).lineWidth(0.8).strokeColor(a).stroke();
+  }
+  // Inner filled circle
+  doc.circle(cx, cy, r * 0.58).fill(p);
+  // Dotted decorative ring
+  const nDots = 20;
+  for (let i = 0; i < nDots; i++) {
+    const ang = (i / nDots) * Math.PI * 2;
+    const dx = cx + Math.cos(ang) * (r * 0.78);
+    const dy = cy + Math.sin(ang) * (r * 0.78);
+    doc.circle(dx, dy, 1.2).fill(a);
+  }
+  // Abbreviation text
   doc.fillColor("#fff").font(font("bold")).fontSize(el.fontSize || 14)
     .text(el.abbr || "?", cx - r, cy - 9, { width: r * 2, align: "center" });
-  ctx.y += (r + 6) * 2 + (el.gap || 12);
+
+  ctx.y += (r + 12) * 2 + (el.gap || 12);
 }
 
 function renderNameLine(doc, el, ctx) {
   const { W, palette } = ctx;
   const c = col(el.color || "primary", palette);
+  const a = col("accent", palette);
   const w = el.width || 400;
   const x = (W - w) / 2;
+
+  // Small decorative diamonds flanking the line
+  const diamondSize = 5;
+  doc.save().translate(x - 14, ctx.y).rotate(45)
+    .rect(-diamondSize/2, -diamondSize/2, diamondSize, diamondSize).fill(a).restore();
+  doc.save().translate(x + w + 14, ctx.y).rotate(45)
+    .rect(-diamondSize/2, -diamondSize/2, diamondSize, diamondSize).fill(a).restore();
+
+  // Main line
   doc.moveTo(x, ctx.y).lineTo(x + w, ctx.y)
     .lineWidth(el.thick || 1.5).strokeColor(c).stroke();
+  // Thin accent line below
+  doc.moveTo(x + 10, ctx.y + 3).lineTo(x + w - 10, ctx.y + 3)
+    .lineWidth(0.4).strokeColor(a).stroke();
+
   if (el.hint) {
-    doc.fillColor("#9E9E9E").font(font("regular")).fontSize(9)
-      .text(el.hint, x, ctx.y + 4, { width: w, align: "center" });
-    ctx.y += 20;
+    // Script font for recipient name placeholder
+    doc.fillColor(c).font(font("script")).fontSize(el.hintSize || 22)
+      .text(el.hint, x, ctx.y + 6, { width: w, align: "center" });
+    ctx.y += 32;
   }
   ctx.y += (el.gap || 16);
 }
@@ -131,19 +177,101 @@ function renderPill(doc, el, ctx) {
   ctx.y += ph + (el.gap || 10);
 }
 
+function renderWatermark(doc, el, ctx) {
+  const { W, H, palette } = ctx;
+  const c = col(el.color || "accent", palette);
+  const pattern = el.pattern || "diamond";
+  const step = el.step || 40;
+  doc.save();
+  doc.opacity(el.opacity || 0.06);
+  if (pattern === "diamond") {
+    for (let gy = step / 2; gy < H; gy += step) {
+      for (let gx = (Math.floor(gy / step) % 2 === 0 ? step / 2 : 0); gx < W; gx += step) {
+        doc.save().translate(gx, gy).rotate(45)
+          .rect(-5, -5, 10, 10).lineWidth(0.8).strokeColor(c).stroke()
+          .restore();
+      }
+    }
+  } else if (pattern === "dots") {
+    for (let gy = step; gy < H; gy += step) {
+      for (let gx = step; gx < W; gx += step) {
+        doc.circle(gx, gy, 1.5).fill(c);
+      }
+    }
+  } else if (pattern === "lines") {
+    for (let gy = step; gy < H; gy += step) {
+      doc.moveTo(0, gy).lineTo(W, gy).lineWidth(0.5).strokeColor(c).stroke();
+    }
+  }
+  doc.opacity(1);
+  doc.restore();
+}
+
 function renderBorder(doc, el, ctx) {
   const { W, H, palette } = ctx;
   const p = col(el.primary || "primary", palette);
   const a = col(el.accent  || "accent",  palette);
-  doc.rect(12, 12, W - 24, H - 24).lineWidth(5).strokeColor(p).stroke();
-  doc.rect(20, 20, W - 40, H - 40).lineWidth(1.5).strokeColor(a).stroke();
-  const cs = 14;
-  for (const [x, y] of [[12,12],[W-12-cs,12],[12,H-12-cs],[W-12-cs,H-12-cs]]) {
-    doc.rect(x, y, cs, cs).fill(p);
-    doc.rect(x+2, y+2, cs-4, cs-4).fill(a);
+
+  // Outer thick frame
+  doc.rect(10, 10, W - 20, H - 20).lineWidth(6).strokeColor(p).stroke();
+  // Inner thin accent line
+  doc.rect(18, 18, W - 36, H - 36).lineWidth(1).strokeColor(a).stroke();
+  // Second inner thin line
+  doc.rect(22, 22, W - 44, H - 44).lineWidth(0.5).strokeColor(p).stroke();
+
+  // Ornate corners — multi-layer diamond
+  const corners = [[10,10],[W-10,10],[10,H-10],[W-10,H-10]];
+  for (const [cx, cy] of corners) {
+    const sx = cx === 10 ? 1 : -1;
+    const sy = cy === 10 ? 1 : -1;
+    // Filled square base
+    doc.rect(cx, cy, sx * 28, sy * 28).fill(p);
+    // Accent inner square
+    doc.rect(cx + sx*3, cy + sy*3, sx * 22, sy * 22).fill(a);
+    // White center
+    doc.rect(cx + sx*6, cy + sy*6, sx * 16, sy * 16).fill(p);
+    // Tiny center dot
+    doc.circle(cx + sx*14, cy + sy*14, 3).fill(a);
   }
-  doc.rect(12, 12, W - 24, 5).fill(p);
-  doc.rect(12, H - 17, W - 24, 5).fill(p);
+
+  // Midpoint ornaments on top & bottom
+  for (const my of [10, H - 10]) {
+    const sy = my === 10 ? 1 : -1;
+    const mx = W / 2;
+    doc.rect(mx - 14, my, 28, sy * 7).fill(p);
+    doc.rect(mx - 8, my + sy*7, 16, sy*5).fill(a);
+    // Diamond shape
+    doc.save()
+      .translate(mx, my + sy*16)
+      .rotate(45)
+      .rect(-5, -5, 10, 10).fill(p)
+      .restore();
+  }
+
+  // Midpoint ornaments on left & right
+  for (const mx of [10, W - 10]) {
+    const sx = mx === 10 ? 1 : -1;
+    const my = H / 2;
+    doc.rect(mx, my - 14, sx * 7, 28).fill(p);
+    doc.rect(mx + sx*7, my - 8, sx*5, 16).fill(a);
+    doc.save()
+      .translate(mx + sx*16, my)
+      .rotate(45)
+      .rect(-5, -5, 10, 10).fill(p)
+      .restore();
+  }
+
+  // Subtle repeating dots along top border line between corners
+  const dotY1 = 14, dotY2 = H - 14;
+  for (let dx = 50; dx < W - 50; dx += 22) {
+    doc.circle(dx, dotY1, 1.5).fill(a);
+    doc.circle(dx, dotY2, 1.5).fill(a);
+  }
+  // Subtle dots along side border lines
+  for (let dy = 50; dy < H - 50; dy += 22) {
+    doc.circle(14, dy, 1.5).fill(a);
+    doc.circle(W - 14, dy, 1.5).fill(a);
+  }
 }
 
 function renderFields(doc, el, ctx) {
@@ -443,6 +571,7 @@ const RENDERERS = {
   name_line  : renderNameLine,
   pill       : renderPill,
   border     : renderBorder,
+  watermark  : renderWatermark,
   fields     : renderFields,
   table      : renderTable,
   checklist  : renderChecklist,
