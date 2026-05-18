@@ -1,9 +1,8 @@
 // ============================================================
 // NexusPDF Puppeteer Engine — HTML → PDF de alta qualidade
 // ============================================================
-const puppeteer = require("puppeteer");
-const fs        = require("fs");
-const path      = require("path");
+const fs   = require("fs");
+const path = require("path");
 
 const TEMPLATES_DIR = path.join(__dirname, "templates");
 const LOG_FILE      = path.join(__dirname, "../../data/nexuspdf_log.json");
@@ -15,19 +14,35 @@ async function getBrowser() {
     try { await _browser.version(); return _browser; } catch {}
     _browser = null;
   }
-  const executablePath = await puppeteer.executablePath().catch(() => undefined);
-  _browser = await puppeteer.launch({
-    headless: "new",
-    ...(executablePath ? { executablePath } : {}),
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-gpu",
-      "--font-render-hinting=none",
-      "--disable-extensions",
-    ],
-  });
+
+  const LAUNCH_ARGS = [
+    "--no-sandbox",
+    "--disable-setuid-sandbox",
+    "--disable-dev-shm-usage",
+    "--disable-gpu",
+    "--font-render-hinting=none",
+    "--disable-extensions",
+  ];
+
+  // Em produção (Render/Lambda), usar @sparticuz/chromium
+  if (process.env.NODE_ENV === "production" || process.env.RENDER) {
+    const chromium = require("@sparticuz/chromium");
+    const puppeteerCore = require("puppeteer-core");
+    _browser = await puppeteerCore.launch({
+      args: [...chromium.args, ...LAUNCH_ARGS],
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+    });
+  } else {
+    // Local: usar puppeteer normal com Chrome local
+    const puppeteer = require("puppeteer");
+    const executablePath = await puppeteer.executablePath().catch(() => undefined);
+    _browser = await puppeteer.launch({
+      headless: "new",
+      ...(executablePath ? { executablePath } : {}),
+      args: LAUNCH_ARGS,
+    });
+  }
   return _browser;
 }
 

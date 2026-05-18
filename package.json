@@ -5,13 +5,13 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "postinstall": "npx puppeteer browsers install chrome",
     "test:gemini": "node integrations/gemini.js",
     "test:max": "node core/max.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.36.3",
     "@resvg/resvg-js": "^2.6.2",
+    "@sparticuz/chromium": "^148.0.0",
     "@supabase/supabase-js": "^2.45.0",
     "compression": "^1.8.1",
     "docx": "^9.6.1",
@@ -28,6 +28,7 @@
     "pdf-parse": "^1.1.1",
     "pdfkit": "^0.18.0",
     "puppeteer": "^25.0.4",
+    "puppeteer-core": "^25.0.4",
     "satori": "^0.26.0",
     "satori-html": "^0.3.2"
   }
