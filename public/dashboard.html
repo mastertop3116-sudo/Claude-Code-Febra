@@ -1469,7 +1469,7 @@ const CONSELHO_CFG = {
   paulo: {name:'Paulo Vieira',emoji:'🎯',color:'#a855f7'},
 };
 
-const STATIC_VIEWS = new Set(['briefing','overview','integrations','all-sectors','conselho','brn-overview','brn-jiujitsu','brn-despluga','radar','pipeline','biblioteca','board','cerebro']);
+const STATIC_VIEWS = new Set(['briefing','overview','integrations','all-sectors','conselho','brn-overview','brn-jiujitsu','brn-despluga','radar','pipeline','biblioteca','board','cerebro','nexuspdf','gastos']);
 
 // ─── STATE ─────────────────────────────────────
 let currentView = 'briefing';
@@ -1574,6 +1574,7 @@ const VIEW_TITLES = {
   'all-sectors':'Todos os Setores',conselho:'Conselho de Titãs',
   integrations:'Integrações','brn-overview':'BRN VENDAS',
   'brn-jiujitsu':'Jiu-Jitsu','brn-despluga':'Kit Despluga Pro',
+  nexuspdf:'Gerador de PDFs',gastos:'Gastos de API',board:'Board de Ofertas',
 };
 
 function navigate(view){
@@ -1596,6 +1597,7 @@ function navigate(view){
   else if(view==='cerebro'){ loadCerebro(); }
   else if(view==='board'){ loadBoard(); }
   else if(view==='all-sectors'){ loadNotas(); }
+  else if(view==='nexuspdf'){ npdfInit(); }
   else if(!STATIC_VIEWS.has(view) && !historyLoaded[view]){ loadHistory(view); }
 }
 window.navigate = navigate;
@@ -2989,18 +2991,11 @@ if(localStorage.getItem('nxs_sb_collapsed')==='1') document.getElementById('side
   let npdfSelected  = null;
   let npdfSession   = [];
 
-  // ── LOAD on view switch ─────────────────────
-  document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.sb-item[data-view="nexuspdf"]').forEach(el => {
-      el.addEventListener('click', () => {
-        npdfInit();
-      });
-    });
-  });
-
-  async function npdfInit() {
+  let _npdfInited = false;
+  window.npdfInit = async function() {
     await Promise.all([npdfLoadStats(), npdfLoadTemplates()]);
-  }
+    _npdfInited = true;
+  };
 
   // ── STATS ────────────────────────────────────
   async function npdfLoadStats() {
