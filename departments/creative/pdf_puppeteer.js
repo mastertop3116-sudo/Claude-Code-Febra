@@ -15,11 +15,9 @@ async function getBrowser() {
     try { await _browser.version(); return _browser; } catch {}
     _browser = null;
   }
-
-  // No Render, o Chrome fica em /opt/render/.cache/puppeteer
-  const cacheDir = process.env.PUPPETEER_CACHE_DIR || "";
-  const launchOpts = {
+  _browser = await puppeteer.launch({
     headless: "new",
+    executablePath: puppeteer.executablePath(),
     args: [
       "--no-sandbox",
       "--disable-setuid-sandbox",
@@ -28,17 +26,7 @@ async function getBrowser() {
       "--font-render-hinting=none",
       "--disable-extensions",
     ],
-  };
-
-  // Tenta encontrar Chrome instalado via puppeteer browsers install
-  if (cacheDir) {
-    const { executablePath } = require("puppeteer");
-    try {
-      launchOpts.executablePath = executablePath();
-    } catch {}
-  }
-
-  _browser = await puppeteer.launch(launchOpts);
+  });
   return _browser;
 }
 
