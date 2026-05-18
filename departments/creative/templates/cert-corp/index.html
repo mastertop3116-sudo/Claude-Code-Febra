@@ -134,7 +134,9 @@
   }
 
   /* Middle */
-  .mid-content { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 1; }
+  .mid-content { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 1; padding: 8px 0; }
+
+  .mid-top {}
 
   .apresenta {
     font-family: 'Inter', sans-serif;
@@ -142,43 +144,51 @@
     color: #BDBDBD;
     letter-spacing: 2px;
     text-transform: uppercase;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
 
   .recipient-name {
     font-family: 'Playfair Display', serif;
-    font-size: 44px;
+    font-size: 52px;
     font-weight: 700;
     color: var(--p);
     line-height: 1;
-    letter-spacing: -1px;
-    margin-bottom: 8px;
+    letter-spacing: -1.5px;
+    margin-bottom: 10px;
   }
 
   .h-divider {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 10px;
+    margin-bottom: 14px;
   }
 
   .h-div-line { width: 40px; height: 2px; background: var(--a); }
   .h-div-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--a); }
 
+  .course-box {
+    background: color-mix(in srgb, var(--p) 5%, white);
+    border-left: 3px solid var(--p);
+    border-radius: 0 6px 6px 0;
+    padding: 12px 20px 12px 16px;
+    max-width: 440px;
+  }
+
   .course-title {
     font-family: 'Raleway', sans-serif;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     color: #212121;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     letter-spacing: 0.3px;
   }
 
   .body-text {
     font-family: 'Inter', sans-serif;
-    font-size: 10px;
+    font-size: 9.5px;
     color: #757575;
-    line-height: 1.6;
+    line-height: 1.65;
     max-width: 420px;
   }
 
@@ -186,8 +196,9 @@
   .signatures {
     display: flex;
     gap: 48px;
-    margin-top: 20px;
-    position: relative;
+    position: absolute;
+    bottom: 28px;
+    left: 36px;
     z-index: 1;
   }
 
@@ -270,15 +281,19 @@
   </div>
 
   <div class="mid-content">
-    <div class="apresenta">Certificamos que</div>
-    <div class="recipient-name">{{nome_aluno}}</div>
-    <div class="h-divider">
-      <div class="h-div-line"></div>
-      <div class="h-div-dot"></div>
+    <div class="mid-top">
+      <div class="apresenta">Certificamos que</div>
+      <div class="recipient-name">{{nome_aluno}}</div>
+      <div class="h-divider">
+        <div class="h-div-line"></div>
+        <div class="h-div-dot"></div>
+      </div>
+      <div class="course-box">
+        <div class="course-title">{{titulo}}</div>
+        <div class="body-text">{{texto_corpo}}</div>
+      </div>
+      <div class="date-chip" style="margin-top:12px"><div class="date-dot"></div>{{data}}</div>
     </div>
-    <div class="course-title">{{titulo}}</div>
-    <div class="body-text">{{texto_corpo}}</div>
-    <div class="date-chip"><div class="date-dot"></div>{{data}}</div>
   </div>
 
   <div class="signatures">

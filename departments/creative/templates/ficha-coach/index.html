@@ -103,8 +103,8 @@
   .gc-line2 { border-bottom: 0.6px solid rgba(0,0,0,0.1); height: 18px; margin-top: 2px; }
 
   /* Action grid */
-  .action-grid { display: flex; flex-direction: column; gap: 3px; }
-  .action-row { display: flex; align-items: stretch; gap: 4px; height: 28px; }
+  .action-grid { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+  .action-row { display: flex; align-items: stretch; gap: 4px; flex: 1; min-height: 26px; }
   .ar-day {
     width: 48px;
     background: var(--p);
@@ -242,7 +242,7 @@
     </div>
 
     <!-- Daily action plan -->
-    <div class="sec">
+    <div class="sec" style="flex:1">
       <div class="sec-hdr">
         <div class="sec-num">2</div>
         <div class="sec-title">Plano de Ação Diário</div>

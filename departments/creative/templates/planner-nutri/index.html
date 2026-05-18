@@ -16,6 +16,8 @@
     overflow: hidden;
     font-family: 'DM Sans', sans-serif;
     font-size: 10px;
+    display: flex;
+    flex-direction: column;
   }
 
   /* Header */
@@ -80,7 +82,7 @@
   .cf-line { flex: 1; border-bottom: 1px solid #E0E0E0; height: 16px; max-width: 120px; }
 
   /* Daygrid */
-  .daygrid { padding: 8px 22px; flex: 1; }
+  .daygrid { padding: 8px 22px; flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
   .days-header {
     display: grid;
@@ -105,6 +107,8 @@
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 4px;
+    flex: 1;
+    overflow: hidden;
   }
 
   .day-col {
@@ -112,7 +116,11 @@
     border: 1px solid #E8E8E8;
     border-radius: 0 0 6px 6px;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
+
+  .meal-row { flex: 1; }
 
   .day-col:nth-child(even) { background: var(--light); }
 
@@ -151,15 +159,17 @@
 
   /* Footer */
   .footer {
-    position: absolute;
-    bottom: 18px;
-    left: 0; right: 0;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     font-size: 7px;
     font-weight: 500;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: #C0C0C0;
+    flex-shrink: 0;
   }
 </style>
 </head>
@@ -178,7 +188,7 @@
 
 <div class="client-row">
   <div class="cf"><span class="cf-lbl">Paciente:</span><div class="cf-line" style="max-width:160px"></div></div>
-  <div class="cf"><span class="cf-lbl">Semana de:</span><div class="cf-line" style="max-width:100px">{{semana}}</div></div>
+  <div class="cf"><span class="cf-lbl">Semana de:</span><span style="font-size:8px;color:#424242;font-weight:600;margin-left:4px;white-space:nowrap">{{semana}}</span></div>
   <div class="cf"><span class="cf-lbl">Objetivo:</span><div class="cf-line"></div></div>
   <div class="cf"><span class="cf-lbl">Calorias:</span><div class="cf-line" style="max-width:70px"></div></div>
 </div>
