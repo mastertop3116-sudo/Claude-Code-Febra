@@ -1,0 +1,20 @@
+{
+  "id": "ficha-receita",
+  "name": "Ficha de Receita — Chef",
+  "description": "Ficha técnica profissional de receita com ingredientes, modo de preparo e custos",
+  "layout": "portrait",
+  "niche": "Gastronomia",
+  "vars": [
+    { "id": "estabelecimento", "label": "Nome do Estabelecimento", "default": "Restaurante" },
+    { "id": "cor_primaria", "label": "Cor Primária", "default": "#1C2B1E" },
+    { "id": "cor_acento", "label": "Cor Acento", "default": "#C8A96E" },
+    { "id": "nome_receita", "label": "Nome da Receita", "default": "Risoto de Funghi" },
+    { "id": "categoria", "label": "Categoria", "default": "Prato Principal" },
+    { "id": "porcoes", "label": "Porções", "default": "4 porções" },
+    { "id": "tempo_prep", "label": "Tempo de Preparo", "default": "45 min" },
+    { "id": "dificuldade", "label": "Dificuldade", "default": "Intermediário" },
+    { "id": "chef", "label": "Chef Responsável", "default": "Chef Executivo" },
+    { "id": "n_ingredientes", "label": "Número de ingredientes", "default": "10" },
+    { "id": "n_passos", "label": "Número de passos", "default": "6" }
+  ]
+}

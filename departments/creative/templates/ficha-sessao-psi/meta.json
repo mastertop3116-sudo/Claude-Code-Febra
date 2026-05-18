@@ -1,0 +1,16 @@
+{
+  "id": "ficha-sessao-psi",
+  "name": "Ficha de Sessão — Psicologia Clínica",
+  "description": "Registro estruturado de sessão terapêutica com anamnese, objetivos e evolução",
+  "layout": "portrait",
+  "niche": "Psicologia",
+  "vars": [
+    { "id": "clinica", "label": "Nome da Clínica/Consultório", "default": "Consultório de Psicologia" },
+    { "id": "cor_primaria", "label": "Cor Primária", "default": "#2C4A7C" },
+    { "id": "cor_acento", "label": "Cor Acento", "default": "#7EB8B1" },
+    { "id": "terapeuta", "label": "Nome do Terapeuta", "default": "Psicóloga Responsável" },
+    { "id": "crp", "label": "CRP", "default": "CRP 00/00000" },
+    { "id": "sessao_num", "label": "Número da Sessão", "default": "01" },
+    { "id": "modalidade", "label": "Modalidade", "default": "Terapia Cognitivo-Comportamental" }
+  ]
+}

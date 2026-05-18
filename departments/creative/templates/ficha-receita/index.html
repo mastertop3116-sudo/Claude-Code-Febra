@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Jost:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --p: {{cor_primaria}}; --a: {{cor_acento}}; --light: color-mix(in srgb, var(--a) 8%, white); --cream: #FDFBF5; }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  @page { size: A4 portrait; margin: 0; }
+  html { width: 210mm; height: 297mm; }
+
+  body {
+    width: 210mm; height: 297mm;
+    background: var(--cream);
+    overflow: hidden;
+    font-family: 'Jost', sans-serif;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── HERO HEADER ── */
+  .hero {
+    background: var(--p);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 16px 24px 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-brand {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--a);
+  }
+
+  .hero-categoria {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .hero-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 40px;
+    font-weight: 600;
+    color: white;
+    line-height: 1;
+    letter-spacing: -0.5px;
+    padding: 10px 24px 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-name em {
+    font-style: italic;
+    color: var(--a);
+    font-weight: 400;
+  }
+
+  .hero-badges {
+    display: flex;
+    gap: 8px;
+    padding: 10px 24px 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 4px;
+    padding: 4px 10px;
+  }
+
+  .badge-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 6.5px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--a);
+    opacity: 0.8;
+  }
+
+  .badge-value {
+    font-family: 'Jost', sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    color: white;
+  }
+
+  .hero-deco {
+    position: absolute;
+    right: -20px; top: -20px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .hero-deco2 {
+    position: absolute;
+    right: 40px; top: 40px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+
+  /* ── ACCENT LINE ── */
+  .accent-strip {
+    height: 3px;
+    background: linear-gradient(90deg, var(--a), color-mix(in srgb, var(--a) 30%, transparent));
+    flex-shrink: 0;
+  }
+
+  /* ── MAIN BODY ── */
+  .main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* ── LEFT: INGREDIENTS ── */
+  .ingredients-col {
+    width: 200px;
+    flex-shrink: 0;
+    background: white;
+    border-right: 1px solid #F0EDE6;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .col-header {
+    padding: 10px 14px 8px;
+    border-bottom: 1px solid #F0EDE6;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
+  }
+
+  .col-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--a); flex-shrink: 0; }
+
+  .col-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--p);
+  }
+
+  .ing-table {
+    flex: 1;
+    padding: 6px 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ing-row {
+    display: flex;
+    align-items: center;
+    padding: 4px 14px;
+    gap: 6px;
+    border-bottom: 0.7px solid #F8F6F0;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .ing-qty {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    font-weight: 500;
+    color: var(--a);
+    width: 40px;
+    flex-shrink: 0;
+  }
+
+  .ing-name {
+    font-size: 8px;
+    color: #424242;
+    flex: 1;
+  }
+
+  .ing-mark {
+    width: 8px; height: 8px;
+    border: 1px solid #BDBDBD;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* Notes below ingredients */
+  .ing-notes {
+    padding: 8px 14px 10px;
+    flex-shrink: 0;
+    border-top: 1px solid #F0EDE6;
+  }
+
+  .ing-note-line {
+    border-bottom: 0.7px solid #F0EDE6;
+    height: 18px;
+    width: 100%;
+    margin-bottom: 2px;
+  }
+
+  .notes-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 6.5px;
+    color: #BDBDBD;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  /* ── RIGHT: PREPARO ── */
+  .preparo-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .preparo-body {
+    flex: 1;
+    padding: 10px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow: hidden;
+  }
+
+  .step-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    flex: 1;
+    min-height: 0;
+    border-bottom: 0.7px solid #F0EDE6;
+    padding-bottom: 4px;
+  }
+
+  .step-num {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--p);
+    color: white;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding-top: 3px;
+  }
+
+  .step-line {
+    border-bottom: 0.7px solid #F0EDE6;
+    height: 17px;
+    width: 100%;
+  }
+
+  /* ── BOTTOM BAR ── */
+  .bottom-bar {
+    background: white;
+    border-top: 1px solid #F0EDE6;
+    padding: 8px 18px;
+    display: flex;
+    gap: 0;
+    flex-shrink: 0;
+  }
+
+  .bb-field {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .bb-field + .bb-field {
+    border-left: 1px solid #F0EDE6;
+    padding-left: 16px;
+    margin-left: 16px;
+  }
+
+  .bb-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 6.5px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--p);
+    opacity: 0.4;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .bb-line {
+    flex: 1;
+    border-bottom: 1px solid #E8E4DC;
+    height: 18px;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--p);
+    padding: 6px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .footer-brand {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--a);
+  }
+
+  .footer-chef {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 9px;
+    color: rgba(255,255,255,0.5);
+  }
+</style>
+</head>
+<body>
+
+<!-- Hero Header -->
+<div class="hero">
+  <div class="hero-deco"></div>
+  <div class="hero-deco2"></div>
+  <div class="hero-top">
+    <div class="hero-brand">{{estabelecimento}} · Ficha Técnica</div>
+    <div class="hero-categoria">{{categoria}}</div>
+  </div>
+  <div class="hero-name">{{nome_receita}}</div>
+  <div class="hero-badges">
+    <div class="badge">
+      <span class="badge-label">Porções</span>
+      <span class="badge-value">{{porcoes}}</span>
+    </div>
+    <div class="badge">
+      <span class="badge-label">Preparo</span>
+      <span class="badge-value">{{tempo_prep}}</span>
+    </div>
+    <div class="badge">
+      <span class="badge-label">Nível</span>
+      <span class="badge-value">{{dificuldade}}</span>
+    </div>
+  </div>
+</div>
+<div class="accent-strip"></div>
+
+<!-- Main content -->
+<div class="main">
+
+  <!-- Left: Ingredientes -->
+  <div class="ingredients-col">
+    <div class="col-header">
+      <div class="col-dot"></div>
+      <div class="col-title">Ingredientes</div>
+    </div>
+    <div class="ing-table" id="ing-list"></div>
+    <div class="ing-notes">
+      <span class="notes-label">Observações</span>
+      <div class="ing-note-line"></div>
+      <div class="ing-note-line"></div>
+      <div class="ing-note-line"></div>
+    </div>
+  </div>
+
+  <!-- Right: Modo de preparo -->
+  <div class="preparo-col">
+    <div class="col-header" style="padding: 10px 18px 8px;">
+      <div class="col-dot"></div>
+      <div class="col-title">Modo de Preparo</div>
+    </div>
+    <div class="preparo-body" id="steps-list"></div>
+
+    <!-- Cost / yield bar -->
+    <div class="bottom-bar">
+      <div class="bb-field">
+        <span class="bb-label">Custo Unit.</span>
+        <div class="bb-line"></div>
+      </div>
+      <div class="bb-field">
+        <span class="bb-label">Preço Venda</span>
+        <div class="bb-line"></div>
+      </div>
+      <div class="bb-field">
+        <span class="bb-label">CMV %</span>
+        <div class="bb-line"></div>
+      </div>
+      <div class="bb-field">
+        <span class="bb-label">Validade</span>
+        <div class="bb-line"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <span class="footer-brand">{{estabelecimento}}</span>
+  <span class="footer-chef">{{chef}}</span>
+</div>
+
+<script>
+const nIng = parseInt('{{n_ingredientes}}') || 10;
+const nPas = parseInt('{{n_passos}}') || 6;
+
+const ingList = document.getElementById('ing-list');
+for(let i = 0; i < nIng; i++) {
+  ingList.innerHTML += `
+    <div class="ing-row">
+      <span class="ing-qty"></span>
+      <span class="ing-name"></span>
+      <div class="ing-mark"></div>
+    </div>`;
+}
+
+const stepsList = document.getElementById('steps-list');
+for(let i = 0; i < nPas; i++) {
+  stepsList.innerHTML += `
+    <div class="step-row">
+      <div class="step-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="step-content">
+        <div class="step-line"></div>
+        <div class="step-line"></div>
+      </div>
+    </div>`;
+}
+</script>
+</body>
+</html>

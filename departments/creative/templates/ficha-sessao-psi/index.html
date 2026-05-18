@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --p: {{cor_primaria}}; --a: {{cor_acento}}; --soft: color-mix(in srgb, var(--a) 12%, white); --pale: color-mix(in srgb, var(--p) 5%, white); }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  @page { size: A4 portrait; margin: 0; }
+  html { width: 210mm; height: 297mm; }
+
+  body {
+    width: 210mm; height: 297mm;
+    background: #FAFAF8;
+    overflow: hidden;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--p);
+    padding: 18px 24px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 60px;
+    width: 200px; height: 3px;
+    background: var(--a);
+    opacity: 0.6;
+  }
+
+  .header-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .header-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 7px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--a);
+  }
+
+  .header-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: white;
+    line-height: 1;
+    letter-spacing: -0.3px;
+  }
+
+  .header-meta {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .header-crp {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 1px;
+  }
+
+  .header-sessao {
+    background: var(--a);
+    color: var(--p);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    text-align: center;
+  }
+
+  /* ── PATIENT ROW ── */
+  .patient-row {
+    background: var(--pale);
+    border-bottom: 1px solid color-mix(in srgb, var(--p) 10%, white);
+    padding: 10px 24px;
+    display: flex;
+    gap: 0;
+    flex-shrink: 0;
+  }
+
+  .pf {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 8px;
+  }
+  .pf + .pf {
+    border-left: 1px solid color-mix(in srgb, var(--p) 12%, white);
+    padding-left: 20px;
+    margin-left: 20px;
+  }
+
+  .pf-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 7px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--p);
+    opacity: 0.5;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .pf-line {
+    flex: 1;
+    border-bottom: 1px solid color-mix(in srgb, var(--p) 18%, white);
+    height: 18px;
+  }
+
+  /* ── BODY ── */
+  .body-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 24px 14px;
+    gap: 8px;
+    overflow: hidden;
+  }
+
+  .sec-stretch {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-height: 0;
+  }
+
+  .write-line-flex {
+    flex: 1;
+    border-bottom: 0.7px solid color-mix(in srgb, var(--p) 12%, white);
+    min-height: 18px;
+  }
+
+  /* ── SECTION BLOCK ── */
+  .sec {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .sec-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 3px;
+  }
+
+  .sec-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--a);
+    flex-shrink: 0;
+  }
+
+  .sec-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--p);
+  }
+
+  .sec-rule { flex: 1; height: 1px; background: color-mix(in srgb, var(--p) 10%, white); }
+
+  .write-line {
+    border-bottom: 0.7px solid color-mix(in srgb, var(--p) 12%, white);
+    height: 22px;
+    width: 100%;
+  }
+
+  .write-line-sm { height: 18px; }
+
+  /* ── 2-COL GRID ── */
+  .two-col { display: flex; gap: 16px; }
+  .col { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+
+  /* ── MOOD SCALE ── */
+  .mood-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid color-mix(in srgb, var(--p) 8%, white);
+  }
+
+  .mood-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 7.5px;
+    color: #9E9E9E;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+    width: 80px;
+  }
+
+  .mood-scale {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .mood-pip {
+    flex: 1;
+    height: 12px;
+    border-radius: 2px;
+    border: 1px solid color-mix(in srgb, var(--a) 30%, white);
+    background: color-mix(in srgb, var(--a) 8%, white);
+  }
+
+  .mood-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 7px;
+    color: #BDBDBD;
+    flex-shrink: 0;
+  }
+
+  /* ── CHECKBOX LIST ── */
+  .check-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 8px;
+    color: #616161;
+  }
+
+  .check-box {
+    width: 11px; height: 11px;
+    border: 1px solid #BDBDBD;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* ── TECHNIQUE TABLE ── */
+  .tec-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .tec-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 7px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.85);
+    background: var(--p);
+    padding: 6px 8px;
+    text-align: left;
+  }
+
+  .tec-table td {
+    padding: 7px 8px;
+    border-bottom: 1px solid color-mix(in srgb, var(--p) 6%, white);
+    font-size: 8px;
+    color: #424242;
+    height: 24px;
+  }
+
+  .tec-table tr:nth-child(even) td { background: var(--pale); }
+
+  /* ── NEXT SESSION ── */
+  .next-session {
+    background: color-mix(in srgb, var(--p) 96%, white);
+    border-radius: 6px;
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+
+  .ns-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 7px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--a);
+    white-space: nowrap;
+  }
+
+  .ns-field {
+    flex: 1;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    height: 20px;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--p);
+    padding: 7px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .footer-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 6.5px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .footer-a {
+    color: var(--a);
+    opacity: 0.8;
+  }
+
+  /* ── SIG ── */
+  .sig-area {
+    display: flex;
+    gap: 24px;
+    flex-shrink: 0;
+  }
+
+  .sig-block { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+  .sig-line-el { border-bottom: 1px solid color-mix(in srgb, var(--p) 25%, white); height: 20px; }
+  .sig-lbl {
+    font-family: 'DM Mono', monospace;
+    font-size: 7px;
+    color: #BDBDBD;
+    letter-spacing: 1px;
+    text-align: center;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-brand">
+    <div class="header-tag">{{clinica}} · Psicologia Clínica</div>
+    <div class="header-title">Ficha de Sessão</div>
+  </div>
+  <div class="header-meta">
+    <div class="header-crp">{{terapeuta}} · {{crp}}</div>
+    <div class="header-sessao">Sessão Nº {{sessao_num}}</div>
+  </div>
+</div>
+
+<!-- Patient fields -->
+<div class="patient-row">
+  <div class="pf">
+    <span class="pf-label">Paciente</span>
+    <div class="pf-line"></div>
+  </div>
+  <div class="pf">
+    <span class="pf-label">Data</span>
+    <div class="pf-line" style="max-width:90px"></div>
+  </div>
+  <div class="pf">
+    <span class="pf-label">Duração</span>
+    <div class="pf-line" style="max-width:70px"></div>
+  </div>
+  <div class="pf">
+    <span class="pf-label">Modalidade</span>
+    <div class="pf-line"></div>
+  </div>
+</div>
+
+<!-- Body -->
+<div class="body-wrap">
+
+  <!-- Queixa + Humor -->
+  <div class="two-col">
+    <div class="col" style="flex:1.5">
+      <div class="sec-header">
+        <div class="sec-dot"></div>
+        <div class="sec-title">Queixa Principal / Tema da Sessão</div>
+        <div class="sec-rule"></div>
+      </div>
+      <div class="write-line"></div>
+      <div class="write-line"></div>
+      <div class="write-line"></div>
+    </div>
+
+    <div class="col" style="flex:1">
+      <div class="sec-header">
+        <div class="sec-dot"></div>
+        <div class="sec-title">Humor / Estado Afetivo</div>
+        <div class="sec-rule"></div>
+      </div>
+      <div class="mood-row">
+        <span class="mood-label">Humor Geral</span>
+        <div class="mood-scale" id="scale1"></div>
+        <span class="mood-num">1–10</span>
+      </div>
+      <div class="mood-row" style="margin-top:4px">
+        <span class="mood-label">Ansiedade</span>
+        <div class="mood-scale" id="scale2"></div>
+        <span class="mood-num">1–10</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sintomas -->
+  <div class="sec">
+    <div class="sec-header">
+      <div class="sec-dot"></div>
+      <div class="sec-title">Sintomas Relatados</div>
+      <div class="sec-rule"></div>
+    </div>
+    <div class="check-grid" id="sintomas"></div>
+  </div>
+
+  <!-- Relato / Conteúdo -->
+  <div class="sec-stretch">
+    <div class="sec-header">
+      <div class="sec-dot"></div>
+      <div class="sec-title">Relato / Conteúdo da Sessão</div>
+      <div class="sec-rule"></div>
+    </div>
+    <div class="write-line-flex"></div>
+    <div class="write-line-flex"></div>
+    <div class="write-line-flex"></div>
+    <div class="write-line-flex"></div>
+    <div class="write-line-flex"></div>
+    <div class="write-line-flex"></div>
+  </div>
+
+  <!-- Técnicas + Objetivos -->
+  <div class="two-col">
+    <div class="col">
+      <div class="sec-header">
+        <div class="sec-dot"></div>
+        <div class="sec-title">Técnicas / Intervenções</div>
+        <div class="sec-rule"></div>
+      </div>
+      <table class="tec-table">
+        <thead>
+          <tr>
+            <th style="width:60%">Técnica</th>
+            <th>Resposta</th>
+          </tr>
+        </thead>
+        <tbody id="tec-rows"></tbody>
+      </table>
+    </div>
+
+    <div class="col">
+      <div class="sec-header">
+        <div class="sec-dot"></div>
+        <div class="sec-title">Objetivos / Tarefas</div>
+        <div class="sec-rule"></div>
+      </div>
+      <div class="write-line write-line-sm"></div>
+      <div class="write-line write-line-sm"></div>
+      <div class="write-line write-line-sm"></div>
+      <div class="write-line write-line-sm"></div>
+    </div>
+  </div>
+
+  <!-- Observações clínicas -->
+  <div class="sec">
+    <div class="sec-header">
+      <div class="sec-dot"></div>
+      <div class="sec-title">Observações Clínicas / Hipóteses</div>
+      <div class="sec-rule"></div>
+    </div>
+    <div class="write-line"></div>
+    <div class="write-line"></div>
+  </div>
+
+  <!-- Next session + sig -->
+  <div class="next-session">
+    <span class="ns-label">Próxima Sessão</span>
+    <div class="ns-field"></div>
+    <span class="ns-label">Hora</span>
+    <div class="ns-field" style="max-width:80px"></div>
+    <span class="ns-label">Local</span>
+    <div class="ns-field" style="max-width:110px"></div>
+  </div>
+
+  <div class="sig-area">
+    <div class="sig-block">
+      <div class="sig-line-el"></div>
+      <div class="sig-lbl">Assinatura do Terapeuta</div>
+    </div>
+    <div class="sig-block">
+      <div class="sig-line-el"></div>
+      <div class="sig-lbl">{{crp}}</div>
+    </div>
+    <div class="sig-block">
+      <div class="sig-line-el"></div>
+      <div class="sig-lbl">Ciência do Paciente (opt.)</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <span class="footer-text"><span class="footer-a">{{clinica}}</span> · Documento Confidencial · Sigilo Profissional</span>
+  <span class="footer-text">{{terapeuta}} · <span class="footer-a">{{crp}}</span></span>
+</div>
+
+<script>
+// Mood scale pips
+['scale1','scale2'].forEach(id => {
+  const el = document.getElementById(id);
+  for(let i=0;i<10;i++) el.innerHTML += '<div class="mood-pip"></div>';
+});
+
+// Sintomas
+const sintList = ['Insônia','Ansiedade','Tristeza','Irritabilidade','Fadiga','Concentração','Apetite','Choro','Isolamento','Pensamentos intrusivos','Flashbacks','Somatização'];
+const sg = document.getElementById('sintomas');
+sintList.forEach(s => {
+  sg.innerHTML += `<div class="check-item"><div class="check-box"></div>${s}</div>`;
+});
+
+// Técnicas
+const tecs = ['','','','',''];
+const tb = document.getElementById('tec-rows');
+tecs.forEach((_,i) => {
+  tb.innerHTML += `<tr><td></td><td></td></tr>`;
+});
+</script>
+</body>
+</html>
