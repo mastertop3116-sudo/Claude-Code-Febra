@@ -13,8 +13,12 @@ let _browser = null;
 async function getBrowser() {
   if (_browser) {
     try { await _browser.version(); return _browser; } catch {}
+    _browser = null;
   }
-  _browser = await puppeteer.launch({
+
+  // No Render, o Chrome fica em /opt/render/.cache/puppeteer
+  const cacheDir = process.env.PUPPETEER_CACHE_DIR || "";
+  const launchOpts = {
     headless: "new",
     args: [
       "--no-sandbox",
@@ -22,8 +26,19 @@ async function getBrowser() {
       "--disable-dev-shm-usage",
       "--disable-gpu",
       "--font-render-hinting=none",
+      "--disable-extensions",
     ],
-  });
+  };
+
+  // Tenta encontrar Chrome instalado via puppeteer browsers install
+  if (cacheDir) {
+    const { executablePath } = require("puppeteer");
+    try {
+      launchOpts.executablePath = executablePath();
+    } catch {}
+  }
+
+  _browser = await puppeteer.launch(launchOpts);
   return _browser;
 }
 

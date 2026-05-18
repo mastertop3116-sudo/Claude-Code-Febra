@@ -2,7 +2,7 @@ services:
   - type: web
     name: nexus-max
     runtime: node
-    buildCommand: npm install
+    buildCommand: npm install && npx puppeteer browsers install chrome
     startCommand: node server.js
     envVars:
       - key: GEMINI_API_KEY
@@ -19,3 +19,5 @@ services:
         sync: false
       - key: RENDER_URL
         sync: false
+      - key: PUPPETEER_CACHE_DIR
+        value: /opt/render/.cache/puppeteer
