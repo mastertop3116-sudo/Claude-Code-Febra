@@ -202,7 +202,7 @@
     display: flex;
     align-items: flex-start;
     gap: 18px;
-    flex: 1;
+    flex: 3;
   }
 
   .analogy-icon {
@@ -240,7 +240,7 @@
     border-radius: 16px;
     border-left: 6px solid;
     padding: 14px 18px;
-    flex-shrink: 0;
+    flex: 1.5;
   }
 
   .kid-def-label {
@@ -259,7 +259,7 @@
   }
 
   /* Exemplos do dia a dia */
-  .examples-section { flex-shrink: 0; }
+  .examples-section { flex: 2; display: flex; flex-direction: column; }
 
   .examples-label {
     font-size: 12px;
@@ -274,6 +274,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
+    flex: 1;
   }
 
   .example-item {
@@ -295,7 +296,7 @@
     display: flex;
     align-items: flex-start;
     gap: 14px;
-    flex-shrink: 0;
+    flex: 1.5;
   }
 
   .question-icon { font-size: 28px; flex-shrink: 0; }
@@ -362,6 +363,160 @@
   .question-text { color: var(--dark); }
 
   .concept-footer { color: var(--dark); }
+
+  /* ── PÁGINA COMO USAR ──────────────────────────────────── */
+  .pg-howto {
+    background: #fff;
+    padding: 0;
+  }
+
+  .howto-header {
+    background: linear-gradient(135deg, #1a1a2e, #0f3460);
+    padding: 28px 32px 22px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-shrink: 0;
+  }
+
+  .howto-header-icon { font-size: 48px; }
+
+  .howto-header-text {}
+  .howto-header-label {
+    font-size: 12px; font-weight: 800; letter-spacing: 3px;
+    text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 4px;
+  }
+  .howto-header-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 38px; color: #fff; line-height: 1;
+  }
+
+  .howto-body {
+    flex: 1;
+    padding: 22px 32px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: hidden;
+  }
+
+  .howto-intro {
+    background: #f0f4ff;
+    border-radius: 14px;
+    padding: 14px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a2e;
+    line-height: 1.6;
+    flex-shrink: 0;
+  }
+
+  .howto-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+  }
+
+  .howto-step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: #f8f9fa;
+    border-radius: 14px;
+    padding: 14px 16px;
+    flex: 1;
+  }
+
+  .howto-step-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fredoka One', cursive;
+    font-size: 20px;
+    color: #fff;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .howto-step-content {}
+  .howto-step-title {
+    font-weight: 800;
+    font-size: 14px;
+    color: #1a1a2e;
+    margin-bottom: 4px;
+  }
+  .howto-step-desc {
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+    line-height: 1.5;
+  }
+
+  .howto-timeline {
+    background: #fff3e0;
+    border-radius: 14px;
+    padding: 14px 18px;
+    flex-shrink: 0;
+  }
+
+  .howto-timeline-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #e65100;
+    margin-bottom: 8px;
+  }
+
+  .howto-timeline-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+  }
+
+  .howto-concept-chip {
+    border-radius: 8px;
+    padding: 6px 4px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  .howto-tip {
+    background: #e8f5e9;
+    border-left: 5px solid #2e7d32;
+    border-radius: 0 12px 12px 0;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1b5e20;
+    line-height: 1.5;
+    flex-shrink: 0;
+  }
+
+  .howto-footer {
+    flex-shrink: 0;
+    padding: 10px 32px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #999;
+  }
+
+  /* ── IMPRESSÃO PB (media print grayscale) ─────────────── */
+  @media print {
+    .pg-cover { background: #111 !important; }
+    .concept-header { background: #333 !important; }
+    .analogy-card, .kid-def, .examples-section .example-item,
+    .class-question { filter: grayscale(1) !important; }
+  }
 </style>
 </head>
 <body>
@@ -413,7 +568,92 @@
 </div>
 
 <!-- ══════════════════════════════════════════════════════ -->
-<!--  PÁGINA 2 — ALGORITMO                                 -->
+<!--  PÁGINA 2 — COMO USAR ESTE GUIA                       -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="pg pg-howto">
+
+  <div class="howto-header">
+    <div class="howto-header-icon">📋</div>
+    <div class="howto-header-text">
+      <div class="howto-header-label">Antes de começar</div>
+      <div class="howto-header-title">Como Usar Este Guia</div>
+    </div>
+  </div>
+
+  <svg viewBox="0 0 840 40" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="flex-shrink:0;display:block;width:100%;margin-top:-2px">
+    <path d="M0,0 L840,0 L840,20 Q630,45 420,25 Q210,5 0,30 Z" fill="#0f3460"/>
+    <path d="M0,30 Q210,5 420,25 Q630,45 840,20 L840,40 L0,40 Z" fill="#ffffff"/>
+  </svg>
+
+  <div class="howto-body">
+
+    <div class="howto-intro">
+      Este guia tem <strong>6 cartazes prontos para imprimir e colar na parede</strong> — um para cada conceito de Pensamento Computacional. Cada cartaz apresenta o conceito com uma analogia que toda criança entende, exemplos do dia a dia e uma atividade para fazer com a turma.
+    </div>
+
+    <div class="howto-steps">
+
+      <div class="howto-step">
+        <div class="howto-step-num" style="background:#e84393">1</div>
+        <div class="howto-step-content">
+          <div class="howto-step-title">Imprima e cole os cartazes</div>
+          <div class="howto-step-desc">Imprima em A4 colorido (ou preto e branco — funciona também). Cole os 6 cartazes na parede antes da primeira aula. Deixe em local visível para todos.</div>
+        </div>
+      </div>
+
+      <div class="howto-step">
+        <div class="howto-step-num" style="background:#ff6d00">2</div>
+        <div class="howto-step-content">
+          <div class="howto-step-title">Na 1ª aula: apresente 1 ou 2 conceitos</div>
+          <div class="howto-step-desc">Não tente apresentar todos de uma vez. Comece pelo <strong>Algoritmo</strong> — é o mais fácil. Leia a analogia em voz alta, faça a pergunta da turma e deixe as crianças responderem.</div>
+        </div>
+      </div>
+
+      <div class="howto-step">
+        <div class="howto-step-num" style="background:#7b1fa2">3</div>
+        <div class="howto-step-content">
+          <div class="howto-step-title">Nas aulas seguintes: 1 conceito novo por semana</div>
+          <div class="howto-step-desc">Dedique os primeiros 10 minutos de cada aula a um conceito novo. Aponte para o cartaz antes de aplicar qualquer atividade desplugada relacionada.</div>
+        </div>
+      </div>
+
+      <div class="howto-step">
+        <div class="howto-step-num" style="background:#2e7d32">4</div>
+        <div class="howto-step-content">
+          <div class="howto-step-title">Use o cartaz como âncora durante as atividades</div>
+          <div class="howto-step-desc">Quando uma criança perguntar "o que é isso?", aponte para o cartaz na parede. Eles viram referência visual permanente da turma.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="howto-timeline">
+      <div class="howto-timeline-label">Sequência recomendada de apresentação</div>
+      <div class="howto-timeline-grid">
+        <div class="howto-concept-chip" style="background:#e84393">🍰 Algoritmo</div>
+        <div class="howto-concept-chip" style="background:#ff6d00">👕 Sequência</div>
+        <div class="howto-concept-chip" style="background:#7b1fa2">🎲 Lógica</div>
+        <div class="howto-concept-chip" style="background:#c62828">🔍 Depuração</div>
+        <div class="howto-concept-chip" style="background:#2e7d32">🐜 Padrão</div>
+        <div class="howto-concept-chip" style="background:#f57f17">🥪 Decompos.</div>
+      </div>
+    </div>
+
+    <div class="howto-tip">
+      💡 <strong>Dica de ouro:</strong> Pergunte para a turma no final de cada aula — "Que conceito usamos hoje?" e aponte para os cartazes. Em 6 semanas, as crianças vão reconhecer os conceitos antes de você explicar.
+    </div>
+
+  </div>
+
+  <div class="howto-footer">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Como Usar Este Guia</span>
+    <span>2 / 8</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  PÁGINA 3 — ALGORITMO                                 -->
 <!-- ══════════════════════════════════════════════════════ -->
 <div class="pg pg-concept c1">
 
@@ -474,7 +714,7 @@
   <div class="concept-footer">
     <span>{{escola}} · {{professor}}</span>
     <span>Pensamento Computacional — Algoritmo</span>
-    <span>2 / 7</span>
+    <span>3 / 8</span>
   </div>
 </div>
 
@@ -540,7 +780,7 @@
   <div class="concept-footer">
     <span>{{escola}} · {{professor}}</span>
     <span>Pensamento Computacional — Sequência</span>
-    <span>3 / 7</span>
+    <span>4 / 8</span>
   </div>
 </div>
 
@@ -606,7 +846,7 @@
   <div class="concept-footer">
     <span>{{escola}} · {{professor}}</span>
     <span>Pensamento Computacional — Lógica</span>
-    <span>4 / 7</span>
+    <span>5 / 8</span>
   </div>
 </div>
 
@@ -660,10 +900,10 @@
     </div>
 
     <div class="class-question">
-      <div class="question-icon">💬</div>
+      <div class="question-icon">🚨</div>
       <div>
-        <div class="question-label">Atividade prática</div>
-        <div class="question-text">"Vou ler uma receita com um erro escondido. Quem descobre qual passo está errado ou fora de lugar?"</div>
+        <div class="question-label">Desafio: ache o erro!</div>
+        <div class="question-text">"Vou ler os passos para fazer um copo de suco. Quando você ouvir o erro, levante a mão! — 1. Pegue o copo. 2. Beba o suco. 3. Coloque o suco no copo. 4. Misture. Achou?"</div>
       </div>
     </div>
 
@@ -672,7 +912,7 @@
   <div class="concept-footer">
     <span>{{escola}} · {{professor}}</span>
     <span>Pensamento Computacional — Depuração</span>
-    <span>5 / 7</span>
+    <span>6 / 8</span>
   </div>
 </div>
 
@@ -738,7 +978,7 @@
   <div class="concept-footer">
     <span>{{escola}} · {{professor}}</span>
     <span>Pensamento Computacional — Padrão</span>
-    <span>6 / 7</span>
+    <span>7 / 8</span>
   </div>
 </div>
 
@@ -804,7 +1044,7 @@
   <div class="concept-footer">
     <span>{{escola}} · {{professor}}</span>
     <span>Pensamento Computacional — Decomposição</span>
-    <span>7 / 7</span>
+    <span>8 / 8</span>
   </div>
 </div>
 

@@ -2,8 +2,8 @@
   "nome": "Guia de Pensamento Computacional para Crianças",
   "nicho": "Educação / Kit Despluga",
   "layout": "portrait",
-  "paginas": 7,
-  "descricao": "7 cartazes A4 para apresentar o Pensamento Computacional — cover + 6 conceitos com analogias para crianças",
+  "paginas": 8,
+  "descricao": "8 páginas A4 — capa + como usar + 6 cartazes de conceitos com analogias para crianças",
   "vars": [
     { "id": "escola", "label": "Nome da Escola", "default": "Escola Municipal" },
     { "id": "professor", "label": "Nome da Professora", "default": "Professora" },
