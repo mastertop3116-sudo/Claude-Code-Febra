@@ -28,10 +28,18 @@
   /* ── CAPA ──────────────────────────────────────────────── */
   .pg-cover {
     background: linear-gradient(160deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    align-items: stretch;
+    text-align: center;
+    padding: 0;
+  }
+
+  .cover-inner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-align: center;
-    padding: 20mm;
+    padding: 16mm 20mm 10mm;
   }
 
   .cover-badge {
@@ -104,8 +112,8 @@
   }
 
   .cover-footer {
-    margin-top: auto;
-    padding-top: 30px;
+    flex-shrink: 0;
+    padding: 12px 20mm 14px;
     border-top: 1px solid rgba(255,255,255,0.15);
     width: 100%;
     display: flex;
@@ -194,7 +202,7 @@
     display: flex;
     align-items: flex-start;
     gap: 18px;
-    flex-shrink: 0;
+    flex: 1;
   }
 
   .analogy-icon {
@@ -363,35 +371,37 @@
 <!-- ══════════════════════════════════════════════════════ -->
 <div class="pg pg-cover">
 
-  <div class="cover-badge">Kit Despluga Pro · Material de Apoio</div>
+  <div class="cover-inner">
+    <div class="cover-badge">Kit Despluga Pro · Material de Apoio</div>
 
-  <div class="cover-emoji-row">
-    <div class="cover-emoji-chip" style="background:rgba(233,67,147,0.3)">🧁</div>
-    <div class="cover-emoji-chip" style="background:rgba(255,109,0,0.3)">👕</div>
-    <div class="cover-emoji-chip" style="background:rgba(123,31,162,0.3)">🎲</div>
-    <div class="cover-emoji-chip" style="background:rgba(198,40,40,0.3)">🔍</div>
-    <div class="cover-emoji-chip" style="background:rgba(46,125,50,0.3)">🐜</div>
-    <div class="cover-emoji-chip" style="background:rgba(245,127,23,0.3)">🥪</div>
-  </div>
+    <div class="cover-emoji-row">
+      <div class="cover-emoji-chip" style="background:rgba(233,67,147,0.3)">🧁</div>
+      <div class="cover-emoji-chip" style="background:rgba(255,109,0,0.3)">👕</div>
+      <div class="cover-emoji-chip" style="background:rgba(123,31,162,0.3)">🎲</div>
+      <div class="cover-emoji-chip" style="background:rgba(198,40,40,0.3)">🔍</div>
+      <div class="cover-emoji-chip" style="background:rgba(46,125,50,0.3)">🐜</div>
+      <div class="cover-emoji-chip" style="background:rgba(245,127,23,0.3)">🥪</div>
+    </div>
 
-  <h1 class="cover-title">
-    Guia de<br>
-    <span>Pensamento<br>Computacional</span><br>
-    para Crianças
-  </h1>
+    <h1 class="cover-title">
+      Guia de<br>
+      <span>Pensamento<br>Computacional</span><br>
+      para Crianças
+    </h1>
 
-  <p class="cover-sub">
-    6 cartazes prontos para colar na sala de aula.<br>
-    Conceitos explicados com analogias que toda<br>criança entende — na primeira aula.
-  </p>
+    <p class="cover-sub">
+      6 cartazes prontos para colar na sala de aula.<br>
+      Conceitos explicados com analogias que toda<br>criança entende — na primeira aula.
+    </p>
 
-  <div class="cover-concepts">
-    <span class="concept-pill" style="background:#e84393">🍰 Algoritmo</span>
-    <span class="concept-pill" style="background:#ff6d00">👕 Sequência</span>
-    <span class="concept-pill" style="background:#7b1fa2">🎲 Lógica</span>
-    <span class="concept-pill" style="background:#c62828">🔍 Depuração</span>
-    <span class="concept-pill" style="background:#2e7d32">🐜 Padrão</span>
-    <span class="concept-pill" style="background:#f57f17">🥪 Decomposição</span>
+    <div class="cover-concepts">
+      <span class="concept-pill" style="background:#e84393">🍰 Algoritmo</span>
+      <span class="concept-pill" style="background:#ff6d00">👕 Sequência</span>
+      <span class="concept-pill" style="background:#7b1fa2">🎲 Lógica</span>
+      <span class="concept-pill" style="background:#c62828">🔍 Depuração</span>
+      <span class="concept-pill" style="background:#2e7d32">🐜 Padrão</span>
+      <span class="concept-pill" style="background:#f57f17">🥪 Decomposição</span>
+    </div>
   </div>
 
   <div class="cover-footer">
