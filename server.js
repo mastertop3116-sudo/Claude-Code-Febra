@@ -1159,6 +1159,116 @@ app.post("/api/gerar-pdf", async (req, res) => {
       res.status(500).json({ error: e.message });
     }
   });
+
+  // ── AI PDF Creator ──────────────────────────────────────────────────────────
+  // POST /api/nexuspdf/ai-criar → { descricao } → { jobId }
+  // GET  /api/nexuspdf/ai-progress/:jobId → SSE
+  // GET  /api/nexuspdf/ai-download/:jobId → PDF
+
+  const aiPdfJobs = new Map();
+
+  app.post("/api/nexuspdf/ai-criar", (req, res) => {
+    const { descricao } = req.body;
+    if (!descricao || !descricao.trim()) return res.status(400).json({ error: "Descrição obrigatória." });
+
+    const jobId = Math.random().toString(36).slice(2, 10);
+    aiPdfJobs.set(jobId, { status: "running", progress: 0, message: "Iniciando MAX...", criadoEm: Date.now() });
+    res.json({ jobId });
+
+    const setProgress = (pct, msg) => {
+      const j = aiPdfJobs.get(jobId);
+      if (j) { j.progress = pct; j.message = msg; }
+    };
+
+    const TIMEOUT = setTimeout(() => {
+      const j = aiPdfJobs.get(jobId);
+      if (j && j.status === "running") aiPdfJobs.set(jobId, { ...j, status: "error", message: "Timeout: geração demorou mais de 5 minutos." });
+    }, 5 * 60 * 1000);
+
+    Promise.resolve()
+      .then(async () => {
+        setProgress(10, "MAX está pensando no layout...");
+        const OpenAI = require("openai");
+        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+        const systemPrompt = `Você é MAX, motor de criação de PDFs profissionais da Nexus Digital.
+Gere HTML completo e auto-contido para PDF A4 renderizado pelo Puppeteer.
+
+REGRAS TÉCNICAS OBRIGATÓRIAS:
+1. Cada página A4: <div class="pg"> — CSS: width:794px; min-height:1123px; page-break-after:always; overflow:hidden
+2. No <style>: * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing:border-box; margin:0; padding:0; }
+3. Google Fonts via CDN (link href — escolha fontes relevantes ao tema)
+4. Zero JavaScript. Tudo em português brasileiro.
+5. Conteúdo COMPLETO e REAL — nunca use "Lorem ipsum" ou placeholders
+6. Mínimo 5 páginas, máximo 20 páginas
+
+DESIGN:
+- Capa: gradiente escuro impactante, título grande, emoji/ícone relevante, stats do conteúdo
+- Páginas internas: branco ou levemente colorido, cards visuais, ícones, tipografia clara
+- Paleta coerente com o tema (tons frios para tech, quentes para culinária, etc.)
+- Bordas arredondadas, separadores, hierarquia visual clara — design profissional real
+
+Responda APENAS com o HTML completo começando com <!DOCTYPE html> e terminando com </html>. Sem explicação.`;
+
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: descricao.trim() }
+          ],
+          max_tokens: 16000,
+          temperature: 0.7,
+        });
+
+        setProgress(60, "Renderizando PDF com Puppeteer...");
+        const html = completion.choices[0].message.content.trim()
+          .replace(/^```html\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/, "");
+
+        const puppeteer = require("puppeteer");
+        const browser = await puppeteer.launch({ headless: "new", args: ["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage"] });
+        const page = await browser.newPage();
+        await page.setContent(html, { waitUntil: "networkidle0", timeout: 30000 });
+        const buffer = await page.pdf({ format: "A4", printBackground: true, margin: { top:0,right:0,bottom:0,left:0 } });
+        const pageCount = await page.evaluate(() => document.querySelectorAll(".pg").length);
+        await browser.close();
+
+        setProgress(95, "Finalizando...");
+
+        const j = aiPdfJobs.get(jobId);
+        aiPdfJobs.set(jobId, { ...j, status: "done", progress: 100, message: "Pronto!", pdf: buffer, pageCount, descricao: descricao.trim().slice(0, 80) });
+      })
+      .catch(e => {
+        const j = aiPdfJobs.get(jobId);
+        aiPdfJobs.set(jobId, { ...j, status: "error", message: e.message });
+      })
+      .finally(() => clearTimeout(TIMEOUT));
+  });
+
+  app.get("/api/nexuspdf/ai-progress/:jobId", (req, res) => {
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.flushHeaders();
+
+    const send = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
+    const iv = setInterval(() => {
+      const j = aiPdfJobs.get(req.params.jobId);
+      if (!j) { send({ status: "error", message: "Job não encontrado." }); clearInterval(iv); res.end(); return; }
+      send({ status: j.status, progress: j.progress, message: j.message, pageCount: j.pageCount });
+      if (j.status !== "running") { clearInterval(iv); setTimeout(() => res.end(), 200); }
+    }, 600);
+
+    req.on("close", () => clearInterval(iv));
+  });
+
+  app.get("/api/nexuspdf/ai-download/:jobId", (req, res) => {
+    const j = aiPdfJobs.get(req.params.jobId);
+    if (!j || j.status !== "done" || !j.pdf) return res.status(404).json({ error: "PDF não disponível." });
+    const slug = (j.descricao || "nexus-ai").replace(/[^a-zA-Z0-9À-ɏ]/g, "-").slice(0, 40);
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${slug}-${Date.now()}.pdf"`);
+    res.send(j.pdf);
+  });
 })();
 
 // ──────────────────────────────────────────

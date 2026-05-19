@@ -1116,14 +1116,69 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
   <!-- NEXUSPDF ADM -->
   <div id="view-nexuspdf" class="view">
     <div class="topbar">
-      <span class="topbar-icon">📄</span>
-      <div><div class="topbar-title">NexusPDF — Gerador de Entregáveis</div><div class="topbar-desc">Motor HTML+Puppeteer · Templates prontos · Gerar e baixar PDF</div></div>
+      <span class="topbar-icon">✦</span>
+      <div><div class="topbar-title">Fábrica de PDFs</div><div class="topbar-desc">Descreva para MAX · Qualquer nicho · Puppeteer renderiza · PDF pronto</div></div>
       <div class="topbar-spacer"></div>
-      <span class="topbar-badge" style="color:#a855f7;border-color:rgba(168,85,247,.3)" id="npdf-badge">$0,00 hoje</span>
+      <!-- TAB BAR -->
+      <div style="display:flex;gap:2px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:3px">
+        <button id="npdf-tab-ai" onclick="npdfSwitchTab('ai')" style="font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;padding:5px 14px;border-radius:7px;border:none;background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;cursor:pointer;white-space:nowrap">✦ Criar com MAX</button>
+        <button id="npdf-tab-tmpl" onclick="npdfSwitchTab('tmpl')" style="font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;padding:5px 14px;border-radius:7px;border:none;background:transparent;color:var(--text-2);cursor:pointer;white-space:nowrap">📄 Templates</button>
+      </div>
     </div>
-    <div class="overview-scroll">
 
-      <!-- STATS ROW -->
+    <!-- ── TAB: CRIAR COM MAX ── -->
+    <div id="npdf-panel-ai" class="overview-scroll">
+
+      <!-- HERO INPUT -->
+      <div class="card" style="padding:28px;margin-bottom:20px;background:linear-gradient(135deg,rgba(168,85,247,0.08),rgba(99,102,241,0.06));border-color:rgba(168,85,247,0.2)">
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#a855f7;margin-bottom:10px">✦ Descreva o produto</div>
+        <textarea id="npdf-ai-input" placeholder="Ex: Crie um kit de meditação para iniciantes com 10 técnicas práticas, visual zen com tons azuis e verdes, guia de respiração, registro diário de progresso..." style="width:100%;background:var(--surface);border:1px solid rgba(168,85,247,0.25);border-radius:10px;color:var(--text);font-size:13px;padding:14px 16px;font-family:'Outfit',sans-serif;resize:vertical;min-height:90px;line-height:1.6;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='rgba(168,85,247,0.5)'" onblur="this.style.borderColor='rgba(168,85,247,0.25)'"></textarea>
+
+        <!-- SUGESTÕES -->
+        <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;margin-bottom:18px">
+          <span style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);align-self:center">Ideias:</span>
+          <button onclick="npdfSuggest(this)" data-txt="Kit de meditação para iniciantes com 10 técnicas práticas, visual zen com tons azuis e verdes" style="font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-2);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#a855f7';this.style.color='#a855f7'" onmouseout="this.style.borderColor='';this.style.color=''">🧘 Meditação</button>
+          <button onclick="npdfSuggest(this)" data-txt="Guia de alimentação saudável com 30 receitas low-carb, tabela nutricional, lista de compras semanal e dicas de meal prep" style="font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-2);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#a855f7';this.style.color='#a855f7'" onmouseout="this.style.borderColor='';this.style.color=''">🥗 Receitas</button>
+          <button onclick="npdfSuggest(this)" data-txt="Plano de treino 30 dias para iniciantes sem academia, com exercícios em casa, progressão semanal, dicas de descanso e alimentação" style="font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-2);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#a855f7';this.style.color='#a855f7'" onmouseout="this.style.borderColor='';this.style.color=''">💪 Treino</button>
+          <button onclick="npdfSuggest(this)" data-txt="E-book de copywriting com 10 fórmulas de copy comprovadas, exemplos reais, templates de anúncios e headlines para redes sociais" style="font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-2);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#a855f7';this.style.color='#a855f7'" onmouseout="this.style.borderColor='';this.style.color=''">✍️ Copywriting</button>
+          <button onclick="npdfSuggest(this)" data-txt="Planner financeiro pessoal com controle de receitas e despesas, metas mensais, gráfico de progresso, dicas de investimento inicial" style="font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-2);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#a855f7';this.style.color='#a855f7'" onmouseout="this.style.borderColor='';this.style.color=''">💰 Finanças</button>
+          <button onclick="npdfSuggest(this)" data-txt="Guia de vendas no WhatsApp com scripts prontos, técnicas de abordagem, objeções comuns e como fechar mais negócios" style="font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-2);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#a855f7';this.style.color='#a855f7'" onmouseout="this.style.borderColor='';this.style.color=''">📱 Vendas</button>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:12px">
+          <button onclick="aiCriarPDF()" id="npdf-ai-btn" style="font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;padding:12px 28px;border-radius:10px;border:none;background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s;letter-spacing:0.2px">
+            <span style="font-size:16px">✦</span> Criar com MAX
+          </button>
+          <div id="npdf-ai-hint" style="font-size:11px;color:var(--text-3)">MAX vai gerar o PDF completo — leva ~30 segundos</div>
+        </div>
+      </div>
+
+      <!-- PROGRESS -->
+      <div id="npdf-ai-progress-wrap" style="display:none;margin-bottom:20px">
+        <div class="card" style="padding:20px;border-color:rgba(168,85,247,0.2)">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+            <div id="npdf-ai-spinner" style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(168,85,247,0.2);border-top-color:#a855f7;animation:spin 0.8s linear infinite;flex-shrink:0"></div>
+            <div id="npdf-ai-progress-msg" style="font-size:13px;color:var(--text-2)">Iniciando MAX...</div>
+          </div>
+          <div style="background:var(--surface);border-radius:4px;height:4px;overflow:hidden">
+            <div id="npdf-ai-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#a855f7,#6366f1);border-radius:4px;transition:width .4s ease"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTADO -->
+      <div id="npdf-ai-result" style="display:none;margin-bottom:20px"></div>
+
+      <!-- HISTÓRICO AI -->
+      <div class="section-heading" style="margin-bottom:10px">Criados com MAX nesta sessão</div>
+      <div id="npdf-ai-history" style="display:flex;flex-direction:column;gap:8px">
+        <div style="color:var(--text-3);font-size:12px;padding:8px 0">Nenhum PDF criado ainda.</div>
+      </div>
+    </div>
+
+    <!-- ── TAB: TEMPLATES ── -->
+    <div id="npdf-panel-tmpl" class="overview-scroll" style="display:none">
+
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
         <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:6px">
           <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-2)">Hoje</div>
@@ -1147,13 +1202,11 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
         </div>
       </div>
 
-      <!-- TEMPLATE GALLERY -->
       <div class="section-heading" style="margin-bottom:12px">Escolha o Template</div>
       <div id="npdf-gallery" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:24px">
         <div style="color:var(--text-3);font-size:12px;padding:20px">Carregando templates...</div>
       </div>
 
-      <!-- GENERATOR PANEL -->
       <div id="npdf-gen-panel" style="display:none">
         <div class="section-heading" style="margin-bottom:12px">Personalizar: <span id="npdf-tmpl-name" style="color:#a855f7"></span></div>
         <div class="card" style="padding:20px;margin-bottom:20px">
@@ -1168,12 +1221,10 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
         </div>
       </div>
 
-      <!-- RECENT -->
       <div class="section-heading" style="margin-bottom:12px">Gerados Recentemente</div>
       <div id="npdf-recent" style="display:flex;flex-direction:column;gap:8px">
         <div style="color:var(--text-3);font-size:12px;padding:12px 0">Nenhum documento gerado ainda nesta sessão.</div>
       </div>
-
     </div>
   </div>
 
@@ -2990,6 +3041,129 @@ if(localStorage.getItem('nxs_sb_collapsed')==='1') document.getElementById('side
   let npdfTemplates = [];
   let npdfSelected  = null;
   let npdfSession   = [];
+  let aiSession     = [];
+
+  // ── TAB SWITCHING ──────────────────────────────
+  window.npdfSwitchTab = function(tab) {
+    document.getElementById('npdf-panel-ai').style.display   = tab === 'ai'   ? 'flex' : 'none';
+    document.getElementById('npdf-panel-tmpl').style.display = tab === 'tmpl' ? 'flex' : 'none';
+    const btnAi   = document.getElementById('npdf-tab-ai');
+    const btnTmpl = document.getElementById('npdf-tab-tmpl');
+    if (tab === 'ai') {
+      btnAi.style.background = 'linear-gradient(135deg,#a855f7,#7c3aed)';
+      btnAi.style.color = '#fff';
+      btnTmpl.style.background = 'transparent';
+      btnTmpl.style.color = 'var(--text-2)';
+    } else {
+      btnTmpl.style.background = 'linear-gradient(135deg,#a855f7,#7c3aed)';
+      btnTmpl.style.color = '#fff';
+      btnAi.style.background = 'transparent';
+      btnAi.style.color = 'var(--text-2)';
+    }
+  };
+
+  // ── SUGESTÕES ──────────────────────────────────
+  window.npdfSuggest = function(btn) {
+    document.getElementById('npdf-ai-input').value = btn.dataset.txt;
+    document.getElementById('npdf-ai-input').focus();
+  };
+
+  // ── AI CRIAR PDF ───────────────────────────────
+  window.aiCriarPDF = async function() {
+    const descricao = document.getElementById('npdf-ai-input').value.trim();
+    if (!descricao) {
+      document.getElementById('npdf-ai-hint').textContent = '⚠️ Descreva o produto primeiro.';
+      document.getElementById('npdf-ai-hint').style.color = '#f87171';
+      setTimeout(() => {
+        document.getElementById('npdf-ai-hint').textContent = 'MAX vai gerar o PDF completo — leva ~30 segundos';
+        document.getElementById('npdf-ai-hint').style.color = 'var(--text-3)';
+      }, 2000);
+      return;
+    }
+
+    const btn = document.getElementById('npdf-ai-btn');
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+
+    const progressWrap = document.getElementById('npdf-ai-progress-wrap');
+    const progressMsg  = document.getElementById('npdf-ai-progress-msg');
+    const progressBar  = document.getElementById('npdf-ai-progress-bar');
+    const resultEl     = document.getElementById('npdf-ai-result');
+
+    progressWrap.style.display = 'block';
+    resultEl.style.display = 'none';
+    progressMsg.textContent = 'Iniciando MAX...';
+    progressBar.style.width = '5%';
+
+    try {
+      const { jobId } = await fetch('/api/nexuspdf/ai-criar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ descricao }),
+      }).then(r => r.json());
+
+      await new Promise((resolve, reject) => {
+        const es = new EventSource(`/api/nexuspdf/ai-progress/${jobId}`);
+        es.onmessage = (e) => {
+          const d = JSON.parse(e.data);
+          progressMsg.textContent = d.message || '...';
+          progressBar.style.width = (d.progress || 0) + '%';
+          if (d.status === 'done') {
+            es.close();
+            resolve(d);
+          } else if (d.status === 'error') {
+            es.close();
+            reject(new Error(d.message || 'Erro desconhecido'));
+          }
+        };
+        es.onerror = () => { es.close(); reject(new Error('Conexão perdida')); };
+      });
+
+      // Sucesso — cria card de download
+      const ts = Date.now();
+      const slug = descricao.slice(0, 40).replace(/[^a-zA-Z0-9À-ɏ]/g, '-');
+      const downloadUrl = `/api/nexuspdf/ai-download/${jobId}`;
+      aiSession.unshift({ descricao, downloadUrl, slug, ts });
+      renderAiHistory();
+
+      resultEl.innerHTML = `
+        <div class="card" style="padding:20px;border-color:rgba(16,185,129,0.3);background:rgba(16,185,129,0.05);display:flex;align-items:center;gap:16px">
+          <div style="font-size:36px">✅</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">PDF criado com sucesso!</div>
+            <div style="font-size:12px;color:var(--text-3);line-height:1.5">${descricao.slice(0,80)}${descricao.length>80?'...':''}</div>
+          </div>
+          <a href="${downloadUrl}" download="${slug}-${ts}.pdf" style="font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;padding:10px 22px;border-radius:10px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;text-decoration:none;white-space:nowrap;flex-shrink:0;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">⬇ Baixar PDF</a>
+        </div>`;
+      resultEl.style.display = 'block';
+      progressWrap.style.display = 'none';
+
+    } catch(e) {
+      progressMsg.textContent = '❌ ' + e.message;
+      progressMsg.style.color = '#f87171';
+      progressBar.style.background = '#f87171';
+    } finally {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+    }
+  };
+
+  function renderAiHistory() {
+    const el = document.getElementById('npdf-ai-history');
+    if (!aiSession.length) {
+      el.innerHTML = '<div style="color:var(--text-3);font-size:12px;padding:8px 0">Nenhum PDF criado ainda.</div>';
+      return;
+    }
+    el.innerHTML = aiSession.map(e => `
+      <div style="display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px">
+        <span style="font-size:20px">✦</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.descricao.slice(0,60)}${e.descricao.length>60?'...':''}</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:2px">${new Date(e.ts).toLocaleTimeString('pt-BR')}</div>
+        </div>
+        <a href="${e.downloadUrl}" download="${e.slug}-${e.ts}.pdf" style="font-size:11px;font-weight:600;padding:7px 16px;border-radius:8px;background:rgba(168,85,247,0.15);color:#a855f7;border:1px solid rgba(168,85,247,0.3);text-decoration:none;white-space:nowrap;flex-shrink:0">⬇ Baixar</a>
+      </div>`).join('');
+  }
 
   let _npdfInited = false;
   window.npdfInit = async function() {
