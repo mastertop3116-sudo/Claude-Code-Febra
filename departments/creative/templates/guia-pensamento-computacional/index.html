@@ -191,7 +191,7 @@
     padding: 20px 32px 16px;
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
+    gap: 14px;
     overflow: hidden;
   }
 
@@ -259,39 +259,67 @@
   }
 
   /* Exemplos do dia a dia */
-  .examples-section { flex: 1; display: flex; flex-direction: column; min-height: 0; max-height: 420px; }
+  .examples-section { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 
   .examples-label {
     font-size: 12px;
     font-weight: 800;
     letter-spacing: 2px;
     text-transform: uppercase;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     opacity: 0.6;
+    flex-shrink: 0;
   }
 
   .examples-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    grid-template-rows: 1fr 1fr;
+    gap: 10px;
     flex: 1;
+    min-height: 0;
   }
 
   .example-item {
-    border-radius: 12px;
-    padding: 14px 10px;
+    border-radius: 18px;
+    padding: 16px 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    font-size: 14px;
-    font-weight: 700;
+    gap: 10px;
     text-align: center;
-    min-height: 0;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--bg), var(--bg2)) !important;
   }
 
-  .example-item span:first-child { font-size: 36px; flex-shrink: 0; line-height: 1; }
+  .example-item::before {
+    content: '';
+    position: absolute;
+    width: 140px;
+    height: 140px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+    bottom: -40px;
+    right: -30px;
+    pointer-events: none;
+  }
+
+  .example-item::after {
+    content: '';
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 50%;
+    top: -20px;
+    left: -10px;
+    pointer-events: none;
+  }
+
+  .example-item span:first-child { font-size: 52px; flex-shrink: 0; line-height: 1; position: relative; z-index: 1; }
+  .example-item span:last-child { font-size: 14px; font-weight: 800; color: #fff; line-height: 1.3; position: relative; z-index: 1; }
 
   /* Caixa "Pergunta para a turma" */
   .class-question {
@@ -360,7 +388,7 @@
   .kid-def-text { color: var(--dark); }
 
   .examples-label { color: var(--bg); }
-  .example-item { background: var(--mid); color: var(--dark); }
+  .example-item { color: #fff; }
 
   .class-question { background: var(--mid); }
   .question-label { color: var(--bg2); }
@@ -794,7 +822,7 @@
       <span class="concept-pill" style="background:#e84393">🍰 Algoritmo</span>
       <span class="concept-pill" style="background:#ff6d00">👕 Sequência</span>
       <span class="concept-pill" style="background:#7b1fa2">🎲 Lógica</span>
-      <span class="concept-pill" style="background:#c62828">🔍 Depuração</span>
+      <span class="concept-pill" style="background:#c62828">🔄 Repetição</span>
       <span class="concept-pill" style="background:#2e7d32">🐜 Padrão</span>
       <span class="concept-pill" style="background:#f57f17">🥪 Decomposição</span>
     </div>
@@ -874,7 +902,7 @@
         <div class="howto-concept-chip" style="background:#e84393">🍰 Algoritmo</div>
         <div class="howto-concept-chip" style="background:#ff6d00">👕 Sequência</div>
         <div class="howto-concept-chip" style="background:#7b1fa2">🎲 Lógica</div>
-        <div class="howto-concept-chip" style="background:#c62828">🔍 Depuração</div>
+        <div class="howto-concept-chip" style="background:#c62828">🔄 Repetição</div>
         <div class="howto-concept-chip" style="background:#2e7d32">🐜 Padrão</div>
         <div class="howto-concept-chip" style="background:#f57f17">🥪 Decompos.</div>
       </div>
@@ -1100,9 +1128,9 @@
     <div class="concept-number">4</div>
     <div class="concept-header-text">
       <div class="concept-label">Conceito 4 de 6</div>
-      <div class="concept-name">Depuração</div>
+      <div class="concept-name">Repetição</div>
     </div>
-    <div class="concept-emoji-big">🔍</div>
+    <div class="concept-emoji-big">🔄</div>
   </div>
 
   <svg class="wave-divider" viewBox="0 0 840 40" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
@@ -1113,38 +1141,38 @@
   <div class="concept-body">
 
     <div class="analogy-card">
-      <div class="analogy-icon">🕵️</div>
+      <div class="analogy-icon">🦷</div>
       <div class="analogy-text">
         <div class="analogy-label">Analogia do dia a dia</div>
-        <div class="analogy-title">É como achar o erro num caça-palavras!</div>
+        <div class="analogy-title">É como escovar os dentes todo dia!</div>
         <div class="analogy-desc">
-          Você procura "GATO" no caça-palavras mas não encontra. O que faz? Olha de novo, linha por linha, com atenção. Quando acha, entende onde estava o erro. <strong>Depuração é exatamente isso: encontrar e corrigir os erros num programa ou numa sequência de passos.</strong>
+          Você escova os dentes de manhã, à tarde e à noite — todos os dias. Não precisa pensar: é automático! <strong>Repetição é quando mandamos o computador fazer a mesma coisa várias vezes sem precisar escrever tudo de novo.</strong>
         </div>
       </div>
     </div>
 
     <div class="kid-def">
-      <div class="kid-def-label">O que é Depuração?</div>
+      <div class="kid-def-label">O que é Repetição?</div>
       <div class="kid-def-text">
-        "Depuração (ou debug) é encontrar os erros num código ou numa instrução e corrigi-los. Todo programador depura — errar faz parte do processo!"
+        "Repetição é quando um passo se repete várias vezes seguidas. No computador, isso se chama 'loop' — ele faz a mesma coisa até a gente mandar parar!"
       </div>
     </div>
 
     <div class="examples-section">
-      <div class="examples-label">Depuração na vida real</div>
+      <div class="examples-label">Repetição na vida real</div>
       <div class="examples-grid">
-        <div class="example-item"><span>📝</span><span>Revisar a prova antes de entregar</span></div>
-        <div class="example-item"><span>🧩</span><span>Descobrir por que uma peça de puzzle não encaixa</span></div>
-        <div class="example-item"><span>🍝</span><span>Provar o macarrão pra ver se tem sal</span></div>
-        <div class="example-item"><span>🔧</span><span>Encontrar por que o brinquedo parou</span></div>
+        <div class="example-item"><span>🏃</span><span>Dar voltas na quadra correndo</span></div>
+        <div class="example-item"><span>🌊</span><span>As ondas do mar chegando na praia</span></div>
+        <div class="example-item"><span>📅</span><span>O fim de semana que volta toda semana</span></div>
+        <div class="example-item"><span>🎵</span><span>O refrão da música que repete várias vezes</span></div>
       </div>
     </div>
 
     <div class="class-question">
-      <div class="question-icon">🚨</div>
+      <div class="question-icon">🎯</div>
       <div>
-        <div class="question-label">Desafio: ache o erro!</div>
-        <div class="question-text">"Vou ler os passos para fazer um copo de suco. Quando você ouvir o erro, levante a mão! — 1. Pegue o copo. 2. Beba o suco. 3. Coloque o suco no copo. 4. Misture. Achou?"</div>
+        <div class="question-label">Desafio: vamos repetir!</div>
+        <div class="question-text">"De pé! Todos juntos: bata palma 3 vezes — 1, 2, 3. Agora repita mais 3 vezes. Isso é repetição! O computador faz exatamente assim, só que muito mais rápido."</div>
       </div>
     </div>
 
@@ -1152,7 +1180,7 @@
 
   <div class="concept-footer">
     <span>{{escola}} · {{professor}}</span>
-    <span>Pensamento Computacional — Depuração</span>
+    <span>Pensamento Computacional — Repetição</span>
     <span>6 / 10</span>
   </div>
 </div>
@@ -1427,10 +1455,10 @@
         </div>
 
         <div class="glossario-item" style="background:#ffebee;border-left:5px solid #c62828">
-          <div class="glossario-emoji">🔍</div>
+          <div class="glossario-emoji">🔄</div>
           <div class="glossario-concept">
-            <div class="glossario-concept-name" style="color:#7f0000">Depuração</div>
-            <div class="glossario-concept-def">Encontrar e corrigir os erros num plano ou processo.</div>
+            <div class="glossario-concept-name" style="color:#7f0000">Repetição</div>
+            <div class="glossario-concept-def">Fazer a mesma coisa várias vezes seguidas. No computador, isso se chama "loop".</div>
           </div>
         </div>
 
