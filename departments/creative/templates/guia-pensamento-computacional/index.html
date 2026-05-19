@@ -514,6 +514,243 @@
     color: #999;
   }
 
+  /* ── ROTEIRO DA 1ª AULA ──────────────────────────────── */
+  .pg-roteiro { background: #fff; padding: 0; }
+
+  .roteiro-body {
+    flex: 1;
+    padding: 16px 32px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: hidden;
+  }
+
+  .roteiro-intro {
+    background: #f0f4ff;
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a1a2e;
+    flex-shrink: 0;
+    font-style: italic;
+  }
+
+  .roteiro-block {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .roteiro-time {
+    flex-shrink: 0;
+    color: #fff;
+    font-weight: 800;
+    font-size: 12px;
+    border-radius: 10px;
+    padding: 6px 10px;
+    text-align: center;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    letter-spacing: 1px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .roteiro-content {
+    flex: 1;
+    background: #f8f9fa;
+    border-radius: 14px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+  }
+
+  .roteiro-title {
+    font-weight: 800;
+    font-size: 13px;
+    color: #1a1a2e;
+  }
+
+  .roteiro-speech {
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    line-height: 1.5;
+    border-left: 4px solid #e0e0e0;
+  }
+
+  .roteiro-tip {
+    background: #fff8e1;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #e65100;
+    line-height: 1.4;
+  }
+
+  .roteiro-faq {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .roteiro-faq-item {
+    background: #fff;
+    border-radius: 10px;
+    padding: 8px 12px;
+  }
+
+  .roteiro-faq-q {
+    font-size: 12px;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin-bottom: 3px;
+  }
+
+  .roteiro-faq-a {
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+    line-height: 1.4;
+  }
+
+  /* ── GLOSSÁRIO DO ALUNO ───────────────────────────────── */
+  .pg-glossario { background: #f5f5f5; padding: 0; }
+
+  .glossario-outer {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 24px 12px;
+    gap: 14px;
+    overflow: hidden;
+  }
+
+  .glossario-card {
+    flex: 1;
+    background: #fff;
+    border-radius: 20px;
+    border: 3px dashed #bbb;
+    padding: 20px 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: hidden;
+  }
+
+  .glossario-header {
+    flex-shrink: 0;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 12px;
+  }
+
+  .glossario-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 24px;
+    color: #1a1a2e;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+
+  .glossario-title span {
+    background: linear-gradient(90deg, #e84393, #7b1fa2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .glossario-name-row {
+    display: flex;
+    gap: 24px;
+  }
+
+  .glossario-name-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+  }
+
+  .glossario-name-label {
+    font-size: 13px;
+    font-weight: 800;
+    color: #555;
+    white-space: nowrap;
+  }
+
+  .glossario-name-line {
+    flex: 1;
+    border-bottom: 2px solid #ccc;
+    height: 20px;
+  }
+
+  .glossario-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    min-height: 0;
+  }
+
+  .glossario-item {
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .glossario-emoji {
+    font-size: 28px;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .glossario-concept-name {
+    font-family: 'Fredoka One', cursive;
+    font-size: 16px;
+    margin-bottom: 3px;
+  }
+
+  .glossario-concept-def {
+    font-size: 12px;
+    font-weight: 600;
+    color: #444;
+    line-height: 1.4;
+  }
+
+  .glossario-footer-note {
+    flex-shrink: 0;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #777;
+    border-top: 2px dashed #ddd;
+    padding-top: 10px;
+  }
+
+  .glossario-teacher-note {
+    flex-shrink: 0;
+    background: #e3f2fd;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #0d47a1;
+    line-height: 1.5;
+  }
+
   /* ── IMPRESSÃO PB (media print grayscale) ─────────────── */
   @media print {
     .pg-cover { background: #111 !important; }
@@ -652,7 +889,7 @@
   <div class="howto-footer">
     <span>{{escola}} · {{professor}}</span>
     <span>Como Usar Este Guia</span>
-    <span>2 / 8</span>
+    <span>2 / 10</span>
   </div>
 </div>
 
@@ -718,7 +955,7 @@
   <div class="concept-footer">
     <span>{{escola}} · {{professor}}</span>
     <span>Pensamento Computacional — Algoritmo</span>
-    <span>3 / 8</span>
+    <span>3 / 10</span>
   </div>
 </div>
 
@@ -784,7 +1021,7 @@
   <div class="concept-footer">
     <span>{{escola}} · {{professor}}</span>
     <span>Pensamento Computacional — Sequência</span>
-    <span>4 / 8</span>
+    <span>4 / 10</span>
   </div>
 </div>
 
@@ -850,7 +1087,7 @@
   <div class="concept-footer">
     <span>{{escola}} · {{professor}}</span>
     <span>Pensamento Computacional — Lógica</span>
-    <span>5 / 8</span>
+    <span>5 / 10</span>
   </div>
 </div>
 
@@ -916,7 +1153,7 @@
   <div class="concept-footer">
     <span>{{escola}} · {{professor}}</span>
     <span>Pensamento Computacional — Depuração</span>
-    <span>6 / 8</span>
+    <span>6 / 10</span>
   </div>
 </div>
 
@@ -982,7 +1219,7 @@
   <div class="concept-footer">
     <span>{{escola}} · {{professor}}</span>
     <span>Pensamento Computacional — Padrão</span>
-    <span>7 / 8</span>
+    <span>7 / 10</span>
   </div>
 </div>
 
@@ -1048,8 +1285,191 @@
   <div class="concept-footer">
     <span>{{escola}} · {{professor}}</span>
     <span>Pensamento Computacional — Decomposição</span>
-    <span>8 / 8</span>
+    <span>8 / 10</span>
   </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  PÁGINA 9 — ROTEIRO DA 1ª AULA                        -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="pg pg-roteiro">
+
+  <div class="howto-header" style="background:linear-gradient(135deg,#1a1a2e,#0f3460)">
+    <div class="howto-header-icon">⏱️</div>
+    <div class="howto-header-text">
+      <div class="howto-header-label">Script pronto para ler</div>
+      <div class="howto-header-title">Roteiro da 1ª Aula</div>
+    </div>
+    <div style="margin-left:auto;background:rgba(255,255,255,0.12);border-radius:12px;padding:8px 18px;font-size:13px;font-weight:800;color:#fff;white-space:nowrap">20 minutos</div>
+  </div>
+
+  <svg viewBox="0 0 840 40" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="flex-shrink:0;display:block;width:100%;margin-top:-2px">
+    <path d="M0,0 L840,0 L840,20 Q630,45 420,25 Q210,5 0,30 Z" fill="#0f3460"/>
+    <path d="M0,30 Q210,5 420,25 Q630,45 840,20 L840,40 L0,40 Z" fill="#ffffff"/>
+  </svg>
+
+  <div class="roteiro-body">
+
+    <div class="roteiro-intro">
+      Leia em voz alta para a turma. Não precisa memorizar — é só seguir o roteiro.
+    </div>
+
+    <div class="roteiro-block">
+      <div class="roteiro-time" style="background:#e84393">0–5 min</div>
+      <div class="roteiro-content">
+        <div class="roteiro-title">Fala de abertura</div>
+        <div class="roteiro-speech">
+          "Hoje a gente vai aprender algo que programadores usam todo dia — mas sem precisar de computador. Isso se chama <strong>Pensamento Computacional</strong>. Parece difícil, mas vocês já fazem isso sem perceber. Quem já seguiu uma receita de bolo? Quem já se vestiu de manhã? Então vocês já sabem pensar computacionalmente!"
+        </div>
+      </div>
+    </div>
+
+    <div class="roteiro-block">
+      <div class="roteiro-time" style="background:#ff6d00">5–10 min</div>
+      <div class="roteiro-content">
+        <div class="roteiro-title">Dinâmica de engajamento</div>
+        <div class="roteiro-speech">
+          "Vou pedir para alguém me ensinar a fazer um sanduíche. Mas eu vou seguir <em>exatamente</em> o que vocês falarem."
+        </div>
+        <div class="roteiro-tip">Siga ao pé da letra — se a criança disser "põe o queijo", coloque o queijo em cima do pão fechado. A turma vai rir e entender na prática o que é algoritmo.</div>
+      </div>
+    </div>
+
+    <div class="roteiro-block">
+      <div class="roteiro-time" style="background:#7b1fa2">10–15 min</div>
+      <div class="roteiro-content">
+        <div class="roteiro-title">Apresentar os cartazes na parede</div>
+        <div class="roteiro-speech">
+          "Olhem para os cartazes. Cada um tem um conceito com um exemplo do dia a dia de vocês. Ao longo das próximas semanas, a gente vai explorar cada um."
+        </div>
+        <div class="roteiro-tip">Aponte para cada cartaz e leia só o título + a analogia. Peça 1 criança para dar um exemplo do dia dela para cada conceito.</div>
+      </div>
+    </div>
+
+    <div class="roteiro-block">
+      <div class="roteiro-time" style="background:#2e7d32">15–20 min</div>
+      <div class="roteiro-content">
+        <div class="roteiro-title">Responda as 3 perguntas mais comuns</div>
+        <div class="roteiro-faq">
+          <div class="roteiro-faq-item">
+            <div class="roteiro-faq-q">❓ "Por que aprender isso sem computador?"</div>
+            <div class="roteiro-faq-a">→ Porque pensar de forma organizada ajuda em tudo: matemática, redação, resolver problemas da vida. O computador é só uma ferramenta — o raciocínio é o que importa.</div>
+          </div>
+          <div class="roteiro-faq-item">
+            <div class="roteiro-faq-q">❓ "Isso é difícil?"</div>
+            <div class="roteiro-faq-a">→ Não! Escovar os dentes na ordem certa já é um algoritmo. Vocês já fazem isso todo dia.</div>
+          </div>
+          <div class="roteiro-faq-item">
+            <div class="roteiro-faq-q">❓ "Vai ter prova?"</div>
+            <div class="roteiro-faq-a">→ O que importa é aprender a pensar melhor. Isso vai ajudar em todas as matérias.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="howto-footer" style="color:#999">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Roteiro da 1ª Aula</span>
+    <span>9 / 10</span>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  PÁGINA 10 — GLOSSÁRIO DO ALUNO                       -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="pg pg-glossario">
+
+  <div class="glossario-outer">
+
+    <div class="glossario-card">
+
+      <div class="glossario-header">
+        <div class="glossario-title">Meu Glossário de<br><span>Pensamento Computacional</span></div>
+        <div class="glossario-name-row">
+          <div class="glossario-name-field">
+            <span class="glossario-name-label">Nome:</span>
+            <div class="glossario-name-line"></div>
+          </div>
+          <div class="glossario-name-field">
+            <span class="glossario-name-label">Turma:</span>
+            <div class="glossario-name-line"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glossario-grid">
+
+        <div class="glossario-item" style="background:#fce4ec;border-left:5px solid #e84393">
+          <div class="glossario-emoji">🧁</div>
+          <div class="glossario-concept">
+            <div class="glossario-concept-name" style="color:#880e4f">Algoritmo</div>
+            <div class="glossario-concept-def">Lista de passos na ordem certa para resolver um problema.</div>
+          </div>
+        </div>
+
+        <div class="glossario-item" style="background:#fff3e0;border-left:5px solid #ff6d00">
+          <div class="glossario-emoji">👕</div>
+          <div class="glossario-concept">
+            <div class="glossario-concept-name" style="color:#bf360c">Sequência</div>
+            <div class="glossario-concept-def">A ordem certa em que os passos precisam acontecer.</div>
+          </div>
+        </div>
+
+        <div class="glossario-item" style="background:#f3e5f5;border-left:5px solid #7b1fa2">
+          <div class="glossario-emoji">🎲</div>
+          <div class="glossario-concept">
+            <div class="glossario-concept-name" style="color:#38006b">Lógica</div>
+            <div class="glossario-concept-def">Usar o que você sabe para descobrir o que ainda não sabe.</div>
+          </div>
+        </div>
+
+        <div class="glossario-item" style="background:#ffebee;border-left:5px solid #c62828">
+          <div class="glossario-emoji">🔍</div>
+          <div class="glossario-concept">
+            <div class="glossario-concept-name" style="color:#7f0000">Depuração</div>
+            <div class="glossario-concept-def">Encontrar e corrigir os erros num plano ou processo.</div>
+          </div>
+        </div>
+
+        <div class="glossario-item" style="background:#e8f5e9;border-left:5px solid #2e7d32">
+          <div class="glossario-emoji">🐜</div>
+          <div class="glossario-concept">
+            <div class="glossario-concept-name" style="color:#1b5e20">Padrão</div>
+            <div class="glossario-concept-def">Repetições e regularidades que aparecem várias vezes.</div>
+          </div>
+        </div>
+
+        <div class="glossario-item" style="background:#fffde7;border-left:5px solid #f57f17">
+          <div class="glossario-emoji">🥪</div>
+          <div class="glossario-concept">
+            <div class="glossario-concept-name" style="color:#e65100">Decomposição</div>
+            <div class="glossario-concept-def">Dividir um problema grande em partes menores e mais fáceis.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="glossario-footer-note">
+        📌 Cole este glossário no seu caderno e consulte sempre que precisar!
+      </div>
+
+    </div>
+
+    <div class="glossario-teacher-note">
+      <strong>📋 Para a professora:</strong> Imprima esta página e distribua uma para cada aluno. Peça que recortem o glossário pela linha pontilhada e colem na primeira página do caderno de atividades.
+    </div>
+
+  </div>
+
+  <div class="howto-footer" style="color:#999">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Glossário do Aluno</span>
+    <span>10 / 10</span>
+  </div>
+
 </div>
 
 </body>
