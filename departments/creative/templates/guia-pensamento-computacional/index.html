@@ -188,10 +188,10 @@
   /* Corpo branco */
   .concept-body {
     flex: 1;
-    padding: 20px 32px 0;
+    padding: 20px 32px 16px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    justify-content: space-evenly;
     overflow: hidden;
   }
 
@@ -202,7 +202,7 @@
     display: flex;
     align-items: flex-start;
     gap: 18px;
-    flex: 3;
+    flex-shrink: 0;
   }
 
   .analogy-icon {
@@ -240,7 +240,7 @@
     border-radius: 16px;
     border-left: 6px solid;
     padding: 14px 18px;
-    flex: 1.5;
+    flex-shrink: 0;
   }
 
   .kid-def-label {
@@ -259,7 +259,7 @@
   }
 
   /* Exemplos do dia a dia */
-  .examples-section { flex: 2; display: flex; flex-direction: column; }
+  .examples-section { flex: 1; display: flex; flex-direction: column; min-height: 0; max-height: 420px; }
 
   .examples-label {
     font-size: 12px;
@@ -279,15 +279,19 @@
 
   .example-item {
     border-radius: 12px;
-    padding: 10px 14px;
+    padding: 14px 10px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 10px;
-    font-size: 13px;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
     font-weight: 700;
+    text-align: center;
+    min-height: 0;
   }
 
-  .example-item span:first-child { font-size: 22px; flex-shrink: 0; }
+  .example-item span:first-child { font-size: 36px; flex-shrink: 0; line-height: 1; }
 
   /* Caixa "Pergunta para a turma" */
   .class-question {
@@ -296,7 +300,7 @@
     display: flex;
     align-items: flex-start;
     gap: 14px;
-    flex: 1.5;
+    flex-shrink: 0;
   }
 
   .question-icon { font-size: 28px; flex-shrink: 0; }
