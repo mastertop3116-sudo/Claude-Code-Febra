@@ -1,0 +1,12 @@
+{
+  "nome": "Despluga Avançado — Lógica, Algoritmos e Cultura Digital",
+  "nicho": "Educação / Kit Despluga",
+  "layout": "portrait",
+  "paginas": 27,
+  "descricao": "27 páginas A4 — 30 atividades para 6° ano ao Ensino Médio + guia de aplicação + 10 roteiros visuais + ficha de avaliação + guia para família",
+  "vars": [
+    { "id": "escola", "label": "Nome da Escola", "default": "Escola Estadual" },
+    { "id": "professor", "label": "Nome do Professor", "default": "Professor(a)" },
+    { "id": "ano", "label": "Ano / Turma", "default": "8° Ano" }
+  ]
+}

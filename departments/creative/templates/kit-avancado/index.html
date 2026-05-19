@@ -1,0 +1,2073 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Despluga Avançado — Lógica, Algoritmos e Cultura Digital</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+* { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; margin: 0; padding: 0; }
+
+body { font-family: 'Nunito', sans-serif; background: #e2e8f0; }
+
+.pg {
+  width: 794px;
+  min-height: 1123px;
+  background: #fff;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  page-break-after: always;
+  margin: 0 auto 20px;
+}
+
+/* ── PALETA GERAL ── */
+:root {
+  --adv-azul: #0EA5E9;
+  --adv-roxo: #8B5CF6;
+  --adv-verde: #10B981;
+  --adv-amber: #F59E0B;
+  --adv-vermelho: #EF4444;
+  --adv-rosa: #EC4899;
+  --adv-navy: #0c1a2e;
+  --adv-navy2: #0a1628;
+  --bg-suave: #F8FAFC;
+  --borda: #E2E8F0;
+  --texto: #1E293B;
+  --texto-leve: #64748B;
+}
+
+/* ══════════════════════════════════════════════
+   CAPA
+══════════════════════════════════════════════ */
+.pg-capa {
+  background: linear-gradient(160deg, #0c1a2e 0%, #0a1628 55%, #0c2340 100%);
+  justify-content: space-between;
+  align-items: center;
+}
+
+.capa-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(14,165,233,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14,165,233,0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+.capa-glow {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(14,165,233,0.12) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.capa-topo {
+  width: 100%;
+  padding: 28px 40px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.capa-badge {
+  background: rgba(14,165,233,0.15);
+  border: 1px solid rgba(14,165,233,0.35);
+  color: #7DD3FC;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  padding: 6px 16px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+.capa-nivel {
+  background: rgba(139,92,246,0.18);
+  border: 1px solid rgba(139,92,246,0.4);
+  color: #C4B5FD;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 16px;
+  border-radius: 20px;
+}
+
+.capa-centro {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 40px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.capa-icone-principal {
+  font-size: 72px;
+  line-height: 1;
+  margin-bottom: 18px;
+  width: 140px;
+  height: 140px;
+  background: rgba(14,165,233,0.15);
+  border: 2px solid rgba(14,165,233,0.3);
+  border-radius: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 60px rgba(14,165,233,0.1), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.capa-subtag {
+  background: rgba(16,185,129,0.18);
+  border: 1px solid rgba(16,185,129,0.4);
+  color: #6EE7B7;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  padding: 5px 16px;
+  border-radius: 20px;
+  margin-bottom: 18px;
+  text-transform: uppercase;
+}
+
+.capa-titulo {
+  font-family: 'Fredoka One', cursive;
+  font-size: 50px;
+  color: #fff;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+
+.capa-titulo span { color: var(--adv-azul); }
+
+.capa-subtitulo {
+  font-size: 15px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.6;
+  max-width: 500px;
+  margin-bottom: 28px;
+}
+
+.capa-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+
+.capa-chip {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.85);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.capa-destaque-box {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(14,165,233,0.25);
+  border-radius: 16px;
+  padding: 16px 32px;
+  display: flex;
+  gap: 32px;
+}
+
+.capa-stat { text-align: center; }
+.capa-stat-num {
+  font-family: 'JetBrains Mono', 'Fredoka One', monospace;
+  font-size: 32px;
+  color: var(--adv-azul);
+  font-weight: 700;
+}
+.capa-stat-label { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+.capa-rodape {
+  width: 100%;
+  padding: 16px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(14,165,233,0.15);
+  position: relative;
+  z-index: 1;
+}
+
+.capa-rodape span { font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 600; }
+.capa-rodape strong { color: rgba(255,255,255,0.7); }
+
+/* ══════════════════════════════════════════════
+   COMO USAR
+══════════════════════════════════════════════ */
+.pg-como-usar { background: #fff; }
+
+.secao-header {
+  background: linear-gradient(135deg, var(--adv-navy), var(--adv-navy2));
+  padding: 28px 40px 24px;
+}
+
+.secao-header-sub { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.45); text-transform: uppercase; margin-bottom: 6px; }
+.secao-header-titulo { font-family: 'Fredoka One', cursive; font-size: 34px; color: #fff; display: flex; align-items: center; gap: 12px; }
+.secao-header-titulo span { font-size: 30px; }
+
+.wave-sep {
+  width: 100%;
+  height: 32px;
+  display: block;
+}
+
+.secao-corpo {
+  flex: 1;
+  padding: 16px 40px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: hidden;
+}
+
+.intro-box {
+  background: #EFF6FF;
+  border-left: 4px solid var(--adv-azul);
+  border-radius: 0 12px 12px 0;
+  padding: 14px 18px;
+  font-size: 13px;
+  color: var(--texto);
+  line-height: 1.6;
+}
+.intro-box strong { color: var(--adv-azul); }
+
+.passo-lista { display: flex; flex-direction: column; gap: 10px; }
+
+.passo-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.passo-num {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 14px;
+  color: #fff;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.passo-texto-titulo { font-size: 13px; font-weight: 800; color: var(--texto); margin-bottom: 2px; }
+.passo-texto-desc { font-size: 12px; color: var(--texto-leve); line-height: 1.5; }
+
+.aviso-avancado {
+  background: #FFFBEB;
+  border: 2px solid var(--adv-amber);
+  border-radius: 14px;
+  padding: 14px 18px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-top: 4px;
+}
+
+.aviso-avancado-icon { font-size: 24px; flex-shrink: 0; }
+.aviso-avancado-titulo { font-size: 13px; font-weight: 800; color: #92400E; margin-bottom: 4px; }
+.aviso-avancado-texto { font-size: 12px; color: #78350F; line-height: 1.5; }
+
+.pg-footer {
+  padding: 10px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--borda);
+  background: #fff;
+}
+
+.pg-footer span { font-size: 10px; color: var(--texto-leve); font-weight: 600; }
+
+/* ══════════════════════════════════════════════
+   PÁGINA 3 — INTRODUÇÃO AO PC AVANÇADO
+══════════════════════════════════════════════ */
+.pg-avancado-intro { background: #fff; }
+
+.intro-conceitos-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+.intro-conceito-card {
+  border-radius: 14px;
+  padding: 14px;
+  border: 2px solid;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.intro-conceito-icon { font-size: 24px; }
+.intro-conceito-nome { font-size: 13px; font-weight: 800; color: var(--texto); }
+.intro-conceito-def { font-size: 11px; color: var(--texto-leve); line-height: 1.4; }
+.intro-conceito-link { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: auto; }
+
+.habilidades-box {
+  border-radius: 14px;
+  padding: 14px 18px;
+  border: 2px solid #BEE3F8;
+  background: #EFF6FF;
+}
+.habilidades-titulo { font-size: 13px; font-weight: 800; color: #1E40AF; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.habilidades-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.habilidade-item { display: flex; gap: 8px; align-items: flex-start; }
+.habilidade-icon { font-size: 16px; flex-shrink: 0; }
+.habilidade-texto { font-size: 11px; line-height: 1.4; }
+.habilidade-texto strong { font-weight: 800; display: block; font-size: 11px; color: var(--texto); }
+
+/* ══════════════════════════════════════════════
+   ATIVIDADES
+══════════════════════════════════════════════ */
+.pg-atividades { background: var(--bg-suave); }
+
+.atividades-header {
+  padding: 20px 40px 14px;
+  background: linear-gradient(135deg, var(--adv-navy), var(--adv-navy2));
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.atividades-header-titulo { font-family: 'Fredoka One', cursive; font-size: 22px; color: #fff; }
+.atividades-header-sub { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 600; margin-top: 2px; }
+.atividades-bloco-tag {
+  background: rgba(14,165,233,0.2);
+  border: 1px solid rgba(14,165,233,0.35);
+  color: #7DD3FC;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.atividades-corpo {
+  flex: 1;
+  padding: 14px 40px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+}
+.atividade-card + .atividade-card {
+  border-top: 3px dashed #CBD5E0;
+  margin-top: 14px;
+  padding-top: 14px;
+}
+
+.atividade-card {
+  background: #fff;
+  border-radius: 18px;
+  border: 2px solid var(--borda);
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.atividade-topo {
+  padding: 12px 16px 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border-bottom: 2px solid var(--borda);
+}
+
+.atividade-num {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.atividade-info { flex: 1; }
+.atividade-nome { font-family: 'Fredoka One', cursive; font-size: 17px; color: var(--texto); margin-bottom: 3px; }
+.atividade-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+.atividade-tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.atividade-corpo {
+  flex: 1;
+  padding: 12px 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.atividade-col { display: flex; flex-direction: column; gap: 8px; }
+
+.atividade-secao-titulo {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--texto-leve);
+  margin-bottom: 2px;
+}
+
+.material-lista { display: flex; flex-direction: column; gap: 4px; }
+.material-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--texto);
+  font-weight: 600;
+}
+.material-item::before { content: '▸'; color: var(--adv-azul); font-size: 10px; }
+
+.passo-ativ { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 6px; }
+.passo-ativ-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 900;
+  color: #fff;
+  flex-shrink: 0;
+}
+.passo-ativ-texto { font-size: 12px; color: var(--texto); line-height: 1.4; font-weight: 600; }
+
+.dica-tea-box {
+  background: #F0F9FF;
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  border-left: 3px solid var(--adv-azul);
+}
+.dica-tea-label { font-size: 10px; font-weight: 800; color: #0369A1; display: block; margin-bottom: 2px; text-transform: uppercase; }
+.dica-tea-texto { font-size: 11px; color: #0C4A6E; line-height: 1.4; }
+
+.bncc-tag {
+  background: #EDE9FE;
+  border: 1px solid #C4B5FD;
+  border-radius: 8px;
+  padding: 5px 8px;
+  font-size: 10px;
+  color: #5B21B6;
+  font-weight: 700;
+}
+
+/* ══════════════════════════════════════════════
+   GUIA DE APLICAÇÃO
+══════════════════════════════════════════════ */
+.pg-adaptacao { background: #fff; }
+
+.adapt-intro {
+  background: linear-gradient(135deg, var(--adv-navy2), var(--adv-navy));
+  padding: 20px 40px 16px;
+}
+
+.adapt-intro-titulo { font-family: 'Fredoka One', cursive; font-size: 28px; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+.adapt-intro-desc { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.5; }
+
+.adapt-corpo { flex: 1; padding: 16px 40px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+
+.adapt-3-passos {
+  background: #F0F9FF;
+  border-radius: 16px;
+  padding: 16px 20px;
+  border: 2px solid #BAE6FD;
+}
+
+.adapt-3-titulo { font-size: 13px; font-weight: 800; color: #0369A1; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+.adapt-3-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+.adapt-passo-card { background: #fff; border-radius: 12px; padding: 12px; text-align: center; border: 2px solid #BAE6FD; }
+.adapt-passo-num { font-family: 'JetBrains Mono', 'Fredoka One', monospace; font-size: 28px; color: var(--adv-azul); font-weight: 700; }
+.adapt-passo-titulo { font-size: 12px; font-weight: 800; color: var(--texto); margin: 4px 0; }
+.adapt-passo-desc { font-size: 11px; color: var(--texto-leve); line-height: 1.4; }
+
+.adapt-tabela-titulo { font-size: 13px; font-weight: 800; color: var(--texto); display: flex; align-items: center; gap: 8px; }
+
+.adapt-tabela { width: 100%; border-collapse: collapse; border-radius: 12px; overflow: hidden; }
+.adapt-tabela th { background: var(--adv-navy); color: #fff; font-size: 11px; font-weight: 800; padding: 8px 12px; text-align: left; }
+.adapt-tabela td { font-size: 11px; color: var(--texto); padding: 8px 12px; border-bottom: 1px solid var(--borda); line-height: 1.4; vertical-align: top; }
+.adapt-tabela tr:nth-child(even) td { background: var(--bg-suave); }
+.adapt-tabela td:first-child { font-weight: 700; }
+
+.tag-funciona { background: #DCFCE7; color: #166534; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 8px; }
+.tag-adaptar  { background: #FEF9C3; color: #854D0E; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 8px; }
+.tag-evitar   { background: #FEE2E2; color: #991B1B; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 8px; }
+
+/* ══════════════════════════════════════════════
+   ROTEIROS VISUAIS
+══════════════════════════════════════════════ */
+.pg-roteiros { background: var(--bg-suave); }
+
+.roteiros-corpo { flex: 1; padding: 14px 40px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+
+.roteiro-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 2px solid var(--borda);
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.roteiro-topo {
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 2px solid var(--borda);
+}
+
+.roteiro-num { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 700; flex-shrink: 0; }
+.roteiro-nome { font-family: 'Fredoka One', cursive; font-size: 15px; color: var(--texto); }
+.roteiro-tipo { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: auto; }
+
+.roteiro-passos {
+  flex: 1;
+  padding: 10px 14px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.roteiro-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.roteiro-step-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  border: 2px solid var(--borda);
+}
+
+.roteiro-step-num { font-size: 10px; font-weight: 800; color: var(--texto-leve); }
+.roteiro-step-label { font-size: 10px; font-weight: 700; color: var(--texto); line-height: 1.3; }
+
+.roteiro-arrow { font-size: 18px; color: #CBD5E0; flex-shrink: 0; }
+
+/* ══════════════════════════════════════════════
+   FICHA DE AVALIAÇÃO
+══════════════════════════════════════════════ */
+.pg-ficha { background: #fff; }
+
+.ficha-corpo { flex: 1; padding: 16px 40px; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+
+.ficha-card {
+  background: var(--bg-suave);
+  border: 2px solid var(--borda);
+  border-radius: 16px;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.ficha-card-header {
+  background: linear-gradient(135deg, var(--adv-navy2), var(--adv-navy));
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ficha-card-titulo { font-family: 'Fredoka One', cursive; font-size: 15px; color: #fff; }
+.ficha-card-sub { font-size: 10px; color: rgba(255,255,255,0.5); font-weight: 600; }
+
+.ficha-aluno-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 12px 16px; border-bottom: 2px solid var(--borda); }
+
+.ficha-campo { display: flex; flex-direction: column; gap: 4px; }
+.ficha-campo-label { font-size: 10px; font-weight: 800; color: var(--texto-leve); text-transform: uppercase; letter-spacing: 0.5px; }
+.ficha-campo-linha { height: 28px; border-bottom: 2px solid #CBD5E0; background: transparent; }
+
+.ficha-corpo-interna { flex: 1; padding: 12px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.ficha-secao { display: flex; flex-direction: column; gap: 6px; }
+.ficha-secao-titulo { font-size: 11px; font-weight: 800; color: var(--texto); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--borda); padding-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+
+.ficha-escala { display: flex; gap: 6px; }
+.ficha-escala-item { flex: 1; border: 2px solid var(--borda); border-radius: 10px; padding: 6px 4px; text-align: center; }
+.ficha-escala-num { font-family: 'JetBrains Mono', monospace; font-size: 18px; color: var(--texto-leve); font-weight: 700; }
+.ficha-escala-label { font-size: 9px; font-weight: 700; color: var(--texto-leve); }
+
+.ficha-checkboxes { display: flex; flex-direction: column; gap: 4px; }
+.ficha-check { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--texto); font-weight: 600; }
+.ficha-check::before { content: '☐'; font-size: 14px; }
+
+.ficha-linha-escrita { height: 34px; border-bottom: 2px solid #CBD5E0; margin-bottom: 6px; }
+
+.ficha-rodape-nota {
+  background: #EDE9FE;
+  border-top: 2px solid #C4B5FD;
+  padding: 8px 16px;
+  font-size: 10px;
+  color: #5B21B6;
+  font-weight: 700;
+}
+
+/* ══════════════════════════════════════════════
+   GUIA FAMÍLIA
+══════════════════════════════════════════════ */
+.pg-familia {
+  background: linear-gradient(160deg, #F0F9FF 0%, #fff 50%, #F5F3FF 100%);
+}
+
+.familia-corpo { flex: 1; padding: 16px 40px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+
+.familia-intro {
+  background: linear-gradient(135deg, var(--adv-navy), #0369A1);
+  border-radius: 16px;
+  padding: 16px 20px;
+  color: #fff;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.familia-intro-icon { font-size: 36px; flex-shrink: 0; }
+.familia-intro-titulo { font-family: 'Fredoka One', cursive; font-size: 20px; margin-bottom: 6px; }
+.familia-intro-desc { font-size: 12px; line-height: 1.6; opacity: 0.85; }
+
+.familia-conceitos { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.familia-conceito-card {
+  border-radius: 14px;
+  border: 2px solid;
+}
+.familia-conceito-icon { font-size: 22px; margin-bottom: 6px; }
+.familia-conceito-nome { font-size: 13px; font-weight: 800; color: var(--texto); margin-bottom: 4px; }
+.familia-conceito-def { font-size: 11px; color: var(--texto-leve); line-height: 1.4; margin-bottom: 8px; }
+.familia-conceito-brincadeira { font-size: 11px; color: var(--texto); line-height: 1.4; background: rgba(255,255,255,0.7); border-radius: 8px; padding: 6px 8px; }
+.familia-conceito-brincadeira strong { font-size: 10px; font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 2px; }
+
+.familia-frase-final {
+  background: #FFFBEB;
+  border: 2px solid var(--adv-amber);
+  border-radius: 14px;
+  padding: 14px 18px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 800;
+  color: #92400E;
+  font-style: italic;
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     PÁGINA 1 — CAPA
+══════════════════════════════════════════════ -->
+<div class="pg pg-capa">
+  <div class="capa-grid-bg"></div>
+  <div class="capa-glow"></div>
+
+  <div class="capa-topo">
+    <div class="capa-badge">Kit Despluga Pro · Nível Avançado</div>
+    <div class="capa-nivel">6° Ano ao Ensino Médio</div>
+  </div>
+
+  <div class="capa-centro">
+    <div class="capa-icone-principal">⚡</div>
+    <div class="capa-subtag">Lógica · Algoritmos · Cultura Digital</div>
+    <div class="capa-titulo">Despluga<br><span>Avançado</span></div>
+    <div class="capa-subtitulo">30 atividades desplugadas para desenvolver Pensamento Computacional em turmas do 6° ano ao Ensino Médio. Sem computador. Com muito raciocínio.</div>
+
+    <div class="capa-chips">
+      <div class="capa-chip">⚙️ 30 Atividades</div>
+      <div class="capa-chip">🗺️ 10 Roteiros Visuais</div>
+      <div class="capa-chip">📋 Ficha de Avaliação</div>
+      <div class="capa-chip">👨‍👩‍👧 Guia para a Família</div>
+    </div>
+
+    <div class="capa-destaque-box">
+      <div class="capa-stat">
+        <div class="capa-stat-num">30</div>
+        <div class="capa-stat-label">Atividades</div>
+      </div>
+      <div class="capa-stat">
+        <div class="capa-stat-num">6</div>
+        <div class="capa-stat-label">Conceitos</div>
+      </div>
+      <div class="capa-stat">
+        <div class="capa-stat-num">27</div>
+        <div class="capa-stat-label">Páginas A4</div>
+      </div>
+      <div class="capa-stat">
+        <div class="capa-stat-num">0</div>
+        <div class="capa-stat-label">Computador</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="capa-rodape">
+    <span><strong>{{escola}}</strong> · {{professor}}</span>
+    <span>Pensamento Computacional Desplugado</span>
+    <span>Kit Despluga Pro · 1/27</span>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PÁGINA 2 — COMO USAR
+══════════════════════════════════════════════ -->
+<div class="pg pg-como-usar">
+
+  <div class="secao-header">
+    <div class="secao-header-sub">Antes de Começar</div>
+    <div class="secao-header-titulo"><span>📖</span> Como Usar Este Kit</div>
+  </div>
+  <svg class="wave-sep" viewBox="0 0 794 32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <path d="M0,0 L794,0 L794,16 Q596,36 397,20 Q198,4 0,24 Z" fill="#0c1a2e"/>
+    <path d="M0,24 Q198,4 397,20 Q596,36 794,16 L794,32 L0,32 Z" fill="#ffffff"/>
+  </svg>
+
+  <div class="secao-corpo">
+
+    <div class="intro-box">
+      Este kit foi criado para turmas que já têm <strong>maturidade para questionar</strong>. As 30 atividades conectam Pensamento Computacional com tecnologias que os alunos já usam — feeds de redes sociais, algoritmos de busca, criptografia — tornando o abstrato concreto e relevante.
+    </div>
+
+    <div class="passo-lista">
+      <div class="passo-item">
+        <div class="passo-num" style="background:#0EA5E9">1</div>
+        <div>
+          <div class="passo-texto-titulo">Leia a página 3 primeiro</div>
+          <div class="passo-texto-desc">Os 6 conceitos do kit estão resumidos com exemplos do cotidiano digital. Use essa página como mapa antes de escolher qual atividade aplicar.</div>
+        </div>
+      </div>
+      <div class="passo-item">
+        <div class="passo-num" style="background:#8B5CF6">2</div>
+        <div>
+          <div class="passo-texto-titulo">Escolha pelo nível e pela série</div>
+          <div class="passo-texto-desc">Cada atividade tem nível 🟢 Iniciante, 🟡 Intermediário ou 🔴 Desafio. O guia de aplicação (páginas 19–20) indica quais conceitos priorizar por série.</div>
+        </div>
+      </div>
+      <div class="passo-item">
+        <div class="passo-num" style="background:#10B981">3</div>
+        <div>
+          <div class="passo-texto-titulo">Use os Roteiros Visuais (páginas 21–25)</div>
+          <div class="passo-texto-desc">Antes de cada atividade, projete ou entregue o roteiro visual correspondente. Ele guia o aluno pelo processo de forma autônoma, reduzindo interrupções.</div>
+        </div>
+      </div>
+      <div class="passo-item">
+        <div class="passo-num" style="background:#F59E0B">4</div>
+        <div>
+          <div class="passo-texto-titulo">Priorize o raciocínio, não a resposta</div>
+          <div class="passo-texto-desc">Para turmas mais velhas, o debate sobre o processo vale mais que a resposta certa. Peça que os alunos justifiquem cada decisão — isso é o verdadeiro PC.</div>
+        </div>
+      </div>
+      <div class="passo-item">
+        <div class="passo-num" style="background:#EF4444">5</div>
+        <div>
+          <div class="passo-texto-titulo">Registre na Ficha de Avaliação (página 26)</div>
+          <div class="passo-texto-desc">Avaliação formativa focada em habilidades, não em nota. Aceita pelo sistema de avaliação por competências da BNCC. Uma ficha por atividade por aluno.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="aviso-avancado">
+      <div class="aviso-avancado-icon">💡</div>
+      <div>
+        <div class="aviso-avancado-titulo">Dica: conecte com outras disciplinas</div>
+        <div class="aviso-avancado-texto">As atividades de <strong>Lógica</strong> conectam com Matemática (tabelas-verdade, álgebra booleana). <strong>Padrão</strong> conecta com Física e Biologia. <strong>Decomposição</strong> conecta com gestão de projetos em qualquer área. Use como ponte, não como ilha.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="pg-footer">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Despluga Avançado — Como Usar</span>
+    <span>2 / 27</span>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PÁGINA 3 — OS 6 CONCEITOS
+══════════════════════════════════════════════ -->
+<div class="pg pg-avancado-intro">
+
+  <div class="secao-header">
+    <div class="secao-header-sub">Visão Geral do Kit</div>
+    <div class="secao-header-titulo"><span>🧠</span> Os 6 Pilares do Pensamento Computacional</div>
+  </div>
+  <svg class="wave-sep" viewBox="0 0 794 32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <path d="M0,0 L794,0 L794,16 Q596,36 397,20 Q198,4 0,24 Z" fill="#0c1a2e"/>
+    <path d="M0,24 Q198,4 397,20 Q596,36 794,16 L794,32 L0,32 Z" fill="#ffffff"/>
+  </svg>
+
+  <div class="secao-corpo">
+
+    <div class="intro-conceitos-grid">
+      <div class="intro-conceito-card" style="border-color:#BAE6FD;background:#F0F9FF">
+        <div class="intro-conceito-icon">⚙️</div>
+        <div class="intro-conceito-nome" style="color:#0369A1">Algoritmo</div>
+        <div class="intro-conceito-def">Sequência precisa de passos para resolver um problema. O TikTok decide o que você vê usando um algoritmo com milhares de variáveis.</div>
+        <div class="intro-conceito-link" style="color:#0EA5E9">Atividades 1–5 →</div>
+      </div>
+
+      <div class="intro-conceito-card" style="border-color:#DDD6FE;background:#F5F3FF">
+        <div class="intro-conceito-icon">⚖️</div>
+        <div class="intro-conceito-nome" style="color:#5B21B6">Lógica</div>
+        <div class="intro-conceito-def">Pensar de forma estruturada para tomar decisões. IF, THEN, ELSE são a linguagem da lógica — e também das condições do seu WhatsApp.</div>
+        <div class="intro-conceito-link" style="color:#8B5CF6">Atividades 6–10 →</div>
+      </div>
+
+      <div class="intro-conceito-card" style="border-color:#A7F3D0;background:#ECFDF5">
+        <div class="intro-conceito-icon">🗺️</div>
+        <div class="intro-conceito-nome" style="color:#065F46">Abstração</div>
+        <div class="intro-conceito-def">Focar no essencial e ignorar detalhes irrelevantes. Mapas, ícones e APIs são abstrações — mostram o suficiente, escondem o complexo.</div>
+        <div class="intro-conceito-link" style="color:#10B981">Atividades 11–15 →</div>
+      </div>
+
+      <div class="intro-conceito-card" style="border-color:#FDE68A;background:#FFFBEB">
+        <div class="intro-conceito-icon">✂️</div>
+        <div class="intro-conceito-nome" style="color:#78350F">Decomposição</div>
+        <div class="intro-conceito-def">Dividir um problema grande em partes manejáveis. Todo software é construído assim: módulos que se conectam, cada um com uma responsabilidade.</div>
+        <div class="intro-conceito-link" style="color:#F59E0B">Atividades 16–20 →</div>
+      </div>
+
+      <div class="intro-conceito-card" style="border-color:#FECACA;background:#FFF5F5">
+        <div class="intro-conceito-icon">📐</div>
+        <div class="intro-conceito-nome" style="color:#7F1D1D">Padrão</div>
+        <div class="intro-conceito-def">Reconhecer regularidades para prever e generalizar. Algoritmos de fraude, recomendação de conteúdo e previsão do tempo — tudo começa com padrões.</div>
+        <div class="intro-conceito-link" style="color:#EF4444">Atividades 21–25 →</div>
+      </div>
+
+      <div class="intro-conceito-card" style="border-color:#FBCFE8;background:#FDF2F8">
+        <div class="intro-conceito-icon">📦</div>
+        <div class="intro-conceito-nome" style="color:#831843">Variáveis</div>
+        <div class="intro-conceito-def">Guardar e manipular informação. Nome, idade, saldo, likes — tudo em um programa é uma variável. A base de toda programação.</div>
+        <div class="intro-conceito-link" style="color:#EC4899">Atividades 26–30 →</div>
+      </div>
+    </div>
+
+    <div class="habilidades-box">
+      <div class="habilidades-titulo">🎯 O que este kit desenvolve no aluno</div>
+      <div class="habilidades-grid">
+        <div class="habilidade-item">
+          <div class="habilidade-icon">🧩</div>
+          <div class="habilidade-texto">
+            <strong>Raciocínio estruturado</strong>
+            Decompor problemas complexos em etapas claras e gerenciáveis.
+          </div>
+        </div>
+        <div class="habilidade-item">
+          <div class="habilidade-icon">🔍</div>
+          <div class="habilidade-texto">
+            <strong>Pensamento crítico digital</strong>
+            Questionar algoritmos de feed, criptografia e sistemas de recomendação.
+          </div>
+        </div>
+        <div class="habilidade-item">
+          <div class="habilidade-icon">💬</div>
+          <div class="habilidade-texto">
+            <strong>Comunicação técnica precisa</strong>
+            Descrever processos com clareza — base para qualquer área profissional.
+          </div>
+        </div>
+        <div class="habilidade-item">
+          <div class="habilidade-icon">🚀</div>
+          <div class="habilidade-texto">
+            <strong>Mentalidade de resolução</strong>
+            Encarar problemas abertos como engenheiros: hipóteses, testes, iteração.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="pg-footer">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Despluga Avançado — Os 6 Pilares</span>
+    <span>3 / 27</span>
+  </div>
+
+</div>
+
+
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Desplugadas Avançadas</div>
+    <div class="atividades-header-sub">Pensamento Computacional · 6° ano ao Ensino Médio</div></div>
+    <div class="atividades-bloco-tag">Algoritmo</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#0EA5E9">1</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">O Algoritmo do Perfil</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#DCFCE7;color:#166534">🟢 Iniciante</span>
+        <span class="atividade-tag" style="background:#E0F2FE;color:#0C4A6E">Algoritmo</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Ficha em branco</div><div class="material-item">Caneta</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO01</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#0EA5E9">1</div><div class="passo-ativ-texto">Escreva um algoritmo de 5 passos para criar um perfil perfeito em uma rede social.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#0EA5E9">2</div><div class="passo-ativ-texto">Troque com um colega: ele deve seguir seus passos exatamente e avaliar se o resultado faz sentido.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#0EA5E9">3</div><div class="passo-ativ-texto">Identifique qual passo é mais subjetivo e discuta como torná-lo mais preciso.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Conecta com o cotidiano digital. Questione: o que torna um perfil "perfeito"? Esse questionamento abre debate sobre valores e algoritmos de recomendação.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#0EA5E9">2</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Receita de Aprovação</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#DCFCE7;color:#166534">🟢 Iniciante</span>
+        <span class="atividade-tag" style="background:#E0F2FE;color:#0C4A6E">Algoritmo</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Papel e caneta</div><div class="material-item">Timer (celular)</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO01</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#0EA5E9">1</div><div class="passo-ativ-texto">Escreva em 5 minutos o algoritmo completo de como você estuda para uma prova.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#0EA5E9">2</div><div class="passo-ativ-texto">Compare com o algoritmo de um colega: quais passos são iguais? Quais são diferentes?</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#0EA5E9">3</div><div class="passo-ativ-texto">Crie um "super algoritmo de estudos" combinando os melhores passos dos dois.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Ótima abertura de semestre. Revela hábitos de estudo reais. O "super algoritmo" pode virar um cartaz de sala.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Atividades</span><span>4 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Desplugadas Avançadas</div>
+    <div class="atividades-header-sub">Pensamento Computacional · 6° ano ao Ensino Médio</div></div>
+    <div class="atividades-bloco-tag">Algoritmo</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#0EA5E9">3</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Algoritmo de Busca na Mochila</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF9C3;color:#854D0E">🟡 Intermediário</span>
+        <span class="atividade-tag" style="background:#E0F2FE;color:#0C4A6E">Algoritmo</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Mochila com 10 itens variados</div><div class="material-item">Lista de itens para encontrar</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO02</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#0EA5E9">1</div><div class="passo-ativ-texto">Sem olhar, tente achar os 3 itens da lista o mais rápido possível (busca linear).</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#0EA5E9">2</div><div class="passo-ativ-texto">Agora organize os itens por categoria e repita. Meça o tempo de novo.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#0EA5E9">3</div><div class="passo-ativ-texto">Explique por escrito: por que a busca ficou mais rápida? Qual algoritmo você usou?</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Introduz busca linear vs. busca em dados organizados. Conecta com binary search sem usar o nome técnico ainda.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#0EA5E9">4</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Ordenando a Fila</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF9C3;color:#854D0E">🟡 Intermediário</span>
+        <span class="atividade-tag" style="background:#E0F2FE;color:#0C4A6E">Algoritmo</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Cartões com números de 1 a 10 (embaralhados)</div><div class="material-item">Cronômetro</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO02</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#0EA5E9">1</div><div class="passo-ativ-texto">Embaralhe os cartões e ordene-os do menor para o maior, descrevendo em voz alta cada decisão que você toma.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#0EA5E9">2</div><div class="passo-ativ-texto">Tente ordenar de um jeito diferente — outra estratégia. Qual foi mais rápida?</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#0EA5E9">3</div><div class="passo-ativ-texto">Pesquise os nomes dos dois algoritmos de ordenação que você usou sem saber.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Bubble sort e insertion sort surgem naturalmente. Conecta com CS sem assustar. Pode pedir que pesquisem em casa.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Atividades</span><span>5 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Desplugadas Avançadas</div>
+    <div class="atividades-header-sub">Pensamento Computacional · 6° ano ao Ensino Médio</div></div>
+    <div class="atividades-bloco-tag">Algoritmo & Lógica</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#0EA5E9">5</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">O Algoritmo que Falhou</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEE2E2;color:#991B1B">🔴 Desafio</span>
+        <span class="atividade-tag" style="background:#E0F2FE;color:#0C4A6E">Algoritmo</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Impresso: 3 algoritmos com bugs propositais</div><div class="material-item">Caneta vermelha</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#0EA5E9">1</div><div class="passo-ativ-texto">Leia os 3 algoritmos impressos e identifique o erro em cada um (há exatamente 1 bug por algoritmo).</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#0EA5E9">2</div><div class="passo-ativ-texto">Corrija o bug e explique em uma frase por que aquele erro causaria um problema real.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#0EA5E9">3</div><div class="passo-ativ-texto">Crie você mesmo um algoritmo com 1 bug proposital para um colega encontrar.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Debugging é uma habilidade essencial. Erros propositais ensinam mais que exemplos perfeitos. Conecta direto com programação real.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#8B5CF6">6</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">SE... ENTÃO no WhatsApp</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#DCFCE7;color:#166534">🟢 Iniciante</span>
+        <span class="atividade-tag" style="background:#EDE9FE;color:#4C1D95">Lógica</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Folha de registro</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#8B5CF6">1</div><div class="passo-ativ-texto">Escreva 5 regras lógicas que você usa inconscientemente no WhatsApp (Ex.: SE mensagem enviada às 23h, ENTÃO não espere resposta rápida).</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#8B5CF6">2</div><div class="passo-ativ-texto">Converta cada regra para o formato: SE [condição] ENTÃO [ação] SENÃO [outra ação].</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#8B5CF6">3</div><div class="passo-ativ-texto">Identifique qual das suas regras tem mais exceções e discuta por que.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Contextualiza lógica proposicional com comportamento real. Gera debate saudável sobre comunicação digital.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Atividades</span><span>6 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Desplugadas Avançadas</div>
+    <div class="atividades-header-sub">Pensamento Computacional · 6° ano ao Ensino Médio</div></div>
+    <div class="atividades-bloco-tag">Lógica</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#8B5CF6">7</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Detetive Lógico</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#DCFCE7;color:#166534">🟢 Iniciante</span>
+        <span class="atividade-tag" style="background:#EDE9FE;color:#4C1D95">Lógica</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Cartela de detetive (impressa)</div><div class="material-item">Lápis</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#8B5CF6">1</div><div class="passo-ativ-texto">Leia as 4 pistas impressas sobre um crime imaginário.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#8B5CF6">2</div><div class="passo-ativ-texto">Use tabela de V/F para eliminar suspeitos com base nas pistas.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#8B5CF6">3</div><div class="passo-ativ-texto">Apresente sua conclusão com a prova lógica: "O suspeito X é culpado PORQUE...".</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Lúdico e engajante. Treina raciocínio dedutivo. Pode criar variações temáticas (mistério na escola, roubo de snack).</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#8B5CF6">8</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Tabela-Verdade da Vida Real</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF9C3;color:#854D0E">🟡 Intermediário</span>
+        <span class="atividade-tag" style="background:#EDE9FE;color:#4C1D95">Lógica</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Folha quadriculada</div><div class="material-item">Lápis</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#8B5CF6">1</div><div class="passo-ativ-texto">Crie uma tabela-verdade para a decisão: "Vou à festa?" (variáveis: tenho dinheiro, estão meus amigos, tem prova amanhã).</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#8B5CF6">2</div><div class="passo-ativ-texto">Adicione uma 4ª variável e observe como a tabela cresce. Quantas linhas tem agora?</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#8B5CF6">3</div><div class="passo-ativ-texto">Discuta: quando uma tabela-verdade fica grande demais para ser útil? O que fazemos nesse caso?</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Introduz explosão combinatória de forma natural. Conecta com tomada de decisão real e com álgebra booleana.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Atividades</span><span>7 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Desplugadas Avançadas</div>
+    <div class="atividades-header-sub">Pensamento Computacional · 6° ano ao Ensino Médio</div></div>
+    <div class="atividades-bloco-tag">Lógica</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#8B5CF6">9</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">O Paradoxo do Mentiroso</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF9C3;color:#854D0E">🟡 Intermediário</span>
+        <span class="atividade-tag" style="background:#EDE9FE;color:#4C1D95">Lógica</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Cartão com paradoxos impressos</div><div class="material-item">Ficha de análise</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#8B5CF6">1</div><div class="passo-ativ-texto">Leia o paradoxo: "Esta frase é falsa." Tente classificá-la como Verdadeira ou Falsa.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#8B5CF6">2</div><div class="passo-ativ-texto">Discuta em dupla: por que a lógica tradicional falha nesse caso?</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#8B5CF6">3</div><div class="passo-ativ-texto">Pesquise outro paradoxo lógico e apresente para a turma em 2 minutos.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Abre a mente para os limites da lógica formal. Conecta com Gödel, Russell e com as limitações dos sistemas computacionais.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#8B5CF6">10</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Lógica dos Algoritmos de Feed</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEE2E2;color:#991B1B">🔴 Desafio</span>
+        <span class="atividade-tag" style="background:#EDE9FE;color:#4C1D95">Lógica</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Impressão de 10 posts fictícios com engajamento variado</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#8B5CF6">1</div><div class="passo-ativ-texto">Com base nos dados de curtidas/compartilhamentos, crie uma regra lógica para decidir qual post aparece primeiro no feed.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#8B5CF6">2</div><div class="passo-ativ-texto">Teste sua regra nos 10 posts e ordene-os. Compare com o resultado de um colega.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#8B5CF6">3</div><div class="passo-ativ-texto">Identifique 2 situações em que sua regra seria injusta. Como corrigir sem complicar demais?</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Introduz algoritmos de recomendação de forma crítica. Conecta com ética em IA e com economia de atenção.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Atividades</span><span>8 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Desplugadas Avançadas</div>
+    <div class="atividades-header-sub">Pensamento Computacional · 6° ano ao Ensino Médio</div></div>
+    <div class="atividades-bloco-tag">Abstração</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#10B981">11</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">O Mapa Mental que Omite</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#DCFCE7;color:#166534">🟢 Iniciante</span>
+        <span class="atividade-tag" style="background:#D1FAE5;color:#064E3B">Abstração</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Papel A4</div><div class="material-item">Caneta colorida</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO01</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#10B981">1</div><div class="passo-ativ-texto">Desenhe um mapa do caminho de casa até a escola. Inclua apenas o que é necessário para não se perder.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#10B981">2</div><div class="passo-ativ-texto">Troque com um colega: ele consegue seguir seu mapa? O que estava faltando? O que era desnecessário?</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#10B981">3</div><div class="passo-ativ-texto">Discuta: mapas omitem informações de propósito. Por que isso é útil?</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Abstração como simplificação intencional. Mapas, ícones e memes são exemplos do cotidiano. Conecta com UX design.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#10B981">12</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Ícone Perfeito</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#DCFCE7;color:#166534">🟢 Iniciante</span>
+        <span class="atividade-tag" style="background:#D1FAE5;color:#064E3B">Abstração</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Papel branco</div><div class="material-item">Lápis</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO01</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#10B981">1</div><div class="passo-ativ-texto">Escolha um objeto complexo (avião, hospital, restaurante) e desenhe um ícone com no máximo 5 traços que qualquer pessoa entenda.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#10B981">2</div><div class="passo-ativ-texto">Mostre para 3 colegas sem dizer o que é: quantos acertaram?</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#10B981">3</div><div class="passo-ativ-texto">Redesenhe o ícone incorporando o feedback até chegar a 100% de reconhecimento.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Design de ícone é abstração pura. Conecta com UI design, comunicação visual e com como computadores representam conceitos.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Atividades</span><span>9 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Desplugadas Avançadas</div>
+    <div class="atividades-header-sub">Pensamento Computacional · 6° ano ao Ensino Médio</div></div>
+    <div class="atividades-bloco-tag">Abstração</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#10B981">13</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Abstração de Código</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF9C3;color:#854D0E">🟡 Intermediário</span>
+        <span class="atividade-tag" style="background:#D1FAE5;color:#064E3B">Abstração</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Cartões com funções em pseudocódigo</div><div class="material-item">Folha de registro</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO02</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#10B981">1</div><div class="passo-ativ-texto">Leia 3 funções em pseudocódigo sem ver o nome delas. Adivinhe o que cada uma faz.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#10B981">2</div><div class="passo-ativ-texto">Agora leia o nome das funções: você estava certo? O que revelou ou escondeu o código?</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#10B981">3</div><div class="passo-ativ-texto">Escreva sua própria função em pseudocódigo para um colega adivinhar.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Introduz o conceito de função como abstração. Conecta direto com programação. Prepara para Python, JavaScript, etc.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#10B981">14</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">O Personagem Genérico</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF9C3;color:#854D0E">🟡 Intermediário</span>
+        <span class="atividade-tag" style="background:#D1FAE5;color:#064E3B">Abstração</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Descrição de 5 personagens de filmes diferentes</div><div class="material-item">Folha de análise</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO01</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#10B981">1</div><div class="passo-ativ-texto">Leia as 5 descrições e identifique características em COMUM entre todos os personagens.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#10B981">2</div><div class="passo-ativ-texto">Crie um "personagem genérico" que representa o tipo de herói descrito, usando apenas os atributos comuns.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#10B981">3</div><div class="passo-ativ-texto">Compare seu personagem genérico com o de um colega. O que cada um escolheu abstrair?</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">POO (Programação Orientada a Objetos) começa aqui: herói genérico = classe, personagem específico = objeto. Introduz sem assustar.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Atividades</span><span>10 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Desplugadas Avançadas</div>
+    <div class="atividades-header-sub">Pensamento Computacional · 6° ano ao Ensino Médio</div></div>
+    <div class="atividades-bloco-tag">Abstração & Decomposição</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#10B981">15</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Abstraindo o Problema</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEE2E2;color:#991B1B">🔴 Desafio</span>
+        <span class="atividade-tag" style="background:#D1FAE5;color:#064E3B">Abstração</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Folha com 3 problemas complexos do cotidiano</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO02</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#10B981">1</div><div class="passo-ativ-texto">Leia os 3 problemas (Ex.: trânsito, fila de banco, escalação de time). Para cada um, identifique: qual é a essência do problema ignorando detalhes irrelevantes?</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#10B981">2</div><div class="passo-ativ-texto">Reescreva cada problema em uma frase de até 15 palavras capturando apenas o essencial.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#10B981">3</div><div class="passo-ativ-texto">Mostre suas versões abstratas para um colega: ele reconhece o problema original? Houve perda de informação importante?</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Abstração como ferramenta de resolução de problemas. Conecta com modelagem matemática e com design thinking.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#F59E0B">16</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Decompondo o TCC</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#DCFCE7;color:#166534">🟢 Iniciante</span>
+        <span class="atividade-tag" style="background:#FEF3C7;color:#78350F">Decomposição</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Folha A4</div><div class="material-item">Post-its coloridos</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO02</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#F59E0B">1</div><div class="passo-ativ-texto">Escolha um trabalho escolar grande que você tem ou já teve. Decomponha-o em todas as subtarefas que puder imaginar.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#F59E0B">2</div><div class="passo-ativ-texto">Organize as subtarefas em ordem de dependência: o que precisa ser feito antes do quê?</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#F59E0B">3</div><div class="passo-ativ-texto">Estime quanto tempo cada subtarefa levaria. Qual é o tempo total? Surpreso?</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Gestão de projetos na prática. Conecta com metodologias ágeis (Scrum, Kanban) e com planejamento real de vida.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Atividades</span><span>11 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Desplugadas Avançadas</div>
+    <div class="atividades-header-sub">Pensamento Computacional · 6° ano ao Ensino Médio</div></div>
+    <div class="atividades-bloco-tag">Decomposição</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#F59E0B">17</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Anatomia de um App</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#DCFCE7;color:#166534">🟢 Iniciante</span>
+        <span class="atividade-tag" style="background:#FEF3C7;color:#78350F">Decomposição</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Impressão de tela inicial de um app popular</div><div class="material-item">Caneta colorida</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO02</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#F59E0B">1</div><div class="passo-ativ-texto">Olhe a tela do app e liste todas as funcionalidades visíveis (botões, campos, menus).</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#F59E0B">2</div><div class="passo-ativ-texto">Agrupe as funcionalidades por categoria/módulo. Dê um nome a cada grupo.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#F59E0B">3</div><div class="passo-ativ-texto">Estime: quantas pessoas trabalharam em cada módulo? Por que dividir o trabalho assim?</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Decomposição como base para trabalho em equipe e arquitetura de software. Conecta com como empresas de tech funcionam.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#F59E0B">18</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">A Receita Escalável</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF9C3;color:#854D0E">🟡 Intermediário</span>
+        <span class="atividade-tag" style="background:#FEF3C7;color:#78350F">Decomposição</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Receita simples impressa para 4 pessoas</div><div class="material-item">Calculadora</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO02</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#F59E0B">1</div><div class="passo-ativ-texto">A festa vai ter 80 pessoas. Calcule todos os ingredientes na proporção certa.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#F59E0B">2</div><div class="passo-ativ-texto">Agora decomponha o preparo: quais tarefas podem acontecer ao mesmo tempo (paralelas)? Quais precisam ser sequenciais?</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#F59E0B">3</div><div class="passo-ativ-texto">Desenhe um diagrama mostrando a ordem de preparo otimizada para o mínimo de tempo total.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Introduz paralelismo e dependência de tarefas — conceitos centrais em sistemas distribuídos e em CPU multi-core.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Atividades</span><span>12 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Desplugadas Avançadas</div>
+    <div class="atividades-header-sub">Pensamento Computacional · 6° ano ao Ensino Médio</div></div>
+    <div class="atividades-bloco-tag">Decomposição</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#F59E0B">19</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Bug Report Profissional</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF9C3;color:#854D0E">🟡 Intermediário</span>
+        <span class="atividade-tag" style="background:#FEF3C7;color:#78350F">Decomposição</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Descrição vaga de um problema de software</div><div class="material-item">Formulário de bug report</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#F59E0B">1</div><div class="passo-ativ-texto">Leia a descrição vaga: "O app não funciona direito." Faça 5 perguntas que você precisaria responder para resolver o problema.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#F59E0B">2</div><div class="passo-ativ-texto">Reescreva o problema decomposto: quando acontece, em qual tela, o que você esperava, o que aconteceu de fato, como reproduzir.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#F59E0B">3</div><div class="passo-ativ-texto">Troque com um colega: ele consegue reproduzir o bug só com sua descrição?</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Bug report é decomposição aplicada. Conecta com desenvolvimento de software e com comunicação técnica precisa.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#F59E0B">20</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Planejando uma Startup</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEE2E2;color:#991B1B">🔴 Desafio</span>
+        <span class="atividade-tag" style="background:#FEF3C7;color:#78350F">Decomposição</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Folha de planejamento</div><div class="material-item">Caneta</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#F59E0B">1</div><div class="passo-ativ-texto">Escolha uma ideia simples de app ou produto digital. Decomponha o projeto em: produto, tecnologia, marketing, finanças, operações.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#F59E0B">2</div><div class="passo-ativ-texto">Para cada área, liste 3 subtarefas do primeiro mês. Quais dependem de outras áreas?</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#F59E0B">3</div><div class="passo-ativ-texto">Identifique o "caminho crítico": a sequência de tarefas que, se atrasar, atrasa tudo o mais.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Caminho crítico é conceito de gestão de projetos (PERT/CPM). Conecta com empreendedorismo e com como startups planejam lançamentos.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Atividades</span><span>13 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Desplugadas Avançadas</div>
+    <div class="atividades-header-sub">Pensamento Computacional · 6° ano ao Ensino Médio</div></div>
+    <div class="atividades-bloco-tag">Padrão</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#EF4444">21</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Padrão nas Trending</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#DCFCE7;color:#166534">🟢 Iniciante</span>
+        <span class="atividade-tag" style="background:#FEE2E2;color:#7F1D1D">Padrão</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Lista de 10 títulos de vídeos virais do YouTube</div><div class="material-item">Folha de análise</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#EF4444">1</div><div class="passo-ativ-texto">Leia os 10 títulos e identifique padrões de linguagem, números ou palavras que aparecem com frequência.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#EF4444">2</div><div class="passo-ativ-texto">Crie uma "fórmula" para título viral usando os padrões que encontrou.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#EF4444">3</div><div class="passo-ativ-texto">Teste a fórmula: crie 2 títulos usando ela. Ficaram convincentes?</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Reconhecimento de padrões em marketing digital. Conecta com copywriting, clickbait e com como algoritmos identificam conteúdo popular.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#EF4444">22</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Sequências do Cotidiano</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#DCFCE7;color:#166534">🟢 Iniciante</span>
+        <span class="atividade-tag" style="background:#FEE2E2;color:#7F1D1D">Padrão</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Tabela com 5 sequências incompletas (preços, temperaturas, seguidores)</div><div class="material-item">Lápis</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#EF4444">1</div><div class="passo-ativ-texto">Complete cada sequência identificando o padrão (aritmético, geométrico, outro).</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#EF4444">2</div><div class="passo-ativ-texto">Para cada sequência, escreva a regra em palavras: "Cada termo é calculado...".</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#EF4444">3</div><div class="passo-ativ-texto">Crie uma sequência original com pelo menos 6 termos e uma regra não óbvia para um colega descobrir.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Conecta com Progressão Aritmética e Geométrica da Matemática. Mostra que padrões aparecem em dados reais, não só em exercícios.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Atividades</span><span>14 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Desplugadas Avançadas</div>
+    <div class="atividades-header-sub">Pensamento Computacional · 6° ano ao Ensino Médio</div></div>
+    <div class="atividades-bloco-tag">Padrão</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#EF4444">23</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Padrão no Código Musical</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF9C3;color:#854D0E">🟡 Intermediário</span>
+        <span class="atividade-tag" style="background:#FEE2E2;color:#7F1D1D">Padrão</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Cifra simples de uma música conhecida</div><div class="material-item">Folha de análise</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#EF4444">1</div><div class="passo-ativ-texto">Analise a progressão de acordes e identifique padrões que se repetem (refrão, verso, ponte).</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#EF4444">2</div><div class="passo-ativ-texto">Quantas vezes cada padrão aparece? Existe uma estrutura recorrente?</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#EF4444">3</div><div class="passo-ativ-texto">Crie a estrutura de uma nova música usando os mesmos padrões, com letras diferentes.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Música é matemática auditiva. Progressões harmônicas são padrões. Conecta com síntese musical, compressão de dados e com estrutura narrativa.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#EF4444">24</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Reconhecimento de Fraude</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF9C3;color:#854D0E">🟡 Intermediário</span>
+        <span class="atividade-tag" style="background:#FEE2E2;color:#7F1D1D">Padrão</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Impressão com 12 transações financeiras fictícias</div><div class="material-item">Caneta</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#EF4444">1</div><div class="passo-ativ-texto">Analise as transações e identifique quais parecem fora do padrão normal.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#EF4444">2</div><div class="passo-ativ-texto">Crie uma regra em linguagem natural para detectar automaticamente transações suspeitas.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#EF4444">3</div><div class="passo-ativ-texto">Quantos falsos positivos sua regra gera? Como equilibrar segurança com conveniência?</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Machine learning e detecção de fraude começam aqui. Conecta com sistemas de antifraude de bancos e com o que os algoritmos de cartão de crédito fazem.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Atividades</span><span>15 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Desplugadas Avançadas</div>
+    <div class="atividades-header-sub">Pensamento Computacional · 6° ano ao Ensino Médio</div></div>
+    <div class="atividades-bloco-tag">Padrão & Variáveis</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#EF4444">25</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Cifrando com Padrões</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEE2E2;color:#991B1B">🔴 Desafio</span>
+        <span class="atividade-tag" style="background:#FEE2E2;color:#7F1D1D">Padrão</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Mensagem criptografada com cifra de César</div><div class="material-item">Folha de análise</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#EF4444">1</div><div class="passo-ativ-texto">Analise a frequência das letras na mensagem cifrada. Qual letra aparece mais? Em português, é provavelmente o "A" ou "E".</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#EF4444">2</div><div class="passo-ativ-texto">Use a análise de frequência para descobrir o deslocamento da cifra e decifrar a mensagem.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#EF4444">3</div><div class="passo-ativ-texto">Cifre uma mensagem sua para um colega decifrar usando o mesmo método.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Criptografia e análise de frequência — base da criptoanalysis. Conecta com segurança digital, história da WWII (Enigma) e com como HTTPS funciona.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#EC4899">26</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Variáveis da Minha Semana</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#DCFCE7;color:#166534">🟢 Iniciante</span>
+        <span class="atividade-tag" style="background:#FCE7F3;color:#831843">Variáveis</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Tabela de acompanhamento semanal</div><div class="material-item">Caneta</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO01</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#EC4899">1</div><div class="passo-ativ-texto">Escolha 3 variáveis da sua vida para medir durante 1 semana (horas de sono, exercício, tempo de tela).</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#EC4899">2</div><div class="passo-ativ-texto">No dia seguinte, registre os valores. Quais variáveis são numéricas? Quais são categóricas?</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#EC4899">3</div><div class="passo-ativ-texto">Preveja: se você mudar a variável X, como isso afeta as outras? Essa é a lógica de um experimento científico.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Variáveis como conceito científico e computacional. Conecta com Biologia (variáveis em experimentos) e com dados de saúde.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Atividades</span><span>16 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Desplugadas Avançadas</div>
+    <div class="atividades-header-sub">Pensamento Computacional · 6° ano ao Ensino Médio</div></div>
+    <div class="atividades-bloco-tag">Variáveis</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#EC4899">27</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Planilha Mental</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#DCFCE7;color:#166534">🟢 Iniciante</span>
+        <span class="atividade-tag" style="background:#FCE7F3;color:#831843">Variáveis</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Tabela em branco</div><div class="material-item">Calculadora</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO01</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#EC4899">1</div><div class="passo-ativ-texto">Imagine uma planilha para controlar vendas de uma barraquinha. Quais colunas (variáveis) você criaria?</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#EC4899">2</div><div class="passo-ativ-texto">Defina o tipo de dado de cada variável: número, texto, data, verdadeiro/falso.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#EC4899">3</div><div class="passo-ativ-texto">Crie uma fórmula em linguagem natural para calcular o lucro total usando as suas variáveis.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Planilha é banco de dados visual. Tipos de dados são conceito fundamental de programação. Conecta Excel com conceitos de CS.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#EC4899">28</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Simulando com Variáveis</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF9C3;color:#854D0E">🟡 Intermediário</span>
+        <span class="atividade-tag" style="background:#FCE7F3;color:#831843">Variáveis</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Cenário de simulação impresso (ex: crescimento de uma planta)</div><div class="material-item">Calculadora</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO02</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#EC4899">1</div><div class="passo-ativ-texto">Leia o cenário: uma planta cresce 2cm por semana se regada, e não cresce se não for. Calcule a altura após 8 semanas com diferentes padrões de rega.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#EC4899">2</div><div class="passo-ativ-texto">Crie uma tabela com 3 cenários diferentes. Qual variável tem mais impacto no resultado?</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#EC4899">3</div><div class="passo-ativ-texto">Escreva em pseudocódigo o loop que simula o crescimento semana a semana.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Simulações computacionais funcionam exatamente assim. Conecta com modelagem matemática, com jogos e com previsões climáticas.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Atividades</span><span>17 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Desplugadas Avançadas</div>
+    <div class="atividades-header-sub">Pensamento Computacional · 6° ano ao Ensino Médio</div></div>
+    <div class="atividades-bloco-tag">Variáveis</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#EC4899">29</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Depurando Variáveis</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF9C3;color:#854D0E">🟡 Intermediário</span>
+        <span class="atividade-tag" style="background:#FCE7F3;color:#831843">Variáveis</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Pseudocódigo com erro de variável impressa</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#EC4899">1</div><div class="passo-ativ-texto">Leia o pseudocódigo e execute mentalmente passo a passo, anotando o valor de cada variável a cada linha.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#EC4899">2</div><div class="passo-ativ-texto">Identifique onde o valor de uma variável fica inesperado e explique o que causou o erro.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#EC4899">3</div><div class="passo-ativ-texto">Corrija o código e verifique rodando passo a passo de novo.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Debugging com rastreamento de variáveis — habilidade central em qualquer linguagem de programação. Prepara para Python, JavaScript, etc.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#EC4899">30</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Design de API Simples</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEE2E2;color:#991B1B">🔴 Desafio</span>
+        <span class="atividade-tag" style="background:#FCE7F3;color:#831843">Variáveis</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Folha de design</div><div class="material-item">Caneta</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF69CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#EC4899">1</div><div class="passo-ativ-texto">Imagine um serviço de previsão do tempo. Defina: quais variáveis de ENTRADA o sistema precisa? Quais variáveis de SAÍDA ele retorna?</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#EC4899">2</div><div class="passo-ativ-texto">Escreva em pseudocódigo a assinatura de 3 funções que o serviço ofereceria.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#EC4899">3</div><div class="passo-ativ-texto">Discuta: por que esconder os detalhes internos do serviço é uma boa prática (abstração + variáveis bem nomeadas)?</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💡 Dica do Professor</span><div class="dica-tea-texto">Introduz API design e encapsulamento. Conecta com como microsserviços funcionam. Base para qualquer carreira em tecnologia.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Atividades</span><span>18 / 27</span></div>
+</div>
+<div class="pg pg-adaptacao">
+  <div class="adapt-intro">
+    <div class="adapt-intro-titulo">⚡ Como Aplicar este Kit</div>
+    <div class="adapt-intro-desc">Estratégias para tornar o Pensamento Computacional relevante e desafiador para turmas do 6° ano ao Ensino Médio.</div>
+  </div>
+  <svg class="wave-sep" viewBox="0 0 794 32" preserveAspectRatio="none"><path d="M0,0 L794,0 L794,16 Q596,36 397,20 Q198,4 0,24 Z" fill="#0c1a2e"/><path d="M0,24 Q198,4 397,20 Q596,36 794,16 L794,32 L0,32 Z" fill="#ffffff"/></svg>
+  <div class="adapt-corpo">
+    <div class="adapt-3-passos">
+      <div class="adapt-3-titulo">🎯 Os 3 Princípios para Turmas Avançadas</div>
+      <div class="adapt-3-grid">
+        <div class="adapt-passo-card"><div class="adapt-passo-num">1</div><div class="adapt-passo-titulo">Contextualize com o real</div><div class="adapt-passo-desc">Conecte cada atividade com tecnologia que os alunos já usam. Algoritmo do TikTok, lógica do WhatsApp, padrões do Spotify tornam o abstrato concreto.</div></div>
+        <div class="adapt-passo-card"><div class="adapt-passo-num">2</div><div class="adapt-passo-titulo">Valorize o processo</div><div class="adapt-passo-desc">Para alunos mais velhos, o raciocínio importa mais que a resposta certa. Peça que expliquem como chegaram à solução — isso é o verdadeiro aprendizado.</div></div>
+        <div class="adapt-passo-card"><div class="adapt-passo-num">3</div><div class="adapt-passo-titulo">Conecte com carreiras</div><div class="adapt-passo-desc">Mostre onde cada habilidade é usada profissionalmente. Decomposição = gerente de projetos. Abstração = designer. Algoritmo = desenvolvedor. Lógica = advogado.</div></div>
+      </div>
+    </div>
+    <div><div class="adapt-tabela-titulo" style="margin-bottom:10px">📊 Sequência sugerida por série</div>
+    <table class="adapt-tabela">
+      <thead><tr><th>Série</th><th>Foco Principal</th><th>Atividades Recomendadas</th></tr></thead>
+      <tbody>
+        <tr><td>6° e 7° Ano</td><td><span class="tag-funciona">Algoritmo e Sequência</span></td><td>IDs 1–5: contextos simples e cotidianos. Priorize as atividades Iniciante.</td></tr>
+        <tr><td>8° e 9° Ano</td><td><span class="tag-funciona">Lógica e Decomposição</span></td><td>IDs 6–20: conecta com Matemática e Ciências. Misture Iniciante e Intermediário.</td></tr>
+        <tr><td>1° EM</td><td><span class="tag-adaptar">Abstração e Padrão</span></td><td>IDs 11–25: projetos mais longos e análise crítica. Todos os níveis.</td></tr>
+        <tr><td>2° e 3° EM</td><td><span class="tag-adaptar">Variáveis e Sistemas</span></td><td>IDs 26–30: preparação para vestibular e mercado de trabalho. Foco em Desafio.</td></tr>
+        <tr><td>Todas as séries</td><td><span class="tag-evitar">Em duplas ou grupos</span></td><td>Trabalho colaborativo acelera o aprendizado. Debate as soluções diferentes.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Guia de Aplicação</span><span>19 / 27</span></div>
+</div>
+
+<div class="pg pg-adaptacao">
+  <div class="adapt-intro">
+    <div class="adapt-intro-titulo">📖 Dicas por Conceito</div>
+    <div class="adapt-intro-desc">Como aprofundar cada conceito e conectar com outras disciplinas e com o mercado de trabalho.</div>
+  </div>
+  <svg class="wave-sep" viewBox="0 0 794 32" preserveAspectRatio="none"><path d="M0,0 L794,0 L794,16 Q596,36 397,20 Q198,4 0,24 Z" fill="#0c1a2e"/><path d="M0,24 Q198,4 397,20 Q596,36 794,16 L794,32 L0,32 Z" fill="#ffffff"/></svg>
+  <div class="adapt-corpo">
+    
+    <div style="background:#E0F2FE;border:2px solid #0EA5E955;border-radius:14px;padding:12px 16px;display:flex;gap:14px;align-items:flex-start">
+      <div style="width:8px;background:#0EA5E9;border-radius:4px;align-self:stretch;flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:800;color:#0C4A6E;margin-bottom:4px">Algoritmo</div>
+      <div style="font-size:12px;color:#2D3748;line-height:1.5">Peça que o aluno escreva o algoritmo em pseudocódigo ou fluxograma antes de executar. Varie o contexto: receitas, trajetos, redes sociais. Aumentar a complexidade gradualmente é mais eficaz do que saltar para casos difíceis.</div></div>
+    </div>
+    <div style="background:#EDE9FE;border:2px solid #8B5CF655;border-radius:14px;padding:12px 16px;display:flex;gap:14px;align-items:flex-start">
+      <div style="width:8px;background:#8B5CF6;border-radius:4px;align-self:stretch;flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:800;color:#4C1D95;margin-bottom:4px">Lógica</div>
+      <div style="font-size:12px;color:#2D3748;line-height:1.5">Introduza tabelas-verdade com exemplos cotidianos (IF chovendo THEN guarda-chuva). Jogos de dedução (Clue, Sudoku) desenvolvem lógica proposicional de forma lúdica. Conecte com programação: operadores AND, OR, NOT.</div></div>
+    </div>
+    <div style="background:#D1FAE5;border:2px solid #10B98155;border-radius:14px;padding:12px 16px;display:flex;gap:14px;align-items:flex-start">
+      <div style="width:8px;background:#10B981;border-radius:4px;align-self:stretch;flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:800;color:#064E3B;margin-bottom:4px">Abstração</div>
+      <div style="font-size:12px;color:#2D3748;line-height:1.5">Peça que o aluno identifique o que é essencial e o que pode ser ignorado em um problema. Mapas, ícones e memes são abstrações do cotidiano — use-os como ponto de partida para a discussão.</div></div>
+    </div>
+    <div style="background:#FEF3C7;border:2px solid #F59E0B55;border-radius:14px;padding:12px 16px;display:flex;gap:14px;align-items:flex-start">
+      <div style="width:8px;background:#F59E0B;border-radius:4px;align-self:stretch;flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:800;color:#78350F;margin-bottom:4px">Decomposição</div>
+      <div style="font-size:12px;color:#2D3748;line-height:1.5">Projetos reais funcionam bem: decompor um trabalho escolar, planejar um evento, criar um app imaginário. Ensine a criar subtarefas com dependências entre si — base para projetos de engenharia.</div></div>
+    </div>
+    <div style="background:#FEE2E2;border:2px solid #EF444455;border-radius:14px;padding:12px 16px;display:flex;gap:14px;align-items:flex-start">
+      <div style="width:8px;background:#EF4444;border-radius:4px;align-self:stretch;flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:800;color:#7F1D1D;margin-bottom:4px">Padrão</div>
+      <div style="font-size:12px;color:#2D3748;line-height:1.5">Dados de redes sociais, gráficos de tendência, sequências musicais — todos são padrões. Conecte com Matemática (funções, progressões) e com Ciências (DNA, cristais). Desafio: criar padrões com regras ocultas para o colega descobrir.</div></div>
+    </div>
+    <div style="background:#FCE7F3;border:2px solid #EC489955;border-radius:14px;padding:12px 16px;display:flex;gap:14px;align-items:flex-start">
+      <div style="width:8px;background:#EC4899;border-radius:4px;align-self:stretch;flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:800;color:#831843;margin-bottom:4px">Variáveis</div>
+      <div style="font-size:12px;color:#2D3748;line-height:1.5">Relacione com álgebra (x, y) e com programação real (nome, idade, pontos). Atividades de "substituição": o que muda se a variável mudar? Conecte com planilhas e com fórmulas matemáticas que já conhecem.</div></div>
+    </div>
+  </div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Dicas por Conceito</span><span>20 / 27</span></div>
+</div>
+<div class="pg pg-roteiros">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🗺️ Roteiros Visuais</div>
+    <div class="atividades-header-sub">Mostre este roteiro no início da atividade</div></div>
+    <div class="atividades-bloco-tag">Roteiros 1 e 2</div>
+  </div>
+  <div class="roteiros-corpo"><div class="roteiro-card">
+  <div class="roteiro-topo">
+    <div class="roteiro-num" style="color:#0EA5E9">Roteiro 1</div>
+    <div class="roteiro-nome">Criando um Algoritmo</div>
+    <div class="roteiro-tipo" style="background:#E0F2FE;color:#0C4A6E">Algoritmo</div>
+  </div>
+  <div class="roteiro-passos">
+    <div class="roteiro-step"><div class="roteiro-step-icon" style="background:#E0F2FE;border-color:#0EA5E9">🎯</div><div class="roteiro-step-num">Passo 1</div><div class="roteiro-step-label">Definir objetivo</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#E0F2FE;border-color:#0EA5E9">📝</div><div class="roteiro-step-num">Passo 2</div><div class="roteiro-step-label">Listar passos</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#E0F2FE;border-color:#0EA5E9">🔍</div><div class="roteiro-step-num">Passo 3</div><div class="roteiro-step-label">Revisar lógica</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#E0F2FE;border-color:#0EA5E9">🧪</div><div class="roteiro-step-num">Passo 4</div><div class="roteiro-step-label">Testar</div></div>
+  </div>
+</div><div class="roteiro-card">
+  <div class="roteiro-topo">
+    <div class="roteiro-num" style="color:#0EA5E9">Roteiro 2</div>
+    <div class="roteiro-nome">Depurando um Erro</div>
+    <div class="roteiro-tipo" style="background:#E0F2FE;color:#0C4A6E">Algoritmo</div>
+  </div>
+  <div class="roteiro-passos">
+    <div class="roteiro-step"><div class="roteiro-step-icon" style="background:#E0F2FE;border-color:#0EA5E9">🔎</div><div class="roteiro-step-num">Passo 1</div><div class="roteiro-step-label">Ler o erro</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#E0F2FE;border-color:#0EA5E9">🗺️</div><div class="roteiro-step-num">Passo 2</div><div class="roteiro-step-label">Rastrear fluxo</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#E0F2FE;border-color:#0EA5E9">🐛</div><div class="roteiro-step-num">Passo 3</div><div class="roteiro-step-label">Encontrar bug</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#E0F2FE;border-color:#0EA5E9">✅</div><div class="roteiro-step-num">Passo 4</div><div class="roteiro-step-label">Corrigir e testar</div></div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Roteiros</span><span>21 / 27</span></div>
+</div>
+<div class="pg pg-roteiros">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🗺️ Roteiros Visuais</div>
+    <div class="atividades-header-sub">Mostre este roteiro no início da atividade</div></div>
+    <div class="atividades-bloco-tag">Roteiros 3 e 4</div>
+  </div>
+  <div class="roteiros-corpo"><div class="roteiro-card">
+  <div class="roteiro-topo">
+    <div class="roteiro-num" style="color:#8B5CF6">Roteiro 3</div>
+    <div class="roteiro-nome">Resolução Lógica</div>
+    <div class="roteiro-tipo" style="background:#EDE9FE;color:#4C1D95">Lógica</div>
+  </div>
+  <div class="roteiro-passos">
+    <div class="roteiro-step"><div class="roteiro-step-icon" style="background:#EDE9FE;border-color:#8B5CF6">📋</div><div class="roteiro-step-num">Passo 1</div><div class="roteiro-step-label">Ler o problema</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#EDE9FE;border-color:#8B5CF6">🔗</div><div class="roteiro-step-num">Passo 2</div><div class="roteiro-step-label">Mapear condições</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#EDE9FE;border-color:#8B5CF6">⚖️</div><div class="roteiro-step-num">Passo 3</div><div class="roteiro-step-label">Avaliar V/F</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#EDE9FE;border-color:#8B5CF6">💡</div><div class="roteiro-step-num">Passo 4</div><div class="roteiro-step-label">Concluir</div></div>
+  </div>
+</div><div class="roteiro-card">
+  <div class="roteiro-topo">
+    <div class="roteiro-num" style="color:#10B981">Roteiro 4</div>
+    <div class="roteiro-nome">Aplicando Abstração</div>
+    <div class="roteiro-tipo" style="background:#D1FAE5;color:#064E3B">Abstração</div>
+  </div>
+  <div class="roteiro-passos">
+    <div class="roteiro-step"><div class="roteiro-step-icon" style="background:#D1FAE5;border-color:#10B981">🔍</div><div class="roteiro-step-num">Passo 1</div><div class="roteiro-step-label">Analisar problema</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#D1FAE5;border-color:#10B981">🗑️</div><div class="roteiro-step-num">Passo 2</div><div class="roteiro-step-label">Eliminar detalhes</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#D1FAE5;border-color:#10B981">📦</div><div class="roteiro-step-num">Passo 3</div><div class="roteiro-step-label">Definir essencial</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#D1FAE5;border-color:#10B981">✏️</div><div class="roteiro-step-num">Passo 4</div><div class="roteiro-step-label">Modelar</div></div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Roteiros</span><span>22 / 27</span></div>
+</div>
+<div class="pg pg-roteiros">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🗺️ Roteiros Visuais</div>
+    <div class="atividades-header-sub">Mostre este roteiro no início da atividade</div></div>
+    <div class="atividades-bloco-tag">Roteiros 5 e 6</div>
+  </div>
+  <div class="roteiros-corpo"><div class="roteiro-card">
+  <div class="roteiro-topo">
+    <div class="roteiro-num" style="color:#F59E0B">Roteiro 5</div>
+    <div class="roteiro-nome">Decompondo um Projeto</div>
+    <div class="roteiro-tipo" style="background:#FEF3C7;color:#78350F">Decomposição</div>
+  </div>
+  <div class="roteiro-passos">
+    <div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FEF3C7;border-color:#F59E0B">🎯</div><div class="roteiro-step-num">Passo 1</div><div class="roteiro-step-label">Definir meta</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FEF3C7;border-color:#F59E0B">✂️</div><div class="roteiro-step-num">Passo 2</div><div class="roteiro-step-label">Dividir em partes</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FEF3C7;border-color:#F59E0B">🔗</div><div class="roteiro-step-num">Passo 3</div><div class="roteiro-step-label">Ordenar dependências</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FEF3C7;border-color:#F59E0B">📅</div><div class="roteiro-step-num">Passo 4</div><div class="roteiro-step-label">Planejar prazos</div></div>
+  </div>
+</div><div class="roteiro-card">
+  <div class="roteiro-topo">
+    <div class="roteiro-num" style="color:#EF4444">Roteiro 6</div>
+    <div class="roteiro-nome">Reconhecendo Padrões</div>
+    <div class="roteiro-tipo" style="background:#FEE2E2;color:#7F1D1D">Padrão</div>
+  </div>
+  <div class="roteiro-passos">
+    <div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FEE2E2;border-color:#EF4444">📊</div><div class="roteiro-step-num">Passo 1</div><div class="roteiro-step-label">Coletar dados</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FEE2E2;border-color:#EF4444">👀</div><div class="roteiro-step-num">Passo 2</div><div class="roteiro-step-label">Observar repetições</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FEE2E2;border-color:#EF4444">📐</div><div class="roteiro-step-num">Passo 3</div><div class="roteiro-step-label">Formular regra</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FEE2E2;border-color:#EF4444">🔮</div><div class="roteiro-step-num">Passo 4</div><div class="roteiro-step-label">Prever próximo</div></div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Roteiros</span><span>23 / 27</span></div>
+</div>
+<div class="pg pg-roteiros">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🗺️ Roteiros Visuais</div>
+    <div class="atividades-header-sub">Mostre este roteiro no início da atividade</div></div>
+    <div class="atividades-bloco-tag">Roteiros 7 e 8</div>
+  </div>
+  <div class="roteiros-corpo"><div class="roteiro-card">
+  <div class="roteiro-topo">
+    <div class="roteiro-num" style="color:#EC4899">Roteiro 7</div>
+    <div class="roteiro-nome">Trabalhando com Variáveis</div>
+    <div class="roteiro-tipo" style="background:#FCE7F3;color:#831843">Variáveis</div>
+  </div>
+  <div class="roteiro-passos">
+    <div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FCE7F3;border-color:#EC4899">🏷️</div><div class="roteiro-step-num">Passo 1</div><div class="roteiro-step-label">Nomear variável</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FCE7F3;border-color:#EC4899">📦</div><div class="roteiro-step-num">Passo 2</div><div class="roteiro-step-label">Definir tipo</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FCE7F3;border-color:#EC4899">💾</div><div class="roteiro-step-num">Passo 3</div><div class="roteiro-step-label">Atribuir valor</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FCE7F3;border-color:#EC4899">♻️</div><div class="roteiro-step-num">Passo 4</div><div class="roteiro-step-label">Usar no cálculo</div></div>
+  </div>
+</div><div class="roteiro-card">
+  <div class="roteiro-topo">
+    <div class="roteiro-num" style="color:#8B5CF6">Roteiro 8</div>
+    <div class="roteiro-nome">Tabela-Verdade</div>
+    <div class="roteiro-tipo" style="background:#EDE9FE;color:#4C1D95">Lógica</div>
+  </div>
+  <div class="roteiro-passos">
+    <div class="roteiro-step"><div class="roteiro-step-icon" style="background:#EDE9FE;border-color:#8B5CF6">📋</div><div class="roteiro-step-num">Passo 1</div><div class="roteiro-step-label">Listar variáveis</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#EDE9FE;border-color:#8B5CF6">⚡</div><div class="roteiro-step-num">Passo 2</div><div class="roteiro-step-label">Combinar valores</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#EDE9FE;border-color:#8B5CF6">✅</div><div class="roteiro-step-num">Passo 3</div><div class="roteiro-step-label">Avaliar resultado</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#EDE9FE;border-color:#8B5CF6">🔍</div><div class="roteiro-step-num">Passo 4</div><div class="roteiro-step-label">Encontrar padrão</div></div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Roteiros</span><span>24 / 27</span></div>
+</div>
+<div class="pg pg-roteiros">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🗺️ Roteiros Visuais</div>
+    <div class="atividades-header-sub">Mostre este roteiro no início da atividade</div></div>
+    <div class="atividades-bloco-tag">Roteiros 9 e 10</div>
+  </div>
+  <div class="roteiros-corpo"><div class="roteiro-card">
+  <div class="roteiro-topo">
+    <div class="roteiro-num" style="color:#10B981">Roteiro 9</div>
+    <div class="roteiro-nome">Criando uma Função</div>
+    <div class="roteiro-tipo" style="background:#D1FAE5;color:#064E3B">Abstração</div>
+  </div>
+  <div class="roteiro-passos">
+    <div class="roteiro-step"><div class="roteiro-step-icon" style="background:#D1FAE5;border-color:#10B981">🎯</div><div class="roteiro-step-num">Passo 1</div><div class="roteiro-step-label">Definir objetivo</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#D1FAE5;border-color:#10B981">📥</div><div class="roteiro-step-num">Passo 2</div><div class="roteiro-step-label">Definir entradas</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#D1FAE5;border-color:#10B981">⚙️</div><div class="roteiro-step-num">Passo 3</div><div class="roteiro-step-label">Escrever lógica</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#D1FAE5;border-color:#10B981">📤</div><div class="roteiro-step-num">Passo 4</div><div class="roteiro-step-label">Definir saída</div></div>
+  </div>
+</div><div class="roteiro-card">
+  <div class="roteiro-topo">
+    <div class="roteiro-num" style="color:#F59E0B">Roteiro 10</div>
+    <div class="roteiro-nome">Análise de Complexidade</div>
+    <div class="roteiro-tipo" style="background:#FEF3C7;color:#78350F">Decomposição</div>
+  </div>
+  <div class="roteiro-passos">
+    <div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FEF3C7;border-color:#F59E0B">🔢</div><div class="roteiro-step-num">Passo 1</div><div class="roteiro-step-label">Contar operações</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FEF3C7;border-color:#F59E0B">📈</div><div class="roteiro-step-num">Passo 2</div><div class="roteiro-step-label">Ver crescimento</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FEF3C7;border-color:#F59E0B">⚖️</div><div class="roteiro-step-num">Passo 3</div><div class="roteiro-step-label">Comparar soluções</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FEF3C7;border-color:#F59E0B">🏆</div><div class="roteiro-step-num">Passo 4</div><div class="roteiro-step-label">Escolher melhor</div></div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Roteiros</span><span>25 / 27</span></div>
+</div>
+<div class="pg pg-ficha">
+  <div class="secao-header"><div class="secao-header-sub">Avaliação de Processo</div><div class="secao-header-titulo"><span>📋</span> Ficha de Avaliação do Aluno</div></div>
+  <svg class="wave-sep" viewBox="0 0 794 32" preserveAspectRatio="none"><path d="M0,0 L794,0 L794,16 Q596,36 397,20 Q198,4 0,24 Z" fill="#0c1a2e"/><path d="M0,24 Q198,4 397,20 Q596,36 794,16 L794,32 L0,32 Z" fill="#ffffff"/></svg>
+  <div class="ficha-corpo">
+    <div style="font-size:12px;color:#718096;font-style:italic">Avaliação formativa: registre o desenvolvimento do raciocínio, não apenas a resposta final.</div>
+    <div class="ficha-card">
+      <div class="ficha-card-header"><div class="ficha-card-titulo">Dados do Aluno e da Atividade</div><div class="ficha-card-sub">Ficha N°: ______</div></div>
+      <div class="ficha-aluno-grid">
+        <div class="ficha-campo"><div class="ficha-campo-label">Nome do Aluno</div><div class="ficha-campo-linha"></div></div>
+        <div class="ficha-campo"><div class="ficha-campo-label">Data</div><div class="ficha-campo-linha"></div></div>
+        <div class="ficha-campo"><div class="ficha-campo-label">Atividade Realizada</div><div class="ficha-campo-linha"></div></div>
+        <div class="ficha-campo"><div class="ficha-campo-label">Professor(a)</div><div class="ficha-campo-linha"></div></div>
+        <div class="ficha-campo"><div class="ficha-campo-label">Série / Turma</div><div class="ficha-campo-linha"></div></div>
+        <div class="ficha-campo"><div class="ficha-campo-label">Conceito Trabalhado</div><div class="ficha-campo-linha"></div></div>
+      </div>
+      <div class="ficha-corpo-interna">
+        <div class="ficha-secao">
+          <div class="ficha-secao-titulo">📊 Nível de Desenvolvimento (1–5)</div>
+          <div class="ficha-escala">
+            <div class="ficha-escala-item"><div class="ficha-escala-num">1</div><div class="ficha-escala-label">Não demonstrou</div></div>
+            <div class="ficha-escala-item"><div class="ficha-escala-num">2</div><div class="ficha-escala-label">Iniciando</div></div>
+            <div class="ficha-escala-item"><div class="ficha-escala-num">3</div><div class="ficha-escala-label">Em desenvolvimento</div></div>
+            <div class="ficha-escala-item"><div class="ficha-escala-num">4</div><div class="ficha-escala-label">Consolidado</div></div>
+            <div class="ficha-escala-item"><div class="ficha-escala-num">5</div><div class="ficha-escala-label">Avançado</div></div>
+          </div>
+          <div class="ficha-secao-titulo" style="margin-top:10px">🧠 Habilidades Demonstradas</div>
+          <div class="ficha-checkboxes">
+            <div class="ficha-check">Identificou o problema corretamente</div>
+            <div class="ficha-check">Propôs solução estruturada</div>
+            <div class="ficha-check">Justificou o raciocínio com clareza</div>
+            <div class="ficha-check">Identificou erros e os corrigiu</div>
+            <div class="ficha-check">Conectou com situações reais</div>
+            <div class="ficha-check">Colaborou de forma produtiva</div>
+          </div>
+        </div>
+        <div class="ficha-secao">
+          <div class="ficha-secao-titulo">💬 Observações do Professor</div>
+          <div class="ficha-linha-escrita"></div><div class="ficha-linha-escrita"></div><div class="ficha-linha-escrita"></div>
+          <div class="ficha-secao-titulo" style="margin-top:10px">📝 Próximo Passo</div>
+          <div class="ficha-linha-escrita"></div><div class="ficha-linha-escrita"></div>
+          <div class="ficha-secao-titulo" style="margin-top:6px">🌟 Destaque da Atividade</div>
+          <div class="ficha-linha-escrita"></div><div class="ficha-linha-escrita"></div>
+        </div>
+      </div>
+      <div class="ficha-rodape-nota">📌 Esta ficha integra o portfólio de Pensamento Computacional do aluno e pode ser usada em avaliações por competência.</div>
+    </div>
+  </div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Ficha de Avaliação</span><span>26 / 27</span></div>
+</div>
+<div class="pg pg-familia">
+  <div class="secao-header" style="background:linear-gradient(135deg,#0c1a2e,#0ea5e9)">
+    <div class="secao-header-sub">Para compartilhar com os responsáveis</div>
+    <div class="secao-header-titulo"><span>👨‍👩‍👧</span> Guia para a Família</div>
+  </div>
+  <svg class="wave-sep" viewBox="0 0 794 32" preserveAspectRatio="none"><path d="M0,0 L794,0 L794,16 Q596,36 397,20 Q198,4 0,24 Z" fill="#0ea5e9"/><path d="M0,24 Q198,4 397,20 Q596,36 794,16 L794,32 L0,32 Z" fill="#f0f9ff"/></svg>
+  <div class="familia-corpo">
+    <div class="familia-intro">
+      <div class="familia-intro-icon">💻</div>
+      <div>
+        <div class="familia-intro-titulo">O que estamos aprendendo?</div>
+        <div class="familia-intro-desc">Seu filho está aprendendo <strong>Pensamento Computacional</strong> — habilidades que engenheiros, cientistas e empreendedores usam todo dia para resolver problemas complexos. E o melhor: aprendemos isso <strong>sem computador</strong>, desenvolvendo raciocínio que serve para qualquer área da vida.</div>
+      </div>
+    </div>
+    <div class="familia-conceitos">
+      <div class="familia-conceito-card" style="background:#E0F2FE;border-color:#0EA5E9;padding:0;overflow:hidden"><div style="background:#0EA5E9;padding:8px 14px;display:flex;align-items:center;gap:8px"><span style="font-size:22px">🔵</span><span style="font-family:'Fredoka One',cursive;font-size:16px;color:#fff">Algoritmo</span></div><div style="padding:12px 14px"><div class="familia-conceito-def">Uma sequência precisa de passos para resolver um problema.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> Pergunte: "Como você vai estudar para a prova?" Peça que explique o plano passo a passo.</div></div></div><div class="familia-conceito-card" style="background:#EDE9FE;border-color:#8B5CF6;padding:0;overflow:hidden"><div style="background:#8B5CF6;padding:8px 14px;display:flex;align-items:center;gap:8px"><span style="font-size:22px">🟣</span><span style="font-family:'Fredoka One',cursive;font-size:16px;color:#fff">Lógica</span></div><div style="padding:12px 14px"><div class="familia-conceito-def">Pensar de forma clara e estruturada para tomar decisões.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> "SE você terminar o dever de casa, ENTÃO pode usar o celular." Decisões com condições claras.</div></div></div><div class="familia-conceito-card" style="background:#D1FAE5;border-color:#10B981;padding:0;overflow:hidden"><div style="background:#10B981;padding:8px 14px;display:flex;align-items:center;gap:8px"><span style="font-size:22px">🟢</span><span style="font-family:'Fredoka One',cursive;font-size:16px;color:#fff">Abstração</span></div><div style="padding:12px 14px"><div class="familia-conceito-def">Focar no essencial e ignorar o que não importa no momento.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> Ao planejar algo, pergunte: "O que é realmente necessário? O que podemos simplificar?"</div></div></div><div class="familia-conceito-card" style="background:#FEF3C7;border-color:#F59E0B;padding:0;overflow:hidden"><div style="background:#F59E0B;padding:8px 14px;display:flex;align-items:center;gap:8px"><span style="font-size:22px">🟡</span><span style="font-family:'Fredoka One',cursive;font-size:16px;color:#fff">Decomposição</span></div><div style="padding:12px 14px"><div class="familia-conceito-def">Dividir um problema grande em partes menores e manejáveis.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> Projetos escolares grandes: divida em etapas com datas. Uma etapa por vez.</div></div></div>
+    </div>
+    <div class="familia-frase-final">"Pensamento Computacional não é só para programadores.<br>É para quem quer pensar melhor."</div>
+  </div>
+  <div class="pg-footer" style="background:transparent;border-color:rgba(14,165,233,0.2)"><span>{{escola}} · {{professor}}</span><span>Despluga Avançado — Guia para a Família</span><span>27 / 27</span></div>
+</div>
+</body>
+</html>
