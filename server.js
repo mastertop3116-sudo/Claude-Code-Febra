@@ -1160,11 +1160,197 @@ app.post("/api/gerar-pdf", async (req, res) => {
     }
   });
 
-  // ── AI PDF Creator ──────────────────────────────────────────────────────────
-  // POST /api/nexuspdf/ai-criar → { descricao } → { jobId }
+  // ── AI Template Creator ─────────────────────────────────────────────────────
+  // POST /api/nexuspdf/criar-template → { descricao } → { jobId }
+  // GET  /api/nexuspdf/criar-template-progress/:jobId → SSE
+  // POST /api/nexuspdf/ai-criar → { descricao } → { jobId }  (geração rápida sem salvar)
   // GET  /api/nexuspdf/ai-progress/:jobId → SSE
   // GET  /api/nexuspdf/ai-download/:jobId → PDF
 
+  const aiPdfJobs = new Map();
+
+  const SYSTEM_PROMPT_TEMPLATE = `Você é MAX, motor de criação de templates PDF premium da Nexus Digital.
+Rodrigo Cruz usa você para criar infoprodutos que vende online. Qualidade é fundamental.
+
+OBJETIVO: Gerar um template HTML premium de múltiplas páginas A4 para PDF vendável.
+
+══ REQUISITOS TÉCNICOS OBRIGATÓRIOS ══
+CSS base na tag <style>:
+* { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: '[FONTE]', sans-serif; background: #f0f0f0; }
+.pg { width: 794px; min-height: 1123px; background: #fff; position: relative; display: flex; flex-direction: column; overflow: hidden; page-break-after: always; margin: 0 auto 20px; }
+
+Google Fonts CDN (escolha fontes adequadas ao nicho):
+- Educação: Nunito + Fredoka One
+- Saúde/Bem-estar: Poppins + Playfair Display
+- Fitness: Oswald + Open Sans
+- Negócios/Vendas: Outfit + JetBrains Mono
+- Culinária: Lato + Merriweather
+- Finanças: Outfit + JetBrains Mono
+
+Variáveis {{duplas-chaves}} para campos personalizáveis (mín. 2 vars relevantes).
+Conteúdo REAL e COMPLETO — jamais "Lorem ipsum" ou "[conteúdo aqui]".
+Mínimo 8 páginas.
+
+══ ESTRUTURA DAS PÁGINAS ══
+
+PÁGINA 1 — CAPA (obrigatório):
+- Fundo com gradiente escuro (NÃO branco)
+- Padrão grid/textura sutil no background via CSS
+- Título grande, ícone em destaque, subtítulo, chips de destaque, box de stats
+- Rodapé com {{variavel}}
+
+PÁGINAS INTERNAS:
+- Header colorido em CADA página (gradiente do tema)
+- SVG wave separator logo abaixo do header
+- Conteúdo em CARDS (background colorido suave, border-radius, border-left colorida)
+- Grids 2 colunas quando listar itens
+- Boxes especiais para dicas e destaques
+- Rodapé em cada página: {{variavel}} · título · N/TOTAL
+
+ÚLTIMA PÁGINA:
+- Visual diferenciado (fundo colorido), mensagem motivacional / CTA
+
+══ ESTILOS POR NICHO ══
+Educação → navy #1a3a5c, accent por conceito
+Saúde/bem-estar → verde escuro #1a3a2a, tons naturais
+Fitness → roxo escuro #1a1a2e, vermelho/laranja
+Negócios/vendas → slate #0f172a, ciano elétrico
+Culinária → marrom #2d1810, laranja quente
+Finanças → azul royal #0a2240, verde/dourado
+
+══ FORMATO DA RESPOSTA ══
+Responda EXATAMENTE assim:
+1. HTML completo (<!DOCTYPE html> até </html>)
+2. Na linha seguinte: META:{"nome":"Nome","vars":[{"id":"v","label":"Label","default":"Valor"}],"paginas":N,"descricao":"Desc curta","icon":"emoji","category":"educacao"}
+
+Sem explicações. Sem markdown. Apenas HTML + META.`;
+
+  const templateJobs = new Map();
+
+  app.post("/api/nexuspdf/criar-template", (req, res) => {
+    const { descricao } = req.body;
+    if (!descricao?.trim()) return res.status(400).json({ error: "Descrição obrigatória." });
+
+    const jobId = Math.random().toString(36).slice(2, 10);
+    templateJobs.set(jobId, { status: "running", progress: 0, message: "MAX está pensando...", criadoEm: Date.now() });
+    res.json({ jobId });
+
+    const set = (pct, msg) => { const j = templateJobs.get(jobId); if (j) { j.progress = pct; j.message = msg; } };
+    const KILL = setTimeout(() => {
+      const j = templateJobs.get(jobId);
+      if (j?.status === "running") templateJobs.set(jobId, { ...j, status: "error", message: "Timeout após 5 minutos." });
+    }, 5 * 60 * 1000);
+
+    Promise.resolve().then(async () => {
+      set(8, "MAX está analisando o nicho...");
+      const OpenAI = require("openai");
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+      set(15, "Gerando estrutura e design...");
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT_TEMPLATE },
+          { role: "user", content: descricao.trim() }
+        ],
+        max_tokens: 16000,
+        temperature: 0.65,
+      });
+
+      set(55, "Processando HTML gerado...");
+      const raw = completion.choices[0].message.content.trim();
+
+      // Extrai META: da última linha
+      const metaMatch = raw.match(/META:(\{.*\})\s*$/m);
+      if (!metaMatch) throw new Error("MAX não retornou o META do template. Tente novamente.");
+      const meta = JSON.parse(metaMatch[1]);
+      const html = raw.substring(0, raw.lastIndexOf("META:")).trim()
+        .replace(/^```html\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/, "");
+
+      // Gera slug único
+      const slug = (meta.nome || "template")
+        .toLowerCase()
+        .normalize("NFD").replace(/[̀-ͯ]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 40) + "-" + Date.now().toString(36);
+
+      set(65, "Salvando template...");
+      const fs = require("fs");
+      const tmplDir = require("path").join(__dirname, "departments/creative/templates", slug);
+      fs.mkdirSync(tmplDir, { recursive: true });
+      fs.writeFileSync(require("path").join(tmplDir, "index.html"), html, "utf8");
+      fs.writeFileSync(require("path").join(tmplDir, "meta.json"), JSON.stringify({
+        nome: meta.nome || descricao.slice(0, 50),
+        name: meta.nome || descricao.slice(0, 50),
+        nicho: meta.category || "geral",
+        category: meta.category || "geral",
+        icon: meta.icon || "📄",
+        descricao: meta.descricao || descricao.slice(0, 100),
+        description: meta.descricao || descricao.slice(0, 100),
+        layout: "portrait",
+        paginas: meta.paginas || 0,
+        vars: meta.vars || [],
+        criadoViaAI: true,
+        criadoEm: new Date().toISOString(),
+      }, null, 2), "utf8");
+
+      set(80, "Renderizando preview do PDF...");
+      const puppeteer = require("puppeteer");
+      const browser = await puppeteer.launch({ headless: "new", args: ["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage"] });
+      const page = await browser.newPage();
+      await page.setContent(html, { waitUntil: "networkidle0", timeout: 30000 });
+      const pageCount = await page.evaluate(() => document.querySelectorAll(".pg").length);
+      const pdfBuf = await page.pdf({ format: "A4", printBackground: true, margin: { top:0,right:0,bottom:0,left:0 } });
+      await browser.close();
+
+      // Atualiza paginas no meta
+      if (pageCount > 0) {
+        const mPath = require("path").join(tmplDir, "meta.json");
+        const m = JSON.parse(fs.readFileSync(mPath, "utf8"));
+        m.paginas = pageCount;
+        fs.writeFileSync(mPath, JSON.stringify(m, null, 2), "utf8");
+      }
+
+      set(100, "Template criado com sucesso!");
+      const j = templateJobs.get(jobId);
+      templateJobs.set(jobId, { ...j, status: "done", progress: 100, message: "Template pronto!",
+        templateId: slug, meta: { ...meta, paginas: pageCount || meta.paginas },
+        pdf: pdfBuf, descricao: descricao.trim().slice(0, 80) });
+    })
+    .catch(e => {
+      const j = templateJobs.get(jobId);
+      templateJobs.set(jobId, { ...j, status: "error", message: e.message });
+    })
+    .finally(() => clearTimeout(KILL));
+  });
+
+  app.get("/api/nexuspdf/criar-template-progress/:jobId", (req, res) => {
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.flushHeaders();
+    const send = d => res.write(`data: ${JSON.stringify(d)}\n\n`);
+    const iv = setInterval(() => {
+      const j = templateJobs.get(req.params.jobId);
+      if (!j) { send({ status: "error", message: "Job não encontrado." }); clearInterval(iv); res.end(); return; }
+      send({ status: j.status, progress: j.progress, message: j.message,
+        templateId: j.templateId, meta: j.meta, descricao: j.descricao });
+      if (j.status !== "running") { clearInterval(iv); setTimeout(() => res.end(), 200); }
+    }, 700);
+    req.on("close", () => clearInterval(iv));
+  });
+
+  app.get("/api/nexuspdf/criar-template-download/:jobId", (req, res) => {
+    const j = templateJobs.get(req.params.jobId);
+    if (!j?.pdf) return res.status(404).json({ error: "PDF não disponível." });
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${j.templateId || "nexus"}-${Date.now()}.pdf"`);
+    res.send(j.pdf);
+  });
+
+  // ── AI PDF Creator (rápido, sem salvar) ──────────────────────────────────────
   const aiPdfJobs = new Map();
 
   app.post("/api/nexuspdf/ai-criar", (req, res) => {
