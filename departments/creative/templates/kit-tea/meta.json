@@ -1,0 +1,12 @@
+{
+  "nome": "Kit TEA — Pensamento Computacional Inclusivo",
+  "nicho": "Educação / Kit Despluga",
+  "layout": "portrait",
+  "paginas": 27,
+  "descricao": "27 páginas A4 — capa + como usar + guia TEA + 30 atividades adaptadas + guia de adaptação + 10 roteiros visuais + ficha de observação + guia para família",
+  "vars": [
+    { "id": "escola", "label": "Nome da Escola", "default": "Escola Municipal" },
+    { "id": "professor", "label": "Nome da Professora", "default": "Professora" },
+    { "id": "ano", "label": "Ano / Turma", "default": "3º Ano" }
+  ]
+}

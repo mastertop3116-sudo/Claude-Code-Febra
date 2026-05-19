@@ -1,0 +1,2060 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kit TEA — Pensamento Computacional Inclusivo</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+* { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; margin: 0; padding: 0; }
+
+body { font-family: 'Nunito', sans-serif; background: #f0f0f0; }
+
+.pg {
+  width: 794px;
+  min-height: 1123px;
+  background: #fff;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  page-break-after: always;
+  margin: 0 auto 20px;
+}
+
+/* ── PALETA GERAL ── */
+:root {
+  --tea-azul: #4A90D9;
+  --tea-verde: #5CB85C;
+  --tea-laranja: #F0A500;
+  --tea-roxo: #7B68EE;
+  --tea-rosa: #E57399;
+  --tea-cinza: #6C757D;
+  --bg-suave: #F7F9FC;
+  --borda: #E2E8F0;
+  --texto: #2D3748;
+  --texto-leve: #718096;
+}
+
+/* ══════════════════════════════════════════════
+   CAPA
+══════════════════════════════════════════════ */
+.pg-capa {
+  background: linear-gradient(160deg, #1a3a5c 0%, #0f2540 60%, #1a4a3c 100%);
+  justify-content: space-between;
+  align-items: center;
+}
+
+.capa-topo {
+  width: 100%;
+  padding: 28px 40px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.capa-badge {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  padding: 6px 16px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+.capa-preco {
+  background: var(--tea-laranja);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 6px 16px;
+  border-radius: 20px;
+}
+
+.capa-centro {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 40px;
+  text-align: center;
+}
+
+.capa-icone-principal {
+  font-size: 80px;
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
+.capa-subtag {
+  background: rgba(91,184,92,0.25);
+  border: 1px solid rgba(91,184,92,0.5);
+  color: #7ddc7d;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 18px;
+  text-transform: uppercase;
+}
+
+.capa-titulo {
+  font-family: 'Fredoka One', cursive;
+  font-size: 52px;
+  color: #fff;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+
+.capa-titulo span { color: var(--tea-laranja); }
+
+.capa-subtitulo {
+  font-size: 16px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.5;
+  max-width: 480px;
+  margin-bottom: 28px;
+}
+
+.capa-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+
+.capa-chip {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.capa-destaque-box {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 16px;
+  padding: 16px 32px;
+  display: flex;
+  gap: 32px;
+}
+
+.capa-stat { text-align: center; }
+.capa-stat-num { font-family: 'Fredoka One', cursive; font-size: 32px; color: var(--tea-laranja); }
+.capa-stat-label { font-size: 11px; color: rgba(255,255,255,0.65); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+.capa-rodape {
+  width: 100%;
+  padding: 16px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.capa-rodape span { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 600; }
+.capa-rodape strong { color: rgba(255,255,255,0.8); }
+
+/* ══════════════════════════════════════════════
+   COMO USAR
+══════════════════════════════════════════════ */
+.pg-como-usar { background: #fff; }
+
+.secao-header {
+  background: linear-gradient(135deg, #1a3a5c, #0f2540);
+  padding: 28px 40px 24px;
+}
+
+.secao-header-sub { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.55); text-transform: uppercase; margin-bottom: 6px; }
+.secao-header-titulo { font-family: 'Fredoka One', cursive; font-size: 34px; color: #fff; display: flex; align-items: center; gap: 12px; }
+.secao-header-titulo span { font-size: 30px; }
+
+.wave-sep {
+  width: 100%;
+  height: 32px;
+  display: block;
+}
+
+.secao-corpo {
+  flex: 1;
+  padding: 16px 40px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: hidden;
+}
+
+.intro-box {
+  background: #EBF4FF;
+  border-left: 4px solid var(--tea-azul);
+  border-radius: 0 12px 12px 0;
+  padding: 14px 18px;
+  font-size: 13px;
+  color: var(--texto);
+  line-height: 1.6;
+}
+
+.intro-box strong { color: var(--tea-azul); }
+
+.passo-lista { display: flex; flex-direction: column; gap: 10px; }
+
+.passo-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.passo-num {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 14px;
+  color: #fff;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.passo-texto-titulo { font-size: 13px; font-weight: 800; color: var(--texto); margin-bottom: 2px; }
+.passo-texto-desc { font-size: 12px; color: var(--texto-leve); line-height: 1.5; }
+
+.aviso-tea {
+  background: #FFF8E1;
+  border: 2px solid var(--tea-laranja);
+  border-radius: 14px;
+  padding: 14px 18px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-top: 4px;
+}
+
+.aviso-tea-icon { font-size: 24px; flex-shrink: 0; }
+.aviso-tea-titulo { font-size: 13px; font-weight: 800; color: #B7791F; margin-bottom: 4px; }
+.aviso-tea-texto { font-size: 12px; color: #744210; line-height: 1.5; }
+
+.conteudo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.conteudo-card {
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 2px solid var(--borda);
+}
+
+.conteudo-card-icon { font-size: 22px; margin-bottom: 6px; }
+.conteudo-card-titulo { font-size: 12px; font-weight: 800; color: var(--texto); margin-bottom: 3px; }
+.conteudo-card-desc { font-size: 11px; color: var(--texto-leve); line-height: 1.4; }
+
+.pg-footer {
+  padding: 10px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--borda);
+  background: #fff;
+}
+
+.pg-footer span { font-size: 10px; color: var(--texto-leve); font-weight: 600; }
+
+/* ══════════════════════════════════════════════
+   PÁGINA ENTENDENDO O TEA
+══════════════════════════════════════════════ */
+.pg-tea-intro { background: #fff; }
+
+.tea-intro-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.tea-card {
+  border-radius: 14px;
+  padding: 14px;
+  border: 2px solid var(--borda);
+}
+
+.tea-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.tea-card-icon { font-size: 20px; }
+.tea-card-titulo { font-size: 13px; font-weight: 800; color: var(--texto); }
+.tea-card-lista { display: flex; flex-direction: column; gap: 4px; }
+.tea-card-item { font-size: 11px; color: var(--texto-leve); line-height: 1.4; display: flex; gap: 6px; }
+.tea-card-item::before { content: '•'; color: var(--tea-azul); font-weight: 900; flex-shrink: 0; }
+
+.regra-box {
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-top: 0;
+}
+
+.regra-titulo { font-size: 13px; font-weight: 800; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.regra-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.regra-item { display: flex; gap: 8px; align-items: flex-start; }
+.regra-item-icon { font-size: 16px; flex-shrink: 0; }
+.regra-item-texto { font-size: 11px; line-height: 1.4; }
+.regra-item-texto strong { font-weight: 800; display: block; font-size: 11px; }
+
+/* ══════════════════════════════════════════════
+   ATIVIDADES
+══════════════════════════════════════════════ */
+.pg-atividades { background: var(--bg-suave); }
+
+.atividades-header {
+  padding: 20px 40px 14px;
+  background: linear-gradient(135deg, #1a3a5c, #0f2540);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.atividades-header-titulo { font-family: 'Fredoka One', cursive; font-size: 22px; color: #fff; }
+.atividades-header-sub { font-size: 11px; color: rgba(255,255,255,0.55); font-weight: 600; margin-top: 2px; }
+.atividades-bloco-tag {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.atividades-corpo {
+  flex: 1;
+  padding: 14px 40px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: hidden;
+}
+
+.atividade-card {
+  background: #fff;
+  border-radius: 18px;
+  border: 2px solid var(--borda);
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.atividade-topo {
+  padding: 12px 16px 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border-bottom: 2px solid var(--borda);
+}
+
+.atividade-num {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fredoka One', cursive;
+  font-size: 16px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.atividade-info { flex: 1; }
+.atividade-nome { font-family: 'Fredoka One', cursive; font-size: 17px; color: var(--texto); margin-bottom: 3px; }
+.atividade-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+.atividade-tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.atividade-corpo {
+  flex: 1;
+  padding: 12px 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.atividade-col { display: flex; flex-direction: column; gap: 8px; }
+
+.atividade-secao-titulo {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--texto-leve);
+  margin-bottom: 2px;
+}
+
+.material-lista { display: flex; flex-direction: column; gap: 4px; }
+.material-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--texto);
+  font-weight: 600;
+}
+.material-item::before { content: '📌'; font-size: 10px; }
+
+.passo-ativ { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 6px; }
+.passo-ativ-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 900;
+  color: #fff;
+  flex-shrink: 0;
+}
+.passo-ativ-texto { font-size: 12px; color: var(--texto); line-height: 1.4; font-weight: 600; }
+
+.dica-tea-box {
+  background: #FFF8E1;
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  border-left: 3px solid var(--tea-laranja);
+}
+.dica-tea-label { font-size: 10px; font-weight: 800; color: #B7791F; display: block; margin-bottom: 2px; text-transform: uppercase; }
+.dica-tea-texto { font-size: 11px; color: #744210; line-height: 1.4; }
+
+.bncc-tag {
+  background: #E9F5FF;
+  border: 1px solid #BEE3F8;
+  border-radius: 8px;
+  padding: 5px 8px;
+  font-size: 10px;
+  color: #2B6CB0;
+  font-weight: 700;
+}
+
+/* ══════════════════════════════════════════════
+   GUIA DE ADAPTAÇÃO
+══════════════════════════════════════════════ */
+.pg-adaptacao { background: #fff; }
+
+.adapt-intro {
+  background: linear-gradient(135deg, #2D3748, #1A202C);
+  padding: 20px 40px 16px;
+}
+
+.adapt-intro-titulo { font-family: 'Fredoka One', cursive; font-size: 28px; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+.adapt-intro-desc { font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.5; }
+
+.adapt-corpo { flex: 1; padding: 16px 40px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+
+.adapt-3-passos {
+  background: #EBF4FF;
+  border-radius: 16px;
+  padding: 16px 20px;
+  border: 2px solid #BEE3F8;
+}
+
+.adapt-3-titulo { font-size: 13px; font-weight: 800; color: #2B6CB0; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+.adapt-3-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+.adapt-passo-card { background: #fff; border-radius: 12px; padding: 12px; text-align: center; border: 2px solid #BEE3F8; }
+.adapt-passo-num { font-family: 'Fredoka One', cursive; font-size: 28px; color: var(--tea-azul); }
+.adapt-passo-titulo { font-size: 12px; font-weight: 800; color: var(--texto); margin: 4px 0; }
+.adapt-passo-desc { font-size: 11px; color: var(--texto-leve); line-height: 1.4; }
+
+.adapt-tabela-titulo { font-size: 13px; font-weight: 800; color: var(--texto); display: flex; align-items: center; gap: 8px; }
+
+.adapt-tabela { width: 100%; border-collapse: collapse; border-radius: 12px; overflow: hidden; }
+.adapt-tabela th { background: #2D3748; color: #fff; font-size: 11px; font-weight: 800; padding: 8px 12px; text-align: left; }
+.adapt-tabela td { font-size: 11px; color: var(--texto); padding: 8px 12px; border-bottom: 1px solid var(--borda); line-height: 1.4; vertical-align: top; }
+.adapt-tabela tr:nth-child(even) td { background: var(--bg-suave); }
+.adapt-tabela td:first-child { font-weight: 700; }
+
+.tag-funciona { background: #C6F6D5; color: #276749; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 8px; }
+.tag-adaptar { background: #FEF3C7; color: #92400E; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 8px; }
+.tag-evitar { background: #FED7D7; color: #9B2C2C; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 8px; }
+
+/* ══════════════════════════════════════════════
+   ROTEIROS VISUAIS
+══════════════════════════════════════════════ */
+.pg-roteiros { background: var(--bg-suave); }
+
+.roteiros-corpo { flex: 1; padding: 14px 40px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+
+.roteiro-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 2px solid var(--borda);
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.roteiro-topo {
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 2px solid var(--borda);
+}
+
+.roteiro-num { font-family: 'Fredoka One', cursive; font-size: 18px; flex-shrink: 0; }
+.roteiro-nome { font-family: 'Fredoka One', cursive; font-size: 15px; color: var(--texto); }
+.roteiro-tipo { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: auto; }
+
+.roteiro-passos {
+  flex: 1;
+  padding: 10px 14px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.roteiro-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.roteiro-step-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  border: 2px solid var(--borda);
+}
+
+.roteiro-step-num { font-size: 10px; font-weight: 800; color: var(--texto-leve); }
+.roteiro-step-label { font-size: 10px; font-weight: 700; color: var(--texto); line-height: 1.3; }
+
+.roteiro-arrow { font-size: 18px; color: var(--borda); flex-shrink: 0; }
+
+/* ══════════════════════════════════════════════
+   FICHA DE OBSERVAÇÃO
+══════════════════════════════════════════════ */
+.pg-ficha { background: #fff; }
+
+.ficha-corpo { flex: 1; padding: 16px 40px; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+
+.ficha-card {
+  background: var(--bg-suave);
+  border: 2px solid var(--borda);
+  border-radius: 16px;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.ficha-card-header {
+  background: linear-gradient(135deg, #1a3a5c, #0f2540);
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ficha-card-titulo { font-family: 'Fredoka One', cursive; font-size: 15px; color: #fff; }
+.ficha-card-sub { font-size: 10px; color: rgba(255,255,255,0.6); font-weight: 600; }
+
+.ficha-aluno-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 12px 16px; border-bottom: 2px solid var(--borda); }
+
+.ficha-campo { display: flex; flex-direction: column; gap: 4px; }
+.ficha-campo-label { font-size: 10px; font-weight: 800; color: var(--texto-leve); text-transform: uppercase; letter-spacing: 0.5px; }
+.ficha-campo-linha { height: 28px; border-bottom: 2px solid #CBD5E0; background: transparent; }
+
+.ficha-corpo-interna { flex: 1; padding: 12px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.ficha-secao { display: flex; flex-direction: column; gap: 6px; }
+.ficha-secao-titulo { font-size: 11px; font-weight: 800; color: var(--texto); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--borda); padding-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+
+.ficha-escala { display: flex; gap: 6px; }
+.ficha-escala-item { flex: 1; border: 2px solid var(--borda); border-radius: 10px; padding: 6px 4px; text-align: center; }
+.ficha-escala-num { font-family: 'Fredoka One', cursive; font-size: 18px; color: var(--texto-leve); }
+.ficha-escala-label { font-size: 9px; font-weight: 700; color: var(--texto-leve); }
+
+.ficha-checkboxes { display: flex; flex-direction: column; gap: 4px; }
+.ficha-check { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--texto); font-weight: 600; }
+.ficha-check::before { content: '☐'; font-size: 14px; }
+
+.ficha-linha-escrita { height: 22px; border-bottom: 1px solid #CBD5E0; margin-bottom: 4px; }
+
+.ficha-rodape-nota {
+  background: #EBF4FF;
+  border-top: 2px solid #BEE3F8;
+  padding: 8px 16px;
+  font-size: 10px;
+  color: #2B6CB0;
+  font-weight: 700;
+}
+
+/* ══════════════════════════════════════════════
+   GUIA FAMÍLIA
+══════════════════════════════════════════════ */
+.pg-familia { background: linear-gradient(160deg, #f0fff4 0%, #fff 50%, #fffff0 100%); }
+
+.familia-corpo { flex: 1; padding: 16px 40px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+
+.familia-intro {
+  background: linear-gradient(135deg, #276749, #22543d);
+  border-radius: 16px;
+  padding: 16px 20px;
+  color: #fff;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.familia-intro-icon { font-size: 36px; flex-shrink: 0; }
+.familia-intro-titulo { font-family: 'Fredoka One', cursive; font-size: 20px; margin-bottom: 6px; }
+.familia-intro-desc { font-size: 12px; line-height: 1.6; opacity: 0.85; }
+
+.familia-conceitos { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.familia-conceito-card {
+  border-radius: 14px;
+  padding: 12px 14px;
+  border: 2px solid;
+}
+.familia-conceito-icon { font-size: 22px; margin-bottom: 6px; }
+.familia-conceito-nome { font-size: 13px; font-weight: 800; color: var(--texto); margin-bottom: 4px; }
+.familia-conceito-def { font-size: 11px; color: var(--texto-leve); line-height: 1.4; margin-bottom: 8px; }
+.familia-conceito-brincadeira { font-size: 11px; color: var(--texto); line-height: 1.4; background: rgba(255,255,255,0.7); border-radius: 8px; padding: 6px 8px; }
+.familia-conceito-brincadeira strong { font-size: 10px; font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 2px; }
+
+.familia-frase-final {
+  background: #FFF8E1;
+  border: 2px solid var(--tea-laranja);
+  border-radius: 14px;
+  padding: 14px 18px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 800;
+  color: #B7791F;
+  font-style: italic;
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     PÁGINA 1 — CAPA
+══════════════════════════════════════════════ -->
+<div class="pg pg-capa">
+
+  <div class="capa-topo">
+    <div class="capa-badge">Kit Despluga Pro · Material Inclusivo</div>
+    <div class="capa-preco">Order Bump · R$12</div>
+  </div>
+
+  <div class="capa-centro">
+    <div class="capa-icone-principal">🧩</div>
+    <div class="capa-subtag">Educação Inclusiva · TEA</div>
+    <div class="capa-titulo">Kit <span>TEA</span><br>Pensamento<br>Computacional<br>Inclusivo</div>
+    <div class="capa-subtitulo">Atividades desplugadas adaptadas para alunos com Transtorno do Espectro Autista. Menos estímulos, instruções claras, sequências previsíveis.</div>
+
+    <div class="capa-chips">
+      <div class="capa-chip">🎯 30 Atividades Adaptadas</div>
+      <div class="capa-chip">🗺️ 10 Roteiros Visuais</div>
+      <div class="capa-chip">📋 Ficha de Observação</div>
+      <div class="capa-chip">👨‍👩‍👧 Guia para a Família</div>
+    </div>
+
+    <div class="capa-destaque-box">
+      <div class="capa-stat">
+        <div class="capa-stat-num">30</div>
+        <div class="capa-stat-label">Atividades</div>
+      </div>
+      <div class="capa-stat">
+        <div class="capa-stat-num">10</div>
+        <div class="capa-stat-label">Roteiros Visuais</div>
+      </div>
+      <div class="capa-stat">
+        <div class="capa-stat-num">27</div>
+        <div class="capa-stat-label">Páginas A4</div>
+      </div>
+      <div class="capa-stat">
+        <div class="capa-stat-num">0</div>
+        <div class="capa-stat-label">Computador</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="capa-rodape">
+    <span><strong>{{escola}}</strong> · {{professor}}</span>
+    <span>Pensamento Computacional Desplugado</span>
+    <span>Kit Despluga Pro · 1/27</span>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PÁGINA 2 — COMO USAR
+══════════════════════════════════════════════ -->
+<div class="pg pg-como-usar">
+
+  <div class="secao-header">
+    <div class="secao-header-sub">Antes de Começar</div>
+    <div class="secao-header-titulo"><span>📖</span> Como Usar Este Kit</div>
+  </div>
+  <svg class="wave-sep" viewBox="0 0 794 32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <path d="M0,0 L794,0 L794,16 Q596,36 397,20 Q198,4 0,24 Z" fill="#0f2540"/>
+    <path d="M0,24 Q198,4 397,20 Q596,36 794,16 L794,32 L0,32 Z" fill="#ffffff"/>
+  </svg>
+
+  <div class="secao-corpo">
+
+    <div class="intro-box">
+      Este kit foi criado para <strong>nenhum aluno ficar de fora</strong>. As 30 atividades são adaptadas especificamente para alunos com TEA: menos elementos visuais por folha, instruções em no máximo 3 passos, sem metáforas ou duplo sentido, sequências sempre previsíveis.
+    </div>
+
+    <div class="passo-lista">
+      <div class="passo-item">
+        <div class="passo-num" style="background:#4A90D9">1</div>
+        <div>
+          <div class="passo-texto-titulo">Leia a página 3 antes de tudo</div>
+          <div class="passo-texto-desc">Entender o TEA em sala de aula te ajuda a aplicar cada atividade com mais segurança. São 5 minutos de leitura que fazem toda a diferença.</div>
+        </div>
+      </div>
+      <div class="passo-item">
+        <div class="passo-num" style="background:#5CB85C">2</div>
+        <div>
+          <div class="passo-texto-titulo">Escolha a atividade pelo nível do aluno</div>
+          <div class="passo-texto-desc">Cada atividade tem nível 🟢 Fácil, 🟡 Médio ou 🔴 Desafio. Comece pelo Fácil para criar familiaridade com a estrutura antes de avançar.</div>
+        </div>
+      </div>
+      <div class="passo-item">
+        <div class="passo-num" style="background:#F0A500">3</div>
+        <div>
+          <div class="passo-texto-titulo">Use os Roteiros Visuais (páginas 20–24)</div>
+          <div class="passo-texto-desc">Antes de começar a atividade, mostre o roteiro visual para o aluno. Ele vai acompanhar as etapas com os olhos sem precisar ouvir as instruções repetidas vezes.</div>
+        </div>
+      </div>
+      <div class="passo-item">
+        <div class="passo-num" style="background:#7B68EE">4</div>
+        <div>
+          <div class="passo-texto-titulo">Registre na Ficha de Observação (página 25)</div>
+          <div class="passo-texto-desc">Uma ficha por aluno. Registre engajamento, habilidade trabalhada e adaptações usadas. A coordenação e o laudo escolar aceitam esse formato.</div>
+        </div>
+      </div>
+      <div class="passo-item">
+        <div class="passo-num" style="background:#E57399">5</div>
+        <div>
+          <div class="passo-texto-titulo">Envie o Mini Guia para a Família (página 26)</div>
+          <div class="passo-texto-desc">Imprima ou mande no grupo da turma. Explica o que é Pensamento Computacional para pais sem formação pedagógica — e como ajudar em casa.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="aviso-tea">
+      <div class="aviso-tea-icon">⚠️</div>
+      <div>
+        <div class="aviso-tea-titulo">Atenção: cada aluno com TEA é único</div>
+        <div class="aviso-tea-texto">As adaptações deste kit são baseadas em características comuns do TEA, mas cada criança tem seu perfil. Observe o aluno nas primeiras atividades e ajuste conforme necessário. A <strong>Dica TEA</strong> em cada atividade traz sugestões específicas de personalização.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="pg-footer">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Kit TEA — Pensamento Computacional Inclusivo</span>
+    <span>2 / 27</span>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PÁGINA 3 — ENTENDENDO O TEA
+══════════════════════════════════════════════ -->
+<div class="pg pg-tea-intro">
+
+  <div class="secao-header">
+    <div class="secao-header-sub">Guia Rápido para a Professora</div>
+    <div class="secao-header-titulo"><span>🧠</span> Entendendo o TEA em Sala</div>
+  </div>
+  <svg class="wave-sep" viewBox="0 0 794 32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <path d="M0,0 L794,0 L794,16 Q596,36 397,20 Q198,4 0,24 Z" fill="#0f2540"/>
+    <path d="M0,24 Q198,4 397,20 Q596,36 794,16 L794,32 L0,32 Z" fill="#ffffff"/>
+  </svg>
+
+  <div class="secao-corpo">
+
+    <div class="tea-intro-grid">
+      <div class="tea-card" style="border-color:#BEE3F8;background:#EBF4FF">
+        <div class="tea-card-header">
+          <div class="tea-card-icon">👁️</div>
+          <div class="tea-card-titulo" style="color:#2B6CB0">O que pode acontecer em aula</div>
+        </div>
+        <div class="tea-card-lista">
+          <div class="tea-card-item">Dificuldade de processar instruções longas ou com múltiplos passos de uma vez</div>
+          <div class="tea-card-item">Sensibilidade a barulhos, muitas cores ou muito movimento no ambiente</div>
+          <div class="tea-card-item">Preferência por rotinas previsíveis — mudanças repentinas causam ansiedade</div>
+          <div class="tea-card-item">Dificuldade com metáforas, ironia ou linguagem figurada</div>
+          <div class="tea-card-item">Pode precisar de mais tempo para processar antes de responder</div>
+        </div>
+      </div>
+
+      <div class="tea-card" style="border-color:#C6F6D5;background:#F0FFF4">
+        <div class="tea-card-header">
+          <div class="tea-card-icon">💪</div>
+          <div class="tea-card-titulo" style="color:#276749">Pontos fortes comuns</div>
+        </div>
+        <div class="tea-card-lista">
+          <div class="tea-card-item">Excelente memória visual e atenção a detalhes — ótimo para sequências e padrões</div>
+          <div class="tea-card-item">Pensamento sistemático e lógico — PC desplugado é muito adequado para TEA</div>
+          <div class="tea-card-item">Foco intenso em assuntos de interesse — use isso a favor da atividade</div>
+          <div class="tea-card-item">Consistência: uma vez que aprende a estrutura, repete com precisão</div>
+          <div class="tea-card-item">Honestidade direta — feedback genuíno sobre o que funciona ou não</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="regra-box" style="background:#FFF8E1;border:2px solid #F6E05E">
+      <div class="regra-titulo" style="color:#B7791F">⚡ As 4 Regras de Ouro deste Kit</div>
+      <div class="regra-grid">
+        <div class="regra-item">
+          <div class="regra-item-icon">1️⃣</div>
+          <div class="regra-item-texto">
+            <strong>Máximo 3 passos por vez</strong>
+            Nunca dê mais de 3 instruções seguidas. Pause, confirme que entendeu, depois continue.
+          </div>
+        </div>
+        <div class="regra-item">
+          <div class="regra-item-icon">2️⃣</div>
+          <div class="regra-item-texto">
+            <strong>Linguagem direta e literal</strong>
+            Sem "vamos voar nessa atividade" ou "é moleza". Use: "Agora vamos fazer X. Pegue Y."
+          </div>
+        </div>
+        <div class="regra-item">
+          <div class="regra-item-icon">3️⃣</div>
+          <div class="regra-item-texto">
+            <strong>Mostre antes, não só fale</strong>
+            Use o roteiro visual antes de explicar verbalmente. Ver + ouvir = muito mais compreensão.
+          </div>
+        </div>
+        <div class="regra-item">
+          <div class="regra-item-icon">4️⃣</div>
+          <div class="regra-item-texto">
+            <strong>Avise antes de qualquer mudança</strong>
+            "Em 5 minutos vamos parar esta atividade." Transições inesperadas causam crise — previna.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tea-intro-grid">
+      <div class="tea-card" style="border-color:#FED7D7;background:#FFF5F5">
+        <div class="tea-card-header">
+          <div class="tea-card-icon">🚫</div>
+          <div class="tea-card-titulo" style="color:#9B2C2C">Evite nestas atividades</div>
+        </div>
+        <div class="tea-card-lista">
+          <div class="tea-card-item">Trabalho em grupo não estruturado sem papéis definidos</div>
+          <div class="tea-card-item">Música de fundo ou sons altos durante a atividade</div>
+          <div class="tea-card-item">Folhas com muitos elementos ou cores gritantes</div>
+          <div class="tea-card-item">Tempo aberto sem marcação clara de início e fim</div>
+        </div>
+      </div>
+
+      <div class="tea-card" style="border-color:#E9D8FD;background:#FAF5FF">
+        <div class="tea-card-header">
+          <div class="tea-card-icon">✅</div>
+          <div class="tea-card-titulo" style="color:#553C9A">Incentive nestas atividades</div>
+        </div>
+        <div class="tea-card-lista">
+          <div class="tea-card-item">Rotina fixa: mesma estrutura de início e fim em todas as aulas</div>
+          <div class="tea-card-item">Escolha individual: deixe o aluno sentar no lugar preferido</div>
+          <div class="tea-card-item">Reforço positivo específico: "Você fez o passo 2 corretamente!"</div>
+          <div class="tea-card-item">Pausa sensorial se necessário — 5 min de descanso é produtivo</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="pg-footer">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Kit TEA — Guia Rápido</span>
+    <span>3 / 27</span>
+  </div>
+
+</div>
+
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Adaptadas para TEA</div>
+    <div class="atividades-header-sub">Máx. 3 passos · Linguagem direta · Sequência previsível</div></div>
+    <div class="atividades-bloco-tag">Algoritmo</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#E84393">1</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">A Receita do Sanduíche</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#C6F6D5;color:#276749">🟢 Fácil</span>
+        <span class="atividade-tag" style="background:#FCE4EC;color:#880E4F">Algoritmo</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Cartões com figuras (pão, presunto, queijo)</div><div class="material-item">Mesa plana</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO01</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#E84393">1</div><div class="passo-ativ-texto">Coloque os cartões embaralhados na mesa.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#E84393">2</div><div class="passo-ativ-texto">Ordene os cartões para montar o sanduíche na sequência certa.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#E84393">3</div><div class="passo-ativ-texto">Mostre a ordem final para a professora e diga cada passo em voz alta.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Reduza para 3 cartões. Se necessário, deixe um modelo montado ao lado como referência visual.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#E84393">2</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Programando o Robô Humano</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#C6F6D5;color:#276749">🟢 Fácil</span>
+        <span class="atividade-tag" style="background:#FCE4EC;color:#880E4F">Algoritmo</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Fita crepe no chão (forma um caminho)</div><div class="material-item">Folha com setas para preencher</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO01</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#E84393">1</div><div class="passo-ativ-texto">Olhe o caminho marcado no chão com a fita.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#E84393">2</div><div class="passo-ativ-texto">Escreva as setas (→ ↑ ↓) para guiar o robô do início até o X.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#E84393">3</div><div class="passo-ativ-texto">Teste o caminho caminhando e seguindo as setas que você escreveu.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Marque cada passo com uma cor diferente de fita. Demonstre o percurso completo antes de pedir que faça.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Atividades Adaptadas</span><span>4 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Adaptadas para TEA</div>
+    <div class="atividades-header-sub">Máx. 3 passos · Linguagem direta · Sequência previsível</div></div>
+    <div class="atividades-bloco-tag">Algoritmo</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#E84393">3</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Algoritmo da Escovação</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF3C7;color:#92400E">🟡 Médio</span>
+        <span class="atividade-tag" style="background:#FCE4EC;color:#880E4F">Algoritmo</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Folha em branco</div><div class="material-item">Lápis</div><div class="material-item">Imagens de boca e escova já recortadas</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO01</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#E84393">1</div><div class="passo-ativ-texto">Ordene as imagens para mostrar como escovar os dentes corretamente.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#E84393">2</div><div class="passo-ativ-texto">Numere cada imagem de 1 a 5 na ordem certa.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#E84393">3</div><div class="passo-ativ-texto">Troque com um colega: ele deve seguir seus passos e dizer se faria igual.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Forneça as imagens já recortadas — o aluno só precisa ordenar, sem precisar desenhar ou recortar.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#E84393">4</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">A Máquina de Fazer Suco</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF3C7;color:#92400E">🟡 Médio</span>
+        <span class="atividade-tag" style="background:#FCE4EC;color:#880E4F">Algoritmo</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Cartões de ação (lavar, cortar, espremer, coar, servir)</div><div class="material-item">Folha de registro</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO02</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#E84393">1</div><div class="passo-ativ-texto">Ordene os 5 cartões para fazer o suco do começo ao fim.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#E84393">2</div><div class="passo-ativ-texto">Leia em voz alta cada passo na ordem escolhida.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#E84393">3</div><div class="passo-ativ-texto">Marque qual passo NÃO pode ser trocado de lugar com outro.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Use imagens nos cartões, não só texto. Limite a 4 cartões se o aluno ainda está no início.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Atividades Adaptadas</span><span>5 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Adaptadas para TEA</div>
+    <div class="atividades-header-sub">Máx. 3 passos · Linguagem direta · Sequência previsível</div></div>
+    <div class="atividades-bloco-tag">Algoritmo & Sequência</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#E84393">5</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Algoritmo dos Semáforos</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FED7D7;color:#9B2C2C">🔴 Desafio</span>
+        <span class="atividade-tag" style="background:#FCE4EC;color:#880E4F">Algoritmo</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Círculos coloridos (vermelho, amarelo, verde)</div><div class="material-item">Folha de registro</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#E84393">1</div><div class="passo-ativ-texto">Monte o algoritmo: escreva qual cor acende depois de qual.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#E84393">2</div><div class="passo-ativ-texto">Escreva a regra: SE vermelho ENTÃO pare. SE verde ENTÃO ande.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#E84393">3</div><div class="passo-ativ-texto">Teste com um colega: um é o semáforo, o outro é o carro.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Comece com apenas 2 estados (vermelho/verde). Inclua o amarelo somente depois.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#FF6D00">6</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Vestindo o Astronauta</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#C6F6D5;color:#276749">🟢 Fácil</span>
+        <span class="atividade-tag" style="background:#FFF3E0;color:#BF360C">Sequência</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Cartões com roupas (macacão, capacete, luvas, botas, cueca)</div><div class="material-item">Mesa plana</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO01</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#FF6D00">1</div><div class="passo-ativ-texto">Pegue os 5 cartões embaralhados.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#FF6D00">2</div><div class="passo-ativ-texto">Coloque na ordem em que o astronauta precisa se vestir.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#FF6D00">3</div><div class="passo-ativ-texto">Explique por que o capacete não pode ser o primeiro item.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Use figuras grandes e claras. Comece com 3 peças apenas: macacão, capacete, luvas.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Atividades Adaptadas</span><span>6 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Adaptadas para TEA</div>
+    <div class="atividades-header-sub">Máx. 3 passos · Linguagem direta · Sequência previsível</div></div>
+    <div class="atividades-bloco-tag">Sequência</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#FF6D00">7</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">A Sequência da Planta</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#C6F6D5;color:#276749">🟢 Fácil</span>
+        <span class="atividade-tag" style="background:#FFF3E0;color:#BF360C">Sequência</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">4 cartões: semente, broto, planta pequena, planta grande</div><div class="material-item">Cola e folha A4</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO01</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#FF6D00">1</div><div class="passo-ativ-texto">Olhe os 4 cartões fora de ordem.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#FF6D00">2</div><div class="passo-ativ-texto">Ordene do começo ao fim do crescimento da planta.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#FF6D00">3</div><div class="passo-ativ-texto">Cole na folha A4 na ordem certa, deixando espaço entre cada imagem.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Numere levemente as costas dos cartões para que o aluno possa conferir sozinho sem precisar perguntar.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#FF6D00">8</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Dançando em Sequência</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF3C7;color:#92400E">🟡 Médio</span>
+        <span class="atividade-tag" style="background:#FFF3E0;color:#BF360C">Sequência</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Cartões com movimentos (palma, giro, pulo, agacha)</div><div class="material-item">Espaço livre para movimentar</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO01</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#FF6D00">1</div><div class="passo-ativ-texto">A professora mostra uma sequência de 3 movimentos devagar contando em voz alta.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#FF6D00">2</div><div class="passo-ativ-texto">Repita a mesma sequência na mesma ordem.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#FF6D00">3</div><div class="passo-ativ-texto">Crie sua própria sequência de 3 movimentos e ensine para a professora.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Sempre demonstre enquanto conta em voz alta. Evite música de fundo — foque apenas nos movimentos.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Atividades Adaptadas</span><span>7 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Adaptadas para TEA</div>
+    <div class="atividades-header-sub">Máx. 3 passos · Linguagem direta · Sequência previsível</div></div>
+    <div class="atividades-bloco-tag">Sequência</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#FF6D00">9</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">A Fila da Cantina</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF3C7;color:#92400E">🟡 Médio</span>
+        <span class="atividade-tag" style="background:#FFF3E0;color:#BF360C">Sequência</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">6 cartões com situações da fila</div><div class="material-item">Folha de registro</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO02</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#FF6D00">1</div><div class="passo-ativ-texto">Leia os 6 cartões com situações da fila da cantina.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#FF6D00">2</div><div class="passo-ativ-texto">Ordene do primeiro ao último da fila.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#FF6D00">3</div><div class="passo-ativ-texto">Marque qual situação quebra a sequência e escreva por que.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Leia cada cartão em voz alta enquanto o aluno segura o cartão — o toque ajuda na fixação.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#FF6D00">10</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Sequência Quebrada</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FED7D7;color:#9B2C2C">🔴 Desafio</span>
+        <span class="atividade-tag" style="background:#FFF3E0;color:#BF360C">Sequência</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Tira de papel com 5 ações + 1 erro</div><div class="material-item">Tesoura e cola</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO02</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#FF6D00">1</div><div class="passo-ativ-texto">Leia a sequência impressa na tira com atenção.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#FF6D00">2</div><div class="passo-ativ-texto">Encontre o passo que está fora da ordem correta.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#FF6D00">3</div><div class="passo-ativ-texto">Recorte e cole esse passo na posição certa da sequência.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Sugira marcar com lápis o passo suspeito antes de recortar. Nunca imponha limite de tempo.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Atividades Adaptadas</span><span>8 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Adaptadas para TEA</div>
+    <div class="atividades-header-sub">Máx. 3 passos · Linguagem direta · Sequência previsível</div></div>
+    <div class="atividades-bloco-tag">Lógica</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#7B1FA2">11</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Qual é o Intruso?</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#C6F6D5;color:#276749">🟢 Fácil</span>
+        <span class="atividade-tag" style="background:#F3E5F5;color:#4A148C">Lógica</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Cartões com 4 imagens (3 da mesma categoria + 1 diferente)</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#7B1FA2">1</div><div class="passo-ativ-texto">Coloque os 4 cartões visíveis na mesa.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#7B1FA2">2</div><div class="passo-ativ-texto">Aponte o cartão que é diferente dos outros 3.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#7B1FA2">3</div><div class="passo-ativ-texto">Diga em voz alta uma palavra que explique por que ele é diferente.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Use categorias visuais muito claras: 3 animais + 1 fruta. Um único critério de diferença — sem dupla interpretação.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#7B1FA2">12</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Verdadeiro ou Falso com Objetos</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#C6F6D5;color:#276749">🟢 Fácil</span>
+        <span class="atividade-tag" style="background:#F3E5F5;color:#4A148C">Lógica</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Objetos da sala (borracha, régua, lápis)</div><div class="material-item">Cartões com V e F</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#7B1FA2">1</div><div class="passo-ativ-texto">A professora diz uma frase sobre um objeto visível na mesa.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#7B1FA2">2</div><div class="passo-ativ-texto">O aluno levanta o cartão V ou F.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#7B1FA2">3</div><div class="passo-ativ-texto">O aluno explica com UMA palavra por que escolheu.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Comece com afirmações óbvias e concretas: "A borracha é azul." Sem abstrações, sem negações duplas.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Atividades Adaptadas</span><span>9 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Adaptadas para TEA</div>
+    <div class="atividades-header-sub">Máx. 3 passos · Linguagem direta · Sequência previsível</div></div>
+    <div class="atividades-bloco-tag">Lógica</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#7B1FA2">13</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">O Jogo das Pistas</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF3C7;color:#92400E">🟡 Médio</span>
+        <span class="atividade-tag" style="background:#F3E5F5;color:#4A148C">Lógica</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">3 cartões de pistas escritas simples</div><div class="material-item">Imagem-resposta virada para baixo</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#7B1FA2">1</div><div class="passo-ativ-texto">Leia a pista 1 em voz alta e pense no que pode ser.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#7B1FA2">2</div><div class="passo-ativ-texto">Leia a pista 2. Tente adivinhar o objeto.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#7B1FA2">3</div><div class="passo-ativ-texto">Leia a pista 3 para confirmar. Vire a imagem e veja se acertou.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Mostre uma pista de cada vez — nunca as três juntas. Cada cartão separado evita sobrecarga de informação.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#7B1FA2">14</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">SE... ENTÃO com Semáforos</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF3C7;color:#92400E">🟡 Médio</span>
+        <span class="atividade-tag" style="background:#F3E5F5;color:#4A148C">Lógica</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Cartões coloridos (vermelho e verde)</div><div class="material-item">Situações impressas — uma por cartão</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#7B1FA2">1</div><div class="passo-ativ-texto">Leia a situação impressa no cartão.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#7B1FA2">2</div><div class="passo-ativ-texto">Complete mentalmente: SE [condição] ENTÃO [ação].</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#7B1FA2">3</div><div class="passo-ativ-texto">Levante o cartão verde se a ação é correta ou vermelho se é errada.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Mantenha as frases curtas e simples. Sem condições compostas (SE...E...ENTÃO) nesta etapa.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Atividades Adaptadas</span><span>10 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Adaptadas para TEA</div>
+    <div class="atividades-header-sub">Máx. 3 passos · Linguagem direta · Sequência previsível</div></div>
+    <div class="atividades-bloco-tag">Lógica & Repetição</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#7B1FA2">15</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Classificando por 2 Critérios</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FED7D7;color:#9B2C2C">🔴 Desafio</span>
+        <span class="atividade-tag" style="background:#F3E5F5;color:#4A148C">Lógica</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">12 cartões com formas geométricas coloridas e de tamanhos variados</div><div class="material-item">Espaço na mesa para 4 grupos</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#7B1FA2">1</div><div class="passo-ativ-texto">Primeiro: separe os cartões apenas por cor — 2 pilhas.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#7B1FA2">2</div><div class="passo-ativ-texto">Segundo: dentro de cada pilha, separe por tamanho — 4 grupos.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#7B1FA2">3</div><div class="passo-ativ-texto">Conte os cartões em cada grupo e escreva o número.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Faça passo a passo — primeiro só cor, depois refaça incluindo tamanho. Nunca os dois critérios ao mesmo tempo.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#C62828">16</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">O Carimbo Repetido</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#C6F6D5;color:#276749">🟢 Fácil</span>
+        <span class="atividade-tag" style="background:#FFEBEE;color:#7F0000">Repetição</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Carimbo simples (ou dedo com tinta)</div><div class="material-item">Folha A4 branca</div><div class="material-item">Tinta colorida</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO02</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#C62828">1</div><div class="passo-ativ-texto">Carimbe 1 vez no início da linha superior da folha.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#C62828">2</div><div class="passo-ativ-texto">Repita o mesmo carimbo 5 vezes seguidos na mesma linha.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#C62828">3</div><div class="passo-ativ-texto">Conte em voz alta: 1, 2, 3, 4, 5.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Ofereça luvas descartáveis se o aluno tiver hipersensibilidade tátil. Prefira carimbo de cabo em vez de dedo.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Atividades Adaptadas</span><span>11 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Adaptadas para TEA</div>
+    <div class="atividades-header-sub">Máx. 3 passos · Linguagem direta · Sequência previsível</div></div>
+    <div class="atividades-bloco-tag">Repetição</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#C62828">17</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Repetindo o Movimento</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#C6F6D5;color:#276749">🟢 Fácil</span>
+        <span class="atividade-tag" style="background:#FFEBEE;color:#7F0000">Repetição</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Espaço livre — sem material adicional</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO02</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#C62828">1</div><div class="passo-ativ-texto">A professora faz um gesto simples (bater palma uma vez).</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#C62828">2</div><div class="passo-ativ-texto">Repita o mesmo gesto 4 vezes contando em voz alta.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#C62828">3</div><div class="passo-ativ-texto">Invente um gesto novo e peça que a turma repita 3 vezes.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Avise antes: "Vou mostrar um gesto. Você vai repetir 4 vezes. Pronto?" Confirme o número antes de começar.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#C62828">18</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">A Corrente de Papel</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF3C7;color:#92400E">🟡 Médio</span>
+        <span class="atividade-tag" style="background:#FFEBEE;color:#7F0000">Repetição</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Tiras de papel azul e vermelho (8 de cada)</div><div class="material-item">Cola ou grampeador</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO02</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#C62828">1</div><div class="passo-ativ-texto">Faça um elo fechado com a tira azul.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#C62828">2</div><div class="passo-ativ-texto">Passe a tira vermelha pelo elo azul e feche.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#C62828">3</div><div class="passo-ativ-texto">Repita: azul, vermelho, azul, vermelho até usar todas as tiras.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Monte o primeiro par junto com o aluno e deixe o modelo visual ao lado durante toda a atividade.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Atividades Adaptadas</span><span>12 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Adaptadas para TEA</div>
+    <div class="atividades-header-sub">Máx. 3 passos · Linguagem direta · Sequência previsível</div></div>
+    <div class="atividades-bloco-tag">Repetição</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#C62828">19</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Loop da Rotina Escolar</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF3C7;color:#92400E">🟡 Médio</span>
+        <span class="atividade-tag" style="background:#FFEBEE;color:#7F0000">Repetição</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Cartões com atividades diárias (chegada, aula, recreio, almoço, saída)</div><div class="material-item">Relógio de papel</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO02</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#C62828">1</div><div class="passo-ativ-texto">Ordene os cartões da rotina escolar do começo ao fim do dia.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#C62828">2</div><div class="passo-ativ-texto">Aponte qual atividade se repete todos os dias sem exceção.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#C62828">3</div><div class="passo-ativ-texto">Escreva na folha: "Todo dia eu repito: _____".</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Use a rotina real da escola do aluno — a familiaridade com o conteúdo reduz ansiedade e aumenta engajamento.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#C62828">20</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Programando o Loop</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FED7D7;color:#9B2C2C">🔴 Desafio</span>
+        <span class="atividade-tag" style="background:#FFEBEE;color:#7F0000">Repetição</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Folha de registro</div><div class="material-item">Lápis e régua</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO02</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#C62828">1</div><div class="passo-ativ-texto">Escreva na folha: REPITA 3 VEZES: [escreva a ação aqui].</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#C62828">2</div><div class="passo-ativ-texto">Desenhe as 3 repetições da ação em 3 quadrinhos seguidos.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#C62828">3</div><div class="passo-ativ-texto">Mude para REPITA 5 VEZES e refaça — mostre os 5 quadrinhos.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Desenhe uma seta circular ao lado de "repetir" para tornar o conceito mais visual e concreto.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Atividades Adaptadas</span><span>13 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Adaptadas para TEA</div>
+    <div class="atividades-header-sub">Máx. 3 passos · Linguagem direta · Sequência previsível</div></div>
+    <div class="atividades-bloco-tag">Padrão</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#2E7D32">21</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Copiando o Padrão de Cores</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#C6F6D5;color:#276749">🟢 Fácil</span>
+        <span class="atividade-tag" style="background:#E8F5E9;color:#1B5E20">Padrão</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Blocos ou papéis coloridos: vermelho e azul (6 de cada)</div><div class="material-item">Mesa plana</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#2E7D32">1</div><div class="passo-ativ-texto">Olhe a sequência na mesa: azul, vermelho, azul, vermelho...</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#2E7D32">2</div><div class="passo-ativ-texto">Continue a sequência com as peças restantes.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#2E7D32">3</div><div class="passo-ativ-texto">Diga em voz alta qual cor vem depois da última peça colocada.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Use apenas 2 cores no início. Alinhe as peças em linha reta — nunca em grade.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#2E7D32">22</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Padrões no Corpo</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#C6F6D5;color:#276749">🟢 Fácil</span>
+        <span class="atividade-tag" style="background:#E8F5E9;color:#1B5E20">Padrão</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Sem material — apenas espaço livre</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#2E7D32">1</div><div class="passo-ativ-texto">A professora bate o padrão: palma, joelho, palma, joelho.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#2E7D32">2</div><div class="passo-ativ-texto">Repita o padrão junto com a professora.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#2E7D32">3</div><div class="passo-ativ-texto">Diga em voz alta: o que vem depois de "joelho"?</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Se o barulho incomodar, substitua por movimentos silenciosos: levantar o braço direito, depois o esquerdo.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Atividades Adaptadas</span><span>14 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Adaptadas para TEA</div>
+    <div class="atividades-header-sub">Máx. 3 passos · Linguagem direta · Sequência previsível</div></div>
+    <div class="atividades-bloco-tag">Padrão</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#2E7D32">23</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Padrão no Papel Quadriculado</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF3C7;color:#92400E">🟡 Médio</span>
+        <span class="atividade-tag" style="background:#E8F5E9;color:#1B5E20">Padrão</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Folha quadriculada</div><div class="material-item">Lápis de cor azul e vermelho</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#2E7D32">1</div><div class="passo-ativ-texto">Pinte o quadrado 1 de azul e o quadrado 2 de vermelho.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#2E7D32">2</div><div class="passo-ativ-texto">Continue o padrão até o quadrado 10.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#2E7D32">3</div><div class="passo-ativ-texto">Diga qual seria a cor do quadrado 15 sem precisar pintar até lá.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Numere os quadrados levemente com lápis antes de começar — facilita a contagem e reduz erros de posição.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#2E7D32">24</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Encontrando o Padrão Errado</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF3C7;color:#92400E">🟡 Médio</span>
+        <span class="atividade-tag" style="background:#E8F5E9;color:#1B5E20">Padrão</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Tira impressa com padrão de formas + 1 elemento errado</div><div class="material-item">Lápis</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#2E7D32">1</div><div class="passo-ativ-texto">Olhe a tira com atenção e identifique o padrão que se repete.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#2E7D32">2</div><div class="passo-ativ-texto">Encontre o elemento que quebrou o padrão.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#2E7D32">3</div><div class="passo-ativ-texto">Circule com lápis e escreva ao lado o que deveria estar no lugar.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Coloque a tira na frente do aluno e não dê dicas sobre onde está o erro. Dê tempo para processar.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Atividades Adaptadas</span><span>15 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Adaptadas para TEA</div>
+    <div class="atividades-header-sub">Máx. 3 passos · Linguagem direta · Sequência previsível</div></div>
+    <div class="atividades-bloco-tag">Padrão & Decomposição</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#2E7D32">25</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Criando Meu Padrão</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FED7D7;color:#9B2C2C">🔴 Desafio</span>
+        <span class="atividade-tag" style="background:#E8F5E9;color:#1B5E20">Padrão</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">8 cartões em branco</div><div class="material-item">Lápis de cor (2 cores à escolha)</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO03</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#2E7D32">1</div><div class="passo-ativ-texto">Escolha 2 formas ou 2 cores.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#2E7D32">2</div><div class="passo-ativ-texto">Crie um padrão usando os 8 cartões.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#2E7D32">3</div><div class="passo-ativ-texto">Apresente seu padrão para a professora e explique a regra.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Se o trabalho em dupla causar ansiedade, faça individualmente — cada um cria e apresenta apenas para a professora.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#F57F17">26</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Desmontando o Sanduíche</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#C6F6D5;color:#276749">🟢 Fácil</span>
+        <span class="atividade-tag" style="background:#FFF8E1;color:#E65100">Decomposição</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Imagem de sanduíche completo</div><div class="material-item">Cartões com cada ingrediente separado</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO02</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#F57F17">1</div><div class="passo-ativ-texto">Olhe a imagem do sanduíche completo.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#F57F17">2</div><div class="passo-ativ-texto">Separe os cartões de cada parte: pão, queijo, presunto, alface, tomate.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#F57F17">3</div><div class="passo-ativ-texto">Conte em voz alta quantas partes o sanduíche tem.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Use imagens reais de alimentos — mais fácil de identificar do que desenhos estilizados.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Atividades Adaptadas</span><span>16 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Adaptadas para TEA</div>
+    <div class="atividades-header-sub">Máx. 3 passos · Linguagem direta · Sequência previsível</div></div>
+    <div class="atividades-bloco-tag">Decomposição</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#F57F17">27</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">As Partes da Escola</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#C6F6D5;color:#276749">🟢 Fácil</span>
+        <span class="atividade-tag" style="background:#FFF8E1;color:#E65100">Decomposição</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Planta simples da escola</div><div class="material-item">Lápis de cor</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO02</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#F57F17">1</div><div class="passo-ativ-texto">Olhe a planta da escola.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#F57F17">2</div><div class="passo-ativ-texto">Escreva 4 partes que você consegue identificar (sala, banheiro, pátio, refeitório).</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#F57F17">3</div><div class="passo-ativ-texto">Circule a parte que você usa com mais frequência durante o dia.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Se possível, faça uma breve visita antes da atividade — a memória visual do espaço real ajuda muito.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#F57F17">28</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Decompondo a Tarefa de Casa</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF3C7;color:#92400E">🟡 Médio</span>
+        <span class="atividade-tag" style="background:#FFF8E1;color:#E65100">Decomposição</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Uma tarefa de casa real do aluno</div><div class="material-item">Lápis</div><div class="material-item">4 post-its coloridos</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO02</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#F57F17">1</div><div class="passo-ativ-texto">Leia a tarefa de casa completa com atenção.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#F57F17">2</div><div class="passo-ativ-texto">Escreva cada parte menor da tarefa em um post-it separado.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#F57F17">3</div><div class="passo-ativ-texto">Coloque os post-its na ordem em que você vai fazer cada parte.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Limite a tarefas com no máximo 4 etapas identificáveis. Muito eficaz para criar autonomia no dia a dia.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Atividades Adaptadas</span><span>17 / 27</span></div>
+</div>
+<div class="pg pg-atividades">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🎯 Atividades Adaptadas para TEA</div>
+    <div class="atividades-header-sub">Máx. 3 passos · Linguagem direta · Sequência previsível</div></div>
+    <div class="atividades-bloco-tag">Decomposição</div>
+  </div>
+  <div class="atividades-corpo">
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#F57F17">29</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Planejando a Festa</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FEF3C7;color:#92400E">🟡 Médio</span>
+        <span class="atividade-tag" style="background:#FFF8E1;color:#E65100">Decomposição</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Folha de planejamento impressa com espaços para preencher</div><div class="material-item">Lápis</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO02</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#F57F17">1</div><div class="passo-ativ-texto">Leia o objetivo: "Organizar uma festa de aniversário simples".</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#F57F17">2</div><div class="passo-ativ-texto">Escreva 4 tarefas menores que precisam ser feitas para isso.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#F57F17">3</div><div class="passo-ativ-texto">Marque qual tarefa precisa ser feita primeiro e por que.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Use exemplos de festas que o aluno conhece — situações concretas e familiares eliminam a abstração.</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="atividade-card">
+  <div class="atividade-topo">
+    <div class="atividade-num" style="background:#F57F17">30</div>
+    <div class="atividade-info">
+      <div class="atividade-nome">Construindo o Robô por Partes</div>
+      <div class="atividade-meta">
+        <span class="atividade-tag" style="background:#FED7D7;color:#9B2C2C">🔴 Desafio</span>
+        <span class="atividade-tag" style="background:#FFF8E1;color:#E65100">Decomposição</span>
+      </div>
+    </div>
+  </div>
+  <div class="atividade-corpo">
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📌 Material necessário</div>
+      <div class="material-lista"><div class="material-item">Folha com imagem de robô completo</div><div class="material-item">Papel em branco</div><div class="material-item">Lápis</div></div>
+      <div class="bncc-tag" style="margin-top:auto">📚 BNCC: EF15CO02</div>
+    </div>
+    <div class="atividade-col">
+      <div class="atividade-secao-titulo">📋 Passos (máx. 3)</div>
+      <div class="passo-ativ"><div class="passo-ativ-num" style="background:#F57F17">1</div><div class="passo-ativ-texto">Olhe o robô completo e identifique 5 partes diferentes.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#F57F17">2</div><div class="passo-ativ-texto">Escreva o nome de cada parte ao lado da imagem.</div></div><div class="passo-ativ"><div class="passo-ativ-num" style="background:#F57F17">3</div><div class="passo-ativ-texto">Desenhe cada parte separada na folha em branco.</div></div>
+      <div class="dica-tea-box"><div><span class="dica-tea-label">💛 Dica TEA</span><div class="dica-tea-texto">Forneça os nomes das partes por escrito ao lado da imagem — o aluno não precisa memorizar, apenas identificar.</div></div></div>
+    </div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Atividades Adaptadas</span><span>18 / 27</span></div>
+</div>
+<div class="pg pg-adaptacao">
+  <div class="adapt-intro">
+    <div class="adapt-intro-titulo">🔧 Guia de Adaptação das 500 Atividades</div>
+    <div class="adapt-intro-desc">Como adaptar qualquer atividade do Kit Despluga Pro para alunos com TEA em 3 passos simples.</div>
+  </div>
+  <svg class="wave-sep" viewBox="0 0 794 32" preserveAspectRatio="none"><path d="M0,0 L794,0 L794,16 Q596,36 397,20 Q198,4 0,24 Z" fill="#1A202C"/><path d="M0,24 Q198,4 397,20 Q596,36 794,16 L794,32 L0,32 Z" fill="#ffffff"/></svg>
+  <div class="adapt-corpo">
+    <div class="adapt-3-passos">
+      <div class="adapt-3-titulo">⚡ Os 3 Passos para Adaptar Qualquer Atividade</div>
+      <div class="adapt-3-grid">
+        <div class="adapt-passo-card"><div class="adapt-passo-num">1</div><div class="adapt-passo-titulo">Reduza os elementos</div><div class="adapt-passo-desc">Se a atividade tem 6 itens, comece com 3. Se tem 5 passos, dê 2 de cada vez. Menos estímulos = mais foco.</div></div>
+        <div class="adapt-passo-card"><div class="adapt-passo-num">2</div><div class="adapt-passo-titulo">Torne visual</div><div class="adapt-passo-desc">Substitua instruções verbais por imagens ou demonstrações. Mostre sempre antes de pedir que faça.</div></div>
+        <div class="adapt-passo-card"><div class="adapt-passo-num">3</div><div class="adapt-passo-titulo">Dê tempo</div><div class="adapt-passo-desc">Remova limite de tempo. Aguarde a resposta — o processamento pode levar mais alguns segundos. Isso é normal.</div></div>
+      </div>
+    </div>
+    <div><div class="adapt-tabela-titulo" style="margin-bottom:10px">📊 O que funciona, o que adaptar e o que evitar no Kit Despluga Pro</div>
+    <table class="adapt-tabela">
+      <thead><tr><th>Tipo de Atividade</th><th>Status</th><th>O que fazer</th></tr></thead>
+      <tbody>
+        <tr><td>Atividades de sequência com cartões</td><td><span class="tag-funciona">✅ Funciona</span></td><td>Use como está. Reduza para 3–4 cartões inicialmente.</td></tr>
+        <tr><td>Atividades de padrão visual</td><td><span class="tag-funciona">✅ Funciona</span></td><td>Excelente para TEA. Comece com 2 elementos antes de avançar.</td></tr>
+        <tr><td>Atividades com analogias e metáforas</td><td><span class="tag-adaptar">⚠️ Adaptar</span></td><td>Substitua a metáfora por situação concreta e literal da vida do aluno.</td></tr>
+        <tr><td>Atividades em grupo não estruturado</td><td><span class="tag-adaptar">⚠️ Adaptar</span></td><td>Defina o papel de cada aluno com clareza antes de começar.</td></tr>
+        <tr><td>Atividades com timer visível</td><td><span class="tag-adaptar">⚠️ Adaptar</span></td><td>Substitua por avisos verbais: "faltam 5 minutos" a cada etapa.</td></tr>
+        <tr><td>Atividades com música de fundo</td><td><span class="tag-evitar">🚫 Evitar</span></td><td>Retire o som. O silêncio facilita o processamento sensorial.</td></tr>
+        <tr><td>Atividades com muitas cores na folha</td><td><span class="tag-evitar">🚫 Evitar</span></td><td>Use versão PB ou simplifique para 2 cores máximo por folha.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Guia de Adaptação</span><span>19 / 27</span></div>
+</div>
+
+<div class="pg pg-adaptacao">
+  <div class="adapt-intro">
+    <div class="adapt-intro-titulo">📖 Dicas por Conceito</div>
+    <div class="adapt-intro-desc">Orientações específicas para cada conceito de Pensamento Computacional ao trabalhar com alunos com TEA.</div>
+  </div>
+  <svg class="wave-sep" viewBox="0 0 794 32" preserveAspectRatio="none"><path d="M0,0 L794,0 L794,16 Q596,36 397,20 Q198,4 0,24 Z" fill="#1A202C"/><path d="M0,24 Q198,4 397,20 Q596,36 794,16 L794,32 L0,32 Z" fill="#ffffff"/></svg>
+  <div class="adapt-corpo">
+    
+    <div style="background:#FCE4EC;border:2px solid #E8439355;border-radius:14px;padding:12px 16px;display:flex;gap:14px;align-items:flex-start">
+      <div style="width:8px;background:#E84393;border-radius:4px;align-self:stretch;flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:800;color:#880E4F;margin-bottom:4px">Algoritmo</div>
+      <div style="font-size:12px;color:#2D3748;line-height:1.5">Divida em no máximo 3 passos por vez. Use imagens no lugar de texto. Demonstre o algoritmo completo antes de pedir que execute. Prefira situações do cotidiano concreto: escovar dentes, fazer lanche.</div></div>
+    </div>
+    <div style="background:#FFF3E0;border:2px solid #FF6D0055;border-radius:14px;padding:12px 16px;display:flex;gap:14px;align-items:flex-start">
+      <div style="width:8px;background:#FF6D00;border-radius:4px;align-self:stretch;flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:800;color:#BF360C;margin-bottom:4px">Sequência</div>
+      <div style="font-size:12px;color:#2D3748;line-height:1.5">Reduza para 3–4 elementos no início. Numere cada cartão visualmente. Use fotos reais da rotina escolar — a familiaridade reduz a carga cognitiva.</div></div>
+    </div>
+    <div style="background:#F3E5F5;border:2px solid #7B1FA255;border-radius:14px;padding:12px 16px;display:flex;gap:14px;align-items:flex-start">
+      <div style="width:8px;background:#7B1FA2;border-radius:4px;align-self:stretch;flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:800;color:#4A148C;margin-bottom:4px">Lógica</div>
+      <div style="font-size:12px;color:#2D3748;line-height:1.5">Apenas afirmações literais e concretas — sem ironia, sem duplo sentido. Apresente uma condição por vez (SE... ENTÃO...) antes de combinar. Use objetos físicos para representar cada elemento.</div></div>
+    </div>
+    <div style="background:#FFEBEE;border:2px solid #C6282855;border-radius:14px;padding:12px 16px;display:flex;gap:14px;align-items:flex-start">
+      <div style="width:8px;background:#C62828;border-radius:4px;align-self:stretch;flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:800;color:#7F0000;margin-bottom:4px">Repetição</div>
+      <div style="font-size:12px;color:#2D3748;line-height:1.5">Avise o número exato antes de começar: "Vamos fazer 4 vezes." Conte em voz alta. Nunca diga "mais um pouquinho" — seja preciso.</div></div>
+    </div>
+    <div style="background:#E8F5E9;border:2px solid #2E7D3255;border-radius:14px;padding:12px 16px;display:flex;gap:14px;align-items:flex-start">
+      <div style="width:8px;background:#2E7D32;border-radius:4px;align-self:stretch;flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:800;color:#1B5E20;margin-bottom:4px">Padrão</div>
+      <div style="font-size:12px;color:#2D3748;line-height:1.5">Use no máximo 2 elementos (2 cores ou 2 formas). Sempre em linha reta, nunca em grade. Alunos com TEA frequentemente se destacam aqui — use para construir confiança.</div></div>
+    </div>
+    <div style="background:#FFF8E1;border:2px solid #F57F1755;border-radius:14px;padding:12px 16px;display:flex;gap:14px;align-items:flex-start">
+      <div style="width:8px;background:#F57F17;border-radius:4px;align-self:stretch;flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:800;color:#E65100;margin-bottom:4px">Decomposição</div>
+      <div style="font-size:12px;color:#2D3748;line-height:1.5">Comece com objetos físicos reais. Limite a 4 partes identificáveis. Conecte com situações reais como organizar a mochila para criar autonomia.</div></div>
+    </div>
+  </div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Dicas por Conceito</span><span>20 / 27</span></div>
+</div>
+<div class="pg pg-roteiros">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🗺️ Roteiros Visuais</div>
+    <div class="atividades-header-sub">Mostre este roteiro ao aluno antes de iniciar a atividade</div></div>
+    <div class="atividades-bloco-tag">Roteiros 1 e 2</div>
+  </div>
+  <div class="roteiros-corpo"><div class="roteiro-card">
+  <div class="roteiro-topo">
+    <div class="roteiro-num" style="color:#E84393">Roteiro 1</div>
+    <div class="roteiro-nome">Receita do Sanduíche</div>
+    <div class="roteiro-tipo" style="background:#FCE4EC;color:#880E4F">Algoritmo</div>
+  </div>
+  <div class="roteiro-passos">
+    <div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FCE4EC;border-color:#E84393">🃏</div><div class="roteiro-step-num">Passo 1</div><div class="roteiro-step-label">Pegar cartões</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FCE4EC;border-color:#E84393">🔀</div><div class="roteiro-step-num">Passo 2</div><div class="roteiro-step-label">Embaralhar</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FCE4EC;border-color:#E84393">🔢</div><div class="roteiro-step-num">Passo 3</div><div class="roteiro-step-label">Ordenar</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FCE4EC;border-color:#E84393">✅</div><div class="roteiro-step-num">Passo 4</div><div class="roteiro-step-label">Conferir</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FCE4EC;border-color:#E84393">🗣️</div><div class="roteiro-step-num">Passo 5</div><div class="roteiro-step-label">Apresentar</div></div>
+  </div>
+</div><div class="roteiro-card">
+  <div class="roteiro-topo">
+    <div class="roteiro-num" style="color:#E84393">Roteiro 2</div>
+    <div class="roteiro-nome">Robô Humano</div>
+    <div class="roteiro-tipo" style="background:#FCE4EC;color:#880E4F">Algoritmo</div>
+  </div>
+  <div class="roteiro-passos">
+    <div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FCE4EC;border-color:#E84393">👀</div><div class="roteiro-step-num">Passo 1</div><div class="roteiro-step-label">Ver o caminho</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FCE4EC;border-color:#E84393">✏️</div><div class="roteiro-step-num">Passo 2</div><div class="roteiro-step-label">Desenhar setas</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FCE4EC;border-color:#E84393">🚶</div><div class="roteiro-step-num">Passo 3</div><div class="roteiro-step-label">Caminhar</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FCE4EC;border-color:#E84393">✅</div><div class="roteiro-step-num">Passo 4</div><div class="roteiro-step-label">Conferir</div></div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Roteiros Visuais</span><span>21 / 27</span></div>
+</div>
+<div class="pg pg-roteiros">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🗺️ Roteiros Visuais</div>
+    <div class="atividades-header-sub">Mostre este roteiro ao aluno antes de iniciar a atividade</div></div>
+    <div class="atividades-bloco-tag">Roteiros 3 e 4</div>
+  </div>
+  <div class="roteiros-corpo"><div class="roteiro-card">
+  <div class="roteiro-topo">
+    <div class="roteiro-num" style="color:#7B1FA2">Roteiro 3</div>
+    <div class="roteiro-nome">Qual é o Intruso?</div>
+    <div class="roteiro-tipo" style="background:#F3E5F5;color:#4A148C">Lógica</div>
+  </div>
+  <div class="roteiro-passos">
+    <div class="roteiro-step"><div class="roteiro-step-icon" style="background:#F3E5F5;border-color:#7B1FA2">🃏</div><div class="roteiro-step-num">Passo 1</div><div class="roteiro-step-label">Ver os 4 cartões</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#F3E5F5;border-color:#7B1FA2">🔍</div><div class="roteiro-step-num">Passo 2</div><div class="roteiro-step-label">Comparar</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#F3E5F5;border-color:#7B1FA2">👆</div><div class="roteiro-step-num">Passo 3</div><div class="roteiro-step-label">Apontar o diferente</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#F3E5F5;border-color:#7B1FA2">🗣️</div><div class="roteiro-step-num">Passo 4</div><div class="roteiro-step-label">Explicar</div></div>
+  </div>
+</div><div class="roteiro-card">
+  <div class="roteiro-topo">
+    <div class="roteiro-num" style="color:#C62828">Roteiro 4</div>
+    <div class="roteiro-nome">Carimbo Repetido</div>
+    <div class="roteiro-tipo" style="background:#FFEBEE;color:#7F0000">Repetição</div>
+  </div>
+  <div class="roteiro-passos">
+    <div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FFEBEE;border-color:#C62828">🖐️</div><div class="roteiro-step-num">Passo 1</div><div class="roteiro-step-label">Preparar</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FFEBEE;border-color:#C62828">1️⃣</div><div class="roteiro-step-num">Passo 2</div><div class="roteiro-step-label">Carimbar 1x</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FFEBEE;border-color:#C62828">🔄</div><div class="roteiro-step-num">Passo 3</div><div class="roteiro-step-label">Repetir 5x</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FFEBEE;border-color:#C62828">🔢</div><div class="roteiro-step-num">Passo 4</div><div class="roteiro-step-label">Contar alto</div></div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Roteiros Visuais</span><span>22 / 27</span></div>
+</div>
+<div class="pg pg-roteiros">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🗺️ Roteiros Visuais</div>
+    <div class="atividades-header-sub">Mostre este roteiro ao aluno antes de iniciar a atividade</div></div>
+    <div class="atividades-bloco-tag">Roteiros 5 e 6</div>
+  </div>
+  <div class="roteiros-corpo"><div class="roteiro-card">
+  <div class="roteiro-topo">
+    <div class="roteiro-num" style="color:#FF6D00">Roteiro 5</div>
+    <div class="roteiro-nome">Sequência da Planta</div>
+    <div class="roteiro-tipo" style="background:#FFF3E0;color:#BF360C">Sequência</div>
+  </div>
+  <div class="roteiro-passos">
+    <div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FFF3E0;border-color:#FF6D00">🃏</div><div class="roteiro-step-num">Passo 1</div><div class="roteiro-step-label">Pegar cartões</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FFF3E0;border-color:#FF6D00">👀</div><div class="roteiro-step-num">Passo 2</div><div class="roteiro-step-label">Observar</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FFF3E0;border-color:#FF6D00">🔢</div><div class="roteiro-step-num">Passo 3</div><div class="roteiro-step-label">Ordenar 1→4</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FFF3E0;border-color:#FF6D00">🖊️</div><div class="roteiro-step-num">Passo 4</div><div class="roteiro-step-label">Colar na folha</div></div>
+  </div>
+</div><div class="roteiro-card">
+  <div class="roteiro-topo">
+    <div class="roteiro-num" style="color:#FF6D00">Roteiro 6</div>
+    <div class="roteiro-nome">Astronauta se Veste</div>
+    <div class="roteiro-tipo" style="background:#FFF3E0;color:#BF360C">Sequência</div>
+  </div>
+  <div class="roteiro-passos">
+    <div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FFF3E0;border-color:#FF6D00">🃏</div><div class="roteiro-step-num">Passo 1</div><div class="roteiro-step-label">Pegar 5 cartões</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FFF3E0;border-color:#FF6D00">🤔</div><div class="roteiro-step-num">Passo 2</div><div class="roteiro-step-label">Pensar a ordem</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FFF3E0;border-color:#FF6D00">🔢</div><div class="roteiro-step-num">Passo 3</div><div class="roteiro-step-label">Ordenar</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FFF3E0;border-color:#FF6D00">🗣️</div><div class="roteiro-step-num">Passo 4</div><div class="roteiro-step-label">Explicar</div></div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Roteiros Visuais</span><span>23 / 27</span></div>
+</div>
+<div class="pg pg-roteiros">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🗺️ Roteiros Visuais</div>
+    <div class="atividades-header-sub">Mostre este roteiro ao aluno antes de iniciar a atividade</div></div>
+    <div class="atividades-bloco-tag">Roteiros 7 e 8</div>
+  </div>
+  <div class="roteiros-corpo"><div class="roteiro-card">
+  <div class="roteiro-topo">
+    <div class="roteiro-num" style="color:#7B1FA2">Roteiro 7</div>
+    <div class="roteiro-nome">Verdadeiro ou Falso</div>
+    <div class="roteiro-tipo" style="background:#F3E5F5;color:#4A148C">Lógica</div>
+  </div>
+  <div class="roteiro-passos">
+    <div class="roteiro-step"><div class="roteiro-step-icon" style="background:#F3E5F5;border-color:#7B1FA2">👂</div><div class="roteiro-step-num">Passo 1</div><div class="roteiro-step-label">Ouvir a frase</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#F3E5F5;border-color:#7B1FA2">🤔</div><div class="roteiro-step-num">Passo 2</div><div class="roteiro-step-label">Pensar</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#F3E5F5;border-color:#7B1FA2">🃏</div><div class="roteiro-step-num">Passo 3</div><div class="roteiro-step-label">Levantar V ou F</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#F3E5F5;border-color:#7B1FA2">🗣️</div><div class="roteiro-step-num">Passo 4</div><div class="roteiro-step-label">Explicar</div></div>
+  </div>
+</div><div class="roteiro-card">
+  <div class="roteiro-topo">
+    <div class="roteiro-num" style="color:#F57F17">Roteiro 8</div>
+    <div class="roteiro-nome">Sanduíche por Partes</div>
+    <div class="roteiro-tipo" style="background:#FFF8E1;color:#E65100">Decomposição</div>
+  </div>
+  <div class="roteiro-passos">
+    <div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FFF8E1;border-color:#F57F17">🥪</div><div class="roteiro-step-num">Passo 1</div><div class="roteiro-step-label">Ver o sanduíche</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FFF8E1;border-color:#F57F17">🃏</div><div class="roteiro-step-num">Passo 2</div><div class="roteiro-step-label">Pegar cartões</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FFF8E1;border-color:#F57F17">🔀</div><div class="roteiro-step-num">Passo 3</div><div class="roteiro-step-label">Separar partes</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FFF8E1;border-color:#F57F17">🔢</div><div class="roteiro-step-num">Passo 4</div><div class="roteiro-step-label">Contar</div></div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Roteiros Visuais</span><span>24 / 27</span></div>
+</div>
+<div class="pg pg-roteiros">
+  <div class="atividades-header">
+    <div><div class="atividades-header-titulo">🗺️ Roteiros Visuais</div>
+    <div class="atividades-header-sub">Mostre este roteiro ao aluno antes de iniciar a atividade</div></div>
+    <div class="atividades-bloco-tag">Roteiros 9 e 10</div>
+  </div>
+  <div class="roteiros-corpo"><div class="roteiro-card">
+  <div class="roteiro-topo">
+    <div class="roteiro-num" style="color:#2E7D32">Roteiro 9</div>
+    <div class="roteiro-nome">Padrão de Cores</div>
+    <div class="roteiro-tipo" style="background:#E8F5E9;color:#1B5E20">Padrão</div>
+  </div>
+  <div class="roteiro-passos">
+    <div class="roteiro-step"><div class="roteiro-step-icon" style="background:#E8F5E9;border-color:#2E7D32">👀</div><div class="roteiro-step-num">Passo 1</div><div class="roteiro-step-label">Ver a sequência</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#E8F5E9;border-color:#2E7D32">🧠</div><div class="roteiro-step-num">Passo 2</div><div class="roteiro-step-label">Identificar padrão</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#E8F5E9;border-color:#2E7D32">➕</div><div class="roteiro-step-num">Passo 3</div><div class="roteiro-step-label">Continuar</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#E8F5E9;border-color:#2E7D32">🗣️</div><div class="roteiro-step-num">Passo 4</div><div class="roteiro-step-label">Dizer próxima</div></div>
+  </div>
+</div><div class="roteiro-card">
+  <div class="roteiro-topo">
+    <div class="roteiro-num" style="color:#C62828">Roteiro 10</div>
+    <div class="roteiro-nome">Loop da Rotina</div>
+    <div class="roteiro-tipo" style="background:#FFEBEE;color:#7F0000">Repetição</div>
+  </div>
+  <div class="roteiro-passos">
+    <div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FFEBEE;border-color:#C62828">🃏</div><div class="roteiro-step-num">Passo 1</div><div class="roteiro-step-label">Ordenar rotina</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FFEBEE;border-color:#C62828">🔍</div><div class="roteiro-step-num">Passo 2</div><div class="roteiro-step-label">Achar repetição</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FFEBEE;border-color:#C62828">✏️</div><div class="roteiro-step-num">Passo 3</div><div class="roteiro-step-label">Escrever o loop</div></div><div class="roteiro-arrow">›</div><div class="roteiro-step"><div class="roteiro-step-icon" style="background:#FFEBEE;border-color:#C62828">✅</div><div class="roteiro-step-num">Passo 4</div><div class="roteiro-step-label">Conferir</div></div>
+  </div>
+</div></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Roteiros Visuais</span><span>25 / 27</span></div>
+</div>
+<div class="pg pg-ficha">
+  <div class="secao-header"><div class="secao-header-sub">Registro Individual</div><div class="secao-header-titulo"><span>📋</span> Ficha de Observação do Aluno</div></div>
+  <svg class="wave-sep" viewBox="0 0 794 32" preserveAspectRatio="none"><path d="M0,0 L794,0 L794,16 Q596,36 397,20 Q198,4 0,24 Z" fill="#0f2540"/><path d="M0,24 Q198,4 397,20 Q596,36 794,16 L794,32 L0,32 Z" fill="#ffffff"/></svg>
+  <div class="ficha-corpo">
+    <div style="font-size:12px;color:#718096;font-style:italic">Esta ficha é aceita pela coordenação e pode ser anexada ao laudo escolar. Preencha uma ficha por aluno, por atividade.</div>
+    <div class="ficha-card">
+      <div class="ficha-card-header"><div class="ficha-card-titulo">Dados do Aluno e da Atividade</div><div class="ficha-card-sub">Ficha N°: ______</div></div>
+      <div class="ficha-aluno-grid">
+        <div class="ficha-campo"><div class="ficha-campo-label">Nome do Aluno</div><div class="ficha-campo-linha"></div></div>
+        <div class="ficha-campo"><div class="ficha-campo-label">Data</div><div class="ficha-campo-linha"></div></div>
+        <div class="ficha-campo"><div class="ficha-campo-label">Atividade Realizada</div><div class="ficha-campo-linha"></div></div>
+        <div class="ficha-campo"><div class="ficha-campo-label">Professora</div><div class="ficha-campo-linha"></div></div>
+        <div class="ficha-campo"><div class="ficha-campo-label">Ano / Turma</div><div class="ficha-campo-linha"></div></div>
+        <div class="ficha-campo"><div class="ficha-campo-label">Conceito Trabalhado</div><div class="ficha-campo-linha"></div></div>
+      </div>
+      <div class="ficha-corpo-interna">
+        <div class="ficha-secao">
+          <div class="ficha-secao-titulo">📊 Engajamento (1–5)</div>
+          <div class="ficha-escala">
+            <div class="ficha-escala-item"><div class="ficha-escala-num">1</div><div class="ficha-escala-label">Não participou</div></div>
+            <div class="ficha-escala-item"><div class="ficha-escala-num">2</div><div class="ficha-escala-label">Pouco</div></div>
+            <div class="ficha-escala-item"><div class="ficha-escala-num">3</div><div class="ficha-escala-label">Parcial</div></div>
+            <div class="ficha-escala-item"><div class="ficha-escala-num">4</div><div class="ficha-escala-label">Engajado</div></div>
+            <div class="ficha-escala-item"><div class="ficha-escala-num">5</div><div class="ficha-escala-label">Muito</div></div>
+          </div>
+          <div class="ficha-secao-titulo" style="margin-top:10px">🧩 Habilidade Observada</div>
+          <div class="ficha-checkboxes">
+            <div class="ficha-check">Identificou a sequência correta</div>
+            <div class="ficha-check">Seguiu os 3 passos sem ajuda</div>
+            <div class="ficha-check">Reconheceu padrão ou repetição</div>
+            <div class="ficha-check">Decompôs o problema em partes</div>
+            <div class="ficha-check">Aplicou raciocínio lógico</div>
+            <div class="ficha-check">Comunicou o resultado</div>
+          </div>
+        </div>
+        <div class="ficha-secao">
+          <div class="ficha-secao-titulo">🔧 Adaptação Utilizada</div>
+          <div class="ficha-checkboxes">
+            <div class="ficha-check">Reduziu número de elementos</div>
+            <div class="ficha-check">Usou roteiro visual</div>
+            <div class="ficha-check">Removeu limite de tempo</div>
+            <div class="ficha-check">Substituiu metáfora por literal</div>
+            <div class="ficha-check">Fez atividade individualmente</div>
+            <div class="ficha-check">Outra: __________________</div>
+          </div>
+          <div class="ficha-secao-titulo" style="margin-top:10px">📝 Próximo Passo</div>
+          <div class="ficha-linha-escrita"></div><div class="ficha-linha-escrita"></div><div class="ficha-linha-escrita"></div>
+          <div class="ficha-secao-titulo" style="margin-top:6px">💬 Observações Livres</div>
+          <div class="ficha-linha-escrita"></div><div class="ficha-linha-escrita"></div>
+        </div>
+      </div>
+      <div class="ficha-rodape-nota">📌 Esta ficha integra o portfólio de Pensamento Computacional do aluno. Guarde junto com o laudo ou relatório pedagógico.</div>
+    </div>
+  </div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Ficha de Observação</span><span>26 / 27</span></div>
+</div>
+<div class="pg pg-familia">
+  <div class="secao-header" style="background:linear-gradient(135deg,#276749,#22543d)">
+    <div class="secao-header-sub">Para enviar no grupo da turma</div>
+    <div class="secao-header-titulo"><span>👨‍👩‍👧</span> Mini Guia para a Família</div>
+  </div>
+  <svg class="wave-sep" viewBox="0 0 794 32" preserveAspectRatio="none"><path d="M0,0 L794,0 L794,16 Q596,36 397,20 Q198,4 0,24 Z" fill="#22543d"/><path d="M0,24 Q198,4 397,20 Q596,36 794,16 L794,32 L0,32 Z" fill="#f0fff4"/></svg>
+  <div class="familia-corpo">
+    <div class="familia-intro">
+      <div class="familia-intro-icon">🧩</div>
+      <div>
+        <div class="familia-intro-titulo">O que estamos fazendo na escola?</div>
+        <div class="familia-intro-desc">Estamos trabalhando <strong>Pensamento Computacional</strong> — uma forma de pensar que ajuda seu filho a organizar ideias, resolver problemas e seguir sequências. E o melhor: fazemos isso <strong>sem computador</strong>, com atividades práticas, papel e movimento.</div>
+      </div>
+    </div>
+    <div class="familia-conceitos">
+      <div class="familia-conceito-card" style="background:#FFF0F6;border-color:#E84393"><div class="familia-conceito-icon">🍰</div><div class="familia-conceito-nome">Algoritmo</div><div class="familia-conceito-def">Uma sequência de passos para chegar a um resultado.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> Peça para ele explicar os passos de escovar os dentes — um passo de cada vez.</div></div>
+      <div class="familia-conceito-card" style="background:#FFF8F0;border-color:#FF6D00"><div class="familia-conceito-icon">👕</div><div class="familia-conceito-nome">Sequência</div><div class="familia-conceito-def">Fazer as coisas na ordem certa — porque a ordem importa.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> Na hora de se vestir, pergunte: "O que precisa vir primeiro?" Deixe ele descobrir.</div></div>
+      <div class="familia-conceito-card" style="background:#FAF0FF;border-color:#7B1FA2"><div class="familia-conceito-icon">🎲</div><div class="familia-conceito-nome">Lógica</div><div class="familia-conceito-def">Pensar com clareza para tomar a decisão certa.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> "SE está chovendo, ENTÃO o que você coloca para sair?" Perguntas simples de causa e efeito.</div></div>
+      <div class="familia-conceito-card" style="background:#FFF5F5;border-color:#C62828"><div class="familia-conceito-icon">🔄</div><div class="familia-conceito-nome">Repetição</div><div class="familia-conceito-def">Quando a mesma ação se repete várias vezes seguidas.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> "Quantas vezes você escova os dentes por dia?" Mostre que a rotina é um loop que se repete.</div></div>
+    </div>
+    <div class="familia-frase-final">"Inclusão não é só colocar o aluno na sala.<br>É garantir que ele <em>participa de verdade</em>."</div>
+  </div>
+  <div class="pg-footer" style="background:transparent;border-color:rgba(39,103,73,0.2)"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Guia para a Família</span><span>27 / 27</span></div>
+</div>
+</body>
+</html>
