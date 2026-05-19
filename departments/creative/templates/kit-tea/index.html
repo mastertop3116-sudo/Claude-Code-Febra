@@ -85,9 +85,18 @@ body { font-family: 'Nunito', sans-serif; background: #f0f0f0; }
 }
 
 .capa-icone-principal {
-  font-size: 80px;
-  margin-bottom: 16px;
+  font-size: 96px;
   line-height: 1;
+  margin-bottom: 16px;
+  width: 150px;
+  height: 150px;
+  background: rgba(255,255,255,0.18);
+  border: 2px solid rgba(255,255,255,0.25);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 40px rgba(255,255,255,0.08);
 }
 
 .capa-subtag {
@@ -296,7 +305,7 @@ body { font-family: 'Nunito', sans-serif; background: #f0f0f0; }
 .tea-card-icon { font-size: 20px; }
 .tea-card-titulo { font-size: 13px; font-weight: 800; color: var(--texto); }
 .tea-card-lista { display: flex; flex-direction: column; gap: 4px; }
-.tea-card-item { font-size: 11px; color: var(--texto-leve); line-height: 1.4; display: flex; gap: 6px; }
+.tea-card-item { font-size: 12.5px; color: var(--texto-leve); line-height: 1.6; display: flex; gap: 6px; }
 .tea-card-item::before { content: '•'; color: var(--tea-azul); font-weight: 900; flex-shrink: 0; }
 
 .regra-box {
@@ -342,8 +351,13 @@ body { font-family: 'Nunito', sans-serif; background: #f0f0f0; }
   padding: 14px 40px 14px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 0;
   overflow: hidden;
+}
+.atividade-card + .atividade-card {
+  border-top: 3px dashed #CBD5E0;
+  margin-top: 14px;
+  padding-top: 14px;
 }
 
 .atividade-card {
@@ -608,7 +622,7 @@ body { font-family: 'Nunito', sans-serif; background: #f0f0f0; }
 .ficha-check { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--texto); font-weight: 600; }
 .ficha-check::before { content: '☐'; font-size: 14px; }
 
-.ficha-linha-escrita { height: 22px; border-bottom: 1px solid #CBD5E0; margin-bottom: 4px; }
+.ficha-linha-escrita { height: 34px; border-bottom: 2px solid #CBD5E0; margin-bottom: 6px; }
 
 .ficha-rodape-nota {
   background: #EBF4FF;
@@ -912,6 +926,7 @@ body { font-family: 'Nunito', sans-serif; background: #f0f0f0; }
   </div>
 
 </div>
+
 
 <div class="pg pg-atividades">
   <div class="atividades-header">
@@ -2047,10 +2062,10 @@ body { font-family: 'Nunito', sans-serif; background: #f0f0f0; }
       </div>
     </div>
     <div class="familia-conceitos">
-      <div class="familia-conceito-card" style="background:#FFF0F6;border-color:#E84393"><div class="familia-conceito-icon">🍰</div><div class="familia-conceito-nome">Algoritmo</div><div class="familia-conceito-def">Uma sequência de passos para chegar a um resultado.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> Peça para ele explicar os passos de escovar os dentes — um passo de cada vez.</div></div>
-      <div class="familia-conceito-card" style="background:#FFF8F0;border-color:#FF6D00"><div class="familia-conceito-icon">👕</div><div class="familia-conceito-nome">Sequência</div><div class="familia-conceito-def">Fazer as coisas na ordem certa — porque a ordem importa.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> Na hora de se vestir, pergunte: "O que precisa vir primeiro?" Deixe ele descobrir.</div></div>
-      <div class="familia-conceito-card" style="background:#FAF0FF;border-color:#7B1FA2"><div class="familia-conceito-icon">🎲</div><div class="familia-conceito-nome">Lógica</div><div class="familia-conceito-def">Pensar com clareza para tomar a decisão certa.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> "SE está chovendo, ENTÃO o que você coloca para sair?" Perguntas simples de causa e efeito.</div></div>
-      <div class="familia-conceito-card" style="background:#FFF5F5;border-color:#C62828"><div class="familia-conceito-icon">🔄</div><div class="familia-conceito-nome">Repetição</div><div class="familia-conceito-def">Quando a mesma ação se repete várias vezes seguidas.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> "Quantas vezes você escova os dentes por dia?" Mostre que a rotina é um loop que se repete.</div></div>
+      <div class="familia-conceito-card" style="background:#FFF0F6;border-color:#E84393;padding:0;overflow:hidden"><div style="background:#E84393;padding:8px 14px;display:flex;align-items:center;gap:8px"><span style="font-size:22px">🍰</span><span style="font-family:'Fredoka One',cursive;font-size:16px;color:#fff">Algoritmo</span></div><div style="padding:12px 14px"><div class="familia-conceito-def">Uma sequência de passos para chegar a um resultado.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> Peça para ele explicar os passos de escovar os dentes — um passo de cada vez.</div></div></div>
+      <div class="familia-conceito-card" style="background:#FFF8F0;border-color:#FF6D00;padding:0;overflow:hidden"><div style="background:#FF6D00;padding:8px 14px;display:flex;align-items:center;gap:8px"><span style="font-size:22px">👕</span><span style="font-family:'Fredoka One',cursive;font-size:16px;color:#fff">Sequência</span></div><div style="padding:12px 14px"><div class="familia-conceito-def">Fazer as coisas na ordem certa — porque a ordem importa.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> Na hora de se vestir, pergunte: "O que precisa vir primeiro?" Deixe ele descobrir.</div></div></div>
+      <div class="familia-conceito-card" style="background:#FAF0FF;border-color:#7B1FA2;padding:0;overflow:hidden"><div style="background:#7B1FA2;padding:8px 14px;display:flex;align-items:center;gap:8px"><span style="font-size:22px">🎲</span><span style="font-family:'Fredoka One',cursive;font-size:16px;color:#fff">Lógica</span></div><div style="padding:12px 14px"><div class="familia-conceito-def">Pensar com clareza para tomar a decisão certa.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> "SE está chovendo, ENTÃO o que você coloca para sair?" Perguntas simples de causa e efeito.</div></div></div>
+      <div class="familia-conceito-card" style="background:#FFF5F5;border-color:#C62828;padding:0;overflow:hidden"><div style="background:#C62828;padding:8px 14px;display:flex;align-items:center;gap:8px"><span style="font-size:22px">🔄</span><span style="font-family:'Fredoka One',cursive;font-size:16px;color:#fff">Repetição</span></div><div style="padding:12px 14px"><div class="familia-conceito-def">Quando a mesma ação se repete várias vezes seguidas.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> "Quantas vezes você escova os dentes por dia?" Mostre que a rotina é um loop que se repete.</div></div></div>
     </div>
     <div class="familia-frase-final">"Inclusão não é só colocar o aluno na sala.<br>É garantir que ele <em>participa de verdade</em>."</div>
   </div>

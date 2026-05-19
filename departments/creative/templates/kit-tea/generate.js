@@ -366,10 +366,10 @@ extra += `
       </div>
     </div>
     <div class="familia-conceitos">
-      <div class="familia-conceito-card" style="background:#FFF0F6;border-color:#E84393"><div class="familia-conceito-icon">🍰</div><div class="familia-conceito-nome">Algoritmo</div><div class="familia-conceito-def">Uma sequência de passos para chegar a um resultado.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> Peça para ele explicar os passos de escovar os dentes — um passo de cada vez.</div></div>
-      <div class="familia-conceito-card" style="background:#FFF8F0;border-color:#FF6D00"><div class="familia-conceito-icon">👕</div><div class="familia-conceito-nome">Sequência</div><div class="familia-conceito-def">Fazer as coisas na ordem certa — porque a ordem importa.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> Na hora de se vestir, pergunte: "O que precisa vir primeiro?" Deixe ele descobrir.</div></div>
-      <div class="familia-conceito-card" style="background:#FAF0FF;border-color:#7B1FA2"><div class="familia-conceito-icon">🎲</div><div class="familia-conceito-nome">Lógica</div><div class="familia-conceito-def">Pensar com clareza para tomar a decisão certa.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> "SE está chovendo, ENTÃO o que você coloca para sair?" Perguntas simples de causa e efeito.</div></div>
-      <div class="familia-conceito-card" style="background:#FFF5F5;border-color:#C62828"><div class="familia-conceito-icon">🔄</div><div class="familia-conceito-nome">Repetição</div><div class="familia-conceito-def">Quando a mesma ação se repete várias vezes seguidas.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> "Quantas vezes você escova os dentes por dia?" Mostre que a rotina é um loop que se repete.</div></div>
+      <div class="familia-conceito-card" style="background:#FFF0F6;border-color:#E84393;padding:0;overflow:hidden"><div style="background:#E84393;padding:8px 14px;display:flex;align-items:center;gap:8px"><span style="font-size:22px">🍰</span><span style="font-family:'Fredoka One',cursive;font-size:16px;color:#fff">Algoritmo</span></div><div style="padding:12px 14px"><div class="familia-conceito-def">Uma sequência de passos para chegar a um resultado.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> Peça para ele explicar os passos de escovar os dentes — um passo de cada vez.</div></div></div>
+      <div class="familia-conceito-card" style="background:#FFF8F0;border-color:#FF6D00;padding:0;overflow:hidden"><div style="background:#FF6D00;padding:8px 14px;display:flex;align-items:center;gap:8px"><span style="font-size:22px">👕</span><span style="font-family:'Fredoka One',cursive;font-size:16px;color:#fff">Sequência</span></div><div style="padding:12px 14px"><div class="familia-conceito-def">Fazer as coisas na ordem certa — porque a ordem importa.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> Na hora de se vestir, pergunte: "O que precisa vir primeiro?" Deixe ele descobrir.</div></div></div>
+      <div class="familia-conceito-card" style="background:#FAF0FF;border-color:#7B1FA2;padding:0;overflow:hidden"><div style="background:#7B1FA2;padding:8px 14px;display:flex;align-items:center;gap:8px"><span style="font-size:22px">🎲</span><span style="font-family:'Fredoka One',cursive;font-size:16px;color:#fff">Lógica</span></div><div style="padding:12px 14px"><div class="familia-conceito-def">Pensar com clareza para tomar a decisão certa.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> "SE está chovendo, ENTÃO o que você coloca para sair?" Perguntas simples de causa e efeito.</div></div></div>
+      <div class="familia-conceito-card" style="background:#FFF5F5;border-color:#C62828;padding:0;overflow:hidden"><div style="background:#C62828;padding:8px 14px;display:flex;align-items:center;gap:8px"><span style="font-size:22px">🔄</span><span style="font-family:'Fredoka One',cursive;font-size:16px;color:#fff">Repetição</span></div><div style="padding:12px 14px"><div class="familia-conceito-def">Quando a mesma ação se repete várias vezes seguidas.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> "Quantas vezes você escova os dentes por dia?" Mostre que a rotina é um loop que se repete.</div></div></div>
     </div>
     <div class="familia-frase-final">"Inclusão não é só colocar o aluno na sala.<br>É garantir que ele <em>participa de verdade</em>."</div>
   </div>
@@ -380,8 +380,14 @@ extra += `
 
 // ── MERGE COM BASE ───────────────────────────────────────────────────────────
 let base = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
-// Remove qualquer coisa após o </body> da versão atual
-base = base.replace(/(<\/body>[\s\S]*)$/i, '');
+// Corta no marcador de páginas geradas (ou em </body> como fallback)
+const marker = '<!-- GENERATED_PAGES_START -->';
+const cutIdx = base.indexOf(marker);
+if (cutIdx !== -1) {
+  base = base.substring(0, cutIdx);
+} else {
+  base = base.replace(/(<\/body>[\s\S]*)$/i, '');
+}
 const final = base + extra;
 fs.writeFileSync(path.join(__dirname, 'index.html'), final, 'utf8');
 console.log('Kit TEA gerado: 27 páginas, 30 atividades, 10 roteiros visuais.');

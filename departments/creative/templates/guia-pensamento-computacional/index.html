@@ -779,13 +779,8 @@
     line-height: 1.5;
   }
 
-  /* ── IMPRESSÃO PB (media print grayscale) ─────────────── */
-  @media print {
-    .pg-cover { background: #111 !important; }
-    .concept-header { background: #333 !important; }
-    .analogy-card, .kid-def, .examples-section .example-item,
-    .class-question { filter: grayscale(1) !important; }
-  }
+  /* ── IMPRESSÃO COLORIDA ─────────────────────────────────── */
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 </style>
 </head>
 <body>
