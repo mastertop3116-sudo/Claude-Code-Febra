@@ -1351,7 +1351,6 @@ Sem explicações. Sem markdown. Apenas HTML + META.`;
   });
 
   // ── AI PDF Creator (rápido, sem salvar) ──────────────────────────────────────
-  const aiPdfJobs = new Map();
 
   app.post("/api/nexuspdf/ai-criar", (req, res) => {
     const { descricao } = req.body;
