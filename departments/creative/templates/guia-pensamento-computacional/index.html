@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guia de Pensamento Computacional para Crianças</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: #fff;
+  }
+
+  /* ── PÁGINA BASE ───────────────────────────────────────── */
+  .pg {
+    width: 210mm;
+    height: 297mm;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    page-break-after: always;
+    position: relative;
+  }
+  .pg:last-child { page-break-after: avoid; }
+
+  /* ── CAPA ──────────────────────────────────────────────── */
+  .pg-cover {
+    background: linear-gradient(160deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20mm;
+  }
+
+  .cover-badge {
+    background: rgba(255,255,255,0.12);
+    border: 2px solid rgba(255,255,255,0.25);
+    border-radius: 50px;
+    padding: 8px 24px;
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.8);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+  }
+
+  .cover-emoji-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: 32px;
+  }
+
+  .cover-emoji-chip {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+  }
+
+  .cover-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 52px;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  .cover-title span {
+    background: linear-gradient(90deg, #f9c74f, #f8961e, #f3722c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .cover-sub {
+    font-size: 17px;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.6;
+    max-width: 420px;
+    margin: 0 auto 40px;
+  }
+
+  .cover-concepts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 50px;
+    max-width: 450px;
+  }
+
+  .concept-pill {
+    padding: 8px 18px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  .cover-footer {
+    margin-top: auto;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .cover-footer strong {
+    color: rgba(255,255,255,0.8);
+  }
+
+  /* ── PÁGINAS DE CONCEITO ───────────────────────────────── */
+  .pg-concept {
+    padding: 0;
+  }
+
+  .concept-header {
+    padding: 28px 32px 22px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-shrink: 0;
+  }
+
+  .concept-number {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fredoka One', cursive;
+    font-size: 26px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .concept-header-text { flex: 1; }
+
+  .concept-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 4px;
+  }
+
+  .concept-name {
+    font-family: 'Fredoka One', cursive;
+    font-size: 42px;
+    color: #fff;
+    line-height: 1;
+  }
+
+  .concept-emoji-big {
+    font-size: 56px;
+    flex-shrink: 0;
+  }
+
+  /* Separador ondulado SVG */
+  .wave-divider {
+    flex-shrink: 0;
+    display: block;
+    width: 100%;
+    margin-top: -2px;
+  }
+
+  /* Corpo branco */
+  .concept-body {
+    flex: 1;
+    padding: 20px 32px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: hidden;
+  }
+
+  /* Card de analogia */
+  .analogy-card {
+    border-radius: 20px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    flex-shrink: 0;
+  }
+
+  .analogy-icon {
+    font-size: 42px;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .analogy-text { flex: 1; }
+
+  .analogy-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    opacity: 0.7;
+  }
+
+  .analogy-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 22px;
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+
+  .analogy-desc {
+    font-size: 15px;
+    line-height: 1.6;
+    font-weight: 600;
+  }
+
+  /* Definição para crianças */
+  .kid-def {
+    border-radius: 16px;
+    border-left: 6px solid;
+    padding: 14px 18px;
+    flex-shrink: 0;
+  }
+
+  .kid-def-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    opacity: 0.6;
+  }
+
+  .kid-def-text {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+
+  /* Exemplos do dia a dia */
+  .examples-section { flex-shrink: 0; }
+
+  .examples-label {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    opacity: 0.6;
+  }
+
+  .examples-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .example-item {
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .example-item span:first-child { font-size: 22px; flex-shrink: 0; }
+
+  /* Caixa "Pergunta para a turma" */
+  .class-question {
+    border-radius: 16px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+
+  .question-icon { font-size: 28px; flex-shrink: 0; }
+
+  .question-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    opacity: 0.65;
+  }
+
+  .question-text {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  /* Footer da página */
+  .concept-footer {
+    flex-shrink: 0;
+    padding: 10px 32px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    opacity: 0.5;
+  }
+
+  /* ── CORES POR CONCEITO ────────────────────────────────── */
+  .c1 { --bg:#e84393; --bg2:#c1185a; --light:#fce4ec; --mid:#f8bbd0; --dark:#880e4f; --accent:#ff80ab; }
+  .c2 { --bg:#ff6d00; --bg2:#e65100; --light:#fff3e0; --mid:#ffe0b2; --dark:#bf360c; --accent:#ff9e40; }
+  .c3 { --bg:#7b1fa2; --bg2:#4a148c; --light:#f3e5f5; --mid:#e1bee7; --dark:#38006b; --accent:#ea80fc; }
+  .c4 { --bg:#c62828; --bg2:#b71c1c; --light:#ffebee; --mid:#ffcdd2; --dark:#7f0000; --accent:#ff5252; }
+  .c5 { --bg:#2e7d32; --bg2:#1b5e20; --light:#e8f5e9; --mid:#c8e6c9; --dark:#1b5e20; --accent:#69f0ae; }
+  .c6 { --bg:#f57f17; --bg2:#e65100; --light:#fffde7; --mid:#fff9c4; --dark:#e65100; --accent:#ffff00; }
+
+  .pg-concept .concept-header { background: linear-gradient(135deg, var(--bg), var(--bg2)); }
+
+  .pg-concept.c1 .concept-body { background: #fff; color: var(--dark); }
+  .pg-concept.c2 .concept-body { background: #fff; color: var(--dark); }
+  .pg-concept.c3 .concept-body { background: #fff; color: var(--dark); }
+  .pg-concept.c4 .concept-body { background: #fff; color: var(--dark); }
+  .pg-concept.c5 .concept-body { background: #fff; color: var(--dark); }
+  .pg-concept.c6 .concept-body { background: #fff; color: var(--dark); }
+
+  .analogy-card { background: var(--light); }
+  .analogy-label { color: var(--bg); }
+  .analogy-title { color: var(--dark); }
+  .analogy-desc { color: #333; }
+
+  .kid-def { background: var(--light); border-color: var(--bg); }
+  .kid-def-label { color: var(--bg); }
+  .kid-def-text { color: var(--dark); }
+
+  .examples-label { color: var(--bg); }
+  .example-item { background: var(--mid); color: var(--dark); }
+
+  .class-question { background: var(--mid); }
+  .question-label { color: var(--bg2); }
+  .question-text { color: var(--dark); }
+
+  .concept-footer { color: var(--dark); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  PÁGINA 1 — CAPA                                      -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="pg pg-cover">
+
+  <div class="cover-badge">Kit Despluga Pro · Material de Apoio</div>
+
+  <div class="cover-emoji-row">
+    <div class="cover-emoji-chip" style="background:rgba(233,67,147,0.3)">🧁</div>
+    <div class="cover-emoji-chip" style="background:rgba(255,109,0,0.3)">👕</div>
+    <div class="cover-emoji-chip" style="background:rgba(123,31,162,0.3)">🎲</div>
+    <div class="cover-emoji-chip" style="background:rgba(198,40,40,0.3)">🔍</div>
+    <div class="cover-emoji-chip" style="background:rgba(46,125,50,0.3)">🐜</div>
+    <div class="cover-emoji-chip" style="background:rgba(245,127,23,0.3)">🥪</div>
+  </div>
+
+  <h1 class="cover-title">
+    Guia de<br>
+    <span>Pensamento<br>Computacional</span><br>
+    para Crianças
+  </h1>
+
+  <p class="cover-sub">
+    6 cartazes prontos para colar na sala de aula.<br>
+    Conceitos explicados com analogias que toda<br>criança entende — na primeira aula.
+  </p>
+
+  <div class="cover-concepts">
+    <span class="concept-pill" style="background:#e84393">🍰 Algoritmo</span>
+    <span class="concept-pill" style="background:#ff6d00">👕 Sequência</span>
+    <span class="concept-pill" style="background:#7b1fa2">🎲 Lógica</span>
+    <span class="concept-pill" style="background:#c62828">🔍 Depuração</span>
+    <span class="concept-pill" style="background:#2e7d32">🐜 Padrão</span>
+    <span class="concept-pill" style="background:#f57f17">🥪 Decomposição</span>
+  </div>
+
+  <div class="cover-footer">
+    <div><strong>{{escola}}</strong> · {{professor}}</div>
+    <div>{{ano}} · Computação Desplugada</div>
+    <div style="opacity:0.4">Kit Despluga Pro</div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  PÁGINA 2 — ALGORITMO                                 -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="pg pg-concept c1">
+
+  <div class="concept-header">
+    <div class="concept-number">1</div>
+    <div class="concept-header-text">
+      <div class="concept-label">Conceito 1 de 6</div>
+      <div class="concept-name">Algoritmo</div>
+    </div>
+    <div class="concept-emoji-big">🍰</div>
+  </div>
+
+  <svg class="wave-divider" viewBox="0 0 840 40" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <path d="M0,0 L840,0 L840,20 Q630,45 420,25 Q210,5 0,30 Z" fill="#c1185a"/>
+    <path d="M0,30 Q210,5 420,25 Q630,45 840,20 L840,40 L0,40 Z" fill="#ffffff"/>
+  </svg>
+
+  <div class="concept-body">
+
+    <div class="analogy-card">
+      <div class="analogy-icon">🧁</div>
+      <div class="analogy-text">
+        <div class="analogy-label">Analogia do dia a dia</div>
+        <div class="analogy-title">É como uma receita de bolo!</div>
+        <div class="analogy-desc">
+          Uma receita de bolo tem passos na ordem certa: misturar os ovos, depois a farinha, colocar no forno... Se você pular um passo ou trocar a ordem, o bolo não fica bom. Um algoritmo é exatamente isso: <strong>uma lista de passos, na ordem certa, para resolver um problema.</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="kid-def">
+      <div class="kid-def-label">O que é Algoritmo?</div>
+      <div class="kid-def-text">
+        "Um algoritmo é um conjunto de instruções passo a passo que dizem ao computador — ou a uma pessoa — o que fazer para resolver um problema."
+      </div>
+    </div>
+
+    <div class="examples-section">
+      <div class="examples-label">Algoritmos que você já usa todo dia</div>
+      <div class="examples-grid">
+        <div class="example-item"><span>🦷</span><span>Escovar os dentes (começa sempre pelo mesmo lado)</span></div>
+        <div class="example-item"><span>🎮</span><span>Passos para ganhar num jogo</span></div>
+        <div class="example-item"><span>🗺️</span><span>Direções para chegar a um lugar</span></div>
+        <div class="example-item"><span>📞</span><span>Salvar um número no celular</span></div>
+      </div>
+    </div>
+
+    <div class="class-question">
+      <div class="question-icon">💬</div>
+      <div>
+        <div class="question-label">Pergunta para a turma</div>
+        <div class="question-text">"Quais são os passos para fazer um sanduíche de queijo? Vamos escrever na ordem correta e ver se funciona!"</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="concept-footer">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Pensamento Computacional — Algoritmo</span>
+    <span>2 / 7</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  PÁGINA 3 — SEQUÊNCIA                                 -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="pg pg-concept c2">
+
+  <div class="concept-header">
+    <div class="concept-number">2</div>
+    <div class="concept-header-text">
+      <div class="concept-label">Conceito 2 de 6</div>
+      <div class="concept-name">Sequência</div>
+    </div>
+    <div class="concept-emoji-big">👕</div>
+  </div>
+
+  <svg class="wave-divider" viewBox="0 0 840 40" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <path d="M0,0 L840,0 L840,20 Q630,45 420,25 Q210,5 0,30 Z" fill="#e65100"/>
+    <path d="M0,30 Q210,5 420,25 Q630,45 840,20 L840,40 L0,40 Z" fill="#ffffff"/>
+  </svg>
+
+  <div class="concept-body">
+
+    <div class="analogy-card">
+      <div class="analogy-icon">👔</div>
+      <div class="analogy-text">
+        <div class="analogy-label">Analogia do dia a dia</div>
+        <div class="analogy-title">É como se vestir pela manhã!</div>
+        <div class="analogy-desc">
+          Você não coloca o sapato antes da meia, certo? Existe uma ordem! Roupa de baixo primeiro, depois a camiseta, depois a calça, por último o sapato. <strong>Sequência é fazer as coisas na ordem correta — cada passo só acontece depois que o anterior terminar.</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="kid-def">
+      <div class="kid-def-label">O que é Sequência?</div>
+      <div class="kid-def-text">
+        "Sequência é a ordem em que os passos de um algoritmo devem acontecer. Se você trocar a ordem, o resultado muda — ou tudo dá errado!"
+      </div>
+    </div>
+
+    <div class="examples-section">
+      <div class="examples-label">Sequências que você já conhece</div>
+      <div class="examples-grid">
+        <div class="example-item"><span>🚦</span><span>Vermelho → Amarelo → Verde no semáforo</span></div>
+        <div class="example-item"><span>📚</span><span>Abre o caderno → Escreve → Fecha</span></div>
+        <div class="example-item"><span>🛁</span><span>Água → Sabonete → Enxágue no banho</span></div>
+        <div class="example-item"><span>🍳</span><span>Ovo → Frigideira → Fogo (nunca ao contrário!)</span></div>
+      </div>
+    </div>
+
+    <div class="class-question">
+      <div class="question-icon">💬</div>
+      <div>
+        <div class="question-label">Atividade prática</div>
+        <div class="question-text">"Cada um escreve os passos de como escova os dentes. Depois comparamos — todo mundo faz na mesma ordem?"</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="concept-footer">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Pensamento Computacional — Sequência</span>
+    <span>3 / 7</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  PÁGINA 4 — LÓGICA                                    -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="pg pg-concept c3">
+
+  <div class="concept-header">
+    <div class="concept-number">3</div>
+    <div class="concept-header-text">
+      <div class="concept-label">Conceito 3 de 6</div>
+      <div class="concept-name">Lógica</div>
+    </div>
+    <div class="concept-emoji-big">🎲</div>
+  </div>
+
+  <svg class="wave-divider" viewBox="0 0 840 40" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <path d="M0,0 L840,0 L840,20 Q630,45 420,25 Q210,5 0,30 Z" fill="#4a148c"/>
+    <path d="M0,30 Q210,5 420,25 Q630,45 840,20 L840,40 L0,40 Z" fill="#ffffff"/>
+  </svg>
+
+  <div class="concept-body">
+
+    <div class="analogy-card">
+      <div class="analogy-icon">🤔</div>
+      <div class="analogy-text">
+        <div class="analogy-label">Analogia do dia a dia</div>
+        <div class="analogy-title">É como um jogo de adivinhação!</div>
+        <div class="analogy-desc">
+          "Estou pensando num número de 1 a 100. É maior que 50? Não. É maior que 25? Sim. É maior que 37? Não..." — Cada resposta elimina metade das opções. <strong>Isso é lógica: usar informações para chegar à resposta certa, passo a passo, sem precisar adivinhar por sorte.</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="kid-def">
+      <div class="kid-def-label">O que é Lógica?</div>
+      <div class="kid-def-text">
+        "Lógica é pensar de forma organizada para resolver problemas. É usar o que você sabe para descobrir o que ainda não sabe — como um detetive!"
+      </div>
+    </div>
+
+    <div class="examples-section">
+      <div class="examples-label">Lógica no seu dia a dia</div>
+      <div class="examples-grid">
+        <div class="example-item"><span>🌂</span><span>SE está nublado, ENTÃO levo o guarda-chuva</span></div>
+        <div class="example-item"><span>🍕</span><span>SE está com fome, ENTÃO como algo</span></div>
+        <div class="example-item"><span>🎯</span><span>Descobrir regra de um jogo testando</span></div>
+        <div class="example-item"><span>🔐</span><span>Adivinhar senha esquecida por exclusão</span></div>
+      </div>
+    </div>
+
+    <div class="class-question">
+      <div class="question-icon">💬</div>
+      <div>
+        <div class="question-label">Jogo em sala</div>
+        <div class="question-text">"Vou pensar num objeto da sala. Vocês só podem fazer perguntas de Sim ou Não. Quantas perguntas precisam para descobrir?"</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="concept-footer">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Pensamento Computacional — Lógica</span>
+    <span>4 / 7</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  PÁGINA 5 — DEPURAÇÃO                                 -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="pg pg-concept c4">
+
+  <div class="concept-header">
+    <div class="concept-number">4</div>
+    <div class="concept-header-text">
+      <div class="concept-label">Conceito 4 de 6</div>
+      <div class="concept-name">Depuração</div>
+    </div>
+    <div class="concept-emoji-big">🔍</div>
+  </div>
+
+  <svg class="wave-divider" viewBox="0 0 840 40" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <path d="M0,0 L840,0 L840,20 Q630,45 420,25 Q210,5 0,30 Z" fill="#b71c1c"/>
+    <path d="M0,30 Q210,5 420,25 Q630,45 840,20 L840,40 L0,40 Z" fill="#ffffff"/>
+  </svg>
+
+  <div class="concept-body">
+
+    <div class="analogy-card">
+      <div class="analogy-icon">🕵️</div>
+      <div class="analogy-text">
+        <div class="analogy-label">Analogia do dia a dia</div>
+        <div class="analogy-title">É como achar o erro num caça-palavras!</div>
+        <div class="analogy-desc">
+          Você procura "GATO" no caça-palavras mas não encontra. O que faz? Olha de novo, linha por linha, com atenção. Quando acha, entende onde estava o erro. <strong>Depuração é exatamente isso: encontrar e corrigir os erros num programa ou numa sequência de passos.</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="kid-def">
+      <div class="kid-def-label">O que é Depuração?</div>
+      <div class="kid-def-text">
+        "Depuração (ou debug) é encontrar os erros num código ou numa instrução e corrigi-los. Todo programador depura — errar faz parte do processo!"
+      </div>
+    </div>
+
+    <div class="examples-section">
+      <div class="examples-label">Depuração na vida real</div>
+      <div class="examples-grid">
+        <div class="example-item"><span>📝</span><span>Revisar a prova antes de entregar</span></div>
+        <div class="example-item"><span>🧩</span><span>Descobrir por que uma peça de puzzle não encaixa</span></div>
+        <div class="example-item"><span>🍝</span><span>Provar o macarrão pra ver se tem sal</span></div>
+        <div class="example-item"><span>🔧</span><span>Encontrar por que o brinquedo parou</span></div>
+      </div>
+    </div>
+
+    <div class="class-question">
+      <div class="question-icon">💬</div>
+      <div>
+        <div class="question-label">Atividade prática</div>
+        <div class="question-text">"Vou ler uma receita com um erro escondido. Quem descobre qual passo está errado ou fora de lugar?"</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="concept-footer">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Pensamento Computacional — Depuração</span>
+    <span>5 / 7</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  PÁGINA 6 — PADRÃO                                    -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="pg pg-concept c5">
+
+  <div class="concept-header">
+    <div class="concept-number">5</div>
+    <div class="concept-header-text">
+      <div class="concept-label">Conceito 5 de 6</div>
+      <div class="concept-name">Padrão</div>
+    </div>
+    <div class="concept-emoji-big">🐜</div>
+  </div>
+
+  <svg class="wave-divider" viewBox="0 0 840 40" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <path d="M0,0 L840,0 L840,20 Q630,45 420,25 Q210,5 0,30 Z" fill="#1b5e20"/>
+    <path d="M0,30 Q210,5 420,25 Q630,45 840,20 L840,40 L0,40 Z" fill="#ffffff"/>
+  </svg>
+
+  <div class="concept-body">
+
+    <div class="analogy-card">
+      <div class="analogy-icon">♟️</div>
+      <div class="analogy-text">
+        <div class="analogy-label">Analogia do dia a dia</div>
+        <div class="analogy-title">É como o xadrez e as formigas!</div>
+        <div class="analogy-desc">
+          O tabuleiro de xadrez repete a mesma coisa: quadrado preto, quadrado branco, quadrado preto... As formigas sempre andam em fila, pelo mesmo caminho, do formigueiro até a comida. <strong>Padrão é quando algo se repete de forma previsível — reconhecê-lo ajuda a resolver problemas mais rápido!</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="kid-def">
+      <div class="kid-def-label">O que é Reconhecimento de Padrão?</div>
+      <div class="kid-def-text">
+        "Padrão é uma sequência ou comportamento que se repete. Quando você reconhece um padrão, pode prever o que vem a seguir — ou usar a mesma solução de novo!"
+      </div>
+    </div>
+
+    <div class="examples-section">
+      <div class="examples-label">Padrões em todo lugar</div>
+      <div class="examples-grid">
+        <div class="example-item"><span>🌅</span><span>Todo dia: manhã → tarde → noite</span></div>
+        <div class="example-item"><span>🎵</span><span>Música com refrão que se repete</span></div>
+        <div class="example-item"><span>🔢</span><span>Tabuada: 2, 4, 6, 8... sempre +2</span></div>
+        <div class="example-item"><span>🌺</span><span>Pétalas na flor — sempre o mesmo formato</span></div>
+      </div>
+    </div>
+
+    <div class="class-question">
+      <div class="question-icon">💬</div>
+      <div>
+        <div class="question-label">Desafio para a turma</div>
+        <div class="question-text">"🔴🔵🔴🔵🔴___ Qual vem depois? Por quê? Quem inventa uma sequência para os colegas continuarem?"</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="concept-footer">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Pensamento Computacional — Padrão</span>
+    <span>6 / 7</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  PÁGINA 7 — DECOMPOSIÇÃO                              -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="pg pg-concept c6">
+
+  <div class="concept-header">
+    <div class="concept-number">6</div>
+    <div class="concept-header-text">
+      <div class="concept-label">Conceito 6 de 6</div>
+      <div class="concept-name">Decomposição</div>
+    </div>
+    <div class="concept-emoji-big">🥪</div>
+  </div>
+
+  <svg class="wave-divider" viewBox="0 0 840 40" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <path d="M0,0 L840,0 L840,20 Q630,45 420,25 Q210,5 0,30 Z" fill="#e65100"/>
+    <path d="M0,30 Q210,5 420,25 Q630,45 840,20 L840,40 L0,40 Z" fill="#ffffff"/>
+  </svg>
+
+  <div class="concept-body">
+
+    <div class="analogy-card">
+      <div class="analogy-icon">🍞</div>
+      <div class="analogy-text">
+        <div class="analogy-label">Analogia do dia a dia</div>
+        <div class="analogy-title">É como montar um lanche!</div>
+        <div class="analogy-desc">
+          "Montar um lanche" parece grande. Mas quando você divide: separar o pão, escolher o recheio, colocar o queijo, fechar... cada parte fica pequena e fácil. <strong>Decomposição é pegar um problema grande e dividir em partes menores que são mais fáceis de resolver.</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="kid-def">
+      <div class="kid-def-label">O que é Decomposição?</div>
+      <div class="kid-def-text">
+        "Decomposição é dividir um problema grande em problemas menores. Resolver partes pequenas é muito mais fácil do que tentar resolver tudo de uma vez!"
+      </div>
+    </div>
+
+    <div class="examples-section">
+      <div class="examples-label">Decomposição no seu mundo</div>
+      <div class="examples-grid">
+        <div class="example-item"><span>🎒</span><span>Arrumar a mochila item por item</span></div>
+        <div class="example-item"><span>🏠</span><span>Limpar o quarto: cama → chão → brinquedos</span></div>
+        <div class="example-item"><span>📖</span><span>Ler um livro capítulo por capítulo</span></div>
+        <div class="example-item"><span>🎨</span><span>Desenhar: contorno → detalhes → colorir</span></div>
+      </div>
+    </div>
+
+    <div class="class-question">
+      <div class="question-icon">💬</div>
+      <div>
+        <div class="question-label">Desafio em grupo</div>
+        <div class="question-text">"Como organizaríamos uma festa junina na escola? Vamos dividir em partes: decoração, comida, brincadeiras, música. Cada grupo resolve uma parte!"</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="concept-footer">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Pensamento Computacional — Decomposição</span>
+    <span>7 / 7</span>
+  </div>
+</div>
+
+</body>
+</html>
