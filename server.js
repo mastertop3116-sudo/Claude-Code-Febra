@@ -58,6 +58,11 @@ app.get("/criar", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "criar.html"));
 });
 
+app.get("/kit-builder", (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  res.sendFile(path.join(__dirname, "public", "kit-builder.html"));
+});
+
 // Jobs em memória: jobId → { status, progress, message, result, error }
 const criarJobs = new Map();
 function limparJobsAntigos() {
@@ -1117,6 +1122,42 @@ app.post("/api/gerar-pdf", async (req, res) => {
   app.get("/api/nexuspdf/stats", (req, res) => {
     try { res.json(getStats()); }
     catch (e) { res.status(500).json({ error: e.message }); }
+  });
+
+  // POST /api/nexuspdf/gerar-kit → { templateId, kitData } → PDF customizado
+  app.post("/api/nexuspdf/gerar-kit", async (req, res) => {
+    try {
+      const { templateId = "kit-tea", kitData = {} } = req.body;
+      const genPath = require("path").join(__dirname, "departments/creative/templates", templateId, "generate.js");
+      const { buildHTML } = require(genPath);
+      const html = buildHTML(kitData);
+
+      const puppeteer = require("puppeteer");
+      const browser = await puppeteer.launch({ headless: "new", args: ["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage"] });
+      const page = await browser.newPage();
+      await page.setContent(html, { waitUntil: "networkidle0", timeout: 30000 });
+      const buffer = await page.pdf({ format: "A4", printBackground: true, margin: { top:0,right:0,bottom:0,left:0 } });
+      await browser.close();
+
+      const slug = (kitData.kitNome || templateId).replace(/\s+/g, "-").toLowerCase();
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", `attachment; filename="${slug}-${Date.now()}.pdf"`);
+      res.send(buffer);
+    } catch (e) {
+      console.error("[/api/nexuspdf/gerar-kit]", e.message);
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  // GET /api/nexuspdf/kit-data/:templateId → retorna defaultData do template
+  app.get("/api/nexuspdf/kit-data/:templateId", (req, res) => {
+    try {
+      const genPath = require("path").join(__dirname, "departments/creative/templates", req.params.templateId, "generate.js");
+      const { defaultData } = require(genPath);
+      res.json(defaultData);
+    } catch (e) {
+      res.status(500).json({ error: e.message });
+    }
   });
 })();
 

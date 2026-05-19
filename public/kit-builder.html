@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kit Builder — Nexus</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#04040a;--surface:#0d0d18;--border:#1e1e2e;--border2:#2a2a3e;
+  --text:#e8e8f0;--muted:#6b6b8a;--accent:#7c6fff;--accent2:#4fffb0;
+  --danger:#ff4f6a;--warn:#ffb347;
+  --algo:#E84393;--seq:#FF6D00;--log:#7B1FA2;--rep:#C62828;--pad:#2E7D32;--dec:#F57F17;
+}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+
+/* ── TOP BAR ── */
+.topbar{height:44px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:16px;flex-shrink:0;position:sticky;top:0;z-index:100}
+.topbar-logo{font-size:13px;font-weight:800;color:var(--accent);letter-spacing:.5px}
+.topbar-title{font-size:13px;color:var(--muted)}
+.topbar-spacer{flex:1}
+.topbar-actions{display:flex;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:.15s}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border2)}
+.btn-ghost:hover{color:var(--text);border-color:var(--accent)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{opacity:.9}
+.btn-success{background:var(--accent2);color:#000}
+.btn-success:hover{opacity:.9}
+.btn-danger{background:var(--danger);color:#fff}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── LAYOUT ── */
+.layout{display:flex;flex:1;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);flex-shrink:0;overflow-y:auto;padding:12px 0}
+.sidebar-section{padding:4px 12px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin:12px 0 4px}
+.sidebar-item{padding:8px 16px;font-size:13px;cursor:pointer;border-left:2px solid transparent;color:var(--muted);transition:.12s;display:flex;align-items:center;gap:8px}
+.sidebar-item:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.sidebar-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(124,111,255,.08)}
+.sidebar-item .badge{margin-left:auto;background:var(--border2);color:var(--muted);font-size:10px;padding:2px 6px;border-radius:10px}
+.sidebar-item.active .badge{background:rgba(124,111,255,.25);color:var(--accent)}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;padding:24px 32px}
+.section-panel{display:none}
+.section-panel.active{display:block}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+.card-title{font-size:14px;font-weight:700;margin-bottom:16px;color:var(--text);display:flex;align-items:center;gap:8px}
+
+/* ── FORM ── */
+.form-row{display:grid;gap:12px;margin-bottom:12px}
+.form-row-2{grid-template-columns:1fr 1fr}
+.form-row-3{grid-template-columns:1fr 1fr 1fr}
+.form-group{display:flex;flex-direction:column;gap:5px}
+label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+input,textarea,select{background:#0a0a14;border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;font-family:'Outfit',sans-serif;outline:none;transition:.15s;width:100%}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:64px;line-height:1.5}
+select option{background:#0a0a14}
+
+/* ── ATIVIDADE ACCORDION ── */
+.ativ-list{display:flex;flex-direction:column;gap:8px}
+.ativ-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.ativ-header{padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none}
+.ativ-header:hover{background:rgba(255,255,255,.03)}
+.ativ-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
+.ativ-header-info{flex:1}
+.ativ-header-nome{font-size:13px;font-weight:600}
+.ativ-header-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.ativ-chevron{color:var(--muted);transition:.2s;font-size:16px}
+.ativ-card.open .ativ-chevron{transform:rotate(180deg)}
+.ativ-body{display:none;padding:16px;border-top:1px solid var(--border);background:#07070f}
+.ativ-card.open .ativ-body{display:block}
+
+.mat-list,.ps-list{display:flex;flex-direction:column;gap:6px}
+.mat-item,.ps-item{display:flex;gap:8px;align-items:flex-start}
+.mat-item span,.ps-item span{font-size:12px;font-weight:700;color:var(--muted);flex-shrink:0;padding-top:9px;min-width:20px}
+.mat-item input,.ps-item input,.ps-item textarea{flex:1}
+
+.add-btn{font-size:12px;color:var(--accent);cursor:pointer;background:none;border:1px dashed var(--border2);border-radius:6px;padding:4px 10px;margin-top:4px;font-family:'Outfit',sans-serif}
+.add-btn:hover{border-color:var(--accent);background:rgba(124,111,255,.06)}
+.remove-btn{font-size:12px;color:var(--danger);cursor:pointer;background:none;border:none;padding:4px;flex-shrink:0;margin-top:5px;opacity:.6}
+.remove-btn:hover{opacity:1}
+
+/* ── ROTEIRO ── */
+.rot-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px}
+.rot-header{padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.rot-header:hover{background:rgba(255,255,255,.03)}
+.rot-num{font-size:12px;font-weight:800;color:var(--muted)}
+.rot-body{display:none;padding:16px;border-top:1px solid var(--border);background:#07070f}
+.rot-card.open .rot-body{display:block}
+.rot-card.open .ativ-chevron{transform:rotate(180deg)}
+.rot-passos{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.rot-passo{display:flex;gap:8px;align-items:center}
+.rot-passo-label{font-size:11px;color:var(--muted);flex-shrink:0;width:50px}
+
+/* ── CONCEITO PILLS ── */
+.conceito-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.conceito-pill{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:2px solid transparent;opacity:.5;transition:.15s}
+.conceito-pill.sel{opacity:1;border-color:currentColor}
+
+/* ── NIVEL PILLS ── */
+.nivel-pills{display:flex;gap:6px;margin-bottom:8px}
+.nivel-pill{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;opacity:.5;transition:.15s}
+.nivel-pill.sel{opacity:1}
+.nivel-f{background:#C6F6D5;color:#276749}
+.nivel-m{background:#FEF3C7;color:#92400E}
+.nivel-d{background:#FED7D7;color:#9B2C2C}
+
+/* ── STATUS / TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;background:#1a1a2e;border:1px solid var(--border2);border-radius:10px;padding:12px 20px;font-size:13px;font-weight:600;z-index:999;transform:translateY(100px);opacity:0;transition:.3s}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-color:var(--accent2);color:var(--accent2)}
+.toast.err{border-color:var(--danger);color:var(--danger)}
+
+/* ── FAMÍLIA ── */
+.familia-conceito-row{background:#0a0a14;border:1px solid var(--border2);border-radius:10px;padding:14px;margin-bottom:10px}
+.familia-conceito-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.familia-cor-dot{width:14px;height:14px;border-radius:50%}
+
+/* ── PROGRESS ── */
+.progress-overlay{position:fixed;inset:0;background:rgba(4,4,10,.85);display:flex;align-items:center;justify-content:center;z-index:200;display:none}
+.progress-box{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:32px 40px;text-align:center;min-width:280px}
+.progress-box h3{font-size:16px;margin-bottom:8px}
+.progress-box p{font-size:13px;color:var(--muted);margin-bottom:20px}
+.spinner{width:40px;height:40px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ── INFO SECTION ── */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <span class="topbar-logo">NEXUS</span>
+  <span class="topbar-title">Kit Builder</span>
+  <div class="topbar-spacer"></div>
+  <div class="topbar-actions">
+    <button class="btn btn-ghost" onclick="exportJSON()">⬇ Exportar JSON</button>
+    <label class="btn btn-ghost" style="cursor:pointer">
+      ⬆ Importar JSON
+      <input type="file" accept=".json" style="display:none" onchange="importJSON(event)">
+    </label>
+    <button class="btn btn-ghost" onclick="resetKit()" title="Limpar tudo">↺ Novo Kit</button>
+    <button class="btn btn-success" onclick="gerarPDF()" id="btn-gerar">🚀 Gerar PDF</button>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">Kit</div>
+    <div class="sidebar-item active" onclick="switchTab('info')" data-tab="info">📋 Informações</div>
+    <div class="sidebar-item" onclick="switchTab('atividades')" data-tab="atividades">
+      🎯 Atividades <span class="badge" id="badge-ativ">30</span>
+    </div>
+    <div class="sidebar-item" onclick="switchTab('roteiros')" data-tab="roteiros">
+      🗺️ Roteiros <span class="badge" id="badge-rot">10</span>
+    </div>
+    <div class="sidebar-item" onclick="switchTab('familia')" data-tab="familia">
+      👨‍👩‍👧 Família
+    </div>
+    <div class="sidebar-section">Ações</div>
+    <div class="sidebar-item" onclick="gerarPDF()">🚀 Gerar PDF</div>
+    <div class="sidebar-item" onclick="exportJSON()">⬇ Exportar JSON</div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- INFO -->
+    <div id="tab-info" class="section-panel active">
+      <div class="card">
+        <div class="card-title">📋 Informações do Kit</div>
+        <div class="form-row form-row-2">
+          <div class="form-group">
+            <label>Nome do Kit (aparece no PDF)</label>
+            <input id="kitNome" value="Kit TEA — Pensamento Computacional Inclusivo" placeholder="Ex: Kit Despluga Avançado">
+          </div>
+          <div class="form-group">
+            <label>Subtítulo / Nicho</label>
+            <input id="kitNicho" value="Educação / Kit Despluga" placeholder="Ex: Educação / 6° ao EM">
+          </div>
+        </div>
+        <div class="form-row form-row-3">
+          <div class="form-group">
+            <label>Nome da Escola (padrão)</label>
+            <input id="varEscola" value="Escola Municipal" placeholder="Escola Municipal">
+          </div>
+          <div class="form-group">
+            <label>Nome da Professora (padrão)</label>
+            <input id="varProfessor" value="Professora" placeholder="Professora">
+          </div>
+          <div class="form-group">
+            <label>Ano / Turma (padrão)</label>
+            <input id="varAno" value="3º Ano" placeholder="3º Ano">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🎨 Conceitos (cores e nomes)</div>
+        <div id="conceitos-editor"></div>
+      </div>
+    </div>
+
+    <!-- ATIVIDADES -->
+    <div id="tab-atividades" class="section-panel">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div style="font-size:16px;font-weight:700">🎯 Atividades Adaptadas</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">2 por página · máx. 3 passos · linguagem direta</div>
+        </div>
+        <button class="btn btn-ghost" onclick="addAtividade()">+ Nova Atividade</button>
+      </div>
+      <div class="ativ-list" id="ativ-list"></div>
+    </div>
+
+    <!-- ROTEIROS -->
+    <div id="tab-roteiros" class="section-panel">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div style="font-size:16px;font-weight:700">🗺️ Roteiros Visuais</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">2 por página · 4 passos com ícone + texto</div>
+        </div>
+        <button class="btn btn-ghost" onclick="addRoteiro()">+ Novo Roteiro</button>
+      </div>
+      <div id="rot-list"></div>
+    </div>
+
+    <!-- FAMÍLIA -->
+    <div id="tab-familia" class="section-panel">
+      <div class="card">
+        <div class="card-title">👨‍👩‍👧 Mini Guia para a Família</div>
+        <div class="form-group" style="margin-bottom:16px">
+          <label>Texto de introdução</label>
+          <textarea id="familiaIntroDesc" rows="3">Estamos trabalhando <strong>Pensamento Computacional</strong> — uma forma de pensar que ajuda seu filho a organizar ideias, resolver problemas e seguir sequências. E o melhor: fazemos isso <strong>sem computador</strong>, com atividades práticas, papel e movimento.</textarea>
+        </div>
+        <div class="form-group" style="margin-bottom:20px">
+          <label>Frase final inspiradora</label>
+          <input id="familiaFrase" value='"Inclusão não é só colocar o aluno na sala.<br>É garantir que ele <em>participa de verdade</em>."'>
+        </div>
+        <div class="card-title">Conceitos na página da família</div>
+        <div id="familia-conceitos-editor"></div>
+        <button class="btn btn-ghost" style="margin-top:8px" onclick="addFamiliaConceito()">+ Adicionar Conceito</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PROGRESS OVERLAY -->
+<div class="progress-overlay" id="progress-overlay">
+  <div class="progress-box">
+    <div class="spinner"></div>
+    <h3>Gerando PDF...</h3>
+    <p>Aguarde, o Nexus está montando seu kit</p>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── ESTADO ────────────────────────────────────────────────────────────────────
+const CONCEITOS_DEFAULT = [
+  { nome:'Algoritmo',    cor:'#E84393', bg:'#FCE4EC', dark:'#880E4F' },
+  { nome:'Sequência',    cor:'#FF6D00', bg:'#FFF3E0', dark:'#BF360C' },
+  { nome:'Lógica',       cor:'#7B1FA2', bg:'#F3E5F5', dark:'#4A148C' },
+  { nome:'Repetição',    cor:'#C62828', bg:'#FFEBEE', dark:'#7F0000' },
+  { nome:'Padrão',       cor:'#2E7D32', bg:'#E8F5E9', dark:'#1B5E20' },
+  { nome:'Decomposição', cor:'#F57F17', bg:'#FFF8E1', dark:'#E65100' },
+];
+
+const ADAPT_DICAS_DEFAULT = {
+  'Algoritmo':     'Divida em no máximo 3 passos por vez. Use imagens no lugar de texto. Demonstre o algoritmo completo antes de pedir que execute. Prefira situações do cotidiano concreto: escovar dentes, fazer lanche.',
+  'Sequência':     'Reduza para 3–4 elementos no início. Numere cada cartão visualmente. Use fotos reais da rotina escolar — a familiaridade reduz a carga cognitiva.',
+  'Lógica':        'Apenas afirmações literais e concretas — sem ironia, sem duplo sentido. Apresente uma condição por vez (SE... ENTÃO...) antes de combinar. Use objetos físicos para representar cada elemento.',
+  'Repetição':     'Avise o número exato antes de começar: "Vamos fazer 4 vezes." Conte em voz alta. Nunca diga "mais um pouquinho" — seja preciso.',
+  'Padrão':        'Use no máximo 2 elementos (2 cores ou 2 formas). Sempre em linha reta, nunca em grade. Alunos com TEA frequentemente se destacam aqui — use para construir confiança.',
+  'Decomposição':  'Comece com objetos físicos reais. Limite a 4 partes identificáveis. Conecte com situações reais como organizar a mochila para criar autonomia.',
+};
+
+let kitData = null;
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+async function init() {
+  try {
+    const res = await fetch('/api/nexuspdf/kit-data/kit-tea');
+    if (!res.ok) throw new Error('API indisponível');
+    kitData = await res.json();
+  } catch(e) {
+    // Fallback: dados embutidos mínimos
+    kitData = { conceitos: CONCEITOS_DEFAULT, atividades: [], roteiros: [], adaptDicas: ADAPT_DICAS_DEFAULT };
+  }
+  renderAll();
+}
+
+function renderAll() {
+  renderConceitosEditor();
+  renderAtividades();
+  renderRoteiros();
+  renderFamiliaConceitos();
+  updateBadges();
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item[data-tab]').forEach(i => i.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelector(`.sidebar-item[data-tab="${tab}"]`).classList.add('active');
+}
+
+// ── CONCEITOS EDITOR ─────────────────────────────────────────────────────────
+function renderConceitosEditor() {
+  const el = document.getElementById('conceitos-editor');
+  el.innerHTML = kitData.conceitos.map((c, i) => `
+    <div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr 1fr auto;gap:10px;align-items:center;margin-bottom:8px;background:#07070f;padding:10px 14px;border-radius:8px;border:1px solid var(--border)">
+      <div style="width:20px;height:20px;border-radius:50%;background:${c.cor};flex-shrink:0"></div>
+      <div class="form-group">
+        <label>Nome</label>
+        <input value="${esc(c.nome)}" onchange="kitData.conceitos[${i}].nome=this.value;updateBadges()" placeholder="Nome">
+      </div>
+      <div class="form-group">
+        <label>Cor principal</label>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input type="color" value="${c.cor}" style="width:36px;height:32px;padding:2px;cursor:pointer" onchange="kitData.conceitos[${i}].cor=this.value;renderConceitosEditor()">
+          <input value="${esc(c.cor)}" style="flex:1" onchange="kitData.conceitos[${i}].cor=this.value;renderConceitosEditor()">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Cor fundo</label>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input type="color" value="${c.bg}" style="width:36px;height:32px;padding:2px;cursor:pointer" onchange="kitData.conceitos[${i}].bg=this.value">
+          <input value="${esc(c.bg)}" style="flex:1" onchange="kitData.conceitos[${i}].bg=this.value">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Cor escura</label>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input type="color" value="${c.dark}" style="width:36px;height:32px;padding:2px;cursor:pointer" onchange="kitData.conceitos[${i}].dark=this.value">
+          <input value="${esc(c.dark)}" style="flex:1" onchange="kitData.conceitos[${i}].dark=this.value">
+        </div>
+      </div>
+      <button class="remove-btn" onclick="removeConceito(${i})">✕</button>
+    </div>
+  `).join('');
+}
+function removeConceito(i){ if(kitData.conceitos.length>1){kitData.conceitos.splice(i,1);renderConceitosEditor();} }
+
+// ── ATIVIDADES ────────────────────────────────────────────────────────────────
+function renderAtividades() {
+  const list = document.getElementById('ativ-list');
+  list.innerHTML = kitData.atividades.map((a, i) => renderAtivCard(a, i)).join('');
+  updateBadges();
+}
+
+function renderAtivCard(a, i) {
+  const c = kitData.conceitos[a.c] || kitData.conceitos[0];
+  const mats = (a.mat || ['']).map((m, mi) => `
+    <div class="mat-item">
+      <span>•</span>
+      <input value="${esc(m)}" placeholder="Material ${mi+1}" onchange="kitData.atividades[${i}].mat[${mi}]=this.value">
+      <button class="remove-btn" onclick="removeMat(${i},${mi})">✕</button>
+    </div>`).join('');
+  const passos = (a.ps || ['']).map((p, pi) => `
+    <div class="ps-item">
+      <span>${pi+1}</span>
+      <textarea rows="2" placeholder="Passo ${pi+1}" onchange="kitData.atividades[${i}].ps[${pi}]=this.value">${esc(p)}</textarea>
+      <button class="remove-btn" onclick="removePasso(${i},${pi})">✕</button>
+    </div>`).join('');
+
+  const conceitoPills = kitData.conceitos.map((cc, ci) =>
+    `<span class="conceito-pill ${a.c===ci?'sel':''}" style="background:${cc.bg};color:${cc.dark};border-color:${cc.cor}" onclick="setAtivConceito(${i},${ci})">${cc.nome}</span>`
+  ).join('');
+
+  const nivelPills = [
+    {v:'🟢 Fácil',cls:'nivel-f'},{v:'🟡 Médio',cls:'nivel-m'},{v:'🔴 Desafio',cls:'nivel-d'}
+  ].map(n => `<span class="nivel-pill ${n.cls} ${a.nivel===n.v?'sel':''}" onclick="setAtivNivel(${i},'${n.v}')">${n.v}</span>`).join('');
+
+  return `
+<div class="ativ-card" id="ativ-${i}">
+  <div class="ativ-header" onclick="toggleAtiv(${i})">
+    <div class="ativ-num" style="background:${c.cor}">${i+1}</div>
+    <div class="ativ-header-info">
+      <div class="ativ-header-nome">${esc(a.nome) || '(sem nome)'}</div>
+      <div class="ativ-header-meta">${c.nome} · ${a.nivel||'🟢 Fácil'} · BNCC: ${a.bncc||'—'}</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="btn btn-ghost" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();duplicarAtiv(${i})">⧉ Duplicar</button>
+      <button class="btn" style="padding:4px 8px;font-size:11px;background:var(--danger);color:#fff" onclick="event.stopPropagation();removeAtiv(${i})">✕</button>
+      <span class="ativ-chevron">▾</span>
+    </div>
+  </div>
+  <div class="ativ-body">
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Nome da atividade</label>
+      <input value="${esc(a.nome)}" placeholder="Ex: A Receita do Sanduíche" onchange="kitData.atividades[${i}].nome=this.value;refreshAtivHeader(${i})">
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Conceito</label>
+      <div class="conceito-pills">${conceitoPills}</div>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Nível</label>
+      <div class="nivel-pills">${nivelPills}</div>
+    </div>
+    <div class="form-row form-row-2">
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">📌 Materiais</label>
+        <div class="mat-list" id="mat-${i}">${mats}</div>
+        <button class="add-btn" onclick="addMat(${i})">+ Material</button>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">📋 Passos (máx. 3)</label>
+        <div class="ps-list" id="ps-${i}">${passos}</div>
+        <button class="add-btn" onclick="addPasso(${i})">+ Passo</button>
+      </div>
+    </div>
+    <div class="form-row form-row-2" style="margin-top:12px">
+      <div class="form-group">
+        <label>💛 Dica TEA</label>
+        <textarea rows="3" placeholder="Adaptação específica para TEA..." onchange="kitData.atividades[${i}].dica=this.value">${esc(a.dica||'')}</textarea>
+      </div>
+      <div class="form-group">
+        <label>Código BNCC</label>
+        <input value="${esc(a.bncc||'')}" placeholder="Ex: EF15CO01" onchange="kitData.atividades[${i}].bncc=this.value;refreshAtivHeader(${i})">
+      </div>
+    </div>
+  </div>
+</div>`;
+}
+
+function toggleAtiv(i) {
+  document.getElementById('ativ-'+i).classList.toggle('open');
+}
+function refreshAtivHeader(i) {
+  const a = kitData.atividades[i];
+  const c = kitData.conceitos[a.c] || kitData.conceitos[0];
+  const card = document.getElementById('ativ-'+i);
+  if (!card) return;
+  card.querySelector('.ativ-header-nome').textContent = a.nome || '(sem nome)';
+  card.querySelector('.ativ-header-meta').textContent = `${c.nome} · ${a.nivel||'🟢 Fácil'} · BNCC: ${a.bncc||'—'}`;
+  card.querySelector('.ativ-num').style.background = c.cor;
+}
+function setAtivConceito(i, ci) {
+  kitData.atividades[i].c = ci;
+  renderAtividades();
+  const card = document.getElementById('ativ-'+i);
+  if (card) { card.classList.add('open'); card.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+}
+function setAtivNivel(i, nivel) {
+  kitData.atividades[i].nivel = nivel;
+  renderAtividades();
+  const card = document.getElementById('ativ-'+i);
+  if (card) { card.classList.add('open'); card.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+}
+function addMat(i) {
+  kitData.atividades[i].mat = kitData.atividades[i].mat || [];
+  kitData.atividades[i].mat.push('');
+  renderAtividades();
+  document.getElementById('ativ-'+i).classList.add('open');
+}
+function removeMat(i, mi) {
+  kitData.atividades[i].mat.splice(mi, 1);
+  renderAtividades();
+  document.getElementById('ativ-'+i).classList.add('open');
+}
+function addPasso(i) {
+  kitData.atividades[i].ps = kitData.atividades[i].ps || [];
+  kitData.atividades[i].ps.push('');
+  renderAtividades();
+  document.getElementById('ativ-'+i).classList.add('open');
+}
+function removePasso(i, pi) {
+  kitData.atividades[i].ps.splice(pi, 1);
+  renderAtividades();
+  document.getElementById('ativ-'+i).classList.add('open');
+}
+function removeAtiv(i) {
+  if (!confirm('Remover atividade ' + (i+1) + '?')) return;
+  kitData.atividades.splice(i, 1);
+  renderAtividades();
+}
+function duplicarAtiv(i) {
+  const clone = JSON.parse(JSON.stringify(kitData.atividades[i]));
+  clone.nome = clone.nome + ' (cópia)';
+  clone.id = kitData.atividades.length + 1;
+  kitData.atividades.splice(i+1, 0, clone);
+  renderAtividades();
+  setTimeout(() => {
+    const card = document.getElementById('ativ-'+(i+1));
+    if (card) { card.classList.add('open'); card.scrollIntoView({behavior:'smooth'}); }
+  }, 50);
+}
+function addAtividade() {
+  kitData.atividades.push({ id: kitData.atividades.length+1, c:0, nivel:'🟢 Fácil', nome:'', mat:[''], ps:[''], dica:'', bncc:'EF15CO01' });
+  renderAtividades();
+  setTimeout(() => {
+    const card = document.getElementById('ativ-'+(kitData.atividades.length-1));
+    if(card){card.classList.add('open');card.scrollIntoView({behavior:'smooth'});}
+  },50);
+}
+
+// ── ROTEIROS ──────────────────────────────────────────────────────────────────
+function renderRoteiros() {
+  const list = document.getElementById('rot-list');
+  list.innerHTML = kitData.roteiros.map((r, i) => renderRotCard(r, i)).join('');
+  updateBadges();
+}
+
+function renderRotCard(r, i) {
+  const c = kitData.conceitos[r.c] || kitData.conceitos[0];
+  const ps = (r.ps || [{i:'',l:''},{i:'',l:''},{i:'',l:''},{i:'',l:''}]);
+  const conceitoPills = kitData.conceitos.map((cc, ci) =>
+    `<span class="conceito-pill ${r.c===ci?'sel':''}" style="background:${cc.bg};color:${cc.dark};border-color:${cc.cor}" onclick="setRotConceito(${i},${ci})">${cc.nome}</span>`
+  ).join('');
+  const passoInputs = ps.map((p, pi) => `
+    <div class="rot-passo">
+      <span class="rot-passo-label">Passo ${pi+1}</span>
+      <input value="${esc(p.i||'')}" placeholder="ícone" style="width:60px;text-align:center" onchange="kitData.roteiros[${i}].ps[${pi}].i=this.value">
+      <input value="${esc(p.l||'')}" placeholder="texto" style="flex:1" onchange="kitData.roteiros[${i}].ps[${pi}].l=this.value">
+    </div>`).join('');
+
+  return `
+<div class="rot-card" id="rot-${i}">
+  <div class="rot-header" onclick="toggleRot(${i})">
+    <span class="rot-num" style="color:${c.cor}">Roteiro ${i+1}</span>
+    <span style="flex:1;font-size:13px;font-weight:600;margin-left:8px">${esc(r.nome)||'(sem nome)'}</span>
+    <span style="font-size:11px;color:var(--muted);margin-right:12px">${c.nome}</span>
+    <button class="btn btn-ghost" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();duplicarRot(${i})">⧉</button>
+    <button class="btn" style="padding:4px 8px;font-size:11px;background:var(--danger);color:#fff;margin-left:6px" onclick="event.stopPropagation();removeRot(${i})">✕</button>
+    <span class="ativ-chevron" style="margin-left:8px">▾</span>
+  </div>
+  <div class="rot-body">
+    <div class="form-row form-row-2" style="margin-bottom:12px">
+      <div class="form-group">
+        <label>Nome do Roteiro</label>
+        <input value="${esc(r.nome||'')}" placeholder="Ex: Receita do Sanduíche" onchange="kitData.roteiros[${i}].nome=this.value">
+      </div>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Conceito</label>
+      <div class="conceito-pills">${conceitoPills}</div>
+    </div>
+    <label style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:8px">Passos (ícone + texto)</label>
+    <div class="rot-passos">${passoInputs}</div>
+    <button class="add-btn" style="margin-top:10px" onclick="addRotPasso(${i})">+ Passo</button>
+  </div>
+</div>`;
+}
+
+function toggleRot(i) { document.getElementById('rot-'+i).classList.toggle('open'); }
+function setRotConceito(i, ci) { kitData.roteiros[i].c=ci; renderRoteiros(); setTimeout(()=>{const r=document.getElementById('rot-'+i);if(r){r.classList.add('open');r.scrollIntoView({behavior:'smooth',block:'nearest'});}},50); }
+function removeRot(i) { if(!confirm('Remover roteiro '+(i+1)+'?'))return; kitData.roteiros.splice(i,1); renderRoteiros(); }
+function duplicarRot(i) { const c=JSON.parse(JSON.stringify(kitData.roteiros[i])); c.nome+=' (cópia)'; c.id=kitData.roteiros.length+1; kitData.roteiros.splice(i+1,0,c); renderRoteiros(); setTimeout(()=>{const r=document.getElementById('rot-'+(i+1));if(r){r.classList.add('open');r.scrollIntoView({behavior:'smooth'});}},50); }
+function addRoteiro() { kitData.roteiros.push({id:kitData.roteiros.length+1,c:0,nome:'',ps:[{i:'',l:''},{i:'',l:''},{i:'',l:''},{i:'',l:''}]}); renderRoteiros(); setTimeout(()=>{const r=document.getElementById('rot-'+(kitData.roteiros.length-1));if(r){r.classList.add('open');r.scrollIntoView({behavior:'smooth'});}},50); }
+function addRotPasso(i) { kitData.roteiros[i].ps=kitData.roteiros[i].ps||[]; kitData.roteiros[i].ps.push({i:'',l:''}); renderRoteiros(); document.getElementById('rot-'+i).classList.add('open'); }
+
+// ── FAMÍLIA ───────────────────────────────────────────────────────────────────
+let familiaConceitos = [
+  {emoji:'🍰',nome:'Algoritmo', cor:'#E84393',bg:'#FFF0F6',def:'Uma sequência de passos para chegar a um resultado.',casa:'Peça para ele explicar os passos de escovar os dentes — um passo de cada vez.'},
+  {emoji:'👕',nome:'Sequência', cor:'#FF6D00',bg:'#FFF8F0',def:'Fazer as coisas na ordem certa — porque a ordem importa.',casa:'Na hora de se vestir, pergunte: "O que precisa vir primeiro?" Deixe ele descobrir.'},
+  {emoji:'🎲',nome:'Lógica',    cor:'#7B1FA2',bg:'#FAF0FF',def:'Pensar com clareza para tomar a decisão certa.',casa:'"SE está chovendo, ENTÃO o que você coloca para sair?" Perguntas simples de causa e efeito.'},
+  {emoji:'🔄',nome:'Repetição', cor:'#C62828',bg:'#FFF5F5',def:'Quando a mesma ação se repete várias vezes seguidas.',casa:'"Quantas vezes você escova os dentes por dia?" Mostre que a rotina é um loop que se repete.'},
+];
+
+function renderFamiliaConceitos() {
+  const el = document.getElementById('familia-conceitos-editor');
+  el.innerHTML = familiaConceitos.map((fc, i) => `
+    <div class="familia-conceito-row">
+      <div class="familia-conceito-header">
+        <div class="familia-cor-dot" style="background:${fc.cor}"></div>
+        <input value="${esc(fc.emoji)}" style="width:50px;text-align:center" placeholder="emoji" onchange="familiaConceitos[${i}].emoji=this.value">
+        <input value="${esc(fc.nome)}" style="flex:1" placeholder="Nome do conceito" onchange="familiaConceitos[${i}].nome=this.value">
+        <input type="color" value="${fc.cor}" style="width:36px;height:32px;padding:2px" onchange="familiaConceitos[${i}].cor=this.value;familiaConceitos[${i}].bg=this.value+'22';renderFamiliaConceitos()">
+        <button class="remove-btn" onclick="removeFamiliaConceito(${i})">✕</button>
+      </div>
+      <div class="form-row form-row-2">
+        <div class="form-group">
+          <label>Definição simples</label>
+          <textarea rows="2" onchange="familiaConceitos[${i}].def=this.value">${esc(fc.def)}</textarea>
+        </div>
+        <div class="form-group">
+          <label>Atividade em casa</label>
+          <textarea rows="2" onchange="familiaConceitos[${i}].casa=this.value">${esc(fc.casa)}</textarea>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function removeFamiliaConceito(i) { familiaConceitos.splice(i,1); renderFamiliaConceitos(); }
+function addFamiliaConceito() { familiaConceitos.push({emoji:'⭐',nome:'Novo Conceito',cor:'#6366f1',bg:'#eef2ff',def:'',casa:''}); renderFamiliaConceitos(); }
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function updateBadges() {
+  document.getElementById('badge-ativ').textContent = kitData.atividades.length;
+  document.getElementById('badge-rot').textContent = kitData.roteiros.length;
+}
+function toast(msg, type='ok') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'toast show ' + type;
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ── COLLECT DATA ──────────────────────────────────────────────────────────────
+function collectKitData() {
+  return {
+    kitNome: document.getElementById('kitNome').value || 'Kit TEA',
+    vars: {
+      escola: document.getElementById('varEscola').value,
+      professor: document.getElementById('varProfessor').value,
+      ano: document.getElementById('varAno').value,
+    },
+    conceitos: kitData.conceitos,
+    atividades: kitData.atividades,
+    roteiros: kitData.roteiros,
+    adaptDicas: kitData.adaptDicas,
+    familiaConceitos: familiaConceitos,
+    familiaIntroDesc: document.getElementById('familiaIntroDesc').value,
+    familiaFrase: document.getElementById('familiaFrase').value,
+  };
+}
+
+// ── GERAR PDF ─────────────────────────────────────────────────────────────────
+async function gerarPDF() {
+  const overlay = document.getElementById('progress-overlay');
+  overlay.style.display = 'flex';
+  const btn = document.getElementById('btn-gerar');
+  btn.disabled = true;
+
+  try {
+    const payload = { templateId: 'kit-tea', kitData: collectKitData() };
+    const res = await fetch('/api/nexuspdf/gerar-kit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error || 'Erro ao gerar'); }
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (collectKitData().kitNome || 'kit').replace(/\s+/g,'-').toLowerCase() + '.pdf';
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('✅ PDF gerado e baixado!');
+  } catch(e) {
+    toast('❌ ' + e.message, 'err');
+  } finally {
+    overlay.style.display = 'none';
+    btn.disabled = false;
+  }
+}
+
+// ── IMPORT / EXPORT ───────────────────────────────────────────────────────────
+function exportJSON() {
+  const data = collectKitData();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (data.kitNome||'kit').replace(/\s+/g,'-').toLowerCase() + '.json';
+  a.click();
+  toast('✅ JSON exportado!');
+}
+
+function importJSON(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (data.atividades) kitData.atividades = data.atividades;
+      if (data.roteiros) kitData.roteiros = data.roteiros;
+      if (data.conceitos) kitData.conceitos = data.conceitos;
+      if (data.adaptDicas) kitData.adaptDicas = data.adaptDicas;
+      if (data.familiaConceitos) familiaConceitos = data.familiaConceitos;
+      if (data.kitNome) document.getElementById('kitNome').value = data.kitNome;
+      if (data.vars) {
+        if(data.vars.escola) document.getElementById('varEscola').value = data.vars.escola;
+        if(data.vars.professor) document.getElementById('varProfessor').value = data.vars.professor;
+        if(data.vars.ano) document.getElementById('varAno').value = data.vars.ano;
+      }
+      if (data.familiaIntroDesc) document.getElementById('familiaIntroDesc').value = data.familiaIntroDesc;
+      if (data.familiaFrase) document.getElementById('familiaFrase').value = data.familiaFrase;
+      renderAll();
+      toast('✅ JSON importado!');
+    } catch(err) {
+      toast('❌ JSON inválido', 'err');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function resetKit() {
+  if (!confirm('Limpar tudo e começar um novo kit?')) return;
+  kitData.atividades = [];
+  kitData.roteiros = [];
+  document.getElementById('kitNome').value = 'Novo Kit';
+  renderAll();
+  toast('↺ Kit zerado — pronto para começar!');
+}
+
+// ── START ─────────────────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>

@@ -162,7 +162,7 @@ function nivelStyle(n) {
   return 'background:#FED7D7;color:#9B2C2C';
 }
 
-function card(a) {
+function buildCard(a, conceitos) {
   const c = conceitos[a.c];
   return `
 <div class="atividade-card">
@@ -191,8 +191,9 @@ function card(a) {
 </div>`;
 }
 
-function pgAtiv(a1, a2, pg) {
+function buildPgAtiv(a1, a2, pg, conceitos, kitNome) {
   const label = a1.c === a2.c ? conceitos[a1.c].nome : conceitos[a1.c].nome + ' & ' + conceitos[a2.c].nome;
+  const total = 3 + Math.ceil(30/2) + 2 + 5 + 1 + 1; // 27 always
   return `
 <div class="pg pg-atividades">
   <div class="atividades-header">
@@ -200,12 +201,12 @@ function pgAtiv(a1, a2, pg) {
     <div class="atividades-header-sub">Máx. 3 passos · Linguagem direta · Sequência previsível</div></div>
     <div class="atividades-bloco-tag">${label}</div>
   </div>
-  <div class="atividades-corpo">${card(a1)}${card(a2)}</div>
-  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Atividades Adaptadas</span><span>${pg} / 27</span></div>
+  <div class="atividades-corpo">${buildCard(a1, conceitos)}${buildCard(a2, conceitos)}</div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>${kitNome} — Atividades Adaptadas</span><span>${pg} / 27</span></div>
 </div>`;
 }
 
-function pgRoteiros(r1, r2, pg) {
+function buildPgRoteiros(r1, r2, pg, conceitos, kitNome) {
   function rc(r) {
     const c = conceitos[r.c];
     return `<div class="roteiro-card">
@@ -227,17 +228,47 @@ function pgRoteiros(r1, r2, pg) {
     <div class="atividades-bloco-tag">Roteiros ${r1.id} e ${r2.id}</div>
   </div>
   <div class="roteiros-corpo">${rc(r1)}${rc(r2)}</div>
-  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Roteiros Visuais</span><span>${pg} / 27</span></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>${kitNome} — Roteiros Visuais</span><span>${pg} / 27</span></div>
 </div>`;
 }
 
-// ── MONTAR PÁGINAS 4–27 ──────────────────────────────────────────────────────
-let extra = '';
-// Pgs 4–18: atividades
-for (let i = 0; i < 30; i += 2) extra += pgAtiv(atividades[i], atividades[i+1], 4 + i/2);
+// ── buildHTML: gera o HTML completo a partir dos dados ───────────────────────
+function buildHTML(data) {
+  const _conceitos   = data.conceitos   || conceitos;
+  const _atividades  = data.atividades  || atividades;
+  const _roteiros    = data.roteiros    || roteiros;
+  const _adaptDicas  = data.adaptDicas  || adaptDicas;
+  const _kitNome     = data.kitNome     || 'Kit TEA';
+  const _vars        = data.vars        || {};
+  const _familiaConceitos = data.familiaConceitos || [
+    { emoji:'🍰', nome:'Algoritmo',  cor:'#E84393', bg:'#FFF0F6', def:'Uma sequência de passos para chegar a um resultado.', casa:'Peça para ele explicar os passos de escovar os dentes — um passo de cada vez.' },
+    { emoji:'👕', nome:'Sequência',  cor:'#FF6D00', bg:'#FFF8F0', def:'Fazer as coisas na ordem certa — porque a ordem importa.', casa:'Na hora de se vestir, pergunte: "O que precisa vir primeiro?" Deixe ele descobrir.' },
+    { emoji:'🎲', nome:'Lógica',     cor:'#7B1FA2', bg:'#FAF0FF', def:'Pensar com clareza para tomar a decisão certa.', casa:'"SE está chovendo, ENTÃO o que você coloca para sair?" Perguntas simples de causa e efeito.' },
+    { emoji:'🔄', nome:'Repetição',  cor:'#C62828', bg:'#FFF5F5', def:'Quando a mesma ação se repete várias vezes seguidas.', casa:'"Quantas vezes você escova os dentes por dia?" Mostre que a rotina é um loop que se repete.' },
+  ];
+  const _familiaIntroDesc = data.familiaIntroDesc || 'Estamos trabalhando <strong>Pensamento Computacional</strong> — uma forma de pensar que ajuda seu filho a organizar ideias, resolver problemas e seguir sequências. E o melhor: fazemos isso <strong>sem computador</strong>, com atividades práticas, papel e movimento.';
+  const _familiaFrase = data.familiaFrase || '"Inclusão não é só colocar o aluno na sala.<br>É garantir que ele <em>participa de verdade</em>."';
+  const _totalPags = 3 + Math.ceil(_atividades.length / 2) + 2 + Math.ceil(_roteiros.length / 2) + 2;
 
-// Pgs 19–20: guia de adaptação
-extra += `
+  // Lê a base HTML (CSS + páginas 1–3 estáticas)
+  let base = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+  const marker = '<!-- GENERATED_PAGES_START -->';
+  const cutIdx = base.indexOf(marker);
+  base = cutIdx !== -1 ? base.substring(0, cutIdx) : base.replace(/(<\/body>[\s\S]*)$/i, '');
+  for (const [k, v] of Object.entries(_vars)) base = base.replaceAll(`{{${k}}}`, v);
+
+  let extra = '';
+
+  // Páginas de atividades (2 por página)
+  for (let i = 0; i < _atividades.length; i += 2) {
+    if (_atividades[i] && _atividades[i+1])
+      extra += buildPgAtiv(_atividades[i], _atividades[i+1], 4 + i/2, _conceitos, _kitNome);
+  }
+
+  // Guia de adaptação — 2 páginas fixas
+  const pgAdapt1 = 4 + Math.ceil(_atividades.length / 2);
+  const pgAdapt2 = pgAdapt1 + 1;
+  extra += `
 <div class="pg pg-adaptacao">
   <div class="adapt-intro">
     <div class="adapt-intro-titulo">🔧 Guia de Adaptação das 500 Atividades</div>
@@ -267,7 +298,7 @@ extra += `
       </tbody>
     </table></div>
   </div>
-  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Guia de Adaptação</span><span>19 / 27</span></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>${_kitNome} — Guia de Adaptação</span><span>${pgAdapt1} / ${_totalPags}</span></div>
 </div>
 
 <div class="pg pg-adaptacao">
@@ -277,21 +308,26 @@ extra += `
   </div>
   <svg class="wave-sep" viewBox="0 0 794 32" preserveAspectRatio="none"><path d="M0,0 L794,0 L794,16 Q596,36 397,20 Q198,4 0,24 Z" fill="#1A202C"/><path d="M0,24 Q198,4 397,20 Q596,36 794,16 L794,32 L0,32 Z" fill="#ffffff"/></svg>
   <div class="adapt-corpo">
-    ${conceitos.map(c=>`
+    ${_conceitos.map(c=>`
     <div style="background:${c.bg};border:2px solid ${c.cor}55;border-radius:14px;padding:12px 16px;display:flex;gap:14px;align-items:flex-start">
       <div style="width:8px;background:${c.cor};border-radius:4px;align-self:stretch;flex-shrink:0"></div>
       <div style="flex:1"><div style="font-size:13px;font-weight:800;color:${c.dark};margin-bottom:4px">${c.nome}</div>
-      <div style="font-size:12px;color:#2D3748;line-height:1.5">${adaptDicas[c.nome]}</div></div>
+      <div style="font-size:12px;color:#2D3748;line-height:1.5">${_adaptDicas[c.nome] || ''}</div></div>
     </div>`).join('')}
   </div>
-  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Dicas por Conceito</span><span>20 / 27</span></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>${_kitNome} — Dicas por Conceito</span><span>${pgAdapt2} / ${_totalPags}</span></div>
 </div>`;
 
-// Pgs 21–25: roteiros visuais
-for (let i = 0; i < 10; i += 2) extra += pgRoteiros(roteiros[i], roteiros[i+1], 21 + i/2);
+  // Páginas de roteiros visuais (2 por página)
+  const pgRoteiroBase = pgAdapt2 + 1;
+  for (let i = 0; i < _roteiros.length; i += 2) {
+    if (_roteiros[i] && _roteiros[i+1])
+      extra += buildPgRoteiros(_roteiros[i], _roteiros[i+1], pgRoteiroBase + i/2, _conceitos, _kitNome);
+  }
 
-// Pg 26: ficha
-extra += `
+  // Ficha de observação
+  const pgFicha = pgRoteiroBase + Math.ceil(_roteiros.length / 2);
+  extra += `
 <div class="pg pg-ficha">
   <div class="secao-header"><div class="secao-header-sub">Registro Individual</div><div class="secao-header-titulo"><span>📋</span> Ficha de Observação do Aluno</div></div>
   <svg class="wave-sep" viewBox="0 0 794 32" preserveAspectRatio="none"><path d="M0,0 L794,0 L794,16 Q596,36 397,20 Q198,4 0,24 Z" fill="#0f2540"/><path d="M0,24 Q198,4 397,20 Q596,36 794,16 L794,32 L0,32 Z" fill="#ffffff"/></svg>
@@ -346,11 +382,12 @@ extra += `
       <div class="ficha-rodape-nota">📌 Esta ficha integra o portfólio de Pensamento Computacional do aluno. Guarde junto com o laudo ou relatório pedagógico.</div>
     </div>
   </div>
-  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Ficha de Observação</span><span>26 / 27</span></div>
+  <div class="pg-footer"><span>{{escola}} · {{professor}}</span><span>${_kitNome} — Ficha de Observação</span><span>${pgFicha} / ${_totalPags}</span></div>
 </div>`;
 
-// Pg 27: família
-extra += `
+  // Guia para a família
+  const pgFamilia = pgFicha + 1;
+  extra += `
 <div class="pg pg-familia">
   <div class="secao-header" style="background:linear-gradient(135deg,#276749,#22543d)">
     <div class="secao-header-sub">Para enviar no grupo da turma</div>
@@ -362,32 +399,27 @@ extra += `
       <div class="familia-intro-icon">🧩</div>
       <div>
         <div class="familia-intro-titulo">O que estamos fazendo na escola?</div>
-        <div class="familia-intro-desc">Estamos trabalhando <strong>Pensamento Computacional</strong> — uma forma de pensar que ajuda seu filho a organizar ideias, resolver problemas e seguir sequências. E o melhor: fazemos isso <strong>sem computador</strong>, com atividades práticas, papel e movimento.</div>
+        <div class="familia-intro-desc">${_familiaIntroDesc}</div>
       </div>
     </div>
     <div class="familia-conceitos">
-      <div class="familia-conceito-card" style="background:#FFF0F6;border-color:#E84393;padding:0;overflow:hidden"><div style="background:#E84393;padding:8px 14px;display:flex;align-items:center;gap:8px"><span style="font-size:22px">🍰</span><span style="font-family:'Fredoka One',cursive;font-size:16px;color:#fff">Algoritmo</span></div><div style="padding:12px 14px"><div class="familia-conceito-def">Uma sequência de passos para chegar a um resultado.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> Peça para ele explicar os passos de escovar os dentes — um passo de cada vez.</div></div></div>
-      <div class="familia-conceito-card" style="background:#FFF8F0;border-color:#FF6D00;padding:0;overflow:hidden"><div style="background:#FF6D00;padding:8px 14px;display:flex;align-items:center;gap:8px"><span style="font-size:22px">👕</span><span style="font-family:'Fredoka One',cursive;font-size:16px;color:#fff">Sequência</span></div><div style="padding:12px 14px"><div class="familia-conceito-def">Fazer as coisas na ordem certa — porque a ordem importa.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> Na hora de se vestir, pergunte: "O que precisa vir primeiro?" Deixe ele descobrir.</div></div></div>
-      <div class="familia-conceito-card" style="background:#FAF0FF;border-color:#7B1FA2;padding:0;overflow:hidden"><div style="background:#7B1FA2;padding:8px 14px;display:flex;align-items:center;gap:8px"><span style="font-size:22px">🎲</span><span style="font-family:'Fredoka One',cursive;font-size:16px;color:#fff">Lógica</span></div><div style="padding:12px 14px"><div class="familia-conceito-def">Pensar com clareza para tomar a decisão certa.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> "SE está chovendo, ENTÃO o que você coloca para sair?" Perguntas simples de causa e efeito.</div></div></div>
-      <div class="familia-conceito-card" style="background:#FFF5F5;border-color:#C62828;padding:0;overflow:hidden"><div style="background:#C62828;padding:8px 14px;display:flex;align-items:center;gap:8px"><span style="font-size:22px">🔄</span><span style="font-family:'Fredoka One',cursive;font-size:16px;color:#fff">Repetição</span></div><div style="padding:12px 14px"><div class="familia-conceito-def">Quando a mesma ação se repete várias vezes seguidas.</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> "Quantas vezes você escova os dentes por dia?" Mostre que a rotina é um loop que se repete.</div></div></div>
+      ${_familiaConceitos.map(fc=>`<div class="familia-conceito-card" style="background:${fc.bg};border-color:${fc.cor};padding:0;overflow:hidden"><div style="background:${fc.cor};padding:8px 14px;display:flex;align-items:center;gap:8px"><span style="font-size:22px">${fc.emoji}</span><span style="font-family:'Fredoka One',cursive;font-size:16px;color:#fff">${fc.nome}</span></div><div style="padding:12px 14px"><div class="familia-conceito-def">${fc.def}</div><div class="familia-conceito-brincadeira"><strong>Em casa:</strong> ${fc.casa}</div></div></div>`).join('')}
     </div>
-    <div class="familia-frase-final">"Inclusão não é só colocar o aluno na sala.<br>É garantir que ele <em>participa de verdade</em>."</div>
+    <div class="familia-frase-final">${_familiaFrase}</div>
   </div>
-  <div class="pg-footer" style="background:transparent;border-color:rgba(39,103,73,0.2)"><span>{{escola}} · {{professor}}</span><span>Kit TEA — Guia para a Família</span><span>27 / 27</span></div>
+  <div class="pg-footer" style="background:transparent;border-color:rgba(39,103,73,0.2)"><span>{{escola}} · {{professor}}</span><span>${_kitNome} — Guia para a Família</span><span>${pgFamilia} / ${_totalPags}</span></div>
 </div>
 </body>
 </html>`;
 
-// ── MERGE COM BASE ───────────────────────────────────────────────────────────
-let base = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
-// Corta no marcador de páginas geradas (ou em </body> como fallback)
-const marker = '<!-- GENERATED_PAGES_START -->';
-const cutIdx = base.indexOf(marker);
-if (cutIdx !== -1) {
-  base = base.substring(0, cutIdx);
-} else {
-  base = base.replace(/(<\/body>[\s\S]*)$/i, '');
+  return base + extra;
 }
-const final = base + extra;
-fs.writeFileSync(path.join(__dirname, 'index.html'), final, 'utf8');
-console.log('Kit TEA gerado: 27 páginas, 30 atividades, 10 roteiros visuais.');
+
+module.exports = { buildHTML, defaultData: { conceitos, atividades, roteiros, adaptDicas } };
+
+// ── Quando executado diretamente: grava index.html ───────────────────────────
+if (require.main === module) {
+  const html = buildHTML({ conceitos, atividades, roteiros, adaptDicas });
+  fs.writeFileSync(path.join(__dirname, 'index.html'), html, 'utf8');
+  console.log('Kit TEA gerado: 27 páginas, 30 atividades, 10 roteiros visuais.');
+}
