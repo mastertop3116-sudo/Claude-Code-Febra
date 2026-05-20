@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kit Worksheet — Atividades de Alfabetização</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+* { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cor-caça:    #E63946;
+  --cor-liga:    #2A9D8F;
+  --cor-comp:    #E9C46A;
+  --cor-comp-dk: #B5883A;
+  --cor-ord:     #5E9E6E;
+  --cor-nome:    #7B5EA7;
+  --cor-capa:    #264653;
+  --texto:       #1a1a2e;
+  --texto-leve:  #6c757d;
+  --borda:       #dee2e6;
+}
+
+body { font-family: 'Nunito', sans-serif; background: #eee; }
+
+.pg {
+  width: 794px;
+  min-height: 1123px;
+  background: #fff;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  page-break-after: always;
+  margin: 0 auto 24px;
+}
+
+/* ─── CAMPO ALUNO (topo de cada atividade) ─── */
+.campo-aluno {
+  display: flex;
+  gap: 12px;
+  padding: 12px 36px 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--texto-leve);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.campo-aluno .campo {
+  flex: 1;
+  border-bottom: 1.5px solid var(--borda);
+  padding-bottom: 3px;
+}
+.campo-aluno .campo-sm { flex: 0.4; }
+
+/* ─── RODAPÉ PADRÃO ─── */
+.rodape {
+  margin-top: auto;
+  padding: 10px 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--borda);
+  font-size: 10px;
+  color: var(--texto-leve);
+  font-weight: 600;
+}
+
+/* ─── HEADER DE SEÇÃO ─── */
+.sec-header {
+  padding: 20px 36px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.sec-badge {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 20px;
+  color: #fff;
+}
+.sec-num {
+  font-family: 'Fredoka One', cursive;
+  font-size: 15px;
+  color: var(--texto-leve);
+}
+.sec-titulo {
+  font-family: 'Fredoka One', cursive;
+  font-size: 26px;
+  color: var(--texto);
+  flex: 1;
+}
+.sec-icone { font-size: 28px; }
+
+/* ─── INSTRUÇÃO PROFESSOR ─── */
+.instrucao-prof {
+  margin: 0 36px 16px;
+  background: #f8f9fa;
+  border-left: 4px solid;
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  font-size: 11.5px;
+  color: #555;
+  line-height: 1.5;
+}
+.instrucao-prof strong { font-weight: 800; }
+
+/* ─── CORPO ─── */
+.corpo { flex: 1; padding: 0 36px; }
+
+/* ─── LINHAS DE ESCRITA ─── */
+.linhas { display: flex; flex-direction: column; gap: 14px; margin-top: 10px; }
+.linha-escrita {
+  border-bottom: 1.5px dashed #ccc;
+  height: 32px;
+  width: 100%;
+}
+
+/* ─────────────────────────────────────────
+   CAPA
+───────────────────────────────────────── */
+.pg-capa {
+  background: linear-gradient(160deg, #264653 0%, #1a3340 60%, #1d4044 100%);
+  justify-content: space-between;
+}
+
+.capa-topo {
+  padding: 28px 40px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.capa-tag {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+.capa-ano-tag {
+  background: #E9C46A;
+  color: #264653;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 5px 14px;
+  border-radius: 20px;
+}
+
+.capa-centro {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 40px 20px;
+  text-align: center;
+}
+.capa-icone-wrap {
+  width: 130px; height: 130px;
+  background: rgba(255,255,255,0.12);
+  border: 2px solid rgba(255,255,255,0.22);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 72px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 40px rgba(233,196,106,0.2);
+}
+.capa-sub-tag {
+  background: rgba(233,196,106,0.2);
+  border: 1px solid rgba(233,196,106,0.4);
+  color: #E9C46A;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 14px;
+}
+.capa-titulo {
+  font-family: 'Fredoka One', cursive;
+  font-size: 54px;
+  color: #fff;
+  line-height: 1.05;
+  margin-bottom: 8px;
+}
+.capa-titulo span { color: #E9C46A; }
+.capa-subtitulo {
+  font-size: 15px;
+  color: rgba(255,255,255,0.7);
+  max-width: 480px;
+  line-height: 1.55;
+  margin-bottom: 28px;
+}
+
+.capa-chips {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  justify-content: center; margin-bottom: 28px;
+}
+.capa-chip {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: #fff;
+  font-size: 12px; font-weight: 700;
+  padding: 6px 14px; border-radius: 20px;
+}
+
+.capa-stats {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px;
+  padding: 16px 36px;
+  display: flex; gap: 36px;
+}
+.capa-stat { text-align: center; }
+.capa-stat-n {
+  font-family: 'Fredoka One', cursive;
+  font-size: 34px; color: #E9C46A;
+}
+.capa-stat-l {
+  font-size: 10px; font-weight: 700;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase; letter-spacing: 1px;
+}
+
+.capa-rodape {
+  padding: 14px 40px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.capa-rodape span { font-size: 11px; color: rgba(255,255,255,0.45); font-weight: 600; }
+.capa-rodape strong { color: rgba(255,255,255,0.75); }
+
+/* ─────────────────────────────────────────
+   COMO USAR
+───────────────────────────────────────── */
+.como-header {
+  background: linear-gradient(135deg, #264653, #1a3340);
+  padding: 28px 40px 22px;
+}
+.como-header-sub {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  color: rgba(255,255,255,0.5); text-transform: uppercase; margin-bottom: 6px;
+}
+.como-header-titulo {
+  font-family: 'Fredoka One', cursive;
+  font-size: 32px; color: #fff;
+}
+
+.como-corpo { flex: 1; padding: 24px 36px; }
+
+.tipos-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.tipo-card {
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex; align-items: flex-start; gap: 12px;
+}
+.tipo-card-icone { font-size: 28px; flex-shrink: 0; }
+.tipo-card-nome {
+  font-family: 'Fredoka One', cursive;
+  font-size: 16px; margin-bottom: 3px;
+}
+.tipo-card-desc { font-size: 12px; color: #555; line-height: 1.45; }
+
+.dica-box {
+  background: #fffbf0;
+  border: 1.5px solid #E9C46A;
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 12.5px; color: #555; line-height: 1.6;
+}
+.dica-box strong { color: #264653; font-weight: 800; }
+
+/* ─────────────────────────────────────────
+   CAÇADORES DE GRAFEMAS
+───────────────────────────────────────── */
+.caça-faixa { background: var(--cor-caça); height: 6px; }
+
+.caça-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.caça-card {
+  background: #fff5f5;
+  border: 1.5px solid #fcc;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.caça-card-topo {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 8px;
+}
+.caça-letra-alvo {
+  font-family: 'Fredoka One', cursive;
+  font-size: 36px; color: var(--cor-caça); line-height: 1;
+}
+.caça-contagem {
+  font-size: 11px; font-weight: 700; color: #999;
+  border: 1.5px dashed #ccc; border-radius: 6px;
+  padding: 4px 10px;
+}
+.caça-texto {
+  font-size: 15px; line-height: 1.9; color: var(--texto);
+  font-weight: 600;
+  word-spacing: 4px;
+}
+
+.caça-tabela {
+  margin-top: 14px;
+  border: 1.5px solid #fcc;
+  border-radius: 10px;
+  overflow: hidden;
+  width: 100%;
+}
+.caça-tabela th {
+  background: var(--cor-caça);
+  color: #fff; font-size: 11px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 1px;
+  padding: 8px 14px; text-align: left;
+}
+.caça-tabela td {
+  padding: 9px 14px; font-size: 13px;
+  border-top: 1px solid #fcc; color: var(--texto);
+}
+.caça-tabela tr:nth-child(even) td { background: #fff5f5; }
+.caça-caixa-resp {
+  width: 40px; height: 28px;
+  border: 1.5px solid #fcc; border-radius: 6px;
+  display: inline-block;
+}
+
+/* ─────────────────────────────────────────
+   LIGA A PALAVRA
+───────────────────────────────────────── */
+.liga-faixa { background: var(--cor-liga); height: 6px; }
+
+.liga-par-wrap {
+  display: flex; align-items: stretch;
+  gap: 0; margin-bottom: 12px;
+}
+.liga-col {
+  flex: 1;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.liga-col-meio {
+  width: 60px; flex-shrink: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: space-around;
+  gap: 10px;
+}
+.liga-item {
+  background: #f0faf9;
+  border: 1.5px solid #b2dfdb;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14px; font-weight: 700; color: var(--texto);
+  display: flex; align-items: center; gap: 8px;
+  min-height: 44px;
+}
+.liga-item-img { font-size: 24px; }
+.liga-linha-h {
+  width: 100%;
+  border-top: 1.5px dashed #aaa;
+  margin: auto 0;
+}
+
+/* ─────────────────────────────────────────
+   COMPLETE A PALAVRA
+───────────────────────────────────────── */
+.comp-faixa { background: var(--cor-comp-dk); height: 6px; }
+
+.comp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.comp-item {
+  background: #fffdf0;
+  border: 1.5px solid #f0d080;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+}
+.comp-img { font-size: 48px; margin-bottom: 8px; }
+.comp-palavra {
+  font-family: 'Fredoka One', cursive;
+  font-size: 26px;
+  letter-spacing: 4px;
+  color: var(--texto);
+  display: flex; align-items: center; gap: 2px;
+}
+.comp-blank {
+  display: inline-block;
+  width: 28px;
+  border-bottom: 3px solid var(--cor-comp-dk);
+  height: 28px;
+  vertical-align: bottom;
+}
+.comp-dica {
+  font-size: 11px; color: #999; margin-top: 5px;
+  font-weight: 600;
+}
+
+/* ─────────────────────────────────────────
+   ORDENE AS SÍLABAS
+───────────────────────────────────────── */
+.ord-faixa { background: var(--cor-ord); height: 6px; }
+
+.ord-item {
+  background: #f1faf3;
+  border: 1.5px solid #a5d6a7;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 14px;
+}
+.ord-num {
+  font-family: 'Fredoka One', cursive;
+  font-size: 22px; color: var(--cor-ord);
+  width: 32px; flex-shrink: 0; text-align: center;
+}
+.ord-sil-wrap {
+  display: flex; gap: 8px; flex-wrap: wrap; flex: 1;
+}
+.ord-sil {
+  background: var(--cor-ord);
+  color: #fff;
+  font-family: 'Fredoka One', cursive;
+  font-size: 18px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  box-shadow: 0 2px 0 rgba(0,0,0,0.12);
+}
+.ord-seta { font-size: 20px; color: #aaa; }
+.ord-resp {
+  flex: 1;
+  border-bottom: 2.5px solid var(--cor-ord);
+  min-width: 120px;
+  height: 32px;
+}
+.ord-img { font-size: 32px; flex-shrink: 0; }
+
+/* ─────────────────────────────────────────
+   NOMEIE A IMAGEM
+───────────────────────────────────────── */
+.nome-faixa { background: var(--cor-nome); height: 6px; }
+
+.nome-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+}
+.nome-item {
+  background: #f8f4ff;
+  border: 1.5px solid #d0b8f0;
+  border-radius: 12px;
+  padding: 14px 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.nome-img { font-size: 52px; line-height: 1; }
+.nome-linhas {
+  width: 100%;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.nome-linha {
+  border-bottom: 1.5px dashed #c0a0e0;
+  height: 28px; width: 100%;
+}
+.nome-dica {
+  font-size: 11px; color: #999; font-weight: 700;
+  text-align: center; letter-spacing: 0.5px;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════
+     PÁGINA 1 — CAPA
+════════════════════════════════════════════════ -->
+<div class="pg pg-capa">
+  <div class="capa-topo">
+    <span class="capa-tag">📚 Alfabetização</span>
+    <span class="capa-ano-tag">{{ano}}</span>
+  </div>
+
+  <div class="capa-centro">
+    <div class="capa-icone-wrap">📝</div>
+    <div class="capa-sub-tag">✦ Kit Imprimível</div>
+    <div class="capa-titulo">Kit <span>Worksheet</span></div>
+    <div class="capa-subtitulo">Atividades de Alfabetização prontas para imprimir e aplicar — 5 tipos de exercício, progressão de dificuldade, alinhadas à BNCC.</div>
+
+    <div class="capa-chips">
+      <span class="capa-chip">🔍 Caçadores de Grafemas</span>
+      <span class="capa-chip">🔗 Liga a Palavra</span>
+      <span class="capa-chip">✏️ Complete a Palavra</span>
+      <span class="capa-chip">🔀 Ordene as Sílabas</span>
+      <span class="capa-chip">🖼️ Nomeie a Imagem</span>
+    </div>
+
+    <div class="capa-stats">
+      <div class="capa-stat">
+        <div class="capa-stat-n">20</div>
+        <div class="capa-stat-l">Páginas</div>
+      </div>
+      <div class="capa-stat">
+        <div class="capa-stat-n">5</div>
+        <div class="capa-stat-l">Tipos de<br>Atividade</div>
+      </div>
+      <div class="capa-stat">
+        <div class="capa-stat-n">A4</div>
+        <div class="capa-stat-l">Formato<br>Imprimível</div>
+      </div>
+      <div class="capa-stat">
+        <div class="capa-stat-n">R$0</div>
+        <div class="capa-stat-l">Custo por<br>Geração</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="capa-rodape">
+    <span>{{escola}}</span>
+    <strong>{{professor}}</strong>
+    <span>Nexus MAX · Kit Worksheet</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PÁGINA 2 — COMO USAR
+════════════════════════════════════════════════ -->
+<div class="pg">
+  <div class="como-header">
+    <div class="como-header-sub">📋 Guia do Professor</div>
+    <div class="como-header-titulo">Como usar este Kit</div>
+  </div>
+
+  <div class="como-corpo">
+    <div class="tipos-grid">
+      <div class="tipo-card" style="background:#fff5f5; border:1.5px solid #fcc;">
+        <div class="tipo-card-icone">🔍</div>
+        <div>
+          <div class="tipo-card-nome" style="color:var(--cor-caça)">Caçadores de Grafemas</div>
+          <div class="tipo-card-desc">O aluno lê um texto curto e circunda todas as ocorrências de uma letra ou dígrafo. Treina reconhecimento visual de grafemas. <strong>BNCC: EF01LP03</strong></div>
+        </div>
+      </div>
+      <div class="tipo-card" style="background:#f0faf9; border:1.5px solid #b2dfdb;">
+        <div class="tipo-card-icone">🔗</div>
+        <div>
+          <div class="tipo-card-nome" style="color:var(--cor-liga)">Liga a Palavra</div>
+          <div class="tipo-card-desc">O aluno traça uma linha ligando a palavra escrita à imagem correspondente. Treina leitura e associação semântica. <strong>BNCC: EF01LP10</strong></div>
+        </div>
+      </div>
+      <div class="tipo-card" style="background:#fffdf0; border:1.5px solid #f0d080;">
+        <div class="tipo-card-icone">✏️</div>
+        <div>
+          <div class="tipo-card-nome" style="color:var(--cor-comp-dk)">Complete a Palavra</div>
+          <div class="tipo-card-desc">O aluno preenche letras ou sílabas faltando nas palavras com apoio da imagem. Treina rota fonológica e grafema-fonema. <strong>BNCC: EF01LP08</strong></div>
+        </div>
+      </div>
+      <div class="tipo-card" style="background:#f1faf3; border:1.5px solid #a5d6a7;">
+        <div class="tipo-card-icone">🔀</div>
+        <div>
+          <div class="tipo-card-nome" style="color:var(--cor-ord)">Ordene as Sílabas</div>
+          <div class="tipo-card-desc">O aluno recebe sílabas embaralhadas e escreve a palavra correta. Treina consciência silábica e combinação fonológica. <strong>BNCC: EF01LP06</strong></div>
+        </div>
+      </div>
+      <div class="tipo-card" style="background:#f8f4ff; border:1.5px solid #d0b8f0; grid-column: 1 / -1;">
+        <div class="tipo-card-icone">🖼️</div>
+        <div>
+          <div class="tipo-card-nome" style="color:var(--cor-nome)">Nomeie a Imagem</div>
+          <div class="tipo-card-desc">O aluno observa a imagem e escreve o nome correspondente nas linhas pontilhadas. Treina escrita autônoma e vocabulário. Sugerir oralização antes de escrever. <strong>BNCC: EF01LP09</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dica-box">
+      <strong>💡 Dicas de aplicação:</strong> Aplique no máximo 2 páginas por aula (40 minutos). Leia o enunciado em voz alta antes de entregar a folha. Para alunos em N1–N2, realize as primeiras 2 questões junto com a turma antes de deixar fazer sozinho. As atividades estão organizadas em progressão de dificuldade dentro de cada tipo.
+    </div>
+  </div>
+
+  <div class="rodape">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Kit Worksheet — Alfabetização · {{ano}}</span>
+    <span>Pág. 2</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PÁGINAS 3–6 — CAÇADORES DE GRAFEMAS
+════════════════════════════════════════════════ -->
+
+<!-- PG 3 — Letra B (Fácil) -->
+<div class="pg">
+  <div class="caça-faixa"></div>
+  <div class="campo-aluno">
+    <span class="campo">Nome: ________________________________</span>
+    <span class="campo campo-sm">Data: ___________</span>
+    <span class="campo campo-sm">Nota: ___________</span>
+  </div>
+  <div class="sec-header">
+    <span class="sec-badge" style="background:var(--cor-caça)">🔍 Atividade 1</span>
+    <span class="sec-icone">🔍</span>
+    <span class="sec-titulo">Caçadores de Grafemas</span>
+    <span class="sec-num">Pág. 3</span>
+  </div>
+  <div class="instrucao-prof" style="border-color:var(--cor-caça)">
+    <strong>Professor(a):</strong> Peça ao aluno que leia o texto em voz alta e circule com lápis vermelho todas as letras indicadas. Depois preencha a tabela de contagem.
+  </div>
+  <div class="corpo">
+    <div class="caça-grid">
+      <div class="caça-card">
+        <div class="caça-card-topo">
+          <div>
+            <div style="font-size:11px;font-weight:800;color:#999;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">Circule a letra</div>
+            <div class="caça-letra-alvo">B / b</div>
+          </div>
+          <div class="caça-contagem">Encontrei: <span style="color:var(--cor-caça)">___</span> vezes</div>
+        </div>
+        <div class="caça-texto">
+          A <u>b</u>ola é azul.<br>
+          O <u>b</u>oi come capim.<br>
+          A <u>b</u>anana é amarela.<br>
+          O <u>b</u>olo tem cereja.
+        </div>
+      </div>
+      <div class="caça-card">
+        <div class="caça-card-topo">
+          <div>
+            <div style="font-size:11px;font-weight:800;color:#999;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">Circule a letra</div>
+            <div class="caça-letra-alvo">M / m</div>
+          </div>
+          <div class="caça-contagem">Encontrei: <span style="color:var(--cor-caça)">___</span> vezes</div>
+        </div>
+        <div class="caça-texto">
+          A <u>m</u>ala é vermelha.<br>
+          O <u>m</u>acaco pula.<br>
+          A <u>m</u>esa está limpa.<br>
+          O <u>m</u>enu é grande.
+        </div>
+      </div>
+    </div>
+
+    <table class="caça-tabela" style="margin-top:16px">
+      <tr>
+        <th>Palavra</th>
+        <th>Tem B? (sim/não)</th>
+        <th>Quantas vezes?</th>
+        <th>Tem M? (sim/não)</th>
+        <th>Quantas vezes?</th>
+      </tr>
+      <tr><td>BOLA</td><td><div class="caça-caixa-resp"></div></td><td><div class="caça-caixa-resp"></div></td><td><div class="caça-caixa-resp"></div></td><td><div class="caça-caixa-resp"></div></td></tr>
+      <tr><td>BANANA</td><td><div class="caça-caixa-resp"></div></td><td><div class="caça-caixa-resp"></div></td><td><div class="caça-caixa-resp"></div></td><td><div class="caça-caixa-resp"></div></td></tr>
+      <tr><td>MACACO</td><td><div class="caça-caixa-resp"></div></td><td><div class="caça-caixa-resp"></div></td><td><div class="caça-caixa-resp"></div></td><td><div class="caça-caixa-resp"></div></td></tr>
+      <tr><td>BOLO</td><td><div class="caça-caixa-resp"></div></td><td><div class="caça-caixa-resp"></div></td><td><div class="caça-caixa-resp"></div></td><td><div class="caça-caixa-resp"></div></td></tr>
+    </table>
+  </div>
+  <div class="rodape">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Caçadores de Grafemas · Nível 🟢 Fácil · BNCC: EF01LP03</span>
+    <span>Pág. 3</span>
+  </div>
+</div>
+
+<!-- PG 4 — Letra P/F (Fácil-Médio) -->
+<div class="pg">
+  <div class="caça-faixa"></div>
+  <div class="campo-aluno">
+    <span class="campo">Nome: ________________________________</span>
+    <span class="campo campo-sm">Data: ___________</span>
+    <span class="campo campo-sm">Nota: ___________</span>
+  </div>
+  <div class="sec-header">
+    <span class="sec-badge" style="background:var(--cor-caça)">🔍 Atividade 2</span>
+    <span class="sec-icone">🔍</span>
+    <span class="sec-titulo">Caçadores de Grafemas</span>
+    <span class="sec-num">Pág. 4</span>
+  </div>
+  <div class="instrucao-prof" style="border-color:var(--cor-caça)">
+    <strong>Professor(a):</strong> Leia o texto junto com o aluno. Peça que use lápis azul para a letra P e verde para a letra F. Depois complete a tabela.
+  </div>
+  <div class="corpo">
+    <div class="caça-grid">
+      <div class="caça-card">
+        <div class="caça-card-topo">
+          <div>
+            <div style="font-size:11px;font-weight:800;color:#999;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">Azul: Letra</div>
+            <div class="caça-letra-alvo">P / p</div>
+          </div>
+          <div class="caça-contagem">Encontrei: <span style="color:var(--cor-caça)">___</span> vezes</div>
+        </div>
+        <div class="caça-texto">
+          O <u>p</u>ato nada no lago.<br>
+          A <u>p</u>ipa voa alto.<br>
+          O <u>p</u>eixe é saboroso.<br>
+          A <u>p</u>assarinha canta.
+        </div>
+      </div>
+      <div class="caça-card">
+        <div class="caça-card-topo">
+          <div>
+            <div style="font-size:11px;font-weight:800;color:#999;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">Verde: Letra</div>
+            <div class="caça-letra-alvo">F / f</div>
+          </div>
+          <div class="caça-contagem">Encontrei: <span style="color:var(--cor-caça)">___</span> vezes</div>
+        </div>
+        <div class="caça-texto">
+          A <u>f</u>aca corta bem.<br>
+          O <u>f</u>ogo aquece a casa.<br>
+          A <u>f</u>arinha é branca.<br>
+          O <u>f</u>elino dormiu.
+        </div>
+      </div>
+    </div>
+
+    <table class="caça-tabela" style="margin-top:16px">
+      <tr>
+        <th>Palavra</th><th>Começa com P?</th><th>Começa com F?</th><th>Quantas letras tem?</th>
+      </tr>
+      <tr><td>PATO</td><td><div class="caça-caixa-resp"></div></td><td><div class="caça-caixa-resp"></div></td><td><div class="caça-caixa-resp"></div></td></tr>
+      <tr><td>FACA</td><td><div class="caça-caixa-resp"></div></td><td><div class="caça-caixa-resp"></div></td><td><div class="caça-caixa-resp"></div></td></tr>
+      <tr><td>PEIXE</td><td><div class="caça-caixa-resp"></div></td><td><div class="caça-caixa-resp"></div></td><td><div class="caça-caixa-resp"></div></td></tr>
+      <tr><td>FOGO</td><td><div class="caça-caixa-resp"></div></td><td><div class="caça-caixa-resp"></div></td><td><div class="caça-caixa-resp"></div></td></tr>
+    </table>
+  </div>
+  <div class="rodape">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Caçadores de Grafemas · Nível 🟢 Fácil · BNCC: EF01LP03</span>
+    <span>Pág. 4</span>
+  </div>
+</div>
+
+<!-- PG 5 — Dígrafo CH/NH (Médio) -->
+<div class="pg">
+  <div class="caça-faixa"></div>
+  <div class="campo-aluno">
+    <span class="campo">Nome: ________________________________</span>
+    <span class="campo campo-sm">Data: ___________</span>
+    <span class="campo campo-sm">Nota: ___________</span>
+  </div>
+  <div class="sec-header">
+    <span class="sec-badge" style="background:var(--cor-caça)">🔍 Atividade 3</span>
+    <span class="sec-icone">🔍</span>
+    <span class="sec-titulo">Caçadores de Dígrafos</span>
+    <span class="sec-num">Pág. 5</span>
+  </div>
+  <div class="instrucao-prof" style="border-color:var(--cor-caça)">
+    <strong>Professor(a):</strong> Explique que desta vez são dois a letras juntas que fazem um único som. Peça que circulem o dígrafo inteiro (as duas letras juntas) a cada ocorrência.
+  </div>
+  <div class="corpo">
+    <div class="caça-grid">
+      <div class="caça-card">
+        <div class="caça-card-topo">
+          <div>
+            <div style="font-size:11px;font-weight:800;color:#999;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">Circule o dígrafo</div>
+            <div class="caça-letra-alvo">CH</div>
+          </div>
+          <div class="caça-contagem">Encontrei: <span style="color:var(--cor-caça)">___</span> vezes</div>
+        </div>
+        <div class="caça-texto">
+          A <u>ch</u>ave está perdida.<br>
+          O <u>ch</u>á está quente.<br>
+          A <u>ch</u>ávena caiu.<br>
+          O <u>ch</u>eiro é bom.
+        </div>
+      </div>
+      <div class="caça-card">
+        <div class="caça-card-topo">
+          <div>
+            <div style="font-size:11px;font-weight:800;color:#999;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px">Circule o dígrafo</div>
+            <div class="caça-letra-alvo">NH</div>
+          </div>
+          <div class="caça-contagem">Encontrei: <span style="color:var(--cor-caça)">___</span> vezes</div>
+        </div>
+        <div class="caça-texto">
+          O vi<u>nh</u>o é da uva.<br>
+          A ra<u>nh</u>a bri<u>nh</u>ou.<br>
+          O ca<u>nh</u>ão é grande.<br>
+          A li<u>nh</u>a é fina.
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:16px;background:#fff5f5;border-radius:10px;padding:14px 18px;border:1.5px solid #fcc;">
+      <div style="font-size:12px;font-weight:800;color:var(--cor-caça);margin-bottom:10px">✏️ Escreva mais uma palavra com cada dígrafo:</div>
+      <div style="display:flex;gap:24px;">
+        <div style="flex:1">
+          <div style="font-size:12px;font-weight:700;color:#555;margin-bottom:6px">Com CH:</div>
+          <div class="linha-escrita"></div>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:12px;font-weight:700;color:#555;margin-bottom:6px">Com NH:</div>
+          <div class="linha-escrita"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="rodape">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Caçadores de Dígrafos · Nível 🟡 Médio · BNCC: EF01LP03</span>
+    <span>Pág. 5</span>
+  </div>
+</div>
+
+<!-- PG 6 — LH/RR/SS (Desafio) -->
+<div class="pg">
+  <div class="caça-faixa"></div>
+  <div class="campo-aluno">
+    <span class="campo">Nome: ________________________________</span>
+    <span class="campo campo-sm">Data: ___________</span>
+    <span class="campo campo-sm">Nota: ___________</span>
+  </div>
+  <div class="sec-header">
+    <span class="sec-badge" style="background:var(--cor-caça)">🔍 Atividade 4</span>
+    <span class="sec-icone">🔍</span>
+    <span class="sec-titulo">Caçadores — Desafio</span>
+    <span class="sec-num">Pág. 6</span>
+  </div>
+  <div class="instrucao-prof" style="border-color:var(--cor-caça)">
+    <strong>Professor(a):</strong> Atividade desafio — 3 dígrafos ao mesmo tempo. Use 3 cores diferentes. Alunos em N3+ conseguem fazer sozinhos. Para N2, fazer a primeira linha junto.
+  </div>
+  <div class="corpo">
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+      <div style="background:#ffe0e0;border:1.5px solid #f77;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:800;"><span style="color:var(--cor-caça)">LH</span> = lápis <span style="color:#999">vermelho</span></div>
+      <div style="background:#e0f0ff;border:1.5px solid #7af;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:800;"><span style="color:#1976D2">RR</span> = lápis <span style="color:#999">azul</span></div>
+      <div style="background:#e8ffe0;border:1.5px solid #7c7;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:800;"><span style="color:var(--cor-ord)">SS</span> = lápis <span style="color:#999">verde</span></div>
+    </div>
+    <div class="caça-card" style="width:100%">
+      <div class="caça-texto" style="font-size:16px;line-height:2.1">
+        O ca<u>rr</u>o do vi<u>zi</u><u>nh</u>o é ve<u>rm</u>e<u>lh</u>o.<br>
+        A ma<u>ss</u>a do bo<u>lh</u>o ficou go<u>ss</u>o<u>ss</u>a.<br>
+        O ga<u>lh</u>o da á<u>rv</u>ore ra<u>ss</u>gou a ca<u>mi</u><u>ss</u>a.<br>
+        A ba<u>lh</u>a ca<u>rr</u>ega mui<u>ss</u>o peso.
+      </div>
+    </div>
+    <table class="caça-tabela" style="margin-top:14px">
+      <tr><th>Dígrafo</th><th>Palavras encontradas (escreva)</th><th>Total</th></tr>
+      <tr><td style="color:var(--cor-caça);font-weight:800">LH</td><td style="min-width:300px"><div class="linha-escrita"></div></td><td><div class="caça-caixa-resp"></div></td></tr>
+      <tr><td style="color:#1976D2;font-weight:800">RR</td><td><div class="linha-escrita"></div></td><td><div class="caça-caixa-resp"></div></td></tr>
+      <tr><td style="color:var(--cor-ord);font-weight:800">SS</td><td><div class="linha-escrita"></div></td><td><div class="caça-caixa-resp"></div></td></tr>
+    </table>
+  </div>
+  <div class="rodape">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Caçadores de Dígrafos · Nível 🔴 Desafio · BNCC: EF01LP03</span>
+    <span>Pág. 6</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PÁGINAS 7–10 — LIGA A PALAVRA
+════════════════════════════════════════════════ -->
+
+<!-- PG 7 — Animais (Fácil) -->
+<div class="pg">
+  <div class="liga-faixa"></div>
+  <div class="campo-aluno">
+    <span class="campo">Nome: ________________________________</span>
+    <span class="campo campo-sm">Data: ___________</span>
+    <span class="campo campo-sm">Nota: ___________</span>
+  </div>
+  <div class="sec-header">
+    <span class="sec-badge" style="background:var(--cor-liga)">🔗 Atividade 1</span>
+    <span class="sec-icone">🔗</span>
+    <span class="sec-titulo">Liga a Palavra — Animais</span>
+    <span class="sec-num">Pág. 7</span>
+  </div>
+  <div class="instrucao-prof" style="border-color:var(--cor-liga)">
+    <strong>Professor(a):</strong> Peça que o aluno leia cada palavra da coluna da esquerda, identifique a imagem correspondente e trace uma linha ligando os dois. Pode oralizar antes de traçar.
+  </div>
+  <div class="corpo">
+    <div style="background:#f0faf9;border:1.5px solid #b2dfdb;border-radius:12px;padding:18px 20px;">
+      <div style="font-size:13px;font-weight:800;color:var(--cor-liga);margin-bottom:16px">📌 Leia a palavra e ligue à imagem certa. Use régua!</div>
+
+      <!-- Par 1 -->
+      <div style="display:flex;align-items:center;margin-bottom:14px;gap:0;">
+        <div style="flex:1">
+          <div class="liga-item">🐅 TIGRE</div>
+        </div>
+        <div style="width:80px;text-align:center;display:flex;align-items:center;justify-content:center;">
+          <div style="border-top:1.5px dashed #aaa;width:100%;"></div>
+        </div>
+        <div style="flex:1">
+          <div class="liga-item" style="justify-content:flex-end;">🦁</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;margin-bottom:14px;">
+        <div style="flex:1"><div class="liga-item">🦁 LEÃO</div></div>
+        <div style="width:80px;text-align:center;display:flex;align-items:center;justify-content:center;"><div style="border-top:1.5px dashed #aaa;width:100%;"></div></div>
+        <div style="flex:1"><div class="liga-item" style="justify-content:flex-end;">🐘</div></div>
+      </div>
+
+      <div style="display:flex;align-items:center;margin-bottom:14px;">
+        <div style="flex:1"><div class="liga-item">🐘 ELEFANTE</div></div>
+        <div style="width:80px;text-align:center;display:flex;align-items:center;justify-content:center;"><div style="border-top:1.5px dashed #aaa;width:100%;"></div></div>
+        <div style="flex:1"><div class="liga-item" style="justify-content:flex-end;">🦒</div></div>
+      </div>
+
+      <div style="display:flex;align-items:center;margin-bottom:14px;">
+        <div style="flex:1"><div class="liga-item">🦒 GIRAFA</div></div>
+        <div style="width:80px;text-align:center;display:flex;align-items:center;justify-content:center;"><div style="border-top:1.5px dashed #aaa;width:100%;"></div></div>
+        <div style="flex:1"><div class="liga-item" style="justify-content:flex-end;">🐅</div></div>
+      </div>
+
+      <div style="display:flex;align-items:center;margin-bottom:14px;">
+        <div style="flex:1"><div class="liga-item">🐧 PINGUIM</div></div>
+        <div style="width:80px;text-align:center;display:flex;align-items:center;justify-content:center;"><div style="border-top:1.5px dashed #aaa;width:100%;"></div></div>
+        <div style="flex:1"><div class="liga-item" style="justify-content:flex-end;">🦓</div></div>
+      </div>
+
+      <div style="display:flex;align-items:center;">
+        <div style="flex:1"><div class="liga-item">🦓 ZEBRA</div></div>
+        <div style="width:80px;text-align:center;display:flex;align-items:center;justify-content:center;"><div style="border-top:1.5px dashed #aaa;width:100%;"></div></div>
+        <div style="flex:1"><div class="liga-item" style="justify-content:flex-end;">🐧</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="rodape">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Liga a Palavra · Nível 🟢 Fácil · BNCC: EF01LP10</span>
+    <span>Pág. 7</span>
+  </div>
+</div>
+
+<!-- PG 8 — Frutas (Fácil) -->
+<div class="pg">
+  <div class="liga-faixa"></div>
+  <div class="campo-aluno">
+    <span class="campo">Nome: ________________________________</span>
+    <span class="campo campo-sm">Data: ___________</span>
+    <span class="campo campo-sm">Nota: ___________</span>
+  </div>
+  <div class="sec-header">
+    <span class="sec-badge" style="background:var(--cor-liga)">🔗 Atividade 2</span>
+    <span class="sec-icone">🔗</span>
+    <span class="sec-titulo">Liga a Palavra — Frutas</span>
+    <span class="sec-num">Pág. 8</span>
+  </div>
+  <div class="instrucao-prof" style="border-color:var(--cor-liga)">
+    <strong>Professor(a):</strong> O aluno lê as palavras, traça as linhas e depois escreve o nome de mais duas frutas que ele conheça nas linhas ao final.
+  </div>
+  <div class="corpo">
+    <div style="background:#f0faf9;border:1.5px solid #b2dfdb;border-radius:12px;padding:18px 20px;margin-bottom:14px;">
+      <div style="font-size:13px;font-weight:800;color:var(--cor-liga);margin-bottom:16px">🍎 Ligue cada fruta ao seu nome:</div>
+      <div style="display:flex;align-items:center;margin-bottom:12px;">
+        <div style="flex:1"><div class="liga-item">🍎 MAÇÃ</div></div>
+        <div style="width:80px;display:flex;align-items:center;justify-content:center;"><div style="border-top:1.5px dashed #aaa;width:100%;"></div></div>
+        <div style="flex:1"><div class="liga-item" style="justify-content:flex-end;">🍌</div></div>
+      </div>
+      <div style="display:flex;align-items:center;margin-bottom:12px;">
+        <div style="flex:1"><div class="liga-item">🍌 BANANA</div></div>
+        <div style="width:80px;display:flex;align-items:center;justify-content:center;"><div style="border-top:1.5px dashed #aaa;width:100%;"></div></div>
+        <div style="flex:1"><div class="liga-item" style="justify-content:flex-end;">🍓</div></div>
+      </div>
+      <div style="display:flex;align-items:center;margin-bottom:12px;">
+        <div style="flex:1"><div class="liga-item">🍓 MORANGO</div></div>
+        <div style="width:80px;display:flex;align-items:center;justify-content:center;"><div style="border-top:1.5px dashed #aaa;width:100%;"></div></div>
+        <div style="flex:1"><div class="liga-item" style="justify-content:flex-end;">🍇</div></div>
+      </div>
+      <div style="display:flex;align-items:center;margin-bottom:12px;">
+        <div style="flex:1"><div class="liga-item">🍇 UVA</div></div>
+        <div style="width:80px;display:flex;align-items:center;justify-content:center;"><div style="border-top:1.5px dashed #aaa;width:100%;"></div></div>
+        <div style="flex:1"><div class="liga-item" style="justify-content:flex-end;">🍍</div></div>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <div style="flex:1"><div class="liga-item">🍍 ABACAXI</div></div>
+        <div style="width:80px;display:flex;align-items:center;justify-content:center;"><div style="border-top:1.5px dashed #aaa;width:100%;"></div></div>
+        <div style="flex:1"><div class="liga-item" style="justify-content:flex-end;">🍎</div></div>
+      </div>
+    </div>
+    <div style="background:#f0faf9;border:1.5px solid #b2dfdb;border-radius:10px;padding:14px 18px;">
+      <div style="font-size:12px;font-weight:800;color:var(--cor-liga);margin-bottom:10px">✏️ Escreva o nome de mais 2 frutas que você conhece:</div>
+      <div style="display:flex;gap:20px;">
+        <div style="flex:1"><div class="linha-escrita"></div></div>
+        <div style="flex:1"><div class="linha-escrita"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="rodape">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Liga a Palavra · Nível 🟢 Fácil · BNCC: EF01LP10</span>
+    <span>Pág. 8</span>
+  </div>
+</div>
+
+<!-- PG 9 — Objetos da escola (Médio) -->
+<div class="pg">
+  <div class="liga-faixa"></div>
+  <div class="campo-aluno">
+    <span class="campo">Nome: ________________________________</span>
+    <span class="campo campo-sm">Data: ___________</span>
+    <span class="campo campo-sm">Nota: ___________</span>
+  </div>
+  <div class="sec-header">
+    <span class="sec-badge" style="background:var(--cor-liga)">🔗 Atividade 3</span>
+    <span class="sec-icone">🔗</span>
+    <span class="sec-titulo">Liga a Palavra — Escola</span>
+    <span class="sec-num">Pág. 9</span>
+  </div>
+  <div class="instrucao-prof" style="border-color:var(--cor-liga)">
+    <strong>Professor(a):</strong> Atividade de médio. Além de ligar, o aluno deve escrever uma frase simples usando uma das palavras. Incentive a oralização antes da escrita.
+  </div>
+  <div class="corpo">
+    <div style="background:#f0faf9;border:1.5px solid #b2dfdb;border-radius:12px;padding:18px 20px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;margin-bottom:12px;">
+        <div style="flex:1"><div class="liga-item">📚 LIVRO</div></div>
+        <div style="width:80px;display:flex;align-items:center;justify-content:center;"><div style="border-top:1.5px dashed #aaa;width:100%;"></div></div>
+        <div style="flex:1"><div class="liga-item" style="justify-content:flex-end;">✏️</div></div>
+      </div>
+      <div style="display:flex;align-items:center;margin-bottom:12px;">
+        <div style="flex:1"><div class="liga-item">✏️ LÁPIS</div></div>
+        <div style="width:80px;display:flex;align-items:center;justify-content:center;"><div style="border-top:1.5px dashed #aaa;width:100%;"></div></div>
+        <div style="flex:1"><div class="liga-item" style="justify-content:flex-end;">📐</div></div>
+      </div>
+      <div style="display:flex;align-items:center;margin-bottom:12px;">
+        <div style="flex:1"><div class="liga-item">📐 RÉGUA</div></div>
+        <div style="width:80px;display:flex;align-items:center;justify-content:center;"><div style="border-top:1.5px dashed #aaa;width:100%;"></div></div>
+        <div style="flex:1"><div class="liga-item" style="justify-content:flex-end;">📚</div></div>
+      </div>
+      <div style="display:flex;align-items:center;margin-bottom:12px;">
+        <div style="flex:1"><div class="liga-item">🎒 MOCHILA</div></div>
+        <div style="width:80px;display:flex;align-items:center;justify-content:center;"><div style="border-top:1.5px dashed #aaa;width:100%;"></div></div>
+        <div style="flex:1"><div class="liga-item" style="justify-content:flex-end;">📏</div></div>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <div style="flex:1"><div class="liga-item">📏 BORRACHA</div></div>
+        <div style="width:80px;display:flex;align-items:center;justify-content:center;"><div style="border-top:1.5px dashed #aaa;width:100%;"></div></div>
+        <div style="flex:1"><div class="liga-item" style="justify-content:flex-end;">🎒</div></div>
+      </div>
+    </div>
+    <div style="background:#f0faf9;border:1.5px solid #b2dfdb;border-radius:10px;padding:14px 18px;">
+      <div style="font-size:12px;font-weight:800;color:var(--cor-liga);margin-bottom:10px">✏️ Escreva uma frase usando uma das palavras acima:</div>
+      <div class="linhas"><div class="linha-escrita"></div><div class="linha-escrita"></div></div>
+    </div>
+  </div>
+  <div class="rodape">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Liga a Palavra · Nível 🟡 Médio · BNCC: EF01LP10</span>
+    <span>Pág. 9</span>
+  </div>
+</div>
+
+<!-- PG 10 — Sinônimos (Desafio) -->
+<div class="pg">
+  <div class="liga-faixa"></div>
+  <div class="campo-aluno">
+    <span class="campo">Nome: ________________________________</span>
+    <span class="campo campo-sm">Data: ___________</span>
+    <span class="campo campo-sm">Nota: ___________</span>
+  </div>
+  <div class="sec-header">
+    <span class="sec-badge" style="background:var(--cor-liga)">🔗 Atividade 4</span>
+    <span class="sec-icone">🔗</span>
+    <span class="sec-titulo">Liga a Palavra — Desafio</span>
+    <span class="sec-num">Pág. 10</span>
+  </div>
+  <div class="instrucao-prof" style="border-color:var(--cor-liga)">
+    <strong>Professor(a):</strong> Desafio: o aluno liga a palavra ao seu significado (definição curta), não a uma imagem. Para N3+. Pode ler as definições para N2.
+  </div>
+  <div class="corpo">
+    <div style="background:#f0faf9;border:1.5px solid #b2dfdb;border-radius:12px;padding:18px 20px;margin-bottom:14px;">
+      <div style="font-size:13px;font-weight:800;color:var(--cor-liga);margin-bottom:16px">📖 Ligue a palavra à sua definição:</div>
+      <div style="display:flex;align-items:center;margin-bottom:12px;">
+        <div style="flex:1"><div class="liga-item" style="font-size:15px;font-weight:800">ESCOLA</div></div>
+        <div style="width:60px;display:flex;align-items:center;justify-content:center;"><div style="border-top:1.5px dashed #aaa;width:100%;"></div></div>
+        <div style="flex:1.5"><div class="liga-item" style="font-size:12px;font-weight:600;background:#e8f5f3">Lugar onde as crianças aprendem a ler</div></div>
+      </div>
+      <div style="display:flex;align-items:center;margin-bottom:12px;">
+        <div style="flex:1"><div class="liga-item" style="font-size:15px;font-weight:800">BIBLIOTECA</div></div>
+        <div style="width:60px;display:flex;align-items:center;justify-content:center;"><div style="border-top:1.5px dashed #aaa;width:100%;"></div></div>
+        <div style="flex:1.5"><div class="liga-item" style="font-size:12px;font-weight:600;background:#e8f5f3">Lugar onde ficam guardados muitos livros</div></div>
+      </div>
+      <div style="display:flex;align-items:center;margin-bottom:12px;">
+        <div style="flex:1"><div class="liga-item" style="font-size:15px;font-weight:800">PROFESSOR</div></div>
+        <div style="width:60px;display:flex;align-items:center;justify-content:center;"><div style="border-top:1.5px dashed #aaa;width:100%;"></div></div>
+        <div style="flex:1.5"><div class="liga-item" style="font-size:12px;font-weight:600;background:#e8f5f3">Pessoa que nos ensina e explica as coisas</div></div>
+      </div>
+      <div style="display:flex;align-items:center;">
+        <div style="flex:1"><div class="liga-item" style="font-size:15px;font-weight:800">RECREIO</div></div>
+        <div style="width:60px;display:flex;align-items:center;justify-content:center;"><div style="border-top:1.5px dashed #aaa;width:100%;"></div></div>
+        <div style="flex:1.5"><div class="liga-item" style="font-size:12px;font-weight:600;background:#e8f5f3">Tempo livre para brincar na escola</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="rodape">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Liga a Palavra · Nível 🔴 Desafio · BNCC: EF01LP10</span>
+    <span>Pág. 10</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PÁGINAS 11–14 — COMPLETE A PALAVRA
+════════════════════════════════════════════════ -->
+
+<!-- PG 11 — 1 letra faltando (Fácil) -->
+<div class="pg">
+  <div class="comp-faixa"></div>
+  <div class="campo-aluno">
+    <span class="campo">Nome: ________________________________</span>
+    <span class="campo campo-sm">Data: ___________</span>
+    <span class="campo campo-sm">Nota: ___________</span>
+  </div>
+  <div class="sec-header">
+    <span class="sec-badge" style="background:var(--cor-comp-dk)">✏️ Atividade 1</span>
+    <span class="sec-icone">✏️</span>
+    <span class="sec-titulo">Complete a Palavra</span>
+    <span class="sec-num">Pág. 11</span>
+  </div>
+  <div class="instrucao-prof" style="border-color:var(--cor-comp-dk)">
+    <strong>Professor(a):</strong> Olhe a imagem, diga o nome em voz alta e escreva a letra que está faltando. A palavra já está quase completa — apenas 1 letra falta em cada.
+  </div>
+  <div class="corpo">
+    <div class="comp-grid">
+      <div class="comp-item">
+        <div class="comp-img">🐱</div>
+        <div class="comp-palavra">G<span class="comp-blank"></span>TO</div>
+        <div class="comp-dica">Dica: som de "a"</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-img">🌙</div>
+        <div class="comp-palavra">LU<span class="comp-blank"></span>A</div>
+        <div class="comp-dica">Dica: som de "n"</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-img">🐟</div>
+        <div class="comp-palavra">PE<span class="comp-blank"></span>XE</div>
+        <div class="comp-dica">Dica: som de "i"</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-img">🏡</div>
+        <div class="comp-palavra">CA<span class="comp-blank"></span>A</div>
+        <div class="comp-dica">Dica: som de "s"</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-img">🌺</div>
+        <div class="comp-palavra">FL<span class="comp-blank"></span>R</div>
+        <div class="comp-dica">Dica: som de "o"</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-img">🍞</div>
+        <div class="comp-palavra">PÃ<span class="comp-blank"></span></div>
+        <div class="comp-dica">Dica: som de "o"</div>
+      </div>
+    </div>
+  </div>
+  <div class="rodape">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Complete a Palavra · Nível 🟢 Fácil · BNCC: EF01LP08</span>
+    <span>Pág. 11</span>
+  </div>
+</div>
+
+<!-- PG 12 — 2 letras faltando (Fácil-Médio) -->
+<div class="pg">
+  <div class="comp-faixa"></div>
+  <div class="campo-aluno">
+    <span class="campo">Nome: ________________________________</span>
+    <span class="campo campo-sm">Data: ___________</span>
+    <span class="campo campo-sm">Nota: ___________</span>
+  </div>
+  <div class="sec-header">
+    <span class="sec-badge" style="background:var(--cor-comp-dk)">✏️ Atividade 2</span>
+    <span class="sec-icone">✏️</span>
+    <span class="sec-titulo">Complete a Palavra</span>
+    <span class="sec-num">Pág. 12</span>
+  </div>
+  <div class="instrucao-prof" style="border-color:var(--cor-comp-dk)">
+    <strong>Professor(a):</strong> Desta vez faltam 2 letras. O aluno deve olhar a imagem, dizer o nome em voz alta e preencher as duas lacunas.
+  </div>
+  <div class="corpo">
+    <div class="comp-grid">
+      <div class="comp-item">
+        <div class="comp-img">🐘</div>
+        <div class="comp-palavra">EL<span class="comp-blank"></span>F<span class="comp-blank"></span>NTE</div>
+        <div class="comp-dica">e · a</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-img">🌈</div>
+        <div class="comp-palavra">AR<span class="comp-blank"></span>-<span class="comp-blank"></span>RIS</div>
+        class="comp-dica">c · í</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-img">🦋</div>
+        <div class="comp-palavra">B<span class="comp-blank"></span>T<span class="comp-blank"></span>RFLY</div>
+        <div class="comp-dica">boro · eta</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-img">🚂</div>
+        <div class="comp-palavra">T<span class="comp-blank"></span>EM</div>
+        <div class="comp-dica">r</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-img">⭐</div>
+        <div class="comp-palavra">EST<span class="comp-blank"></span>EL<span class="comp-blank"></span></div>
+        <div class="comp-dica">r · a</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-img">🌊</div>
+        <div class="comp-palavra">PR<span class="comp-blank"></span>I<span class="comp-blank"></span></div>
+        <div class="comp-dica">a · a</div>
+      </div>
+    </div>
+  </div>
+  <div class="rodape">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Complete a Palavra · Nível 🟡 Médio · BNCC: EF01LP08</span>
+    <span>Pág. 12</span>
+  </div>
+</div>
+
+<!-- PG 13 — Sílaba faltando (Médio) -->
+<div class="pg">
+  <div class="comp-faixa"></div>
+  <div class="campo-aluno">
+    <span class="campo">Nome: ________________________________</span>
+    <span class="campo campo-sm">Data: ___________</span>
+    <span class="campo campo-sm">Nota: ___________</span>
+  </div>
+  <div class="sec-header">
+    <span class="sec-badge" style="background:var(--cor-comp-dk)">✏️ Atividade 3</span>
+    <span class="sec-icone">✏️</span>
+    <span class="sec-titulo">Complete — Sílaba Faltando</span>
+    <span class="sec-num">Pág. 13</span>
+  </div>
+  <div class="instrucao-prof" style="border-color:var(--cor-comp-dk)">
+    <strong>Professor(a):</strong> Agora falta uma sílaba inteira. Peça que batam palma para cada sílaba antes de escrever. A caixa de sílabas no topo ajuda como pista.
+  </div>
+  <div class="corpo">
+    <div style="background:#fffdf0;border:1.5px dashed var(--cor-comp-dk);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+      <span style="font-size:11px;font-weight:800;color:#999;text-transform:uppercase;letter-spacing:1px;margin-right:4px;">Sílabas:</span>
+      <span style="background:var(--cor-comp-dk);color:#fff;font-weight:800;padding:4px 12px;border-radius:6px;font-size:14px;">NA</span>
+      <span style="background:var(--cor-comp-dk);color:#fff;font-weight:800;padding:4px 12px;border-radius:6px;font-size:14px;">BO</span>
+      <span style="background:var(--cor-comp-dk);color:#fff;font-weight:800;padding:4px 12px;border-radius:6px;font-size:14px;">CA</span>
+      <span style="background:var(--cor-comp-dk);color:#fff;font-weight:800;padding:4px 12px;border-radius:6px;font-size:14px;">RO</span>
+      <span style="background:var(--cor-comp-dk);color:#fff;font-weight:800;padding:4px 12px;border-radius:6px;font-size:14px;">TA</span>
+      <span style="background:var(--cor-comp-dk);color:#fff;font-weight:800;padding:4px 12px;border-radius:6px;font-size:14px;">MI</span>
+    </div>
+    <div class="comp-grid">
+      <div class="comp-item">
+        <div class="comp-img">🌙</div>
+        <div class="comp-palavra" style="font-size:22px">LU·<span class="comp-blank" style="width:40px"></span></div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-img">🏠</div>
+        <div class="comp-palavra" style="font-size:22px"><span class="comp-blank" style="width:40px"></span>·SA</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-img">⚽</div>
+        <div class="comp-palavra" style="font-size:22px"><span class="comp-blank" style="width:40px"></span>·LA</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-img">🥁</div>
+        <div class="comp-palavra" style="font-size:22px">TAM·<span class="comp-blank" style="width:40px"></span></div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-img">🎩</div>
+        <div class="comp-palavra" style="font-size:22px"><span class="comp-blank" style="width:40px"></span>·LEU</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-img">🦁</div>
+        <div class="comp-palavra" style="font-size:22px">LE·<span class="comp-blank" style="width:40px"></span>·O</div>
+      </div>
+    </div>
+  </div>
+  <div class="rodape">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Complete a Palavra · Nível 🟡 Médio · BNCC: EF01LP08</span>
+    <span>Pág. 13</span>
+  </div>
+</div>
+
+<!-- PG 14 — Desafio: várias letras -->
+<div class="pg">
+  <div class="comp-faixa"></div>
+  <div class="campo-aluno">
+    <span class="campo">Nome: ________________________________</span>
+    <span class="campo campo-sm">Data: ___________</span>
+    <span class="campo campo-sm">Nota: ___________</span>
+  </div>
+  <div class="sec-header">
+    <span class="sec-badge" style="background:var(--cor-comp-dk)">✏️ Atividade 4</span>
+    <span class="sec-icone">✏️</span>
+    <span class="sec-titulo">Complete — Desafio</span>
+    <span class="sec-num">Pág. 14</span>
+  </div>
+  <div class="instrucao-prof" style="border-color:var(--cor-comp-dk)">
+    <strong>Professor(a):</strong> Desafio máximo — o aluno vê apenas a imagem e a primeira letra. Deve completar a palavra inteira. Para N3+. Para N2, adicionar mais letras como pista.
+  </div>
+  <div class="corpo">
+    <div class="comp-grid">
+      <div class="comp-item">
+        <div class="comp-img">🦊</div>
+        <div class="comp-palavra" style="font-size:18px">R<span class="comp-blank" style="width:90px"></span></div>
+        <div class="comp-dica">R · A · P · O · S · A</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-img">🦜</div>
+        <div class="comp-palavra" style="font-size:18px">P<span class="comp-blank" style="width:90px"></span></div>
+        <div class="comp-dica">P · A · P · A · G · A · I · O</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-img">🌻</div>
+        <div class="comp-palavra" style="font-size:18px">G<span class="comp-blank" style="width:90px"></span></div>
+        <div class="comp-dica">G · I · R · A · S · S · O · L</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-img">🦈</div>
+        <div class="comp-palavra" style="font-size:18px">T<span class="comp-blank" style="width:90px"></span></div>
+        <div class="comp-dica">T · U · B · A · R · Ã · O</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-img">🎪</div>
+        <div class="comp-palavra" style="font-size:18px">C<span class="comp-blank" style="width:90px"></span></div>
+        <div class="comp-dica">C · I · R · C · O</div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-img">🏔️</div>
+        <div class="comp-palavra" style="font-size:18px">M<span class="comp-blank" style="width:90px"></span></div>
+        <div class="comp-dica">M · O · N · T · A · N · H · A</div>
+      </div>
+    </div>
+  </div>
+  <div class="rodape">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Complete a Palavra · Nível 🔴 Desafio · BNCC: EF01LP08</span>
+    <span>Pág. 14</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PÁGINAS 15–18 — ORDENE AS SÍLABAS
+════════════════════════════════════════════════ -->
+
+<!-- PG 15 — 2 sílabas (Fácil) -->
+<div class="pg">
+  <div class="ord-faixa"></div>
+  <div class="campo-aluno">
+    <span class="campo">Nome: ________________________________</span>
+    <span class="campo campo-sm">Data: ___________</span>
+    <span class="campo campo-sm">Nota: ___________</span>
+  </div>
+  <div class="sec-header">
+    <span class="sec-badge" style="background:var(--cor-ord)">🔀 Atividade 1</span>
+    <span class="sec-icone">🔀</span>
+    <span class="sec-titulo">Ordene as Sílabas</span>
+    <span class="sec-num">Pág. 15</span>
+  </div>
+  <div class="instrucao-prof" style="border-color:var(--cor-ord)">
+    <strong>Professor(a):</strong> Leia as sílabas com o aluno, bata palma para cada uma e depois escreva a palavra na ordem correta. Palavras com 2 sílabas — nível inicial.
+  </div>
+  <div class="corpo">
+    <div class="ord-item">
+      <div class="ord-num">1</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">LA</span><span class="ord-sil">BO</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">⚽</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">2</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">SA</span><span class="ord-sil">CA</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🏡</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">3</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">TU</span><span class="ord-sil">PA</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🥔</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">4</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">CA</span><span class="ord-sil">VA</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🐄</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">5</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">MA</span><span class="ord-sil">LA</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🧳</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">6</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">NA</span><span class="ord-sil">LU</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🌙</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">7</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">BO</span><span class="ord-sil">SO</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🌞</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">8</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">VO</span><span class="ord-sil">O</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🥚</div>
+    </div>
+  </div>
+  <div class="rodape">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Ordene as Sílabas · Nível 🟢 Fácil · BNCC: EF01LP06</span>
+    <span>Pág. 15</span>
+  </div>
+</div>
+
+<!-- PG 16 — 2 sílabas variadas (Fácil+) -->
+<div class="pg">
+  <div class="ord-faixa"></div>
+  <div class="campo-aluno">
+    <span class="campo">Nome: ________________________________</span>
+    <span class="campo campo-sm">Data: ___________</span>
+    <span class="campo campo-sm">Nota: ___________</span>
+  </div>
+  <div class="sec-header">
+    <span class="sec-badge" style="background:var(--cor-ord)">🔀 Atividade 2</span>
+    <span class="sec-icone">🔀</span>
+    <span class="sec-titulo">Ordene as Sílabas</span>
+    <span class="sec-num">Pág. 16</span>
+  </div>
+  <div class="instrucao-prof" style="border-color:var(--cor-ord)">
+    <strong>Professor(a):</strong> Mesma mecânica, palavras com sílabas de padrão CVC e palavras mais longas. Incentive a oralização de cada sílaba antes de escrever.
+  </div>
+  <div class="corpo">
+    <div class="ord-item">
+      <div class="ord-num">1</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">RO</span><span class="ord-sil">CAR</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🚗</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">2</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">XE</span><span class="ord-sil">PEI</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🐟</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">3</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">VER</span><span class="ord-sil">DE</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🌿</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">4</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">NÃO</span><span class="ord-sil">PÃO</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🍞</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">5</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">LHO</span><span class="ord-sil">ME</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🌽</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">6</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">PO</span><span class="ord-sil">CAM</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🌳</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">7</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">VO</span><span class="ord-sil">A</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🥚</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">8</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">RI</span><span class="ord-sil">O</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🌊</div>
+    </div>
+  </div>
+  <div class="rodape">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Ordene as Sílabas · Nível 🟢 Fácil · BNCC: EF01LP06</span>
+    <span>Pág. 16</span>
+  </div>
+</div>
+
+<!-- PG 17 — 3 sílabas (Médio) -->
+<div class="pg">
+  <div class="ord-faixa"></div>
+  <div class="campo-aluno">
+    <span class="campo">Nome: ________________________________</span>
+    <span class="campo campo-sm">Data: ___________</span>
+    <span class="campo campo-sm">Nota: ___________</span>
+  </div>
+  <div class="sec-header">
+    <span class="sec-badge" style="background:var(--cor-ord)">🔀 Atividade 3</span>
+    <span class="sec-icone">🔀</span>
+    <span class="sec-titulo">Ordene — 3 Sílabas</span>
+    <span class="sec-num">Pág. 17</span>
+  </div>
+  <div class="instrucao-prof" style="border-color:var(--cor-ord)">
+    <strong>Professor(a):</strong> Agora são 3 sílabas. Peça que numere as sílabas com 1, 2, 3 antes de escrever. A imagem é a pista principal.
+  </div>
+  <div class="corpo">
+    <div class="ord-item">
+      <div class="ord-num">1</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">CA</span><span class="ord-sil">BO</span><span class="ord-sil">LA</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🛶</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">2</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">CO</span><span class="ord-sil">LA</span><span class="ord-sil">CA</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🐊</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">3</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">FO</span><span class="ord-sil">NA</span><span class="ord-sil">TE</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">⛲</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">4</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">RI</span><span class="ord-sil">BO</span><span class="ord-sil">LBO</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🦋</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">5</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">LA</span><span class="ord-sil">LÁ</span><span class="ord-sil">PIS</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">✏️</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">6</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">CE</span><span class="ord-sil">LO</span><span class="ord-sil">BO</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🐄</div>
+    </div>
+  </div>
+  <div class="rodape">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Ordene as Sílabas · Nível 🟡 Médio · BNCC: EF01LP06</span>
+    <span>Pág. 17</span>
+  </div>
+</div>
+
+<!-- PG 18 — 3-4 sílabas (Desafio) -->
+<div class="pg">
+  <div class="ord-faixa"></div>
+  <div class="campo-aluno">
+    <span class="campo">Nome: ________________________________</span>
+    <span class="campo campo-sm">Data: ___________</span>
+    <span class="campo campo-sm">Nota: ___________</span>
+  </div>
+  <div class="sec-header">
+    <span class="sec-badge" style="background:var(--cor-ord)">🔀 Atividade 4</span>
+    <span class="sec-icone">🔀</span>
+    <span class="sec-titulo">Ordene — Desafio</span>
+    <span class="sec-num">Pág. 18</span>
+  </div>
+  <div class="instrucao-prof" style="border-color:var(--cor-ord)">
+    <strong>Professor(a):</strong> Desafio: palavras com 4 sílabas. Sem imagem de apoio nas últimas 3. Para N3+. Pode cortar para as primeiras 3 atividades com alunos em N2.
+  </div>
+  <div class="corpo">
+    <div class="ord-item">
+      <div class="ord-num">1</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">TE</span><span class="ord-sil">FAN</span><span class="ord-sil">OR</span><span class="ord-sil">TA</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🦋</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">2</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">DA</span><span class="ord-sil">BA</span><span class="ord-sil">LA</span><span class="ord-sil">NA</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🍌</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">3</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">CA</span><span class="ord-sil">NI</span><span class="ord-sil">FA</span><span class="ord-sil">ZEN</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+      <div class="ord-img">🏫</div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">4</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">SO</span><span class="ord-sil">MA</span><span class="ord-sil">RO</span><span class="ord-sil">PA</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+    </div>
+    <div class="ord-item">
+      <div class="ord-num">5</div>
+      <div class="ord-sil-wrap"><span class="ord-sil">PE</span><span class="ord-sil">LÃO</span><span class="ord-sil">CA</span><span class="ord-sil">VÃO</span></div>
+      <div class="ord-seta">→</div>
+      <div class="ord-resp"></div>
+    </div>
+  </div>
+  <div class="rodape">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Ordene as Sílabas · Nível 🔴 Desafio · BNCC: EF01LP06</span>
+    <span>Pág. 18</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PÁGINAS 19–20 — NOMEIE A IMAGEM
+════════════════════════════════════════════════ -->
+
+<!-- PG 19 — 6 imagens (Fácil) -->
+<div class="pg">
+  <div class="nome-faixa"></div>
+  <div class="campo-aluno">
+    <span class="campo">Nome: ________________________________</span>
+    <span class="campo campo-sm">Data: ___________</span>
+    <span class="campo campo-sm">Nota: ___________</span>
+  </div>
+  <div class="sec-header">
+    <span class="sec-badge" style="background:var(--cor-nome)">🖼️ Atividade 1</span>
+    <span class="sec-icone">🖼️</span>
+    <span class="sec-titulo">Nomeie a Imagem</span>
+    <span class="sec-num">Pág. 19</span>
+  </div>
+  <div class="instrucao-prof" style="border-color:var(--cor-nome)">
+    <strong>Professor(a):</strong> O aluno olha cada imagem, diz o nome em voz alta e depois escreve nas linhas. Incentive a escrita autônoma — só ajude se o aluno não conseguir identificar a imagem.
+  </div>
+  <div class="corpo">
+    <div class="nome-grid">
+      <div class="nome-item">
+        <div class="nome-img">🌞</div>
+        <div class="nome-linhas">
+          <div class="nome-linha"></div>
+          <div class="nome-linha"></div>
+        </div>
+        <div class="nome-dica">S _ L</div>
+      </div>
+      <div class="nome-item">
+        <div class="nome-img">🌙</div>
+        <div class="nome-linhas">
+          <div class="nome-linha"></div>
+          <div class="nome-linha"></div>
+        </div>
+        <div class="nome-dica">L _ A</div>
+      </div>
+      <div class="nome-item">
+        <div class="nome-img">⭐</div>
+        <div class="nome-linhas">
+          <div class="nome-linha"></div>
+          <div class="nome-linha"></div>
+        </div>
+        <div class="nome-dica">E _ T _ E _ A</div>
+      </div>
+      <div class="nome-item">
+        <div class="nome-img">🌧️</div>
+        <div class="nome-linhas">
+          <div class="nome-linha"></div>
+          <div class="nome-linha"></div>
+        </div>
+        <div class="nome-dica">C _ U _ A</div>
+      </div>
+      <div class="nome-item">
+        <div class="nome-img">🌈</div>
+        <div class="nome-linhas">
+          <div class="nome-linha"></div>
+          <div class="nome-linha"></div>
+        </div>
+        <div class="nome-dica">A _ C _ - Í _ I _</div>
+      </div>
+      <div class="nome-item">
+        <div class="nome-img">⛅</div>
+        <div class="nome-linhas">
+          <div class="nome-linha"></div>
+          <div class="nome-linha"></div>
+        </div>
+        <div class="nome-dica">N _ _ E _</div>
+      </div>
+    </div>
+  </div>
+  <div class="rodape">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Nomeie a Imagem · Nível 🟢 Fácil · BNCC: EF01LP09</span>
+    <span>Pág. 19</span>
+  </div>
+</div>
+
+<!-- PG 20 — 8 imagens (Médio) -->
+<div class="pg">
+  <div class="nome-faixa"></div>
+  <div class="campo-aluno">
+    <span class="campo">Nome: ________________________________</span>
+    <span class="campo campo-sm">Data: ___________</span>
+    <span class="campo campo-sm">Nota: ___________</span>
+  </div>
+  <div class="sec-header">
+    <span class="sec-badge" style="background:var(--cor-nome)">🖼️ Atividade 2</span>
+    <span class="sec-icone">🖼️</span>
+    <span class="sec-titulo">Nomeie — Sem Dica</span>
+    <span class="sec-num">Pág. 20</span>
+  </div>
+  <div class="instrucao-prof" style="border-color:var(--cor-nome)">
+    <strong>Professor(a):</strong> Desta vez sem dicas de letras — escrita completamente autônoma. Para N3+. Para N2, o professor pode ditar as primeiras letras oralmente sem escrever na folha.
+  </div>
+  <div class="corpo">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;">
+      <div class="nome-item">
+        <div class="nome-img">🐶</div>
+        <div class="nome-linhas"><div class="nome-linha"></div><div class="nome-linha"></div></div>
+      </div>
+      <div class="nome-item">
+        <div class="nome-img">🐱</div>
+        <div class="nome-linhas"><div class="nome-linha"></div><div class="nome-linha"></div></div>
+      </div>
+      <div class="nome-item">
+        <div class="nome-img">🐦</div>
+        <div class="nome-linhas"><div class="nome-linha"></div><div class="nome-linha"></div></div>
+      </div>
+      <div class="nome-item">
+        <div class="nome-img">🐠</div>
+        <div class="nome-linhas"><div class="nome-linha"></div><div class="nome-linha"></div></div>
+      </div>
+      <div class="nome-item">
+        <div class="nome-img">🌴</div>
+        <div class="nome-linhas"><div class="nome-linha"></div><div class="nome-linha"></div></div>
+      </div>
+      <div class="nome-item">
+        <div class="nome-img">🌊</div>
+        <div class="nome-linhas"><div class="nome-linha"></div><div class="nome-linha"></div></div>
+      </div>
+      <div class="nome-item">
+        <div class="nome-img">🏔️</div>
+        <div class="nome-linhas"><div class="nome-linha"></div><div class="nome-linha"></div></div>
+      </div>
+      <div class="nome-item">
+        <div class="nome-img">🌋</div>
+        <div class="nome-linhas"><div class="nome-linha"></div><div class="nome-linha"></div></div>
+      </div>
+    </div>
+    <div style="margin-top:14px;background:#f8f4ff;border:1.5px solid #d0b8f0;border-radius:10px;padding:12px 16px;">
+      <div style="font-size:12px;font-weight:800;color:var(--cor-nome);margin-bottom:8px">🌟 Bônus: Escolha 1 imagem e escreva uma frase com ela:</div>
+      <div class="linhas"><div class="linha-escrita"></div><div class="linha-escrita"></div></div>
+    </div>
+  </div>
+  <div class="rodape">
+    <span>{{escola}} · {{professor}}</span>
+    <span>Nomeie a Imagem · Nível 🟡 Médio · BNCC: EF01LP09</span>
+    <span>Pág. 20</span>
+  </div>
+</div>
+
+</body>
+</html>

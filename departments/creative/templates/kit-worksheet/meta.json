@@ -1,0 +1,14 @@
+{
+  "nome": "Kit Worksheet — Atividades de Alfabetização",
+  "nicho": "Educação / Alfabetização",
+  "icon": "📝",
+  "category": "educacao",
+  "layout": "portrait",
+  "paginas": 20,
+  "descricao": "20 páginas A4 — 5 tipos de atividade: Caçadores de Grafemas, Liga a Palavra, Complete a Palavra, Ordene as Sílabas e Nomeie a Imagem",
+  "vars": [
+    { "id": "escola",    "label": "Nome da Escola",    "default": "Escola Municipal" },
+    { "id": "professor", "label": "Nome do Professor", "default": "Professor(a)" },
+    { "id": "ano",       "label": "Ano / Turma",       "default": "1º Ano" }
+  ]
+}
