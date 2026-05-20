@@ -1096,6 +1096,21 @@ app.post("/api/gerar-pdf", async (req, res) => {
 (function setupNexusPDF() {
   const { renderTemplate, listTemplates, getStats } = require("./departments/creative/pdf_puppeteer");
 
+  // Middleware: CORS + API Key para todas as rotas /api/nexuspdf/*
+  const nexusCors = (req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-api-key, Authorization");
+    if (req.method === "OPTIONS") return res.sendStatus(204);
+    const expectedKey = process.env.NEXUS_API_KEY;
+    if (expectedKey) {
+      const provided = req.headers["x-api-key"] || req.headers["authorization"]?.replace("Bearer ", "");
+      if (provided !== expectedKey) return res.status(401).json({ error: "Chave de API inválida." });
+    }
+    next();
+  };
+  app.use("/api/nexuspdf", nexusCors);
+
   app.get("/api/nexuspdf/templates", (req, res) => {
     try { res.json(listTemplates()); }
     catch (e) { res.status(500).json({ error: e.message }); }
