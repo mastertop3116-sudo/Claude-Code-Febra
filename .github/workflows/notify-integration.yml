@@ -1,0 +1,49 @@
+name: Notify Integration Partners
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "server.js"
+      - "NEXUSPDF-API.md"
+      - "departments/creative/templates/**"
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Build change summary
+        id: summary
+        run: |
+          FILES=$(git diff --name-only HEAD~1 HEAD | tr '\n' ', ' | sed 's/,$//')
+          MSG=$(git log -1 --pretty=format:"%s")
+          echo "files=$FILES" >> $GITHUB_OUTPUT
+          echo "message=$MSG" >> $GITHUB_OUTPUT
+
+      - name: Notify Carlinhos webhook
+        if: env.CARLINHOS_WEBHOOK_URL != ''
+        env:
+          CARLINHOS_WEBHOOK_URL: ${{ secrets.CARLINHOS_WEBHOOK_URL }}
+        run: |
+          curl -s -X POST "$CARLINHOS_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "event": "nexuspdf_api_updated",
+              "repo": "mastertop3116-sudo/Claude-Code-Febra",
+              "commit": "${{ github.sha }}",
+              "message": "${{ steps.summary.outputs.message }}",
+              "changed_files": "${{ steps.summary.outputs.files }}",
+              "api_docs": "https://raw.githubusercontent.com/mastertop3116-sudo/Claude-Code-Febra/main/NEXUSPDF-API.md"
+            }'
+
+      - name: Summary
+        run: |
+          echo "### NexusPDF API atualizada" >> $GITHUB_STEP_SUMMARY
+          echo "**Arquivos alterados:** ${{ steps.summary.outputs.files }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ steps.summary.outputs.message }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Webhook enviado para o dashboard do Carlinhos." >> $GITHUB_STEP_SUMMARY
