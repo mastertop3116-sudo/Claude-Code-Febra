@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Folhinhas Personalizadas</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
+<style>
+* { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Nunito', sans-serif; background: #e8edf2; }
+
+/* Cada página ocupa exatamente uma folha A4 — sem espaço em branco */
+.pg {
+  width: 794px;
+  height: 1123px;
+  background: #fff;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  page-break-after: always;
+  margin: 0 auto 20px;
+}
+
+/* ═══════════════════════════════════
+   CAPA — professor(a) é o destaque
+═══════════════════════════════════ */
+.capa { background: #fff; flex-direction: column; overflow: hidden; }
+
+/* Topo colorido do tema */
+.capa-topo {
+  height: 260px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  position: relative; flex-shrink: 0;
+}
+.capa-topo-bg { position: absolute; inset: 0; background: var(--cor, #1e40af); }
+.capa-topo-ondas { position: absolute; bottom: -2px; left: 0; right: 0; }
+.capa-deco-dots {
+  position: absolute; inset: 0; z-index: 0;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,.18) 3px, transparent 3px),
+    radial-gradient(circle, rgba(255,255,255,.12) 2px, transparent 2px);
+  background-size: 48px 48px, 24px 24px;
+  background-position: 0 0, 12px 12px;
+}
+.capa-badges {
+  position: absolute; top: 14px; right: 14px; z-index: 3;
+  display: flex; gap: 6px;
+}
+.capa-badge {
+  background: rgba(255,255,255,.22); border: 1.5px solid rgba(255,255,255,.45);
+  border-radius: 20px; padding: 4px 13px;
+  font-size: 10px; font-weight: 900; color: #fff; letter-spacing: 1.5px; text-transform: uppercase;
+}
+.capa-sazonal-badge { background: #f59e0b; border-color: #d97706; }
+.capa-tema-icon {
+  position: relative; z-index: 1;
+  font-size: 88px;
+  filter: drop-shadow(0 6px 20px rgba(0,0,0,.3));
+  margin-bottom: 10px;
+}
+.capa-tema-nome {
+  position: relative; z-index: 1;
+  background: rgba(255,255,255,.22); border: 1.5px solid rgba(255,255,255,.5);
+  border-radius: 30px; padding: 6px 24px;
+  font-size: 13px; font-weight: 900; color: #fff;
+  letter-spacing: 4px; text-transform: uppercase;
+}
+
+/* Banner colorido "kit de atividades" */
+.capa-kit-banner {
+  background: var(--cor, #1e40af);
+  color: #fff; text-align: center;
+  padding: 11px 0;
+  font-size: 11px; font-weight: 900;
+  letter-spacing: 4px; text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+/* Corpo principal — preenche toda a página */
+.capa-corpo {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: stretch; justify-content: flex-start;
+  gap: 16px;
+  padding: 22px 44px 20px;
+}
+
+/* Card da professora — cresce para preencher o espaço */
+.capa-prof-card {
+  flex: 1;
+  background: var(--cor-claro, #dbeafe);
+  border-radius: 22px; padding: 22px 30px 20px;
+  position: relative; overflow: hidden; text-align: center;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.capa-prof-card::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 7px; background: var(--cor, #1e40af);
+  border-radius: 22px 0 0 22px;
+}
+.capa-prof-card::after {
+  content: ''; position: absolute; right: 0; top: 0; bottom: 0;
+  width: 7px; background: var(--cor, #1e40af);
+  border-radius: 0 22px 22px 0;
+}
+.capa-prof-deco {
+  position: absolute; inset: 0; z-index: 0; border-radius: 22px;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,.45) 2px, transparent 2px),
+    radial-gradient(circle, rgba(255,255,255,.25) 1.5px, transparent 1.5px);
+  background-size: 36px 36px, 18px 18px;
+  background-position: 0 0, 9px 9px;
+}
+.capa-prof-content { position: relative; z-index: 1; text-align: center; }
+.capa-prof-watermark {
+  position: absolute; bottom: -10px; right: 10px; z-index: 0;
+  font-size: 140px; opacity: .12;
+  line-height: 1; pointer-events: none;
+  filter: grayscale(20%);
+}
+.capa-label-prof {
+  font-size: 10px; font-weight: 900; text-transform: uppercase;
+  letter-spacing: 4px; color: var(--cor, #1e40af); margin-bottom: 6px;
+}
+.capa-nome-prof {
+  font-family: 'Fredoka One', cursive;
+  font-size: 56px; line-height: 1;
+  color: #1e293b; text-transform: capitalize;
+}
+.capa-divisor {
+  width: 52px; height: 4px; border-radius: 4px;
+  background: var(--cor, #1e40af); margin: 12px auto 0;
+}
+.capa-prof-tagline {
+  margin-top: 8px;
+  font-size: 12px; font-weight: 700; color: #64748b;
+  letter-spacing: 0.5px;
+}
+
+/* Linha turma + escola */
+.capa-info-row { display: flex; gap: 14px; }
+.capa-turma-box {
+  flex: 0 0 130px;
+  border: 2.5px solid var(--cor, #1e40af);
+  border-radius: 16px; padding: 14px 18px; text-align: center;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.capa-turma-label { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 2.5px; color: #94a3b8; margin-bottom: 4px; }
+.capa-turma-val { font-size: 20px; font-weight: 900; color: #1e293b; white-space: nowrap; }
+.capa-escola-box {
+  flex: 1; border: 2.5px solid #e2e8f0; border-radius: 16px;
+  padding: 14px 20px; display: flex; flex-direction: column; justify-content: center;
+}
+.capa-escola-label { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 2.5px; color: #94a3b8; margin-bottom: 5px; }
+.capa-escola-val { font-size: 16px; font-weight: 800; color: #1e293b; line-height: 1.2; }
+
+/* Painel "o que tem neste kit" */
+.capa-kit-panel {
+  background: #f8fafc; border: 1.5px solid #e2e8f0;
+  border-radius: 16px; padding: 14px 20px;
+}
+.capa-kit-panel-title {
+  font-size: 9px; font-weight: 900; text-transform: uppercase;
+  letter-spacing: 2.5px; color: #94a3b8; margin-bottom: 10px; text-align: center;
+}
+.capa-kit-acts {
+  display: flex; justify-content: space-between; gap: 6px;
+}
+.capa-kit-act {
+  flex: 1; background: #fff; border: 1.5px solid var(--cor-claro, #dbeafe);
+  border-radius: 10px; padding: 8px 4px; text-align: center;
+}
+.capa-kit-act-icon { font-size: 18px; margin-bottom: 4px; }
+.capa-kit-act-name { font-size: 8.5px; font-weight: 900; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.2; }
+
+/* Rodapé da capa */
+.capa-rodape {
+  padding: 11px 36px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  background: #f8fafc; border-top: 2px solid var(--cor-claro, #dbeafe);
+}
+.capa-rodape-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 800; color: #64748b;
+}
+.capa-rodape-dot { width: 4px; height: 4px; border-radius: 50%; background: #cbd5e1; }
+
+/* ═══════════════════════════════════
+   ATIVIDADES — preenchem a página
+═══════════════════════════════════ */
+
+/* Header do campo do aluno */
+.campo-aluno {
+  display: flex; gap: 10px; padding: 10px 32px;
+  font-size: 9px; font-weight: 900; color: #94a3b8;
+  text-transform: uppercase; letter-spacing: 1px;
+  border-bottom: 1px solid #f8fafc;
+  flex-shrink: 0;
+}
+.campo-aluno .ca { flex: 1; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 3px; }
+.campo-aluno .ca-sm { flex: 0.35; }
+
+/* Faixa colorida do topo de cada atividade */
+.act-strip {
+  height: 6px;
+  background: var(--cor, #1e40af);
+  flex-shrink: 0;
+}
+
+/* Header da atividade */
+.act-header {
+  padding: 14px 32px 10px;
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1.5px solid;
+  border-color: var(--cor-claro, #dbeafe);
+  flex-shrink: 0;
+}
+.act-num-badge {
+  background: var(--cor, #1e40af);
+  color: #fff;
+  font-size: 9px; font-weight: 900; letter-spacing: 2px;
+  text-transform: uppercase; padding: 3px 10px; border-radius: 20px;
+  flex-shrink: 0;
+}
+.act-titulo {
+  font-family: 'Fredoka One', cursive;
+  font-size: 22px;
+  color: #1e293b;
+  flex: 1;
+}
+.act-icone { font-size: 22px; }
+
+/* Instrução */
+.act-inst {
+  margin: 8px 32px;
+  padding: 8px 12px;
+  background: var(--cor-claro, #dbeafe);
+  border-left: 3px solid var(--cor, #1e40af);
+  border-radius: 0 8px 8px 0;
+  font-size: 11px; font-weight: 700; color: #475569;
+  flex-shrink: 0;
+}
+
+/* Rodapé das atividades */
+.act-rodape {
+  margin-top: auto;
+  padding: 8px 32px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid #f1f5f9;
+  font-size: 9px; font-weight: 700; color: #94a3b8;
+  flex-shrink: 0;
+}
+
+/* ── A1: CIRCULE A LETRA ── */
+.a1-wrap { flex: 1; display: flex; flex-direction: column; padding: 10px 32px 8px; }
+.a1-grid { flex: 1; display: grid; grid-template-columns: repeat(2,1fr); grid-auto-rows: 1fr; gap: 10px; }
+.a1-card {
+  border: 1.5px solid #e2e8f0; border-radius: 14px;
+  padding: 12px 16px;
+  display: flex; flex-direction: row; align-items: center; gap: 14px;
+  background: #fafafa;
+}
+.a1-emoji { font-size: 40px; flex-shrink: 0; }
+.a1-conteudo { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.a1-palavra { font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: #374151; }
+.a1-letras { display: flex; gap: 6px; }
+.a1-letra {
+  width: 30px; height: 30px;
+  border: 1.5px solid #e2e8f0; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 900; color: #374151;
+  background: #fff;
+}
+
+/* ── A2: COMPLETE A SÍLABA ── */
+.a2-wrap { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; padding: 8px 32px 0; }
+.a2-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px;
+  background: #fafafa;
+}
+.a2-num { font-family: 'Fredoka One', cursive; font-size: 18px; color: #94a3b8; min-width: 22px; }
+.a2-palavra-wrap { flex: 1; font-size: 18px; font-weight: 900; letter-spacing: 2px; color: #1e293b; }
+.a2-blank {
+  display: inline-block;
+  border-bottom: 3px solid var(--cor, #1e40af);
+  min-width: 32px; margin: 0 1px;
+  vertical-align: bottom;
+}
+.a2-opcoes { display: flex; gap: 6px; }
+.a2-op {
+  padding: 3px 9px; border: 1.5px dashed #cbd5e1; border-radius: 7px;
+  font-size: 12px; font-weight: 900; color: #64748b;
+}
+
+/* ── A3: LIGUE A PALAVRA ── */
+.a3-wrap { flex: 1; padding: 8px 32px 0; display: flex; align-items: center; }
+.a3-inner { display: grid; grid-template-columns: 1fr 48px 1fr; width: 100%; gap: 0; }
+.a3-col { display: flex; flex-direction: column; justify-content: space-evenly; height: 100%; }
+.a3-mid { display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; height: 100%; }
+.a3-word {
+  padding: 9px 14px; border: 2px solid var(--cor-claro, #dbeafe);
+  border-radius: 10px; font-size: 14px; font-weight: 900;
+  text-align: center; color: #1e293b;
+  background: #fff;
+}
+.a3-emoji-box {
+  width: 48px; height: 48px;
+  border: 2px solid var(--cor-claro, #dbeafe);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; background: #fff;
+}
+.a3-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cor-claro, #dbeafe); }
+
+/* ── A4: ORDENA SÍLABAS ── */
+.a4-wrap { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; padding: 12px 32px 8px; }
+.a4-item { display: flex; flex-direction: column; gap: 8px; padding: 10px 14px; border: 1.5px solid #f1f5f9; border-radius: 12px; background: #fafafa; }
+.a4-row { display: flex; align-items: center; gap: 12px; }
+.a4-num { font-family: 'Fredoka One', cursive; font-size: 18px; color: #94a3b8; min-width: 22px; }
+.a4-silabas { display: flex; gap: 8px; flex-wrap: wrap; }
+.a4-silaba {
+  padding: 8px 16px; border: 2px dashed var(--cor, #1e40af);
+  border-radius: 10px; font-size: 18px; font-weight: 900;
+  color: var(--cor, #1e40af);
+}
+.a4-blanks { display: flex; gap: 10px; padding-left: 34px; }
+.a4-blank { width: 80px; border-bottom: 2.5px solid #e2e8f0; height: 32px; }
+
+/* ── A5: CAÇA-PALAVRAS ── */
+.a5-wrap { flex: 1; display: flex; gap: 20px; padding: 8px 32px 0; }
+.a5-grid-wrap { flex: 1; display: flex; align-items: center; justify-content: center; }
+.a5-grid {
+  display: grid;
+  border: 2px solid var(--cor, #1e40af);
+  border-radius: 8px; overflow: hidden;
+}
+.a5-cell {
+  width: 52px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; font-weight: 900;
+  border: 0.5px solid rgba(0,0,0,0.06);
+  text-transform: uppercase; color: #374151;
+}
+.a5-side { width: 180px; display: flex; flex-direction: column; justify-content: center; gap: 6px; padding-top: 4px; }
+.a5-title { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; color: #94a3b8; margin-bottom: 4px; }
+.a5-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px; border: 1.5px solid #e2e8f0;
+  border-radius: 8px; background: #fafafa;
+}
+.a5-check { width: 14px; height: 14px; border: 1.5px solid #cbd5e1; border-radius: 4px; flex-shrink: 0; }
+.a5-emoji { font-size: 14px; }
+.a5-word { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: #374151; }
+
+/* ── GABARITO ── */
+.gabarito-banner {
+  background: #fbbf24; color: #78350f;
+  font-size: 11px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase;
+  text-align: center; padding: 7px 0; flex-shrink: 0;
+}
+.a1-letra.correta { background: var(--cor,#1e40af); color: #fff; border-color: var(--cor,#1e40af); }
+.a2-resp { color: var(--cor,#1e40af); font-weight: 900; }
+.a3-num-badge {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--cor,#1e40af); color: #fff;
+  font-size: 11px; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  position: absolute; top: -8px; right: -8px;
+}
+.a3-word { position: relative; }
+.a3-emoji-box { position: relative; }
+.a4-resp {
+  display: inline-flex; gap: 4px; padding-left: 34px; align-items: center;
+  font-size: 15px; font-weight: 900; color: var(--cor,#1e40af); letter-spacing: 1px;
+}
+.a5-cell.found { background: var(--cor-claro,#dbeafe); color: var(--cor,#1e40af); font-weight: 900; }
+.a5-check.done { background: var(--cor,#1e40af); border-color: var(--cor,#1e40af); }
+
+/* ── P&B ── */
+body.pb .capa-topo-bg { background: #1a1a1a !important; }
+body.pb .capa-kit-banner { background: #333 !important; }
+body.pb .act-strip { background: #333 !important; }
+body.pb .act-num-badge { background: #333 !important; }
+body.pb .act-inst { background: #f5f5f5 !important; border-color: #999 !important; }
+body.pb .capa-prof-card { background: #f0f0f0 !important; }
+body.pb .capa-prof-card::before,body.pb .capa-prof-card::after { background: #333 !important; }
+body.pb .capa-turma-box { border-color: #333 !important; }
+body.pb .capa-rodape { background: #f0f0f0 !important; border-color: #ccc !important; }
+body.pb .gabarito-banner { background: #e0e0e0 !important; color: #333 !important; }
+body.pb .a1-letra.correta { background: #333 !important; border-color: #333 !important; }
+body.pb .a2-resp { color: #333 !important; }
+body.pb .a3-num-badge { background: #333 !important; }
+body.pb .a4-resp { color: #333 !important; }
+body.pb .a5-cell.found { background: #ddd !important; color: #000 !important; }
+body.pb .a5-check.done { background: #333 !important; border-color: #333 !important; }
+</style>
+</head>
+<body>
+<script>
+const D = window.__DATA__;
+const escola = D.escola, professor = D.professor, ano = D.ano;
+const v = D.variant;
+const palavras = D.palavras || v.palavras;
+const GABARITO = !!D.gabarito;
+const PB = !!D.pb;
+
+// Cores temáticas
+const CORES = {
+  animais:'#16a34a', frutas:'#dc2626', escola:'#1e40af', casa:'#9333ea',
+  corpo:'#0891b2', natureza:'#15803d', natal:'#b91c1c', festajunina:'#d97706',
+  pascoa:'#7c3aed', voltaaulas:'#0369a1', diadascriancas:'#e11d48',
+  diadasmaes:'#db2777', diadospais:'#2563eb', diadoindio:'#c2410c',
+  meioambiente:'#166534', diadadapatria:'#1d4ed8', diadoprofessor:'#6d28d9',
+  folclore:'#92400e', carnaval:'#9333ea', diadasarvores:'#14532d'
+};
+const CORES_CLARAS = {
+  animais:'#dcfce7', frutas:'#fee2e2', escola:'#dbeafe', casa:'#f3e8ff',
+  corpo:'#cffafe', natureza:'#dcfce7', natal:'#fee2e2', festajunina:'#fef3c7',
+  pascoa:'#ede9fe', voltaaulas:'#e0f2fe', diadascriancas:'#ffe4e6',
+  diadasmaes:'#fce7f3', diadospais:'#dbeafe', diadoindio:'#ffedd5',
+  meioambiente:'#dcfce7', diadadapatria:'#dbeafe', diadoprofessor:'#ede9fe',
+  folclore:'#fef3c7', carnaval:'#f3e8ff', diadasarvores:'#dcfce7'
+};
+const EMOJIS = {
+  animais:['🐱','🦆','🐻','🐭','🐟','🦁','🐍','🐸','🐺','🦌'],
+  frutas:['🍎','🍐','🍇','🥭','🫐','🥝','🍋','🍑','🍓','🍌'],
+  escola:['✏️','📗','🪑','🖍️','⚽','🖊️','🎀','🖥️','🗺️','📏'],
+  casa:['🛏️','🛋️','🍞','🍴','☕','🪴','🏠','🚿','🪟','🔑'],
+  corpo:['🤚','🦶','👃','👄','👁️','☝️','👂','🦵','💪','🧠'],
+  natureza:['☀️','🌙','🌊','🏞️','🌸','🌧️','💨','🪨','🌍','☁️'],
+  natal:['❄️','🎄','🔔','🎂','🧦','🎀','👼','🕯️','🎅','⭐'],
+  festajunina:['🎆','🌽','🎂','💃','🎵','🚩','👒','🥣','🎡','🕺'],
+  pascoa:['🥚','🐰','🪺','🧺','🌸','🍬','🍫','🌷','🎀','🌼'],
+  voltaaulas:['✏️','🎒','👫','🏫','📖','😄','📅','📚','⏰','🤝'],
+  diadasmaes:['🌸','💐','🌹','🌷','💝','💞','👩','🌼','💖','🎀'],
+  diadospais:['🎩','⚽','🛠️','🏆','🎣','🚗','⌚','👨','🤝','💪'],
+  diadoindio:['🪶','🌺','🌿','🎨','🏹','🌾','🦜','🌻','🔮','🌈'],
+  meioambiente:['🌳','🌱','♻️','🌍','🐦','🌊','☀️','🍃','🌻','🦋'],
+  diadadapatria:['🇧🇷','⭐','🌟','🎺','🌿','🙌','🏅','🎊','🦅','💚'],
+  diadoprofessor:['📚','✏️','🍎','🌟','💡','🏫','📖','🌈','❤️','🎓'],
+  folclore:['🎭','🤡','👺','🎪','🌈','🎶','🪅','🌊','🎨','💃'],
+  carnaval:['🎭','🎊','🎉','🪅','🥁','💃','🕺','🎶','🌈','🎨'],
+  diadasarvores:['🌳','🌱','🍃','🌿','🍀','🌲','🌾','🌻','🦋','🐦'],
+  diadascriancas:['⚽','🪁','🪆','🐻','🚂','🪀','🍬','🎂','🎉','🎈']
+};
+
+const cor = CORES[v.tema_id] || '#1e40af';
+const corClaro = CORES_CLARAS[v.tema_id] || '#dbeafe';
+const emojis = EMOJIS[v.tema_id] || EMOJIS.escola;
+const niveisLabel = ['','Iniciante','Intermediário','Avançado'];
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+function silabas(w){
+  const p=w.toLowerCase().replace(/[^a-záàãâéêíóôõúç]/g,'');
+  const V=new Set('aáàãâeéêiíoóôõuú'); const r=[]; let c='';
+  for(let i=0;i<p.length;i++){
+    c+=p[i];
+    if(V.has(p[i])){
+      if(i+1<p.length&&!V.has(p[i+1])){c+=p[i+1];i++;}
+      r.push(c);c='';
+    }
+  }
+  if(c){if(r.length)r[r.length-1]+=c;else r.push(c);}
+  return r.length>1?r:[p.slice(0,Math.ceil(p.length/2)),p.slice(Math.ceil(p.length/2))];
+}
+
+function campoAluno(){
+  return `<div class="campo-aluno">
+    <div class="ca">Aluno(a):</div>
+    <div class="ca ca-sm">Data:</div>
+    <div class="ca ca-sm">Nota:</div>
+  </div>`;
+}
+
+function actRodape(pg, total){
+  return `<div class="act-rodape">
+    <span>${esc(escola)} · ${esc(professor)}</span>
+    <span>${esc(v.label)} · ${esc(niveisLabel[v.nivel])} · ${esc(ano)}</span>
+    <span>${pg} / ${total}</span>
+  </div>`;
+}
+
+// ── CAPA ────────────────────────────────────────────────────────────────────
+function capitalize(s){ return s.split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' '); }
+
+function renderCapa(atvsOrdenadas){
+  const dataHoje = new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  const nomeCap = capitalize(professor);
+  const temaStar = ['⭐','🌟','✨'];
+  return `<div class="pg capa" style="--cor:${cor};--cor-claro:${corClaro};">
+
+    <div class="capa-topo">
+      <div class="capa-topo-bg"></div>
+      <div class="capa-deco-dots"></div>
+      <svg class="capa-topo-ondas" viewBox="0 0 794 60" preserveAspectRatio="none" height="60">
+        <path d="M0,30 C150,60 350,0 550,40 C650,60 750,20 794,35 L794,60 L0,60 Z" fill="#fff"/>
+      </svg>
+      <div class="capa-badges">
+        <div class="capa-badge">${esc(niveisLabel[v.nivel])}</div>
+        ${v.sazonal?`<div class="capa-badge capa-sazonal-badge">🍂 ${esc(v.mes||'Sazonal')}</div>`:''}
+      </div>
+      <div class="capa-tema-icon">${v.icon}</div>
+      <div class="capa-tema-nome">${esc(v.label)}</div>
+    </div>
+
+    ${GABARITO ? '<div class="gabarito-banner">⭐ GABARITO — USO EXCLUSIVO DO(A) PROFESSOR(A) ⭐</div>' : ''}
+    <div class="capa-kit-banner">✨ &nbsp; Kit de Atividades Personalizadas &nbsp; ✨</div>
+
+    <div class="capa-corpo">
+
+      <div class="capa-prof-card">
+        <div class="capa-prof-deco"></div>
+        <div class="capa-prof-watermark">${v.icon}</div>
+        <div class="capa-prof-content">
+          <div class="capa-label-prof">Professora</div>
+          <div class="capa-nome-prof">${esc(nomeCap)}</div>
+          <div class="capa-divisor"></div>
+          <div class="capa-prof-tagline">Kit preparado com carinho para sua turma 💛</div>
+        </div>
+      </div>
+
+      <div class="capa-info-row">
+        <div class="capa-turma-box">
+          <div class="capa-turma-label">Turma</div>
+          <div class="capa-turma-val">${esc(ano)}</div>
+        </div>
+        <div class="capa-escola-box">
+          <div class="capa-escola-label">🏫 Escola</div>
+          <div class="capa-escola-val">${esc(escola)}</div>
+        </div>
+      </div>
+
+      <div class="capa-kit-panel">
+        <div class="capa-kit-panel-title">📦 O que tem neste kit</div>
+        <div class="capa-kit-acts">${(()=>{
+          const ALL=[
+            {n:1,icon:'🔎',nome:'Circule a Letra'},
+            {n:2,icon:'🧩',nome:'Complete a Sílaba'},
+            {n:3,icon:'🔗',nome:'Ligue a Palavra'},
+            {n:4,icon:'🔀',nome:'Ordene as Sílabas'},
+            {n:5,icon:'🔍',nome:'Caça-Palavras'},
+          ];
+          const set=new Set(atvsOrdenadas);
+          return ALL.filter(a=>set.has(a.n)).map(a=>`<div class="capa-kit-act"><div class="capa-kit-act-icon">${a.icon}</div><div class="capa-kit-act-name">${a.nome}</div></div>`).join('');
+        })()}</div>
+      </div>
+
+    </div>
+
+    <div class="capa-rodape">
+      <div class="capa-rodape-item">📝 ${atvsOrdenadas.length} atividade${atvsOrdenadas.length===1?'':'s'}</div>
+      <div class="capa-rodape-dot"></div>
+      <div class="capa-rodape-item">📖 ${palavras.length} palavras</div>
+      <div class="capa-rodape-dot"></div>
+      <div class="capa-rodape-item">🖨️ Pronta para imprimir</div>
+      <div class="capa-rodape-dot"></div>
+      <div class="capa-rodape-item">📅 ${dataHoje}</div>
+    </div>
+  </div>`;
+}
+
+function gabBanner(){ return GABARITO ? '<div class="gabarito-banner">⭐ GABARITO — USO EXCLUSIVO DO(A) PROFESSOR(A) ⭐</div>' : campoAluno(); }
+
+// ── ATIVIDADE 1: Circule a Letra ─────────────────────────────────────────────
+function renderA1(pg,total){
+  const ps = shuffle(palavras).slice(0,10);
+  const items = ps.map((p,i)=>{
+    const limpa = p.toUpperCase().replace(/[^A-ZÁÀÃÂÉÊÍÓÔÕÚÇ]/g,'');
+    const correta = limpa[0];
+    const letras = shuffle([correta, ...shuffle('BCDFGHJKLMNPQRSTVWXYZ'.split('')).slice(0,3)]);
+    return `<div class="a1-card">
+      <div class="a1-emoji">${emojis[i]||'🔤'}</div>
+      <div class="a1-conteudo">
+        <div class="a1-palavra">${esc(p.toUpperCase())}</div>
+        <div class="a1-letras">${letras.map(l=>`<div class="a1-letra${GABARITO&&l===correta?' correta':''}">${esc(l)}</div>`).join('')}</div>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="pg" style="--cor:${cor};--cor-claro:${corClaro};">
+    <div class="act-strip"></div>
+    ${gabBanner()}
+    <div class="act-header">
+      <div class="act-num-badge">Atividade 1</div>
+      <div class="act-titulo">🔎 Circule a Letra Inicial</div>
+    </div>
+    <div class="act-inst">✏️ <strong>Como fazer:</strong> Circule a letra com que cada palavra começa. Use sua cor favorita!</div>
+    <div class="a1-wrap">
+      <div class="a1-grid">${items}</div>
+    </div>
+    ${actRodape(pg,total)}
+  </div>`;
+}
+
+// ── ATIVIDADE 2: Complete a Sílaba ───────────────────────────────────────────
+function renderA2(pg,total){
+  const ps = shuffle(palavras).slice(0,8);
+  const items = ps.map((p,i)=>{
+    const sils = silabas(p);
+    const idx = sils.length>1?1:0;
+    const oculta = sils[idx];
+    const ops = shuffle([oculta,...shuffle(palavras.filter(x=>x!==p)).slice(0,2).map(x=>silabas(x)[0])]).slice(0,3);
+    const visivel = sils.map((s,si)=>si===idx
+      ? (GABARITO ? `<span class="a2-resp">${esc(s.toUpperCase())}</span>` : `<span class="a2-blank">&nbsp;&nbsp;&nbsp;</span>`)
+      : esc(s.toUpperCase())
+    ).join('-');
+    const opcoesMarcadas = GABARITO
+      ? ops.map(o=>`<div class="a2-op" style="${o===oculta?`border-color:var(--cor);color:var(--cor);font-weight:900`:''}">${esc(o.toUpperCase())}</div>`).join('')
+      : ops.map(o=>`<div class="a2-op">${esc(o.toUpperCase())}</div>`).join('');
+    return `<div class="a2-item">
+      <div class="a2-num">${i+1}</div>
+      <div class="a2-palavra-wrap">${visivel}</div>
+      <div class="a2-opcoes">${opcoesMarcadas}</div>
+    </div>`;
+  }).join('');
+  return `<div class="pg" style="--cor:${cor};--cor-claro:${corClaro};">
+    <div class="act-strip"></div>
+    ${gabBanner()}
+    <div class="act-header">
+      <div class="act-num-badge">Atividade 2</div>
+      <div class="act-titulo">🧩 Complete a Sílaba</div>
+    </div>
+    <div class="act-inst">✏️ <strong>Como fazer:</strong> Escreva a sílaba correta no tracinho para completar a palavra.</div>
+    <div class="a2-wrap">${items}</div>
+    ${actRodape(pg,total)}
+  </div>`;
+}
+
+// ── ATIVIDADE 3: Ligue a Palavra ─────────────────────────────────────────────
+function renderA3(pg,total){
+  const ps = shuffle(palavras).slice(0,6);
+  // pares word→emoji com índice correto
+  const pairs = ps.map((p,i)=>({ word:p, emoji: emojis[palavras.indexOf(p)>=0?palavras.indexOf(p):i]||emojis[i]||'🔤' }));
+  const rightOrder = shuffle([...Array(pairs.length).keys()]);
+  // left: palavras com número de gabarito
+  const left = pairs.map((pair,i)=>{
+    const badge = GABARITO ? `<div class="a3-num-badge">${rightOrder.indexOf(i)+1}</div>` : '';
+    return `<div class="a3-word">${badge}${esc(pair.word.toUpperCase())}</div>`;
+  }).join('');
+  // right: emojis reordenados com número de gabarito
+  const right = rightOrder.map((origIdx,pos)=>{
+    const badge = GABARITO ? `<div class="a3-num-badge">${pos+1}</div>` : '';
+    return `<div class="a3-emoji-box">${badge}${pairs[origIdx].emoji}</div>`;
+  }).join('');
+  const dots = pairs.map(()=>`<div class="a3-dot"></div>`).join('');
+  return `<div class="pg" style="--cor:${cor};--cor-claro:${corClaro};">
+    <div class="act-strip"></div>
+    ${gabBanner()}
+    <div class="act-header">
+      <div class="act-num-badge">Atividade 3</div>
+      <div class="act-titulo">🔗 Ligue a Palavra à Imagem</div>
+    </div>
+    <div class="act-inst">✏️ <strong>Como fazer:</strong> Trace uma linha ligando cada palavra à imagem correspondente.</div>
+    <div class="a3-wrap">
+      <div class="a3-inner" style="height:100%;">
+        <div class="a3-col">${left}</div>
+        <div class="a3-mid">${dots}</div>
+        <div class="a3-col">${right}</div>
+      </div>
+    </div>
+    ${actRodape(pg,total)}
+  </div>`;
+}
+
+// ── ATIVIDADE 4: Ordena Sílabas ──────────────────────────────────────────────
+function renderA4(pg,total){
+  const ps = shuffle(palavras).slice(0,6);
+  const items = ps.map((p,i)=>{
+    const sils = silabas(p);
+    const shuf = shuffle(sils);
+    const resposta = GABARITO
+      ? `<div class="a4-resp">${sils.map(s=>`<span>${esc(s.toUpperCase())}</span>`).join('<span style="color:#94a3b8;margin:0 2px">-</span>')}</div>`
+      : `<div class="a4-blanks">${sils.map(()=>`<div class="a4-blank"></div>`).join('')}</div>`;
+    return `<div class="a4-item">
+      <div class="a4-row">
+        <div class="a4-num">${i+1}</div>
+        <div class="a4-silabas">${shuf.map(s=>`<div class="a4-silaba">${esc(s.toUpperCase())}</div>`).join('')}</div>
+      </div>
+      ${resposta}
+    </div>`;
+  }).join('');
+  return `<div class="pg" style="--cor:${cor};--cor-claro:${corClaro};">
+    <div class="act-strip"></div>
+    ${gabBanner()}
+    <div class="act-header">
+      <div class="act-num-badge">Atividade 4</div>
+      <div class="act-titulo">🔀 Ordene as Sílabas</div>
+    </div>
+    <div class="act-inst">✏️ <strong>Como fazer:</strong> As sílabas estão embaralhadas. Escreva-as em ordem nos espaços abaixo.</div>
+    <div class="a4-wrap">${items}</div>
+    ${actRodape(pg,total)}
+  </div>`;
+}
+
+// ── ATIVIDADE 5: Caça-Palavras ───────────────────────────────────────────────
+
+// RNG com seed — garante que aluno e gabarito gerem a mesma grade
+function mkRng(seed){
+  let s=(seed|0)||1;
+  return ()=>{s=Math.imul(s^s>>>13,s|1);s^=s+Math.imul(s^s>>>7,s|61);return((s^s>>>3)>>>0)/0x100000000;};
+}
+function strHash(str){
+  let h=5381;for(let i=0;i<str.length;i++)h=(Math.imul(h,33)^str.charCodeAt(i))>>>0;return h;
+}
+
+function gerarGrid(words, size=10, rng=Math.random.bind(Math)){
+  const grid=Array.from({length:size},()=>Array(size).fill(''));
+  const ABC='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const placed=[];
+  for(const w of words.slice(0,6).map(p=>p.toUpperCase().replace(/[^A-ZÁÀÃÂÉÊÍÓÔÕÚÇ]/g,''))){
+    let done=false;
+    for(let t=0;t<120&&!done;t++){
+      const h=rng()>.5;
+      const r=Math.floor(rng()*size);
+      const c=Math.floor(rng()*size);
+      if(h&&c+w.length<=size){
+        let good=true;
+        for(let i=0;i<w.length;i++)if(grid[r][c+i]&&grid[r][c+i]!==w[i]){good=false;break;}
+        if(good){
+          const cells=[];
+          for(let i=0;i<w.length;i++){grid[r][c+i]=w[i];cells.push({r,c:c+i});}
+          placed.push({word:w,cells});done=true;
+        }
+      }else if(!h&&r+w.length<=size){
+        let good=true;
+        for(let i=0;i<w.length;i++)if(grid[r+i][c]&&grid[r+i][c]!==w[i]){good=false;break;}
+        if(good){
+          const cells=[];
+          for(let i=0;i<w.length;i++){grid[r+i][c]=w[i];cells.push({r:r+i,c});}
+          placed.push({word:w,cells});done=true;
+        }
+      }
+    }
+  }
+  for(let r=0;r<size;r++)for(let c=0;c<size;c++)if(!grid[r][c])grid[r][c]=ABC[Math.floor(rng()*26)];
+  return{grid,placed};
+}
+
+function renderA5(pg,total){
+  const seed=strHash(escola+professor+ano+v.tema_id+v.nivel+palavras.join(','));
+  const {grid,placed}=gerarGrid(palavras,10,mkRng(seed));
+  const foundSet=new Set();
+  if(GABARITO) placed.forEach(({cells})=>cells.forEach(({r,c})=>foundSet.add(`${r},${c}`)));
+  const cells=grid.map((row,r)=>row.map((ch,c)=>{
+    const f=foundSet.has(`${r},${c}`);
+    return `<div class="a5-cell${f?' found':''}">${esc(ch)}</div>`;
+  }).join('')).join('');
+  const itens=placed.map(({word},i)=>`<div class="a5-item"><div class="a5-check${GABARITO?' done':''}"></div><span class="a5-emoji">${emojis[i]||'🔤'}</span><span class="a5-word">${esc(word)}</span></div>`).join('');
+  return `<div class="pg" style="--cor:${cor};--cor-claro:${corClaro};">
+    <div class="act-strip"></div>
+    ${gabBanner()}
+    <div class="act-header">
+      <div class="act-num-badge">Atividade 5</div>
+      <div class="act-titulo">🔍 Caça-Palavras</div>
+    </div>
+    <div class="act-inst">✏️ <strong>Como fazer:</strong> Encontre e circule as palavras escondidas no quadro abaixo!</div>
+    <div class="a5-wrap">
+      <div class="a5-grid-wrap">
+        <div class="a5-grid" style="grid-template-columns:repeat(10,52px);border-color:${cor};">${cells}</div>
+      </div>
+      <div class="a5-side">
+        <div class="a5-title">Encontre:</div>
+        ${itens}
+      </div>
+    </div>
+    ${actRodape(pg,total)}
+  </div>`;
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  if(PB) document.body.classList.add('pb');
+  if(GABARITO) document.body.classList.add('gabarito');
+  const ATIVS = D.atividades && D.atividades.length ? new Set(D.atividades.map(Number)) : new Set([1,2,3,4,5]);
+  const atvsOrdenadas = [1,2,3,4,5].filter(n=>ATIVS.has(n));
+  const total = atvsOrdenadas.length;
+  const renderMap = { 1:renderA1, 2:renderA2, 3:renderA3, 4:renderA4, 5:renderA5 };
+  const pages = atvsOrdenadas.map((n,i) => renderMap[n](i+1, total));
+  document.body.innerHTML = renderCapa(atvsOrdenadas)+pages.join('');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,362 @@
+[
+  {
+    "id": "animais-n1", "tema_id": "animais", "nivel": 1,
+    "label": "Animais", "icon": "🐾", "sazonal": false,
+    "palavras": ["gato","pato","rato","urso","peixe","leão","cobra","sapo","lobo","veado"],
+    "letras_foco": ["G","P","R","U","L"]
+  },
+  {
+    "id": "animais-n2", "tema_id": "animais", "nivel": 2,
+    "label": "Animais", "icon": "🐾", "sazonal": false,
+    "palavras": ["girafa","cavalo","macaco","tartaruga","borboleta","elefante","jacaré","papagaio","pinguim","tucano"],
+    "letras_foco": ["G","C","M","T","B"]
+  },
+  {
+    "id": "animais-n3", "tema_id": "animais", "nivel": 3,
+    "label": "Animais", "icon": "🐾", "sazonal": false,
+    "palavras": ["crocodilo","chimpanzé","rinoceronte","salamandra","camaleão","ornitorrinco","hipopótamo","porco-espinho","morcego","lontra"],
+    "letras_foco": ["C","R","S","H","M"]
+  },
+  {
+    "id": "frutas-n1", "tema_id": "frutas", "nivel": 1,
+    "label": "Frutas", "icon": "🍎", "sazonal": false,
+    "palavras": ["maçã","pera","uva","manga","caju","figo","kiwi","lima","abiu","açaí"],
+    "letras_foco": ["M","P","U","F","K"]
+  },
+  {
+    "id": "frutas-n2", "tema_id": "frutas", "nivel": 2,
+    "label": "Frutas", "icon": "🍎", "sazonal": false,
+    "palavras": ["banana","melão","mamão","laranja","goiaba","abacaxi","cereja","ameixa","pêssego","tangerina"],
+    "letras_foco": ["B","M","L","G","A"]
+  },
+  {
+    "id": "frutas-n3", "tema_id": "frutas", "nivel": 3,
+    "label": "Frutas", "icon": "🍎", "sazonal": false,
+    "palavras": ["framboesa","carambola","maracujá","pitanga","cupuaçu","graviola","cacau","pupunha","jabuticaba","mangostão"],
+    "letras_foco": ["F","C","M","P","G"]
+  },
+  {
+    "id": "escola-n1", "tema_id": "escola", "nivel": 1,
+    "label": "Escola", "icon": "✏️", "sazonal": false,
+    "palavras": ["lápis","livro","mesa","giz","bola","cola","fita","tela","mapa","rolo"],
+    "letras_foco": ["L","M","G","B","C"]
+  },
+  {
+    "id": "escola-n2", "tema_id": "escola", "nivel": 2,
+    "label": "Escola", "icon": "✏️", "sazonal": false,
+    "palavras": ["caderno","borracha","tesoura","régua","pincel","caneta","mochila","estojos","turma","recreio"],
+    "letras_foco": ["C","B","T","R","P"]
+  },
+  {
+    "id": "escola-n3", "tema_id": "escola", "nivel": 3,
+    "label": "Escola", "icon": "✏️", "sazonal": false,
+    "palavras": ["biblioteca","quadro-negro","laboratório","matemática","português","história","ciências","coordenador","alfabetização","aprendizagem"],
+    "letras_foco": ["B","Q","L","M","A"]
+  },
+  {
+    "id": "casa-n1", "tema_id": "casa", "nivel": 1,
+    "label": "Casa", "icon": "🏠", "sazonal": false,
+    "palavras": ["cama","sala","pão","faca","bule","vaso","teto","pia","chão","muro"],
+    "letras_foco": ["C","S","P","F","B"]
+  },
+  {
+    "id": "casa-n2", "tema_id": "casa", "nivel": 2,
+    "label": "Casa", "icon": "🏠", "sazonal": false,
+    "palavras": ["geladeira","fogão","tapete","almofada","janela","cortina","gaveta","armário","espelho","varanda"],
+    "letras_foco": ["G","F","T","A","J"]
+  },
+  {
+    "id": "casa-n3", "tema_id": "casa", "nivel": 3,
+    "label": "Casa", "icon": "🏠", "sazonal": false,
+    "palavras": ["eletrodoméstico","aquecedor","iluminação","ventilação","impermeabilização","manutenção","infraestrutura","mobiliário","alicerce","ventilador"],
+    "letras_foco": ["E","A","I","V","M"]
+  },
+  {
+    "id": "corpo-n1", "tema_id": "corpo", "nivel": 1,
+    "label": "Corpo Humano", "icon": "🧍", "sazonal": false,
+    "palavras": ["mão","pé","nariz","boca","olho","dedo","orelha","joelho","cotovelo","testa"],
+    "letras_foco": ["M","P","N","B","O"]
+  },
+  {
+    "id": "corpo-n2", "tema_id": "corpo", "nivel": 2,
+    "label": "Corpo Humano", "icon": "🧍", "sazonal": false,
+    "palavras": ["coração","pulmão","estômago","músculo","esqueleto","articulação","circulação","respiração","digestão","cérebro"],
+    "letras_foco": ["C","P","E","M","A"]
+  },
+  {
+    "id": "corpo-n3", "tema_id": "corpo", "nivel": 3,
+    "label": "Corpo Humano", "icon": "🧍", "sazonal": false,
+    "palavras": ["cardiovascular","neurológico","imunológico","metabólico","endócrino","linfático","digestivo","reprodutivo","tegumentar","musculoesquelético"],
+    "letras_foco": ["C","N","I","M","E"]
+  },
+  {
+    "id": "natureza-n1", "tema_id": "natureza", "nivel": 1,
+    "label": "Natureza", "icon": "🌿", "sazonal": false,
+    "palavras": ["sol","lua","mar","rio","flor","chuva","vento","pedra","terra","nuvem"],
+    "letras_foco": ["S","L","M","F","C"]
+  },
+  {
+    "id": "natureza-n2", "tema_id": "natureza", "nivel": 2,
+    "label": "Natureza", "icon": "🌿", "sazonal": false,
+    "palavras": ["floresta","cachoeira","deserto","vulcão","montanha","oceano","savana","pantanal","geleira","recife"],
+    "letras_foco": ["F","C","D","V","M"]
+  },
+  {
+    "id": "natureza-n3", "tema_id": "natureza", "nivel": 3,
+    "label": "Natureza", "icon": "🌿", "sazonal": false,
+    "palavras": ["biodiversidade","ecossistema","sustentabilidade","fotossíntese","evapotranspiração","sedimentação","estratificação","decomposição","polinização","conservação"],
+    "letras_foco": ["B","E","S","F","D"]
+  },
+  {
+    "id": "natal-n1", "tema_id": "natal", "nivel": 1,
+    "label": "Natal", "icon": "🎄", "sazonal": true, "mes": "Dezembro",
+    "palavras": ["neve","pinho","sino","bolo","meia","laço","anjo","vela","sino","noel"],
+    "letras_foco": ["N","P","S","B","A"]
+  },
+  {
+    "id": "natal-n2", "tema_id": "natal", "nivel": 2,
+    "label": "Natal", "icon": "🎄", "sazonal": true, "mes": "Dezembro",
+    "palavras": ["árvore","presentes","enfeites","trenó","renas","papai","noel","estrela","guirlanda","natal"],
+    "letras_foco": ["A","P","E","T","R"]
+  },
+  {
+    "id": "natal-n3", "tema_id": "natal", "nivel": 3,
+    "label": "Natal", "icon": "🎄", "sazonal": true, "mes": "Dezembro",
+    "palavras": ["confraternização","solidariedade","esperança","gratidão","celebração","fraternidade","prosperidade","generosidade","misericórdia","benevolência"],
+    "letras_foco": ["C","S","E","G","F"]
+  },
+  {
+    "id": "festajunina-n1", "tema_id": "festajunina", "nivel": 1,
+    "label": "Festa Junina", "icon": "🎪", "sazonal": true, "mes": "Junho",
+    "palavras": ["foguete","milho","bolo","quadrilha","sanfona","bandeira","chapéu","canjica","quermesse","ciranda"],
+    "letras_foco": ["F","M","B","Q","S"]
+  },
+  {
+    "id": "festajunina-n2", "tema_id": "festajunina", "nivel": 2,
+    "label": "Festa Junina", "icon": "🎪", "sazonal": true, "mes": "Junho",
+    "palavras": ["arraial","forró","caipira","pescaria","correio","elegante","chamego","matuto","acampamento","brincadeiras"],
+    "letras_foco": ["A","F","C","P","B"]
+  },
+  {
+    "id": "festajunina-n3", "tema_id": "festajunina", "nivel": 3,
+    "label": "Festa Junina", "icon": "🎪", "sazonal": true, "mes": "Junho",
+    "palavras": ["comemoração","tradição","nordestino","manifestação","cultural","patrimônio","comunidade","folclórico","celebração","festividade"],
+    "letras_foco": ["C","T","N","M","P"]
+  },
+  {
+    "id": "pascoa-n1", "tema_id": "pascoa", "nivel": 1,
+    "label": "Páscoa", "icon": "🐣", "sazonal": true, "mes": "Abril",
+    "palavras": ["ovo","coelho","ninho","cesta","flores","páscoa","doce","chocolate","primavera","fita"],
+    "letras_foco": ["O","C","N","F","P"]
+  },
+  {
+    "id": "pascoa-n2", "tema_id": "pascoa", "nivel": 2,
+    "label": "Páscoa", "icon": "🐣", "sazonal": true, "mes": "Abril",
+    "palavras": ["alegria","renascimento","coelhinho","pintinho","brincadeira","chocolate","caça","ovos","decoração","família"],
+    "letras_foco": ["A","R","C","B","D"]
+  },
+  {
+    "id": "pascoa-n3", "tema_id": "pascoa", "nivel": 3,
+    "label": "Páscoa", "icon": "🐣", "sazonal": true, "mes": "Abril",
+    "palavras": ["ressurreição","celebração","solidariedade","fraternidade","esperança","renovação","tradição","convivência","partilha","gratidão"],
+    "letras_foco": ["R","C","S","F","E"]
+  },
+  {
+    "id": "voltaaulas-n1", "tema_id": "voltaaulas", "nivel": 1,
+    "label": "Volta às Aulas", "icon": "📚", "sazonal": true, "mes": "Fevereiro",
+    "palavras": ["lápis","mochila","amigo","sala","turma","recreio","professora","aprender","brincar","sorrir"],
+    "letras_foco": ["L","M","A","S","T"]
+  },
+  {
+    "id": "voltaaulas-n2", "tema_id": "voltaaulas", "nivel": 2,
+    "label": "Volta às Aulas", "icon": "📚", "sazonal": true, "mes": "Fevereiro",
+    "palavras": ["calendário","matérias","horário","colega","novidades","expectativas","conteúdos","atividades","conhecimento","descobertas"],
+    "letras_foco": ["C","M","H","N","E"]
+  },
+  {
+    "id": "voltaaulas-n3", "tema_id": "voltaaulas", "nivel": 3,
+    "label": "Volta às Aulas", "icon": "📚", "sazonal": true, "mes": "Fevereiro",
+    "palavras": ["aprendizagem","curiosidade","determinação","responsabilidade","comprometimento","criatividade","desenvolvimento","superação","conquistas","realizações"],
+    "letras_foco": ["A","C","D","R","S"]
+  },
+  {
+    "id": "diadascriancas-n1", "tema_id": "diadascriancas", "nivel": 1,
+    "label": "Dia das Crianças", "icon": "🎈", "sazonal": true, "mes": "Outubro",
+    "palavras": ["bola","pipa","boneca","urso","trem","pião","balas","bolo","festa","alegria"],
+    "letras_foco": ["B","P","U","T","F"]
+  },
+  {
+    "id": "diadascriancas-n2", "tema_id": "diadascriancas", "nivel": 2,
+    "label": "Dia das Crianças", "icon": "🎈", "sazonal": true, "mes": "Outubro",
+    "palavras": ["brincadeiras","brinquedos","diversão","amizade","felicidade","fantasia","imaginação","aventura","criatividade","infância"],
+    "letras_foco": ["B","D","A","F","I"]
+  },
+  {
+    "id": "diadascriancas-n3", "tema_id": "diadascriancas", "nivel": 3,
+    "label": "Dia das Crianças", "icon": "🎈", "sazonal": true, "mes": "Outubro",
+    "palavras": ["responsabilidade","protagonismo","cidadania","autonomia","descoberta","brincadeira","companheirismo","respeito","colaboração","empatia"],
+    "letras_foco": ["R","P","C","A","D"]
+  },
+  {
+    "id": "diadasmaes-n1", "tema_id": "diadasmaes", "nivel": 1,
+    "label": "Dia das Mães", "icon": "🌸", "sazonal": true, "mes": "Maio",
+    "palavras": ["mãe","amor","flor","beijo","mimo","colo","abraço","rosa","laço","doce"],
+    "letras_foco": ["M","A","F","B","C"]
+  },
+  {
+    "id": "diadasmaes-n2", "tema_id": "diadasmaes", "nivel": 2,
+    "label": "Dia das Mães", "icon": "🌸", "sazonal": true, "mes": "Maio",
+    "palavras": ["saudade","alegria","cuidado","carinho","gratidão","admiração","família","querida","ternura","presente"],
+    "letras_foco": ["S","A","C","G","F"]
+  },
+  {
+    "id": "diadasmaes-n3", "tema_id": "diadasmaes", "nivel": 3,
+    "label": "Dia das Mães", "icon": "🌸", "sazonal": true, "mes": "Maio",
+    "palavras": ["responsabilidade","generosidade","companheirismo","perseverança","incondicional","solidariedade","reconhecimento","compreensão","proteção","cumplicidade"],
+    "letras_foco": ["R","G","C","P","S"]
+  },
+  {
+    "id": "diadospais-n1", "tema_id": "diadospais", "nivel": 1,
+    "label": "Dia dos Pais", "icon": "🎩", "sazonal": true, "mes": "Agosto",
+    "palavras": ["pai","herói","amor","bola","carro","abraço","papai","jogo","colo","força"],
+    "letras_foco": ["P","H","A","B","C"]
+  },
+  {
+    "id": "diadospais-n2", "tema_id": "diadospais", "nivel": 2,
+    "label": "Dia dos Pais", "icon": "🎩", "sazonal": true, "mes": "Agosto",
+    "palavras": ["trabalho","amizade","proteção","conquista","admiração","caminhada","família","esporte","história","ensinamento"],
+    "letras_foco": ["T","A","P","C","F"]
+  },
+  {
+    "id": "diadospais-n3", "tema_id": "diadospais", "nivel": 3,
+    "label": "Dia dos Pais", "icon": "🎩", "sazonal": true, "mes": "Agosto",
+    "palavras": ["responsabilidade","comprometimento","superação","perseverança","dedicação","paternidade","generosidade","cumplicidade","ensinamentos","companheirismo"],
+    "letras_foco": ["R","C","S","P","D"]
+  },
+  {
+    "id": "diadoindio-n1", "tema_id": "diadoindio", "nivel": 1,
+    "label": "Dia do Índio", "icon": "🪶", "sazonal": true, "mes": "Abril",
+    "palavras": ["índio","arco","flecha","milho","canoa","tribo","aldeia","arte","pena","caju"],
+    "letras_foco": ["I","A","F","M","T"]
+  },
+  {
+    "id": "diadoindio-n2", "tema_id": "diadoindio", "nivel": 2,
+    "label": "Dia do Índio", "icon": "🪶", "sazonal": true, "mes": "Abril",
+    "palavras": ["indígena","cultura","floresta","rituais","pinturas","artesanato","cerâmica","cocar","lendas","tradição"],
+    "letras_foco": ["I","C","F","R","A"]
+  },
+  {
+    "id": "diadoindio-n3", "tema_id": "diadoindio", "nivel": 3,
+    "label": "Dia do Índio", "icon": "🪶", "sazonal": true, "mes": "Abril",
+    "palavras": ["diversidade","ancestralidade","preservação","patrimônio","resistência","identidade","território","sabedoria","conhecimento","sustentável"],
+    "letras_foco": ["D","A","P","R","I"]
+  },
+  {
+    "id": "meioambiente-n1", "tema_id": "meioambiente", "nivel": 1,
+    "label": "Meio Ambiente", "icon": "🌍", "sazonal": true, "mes": "Junho",
+    "palavras": ["árvore","flor","rio","ar","terra","sol","chuva","folha","semente","verde"],
+    "letras_foco": ["A","F","R","T","S"]
+  },
+  {
+    "id": "meioambiente-n2", "tema_id": "meioambiente", "nivel": 2,
+    "label": "Meio Ambiente", "icon": "🌍", "sazonal": true, "mes": "Junho",
+    "palavras": ["natureza","floresta","poluição","reciclagem","ecologia","planeta","plantas","preservação","bioma","habitat"],
+    "letras_foco": ["N","F","P","R","E"]
+  },
+  {
+    "id": "meioambiente-n3", "tema_id": "meioambiente", "nivel": 3,
+    "label": "Meio Ambiente", "icon": "🌍", "sazonal": true, "mes": "Junho",
+    "palavras": ["sustentabilidade","biodiversidade","conscientização","desmatamento","reflorestamento","ecossistema","aquecimento","preservação","responsabilidade","conservação"],
+    "letras_foco": ["S","B","C","D","R"]
+  },
+  {
+    "id": "diadadapatria-n1", "tema_id": "diadadapatria", "nivel": 1,
+    "label": "Semana da Pátria", "icon": "🇧🇷", "sazonal": true, "mes": "Setembro",
+    "palavras": ["Brasil","verde","amarelo","azul","sol","estrela","terra","povo","nação","pátria"],
+    "letras_foco": ["B","V","A","S","E"]
+  },
+  {
+    "id": "diadadapatria-n2", "tema_id": "diadadapatria", "nivel": 2,
+    "label": "Semana da Pátria", "icon": "🇧🇷", "sazonal": true, "mes": "Setembro",
+    "palavras": ["bandeira","hino","independência","liberdade","civismo","território","história","orgulho","patriotismo","nação"],
+    "letras_foco": ["B","H","I","L","C"]
+  },
+  {
+    "id": "diadadapatria-n3", "tema_id": "diadadapatria", "nivel": 3,
+    "label": "Semana da Pátria", "icon": "🇧🇷", "sazonal": true, "mes": "Setembro",
+    "palavras": ["proclamação","constituição","democracia","soberania","cidadania","diversidade","brasilidade","independência","federação","representação"],
+    "letras_foco": ["P","C","D","S","B"]
+  },
+  {
+    "id": "diadoprofessor-n1", "tema_id": "diadoprofessor", "nivel": 1,
+    "label": "Dia do Professor", "icon": "👩‍🏫", "sazonal": true, "mes": "Outubro",
+    "palavras": ["mestre","lição","livro","giz","turma","saber","ensino","amor","escola","aula"],
+    "letras_foco": ["M","L","G","T","S"]
+  },
+  {
+    "id": "diadoprofessor-n2", "tema_id": "diadoprofessor", "nivel": 2,
+    "label": "Dia do Professor", "icon": "👩‍🏫", "sazonal": true, "mes": "Outubro",
+    "palavras": ["dedicação","conhecimento","paciência","carinho","formação","vocação","sabedoria","aprendizado","inspiração","ensinamento"],
+    "letras_foco": ["D","C","P","F","V"]
+  },
+  {
+    "id": "diadoprofessor-n3", "tema_id": "diadoprofessor", "nivel": 3,
+    "label": "Dia do Professor", "icon": "👩‍🏫", "sazonal": true, "mes": "Outubro",
+    "palavras": ["comprometimento","responsabilidade","transformação","perseverança","aprendizagem","metodologia","profissionalismo","criatividade","motivação","reconhecimento"],
+    "letras_foco": ["C","R","T","P","A"]
+  },
+  {
+    "id": "folclore-n1", "tema_id": "folclore", "nivel": 1,
+    "label": "Folclore", "icon": "🎭", "sazonal": true, "mes": "Agosto",
+    "palavras": ["saci","boto","curupira","iara","mula","fada","duende","lenda","mito","cuca"],
+    "letras_foco": ["S","B","C","I","M"]
+  },
+  {
+    "id": "folclore-n2", "tema_id": "folclore", "nivel": 2,
+    "label": "Folclore", "icon": "🎭", "sazonal": true, "mes": "Agosto",
+    "palavras": ["folclore","lendas","tradição","cultura","personagens","fantasia","imaginação","herança","popular","regional"],
+    "letras_foco": ["F","L","T","C","P"]
+  },
+  {
+    "id": "folclore-n3", "tema_id": "folclore", "nivel": 3,
+    "label": "Folclore", "icon": "🎭", "sazonal": true, "mes": "Agosto",
+    "palavras": ["patrimônio","manifestação","identidade","diversidade","regionalismo","mitologia","ancestralidade","transmissão","preservação","imaterialidade"],
+    "letras_foco": ["P","M","I","D","R"]
+  },
+  {
+    "id": "carnaval-n1", "tema_id": "carnaval", "nivel": 1,
+    "label": "Carnaval", "icon": "🎊", "sazonal": true, "mes": "Fevereiro",
+    "palavras": ["festa","baile","máscara","confete","alegria","dança","ritmo","samba","bloco","folia"],
+    "letras_foco": ["F","B","M","A","D"]
+  },
+  {
+    "id": "carnaval-n2", "tema_id": "carnaval", "nivel": 2,
+    "label": "Carnaval", "icon": "🎊", "sazonal": true, "mes": "Fevereiro",
+    "palavras": ["fantasia","passista","harmonia","desfile","enredo","bateria","alegoria","escola","carnaval","serpentina"],
+    "letras_foco": ["F","P","H","D","E"]
+  },
+  {
+    "id": "carnaval-n3", "tema_id": "carnaval", "nivel": 3,
+    "label": "Carnaval", "icon": "🎊", "sazonal": true, "mes": "Fevereiro",
+    "palavras": ["celebração","manifestação","diversidade","criatividade","patrimônio","apresentação","competição","animação","comemoração","tradicional"],
+    "letras_foco": ["C","M","D","P","A"]
+  },
+  {
+    "id": "diadasarvores-n1", "tema_id": "diadasarvores", "nivel": 1,
+    "label": "Dia das Árvores", "icon": "🌳", "sazonal": true, "mes": "Setembro",
+    "palavras": ["árvore","raiz","galho","folha","tronco","fruto","sombra","terra","verde","semente"],
+    "letras_foco": ["A","R","G","F","T"]
+  },
+  {
+    "id": "diadasarvores-n2", "tema_id": "diadasarvores", "nivel": 2,
+    "label": "Dia das Árvores", "icon": "🌳", "sazonal": true, "mes": "Setembro",
+    "palavras": ["floresta","natureza","oxigênio","plantio","cuidado","preservação","ecologia","arbusto","reflorestamento","frondosa"],
+    "letras_foco": ["F","N","O","P","C"]
+  },
+  {
+    "id": "diadasarvores-n3", "tema_id": "diadasarvores", "nivel": 3,
+    "label": "Dia das Árvores", "icon": "🌳", "sazonal": true, "mes": "Setembro",
+    "palavras": ["fotossíntese","biodiversidade","sustentabilidade","desmatamento","conscientização","ecossistema","preservação","reflorestamento","responsabilidade","conservação"],
+    "letras_foco": ["F","B","S","D","C"]
+  }
+]
