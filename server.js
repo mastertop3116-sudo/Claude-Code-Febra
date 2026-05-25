@@ -2588,10 +2588,34 @@ async function runMigrations() {
     } else {
       console.log('[migrations] nexus_notas ✅');
     }
+
+    // Tabela de insights do Instagram
+    const { error: igErr } = await _supa.from('ig_post_insights').select('post_id').limit(1);
+    if (igErr && igErr.code === 'PGRST205') {
+      console.log('[migrations] Tabela ig_post_insights não encontrada — crie no Supabase Studio:\nCREATE TABLE ig_post_insights (\n  post_id TEXT PRIMARY KEY,\n  media_type TEXT,\n  timestamp TIMESTAMPTZ,\n  like_count INT DEFAULT 0,\n  comments INT DEFAULT 0,\n  reach INT DEFAULT 0,\n  saved INT DEFAULT 0,\n  impressions INT DEFAULT 0,\n  follows INT DEFAULT 0,\n  engagement_score NUMERIC(8,4) DEFAULT 0,\n  tema TEXT DEFAULT \'\',\n  updated_at TIMESTAMPTZ DEFAULT NOW()\n);');
+    } else {
+      console.log('[migrations] ig_post_insights ✅');
+    }
   } catch (e) {
     console.log('[migrations] Aviso:', e.message);
   }
 }
+
+// ── INSTAGRAM INSIGHTS ENDPOINT ──────────────────────────────────────────────
+app.get('/instagram-insights', async (req, res) => {
+  const secret = req.query.secret;
+  if (secret !== process.env.INSTAGRAM_APP_SECRET) {
+    return res.status(401).json({ erro: 'Não autorizado' });
+  }
+  try {
+    const { coletarEsalvar, buscarTopPerformers } = require('./departments/creative/templates/aulas-desplugadas-ei/instagram-pipeline/insights');
+    const registros = await coletarEsalvar();
+    const top = await buscarTopPerformers(5);
+    res.json({ coletados: registros.length, top_performers: top });
+  } catch (e) {
+    res.status(500).json({ erro: e.message });
+  }
+});
 
 // ── INSTAGRAM TEST ENDPOINT ──────────────────────────────────────────────────
 app.get('/instagram-test/:periodo', async (req, res) => {

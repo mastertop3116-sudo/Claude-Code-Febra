@@ -2,6 +2,7 @@
 // Chamado pelo pipeline antes de gerar imagem — evita repetição, sempre fresco
 
 const OpenAI = require('openai');
+const { buscarTopPerformers, formatarContextoIA } = require('./insights');
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -9,7 +10,7 @@ const FONTES_POR_DIA   = [['bebas'], ['anton'], ['gagalin'], ['oswald'], ['bebas
 const TEXTURAS_POR_DIA = ['grunge', 'halftone', 'noise', 'grunge', 'halftone', 'noise', 'grunge'];
 const TIPOS_NOITE      = ['motivacional', 'dica', 'motivacional', 'engajamento', 'dica', 'motivacional', 'engajamento'];
 
-async function gerarManha(dia, dataStr) {
+async function gerarManha(dia, dataStr, contextoIA = '') {
   const fonteIdx   = dia % FONTES_POR_DIA.length;
   const texturaIdx = dia % TEXTURAS_POR_DIA.length;
 
@@ -31,7 +32,7 @@ Retorne SOMENTE JSON com esta estrutura exata:
 }
 
 Tema: pedagogia do jiu-jitsu infantil (atenção, disciplina, técnica, pais, turma difícil, primeiras aulas...).
-Tom: direto, prático, experiente. Evite clichês. Use situações reais do tatame.`;
+Tom: direto, prático, experiente. Evite clichês. Use situações reais do tatame.${contextoIA}`;
 
   const resp  = await client.chat.completions.create({
     model:           'gpt-4o-mini',
@@ -52,7 +53,7 @@ Tom: direto, prático, experiente. Evite clichês. Use situações reais do tata
   };
 }
 
-async function gerarNoite(dia, dataStr) {
+async function gerarNoite(dia, dataStr, contextoIA = '') {
   const tipo   = TIPOS_NOITE[dia];
   const fontes = FONTES_POR_DIA[dia];
   const textura = TEXTURAS_POR_DIA[dia];
@@ -88,7 +89,7 @@ Crie conteúdo para senseis que ensinam crianças de 4 a 12 anos.
 Retorne SOMENTE JSON com esta estrutura exata:
 ${schema}
 
-Tom: autêntico, direto, vindo de quem vive o tatame todo dia. Evite frases genéricas.`;
+Tom: autêntico, direto, vindo de quem vive o tatame todo dia. Evite frases genéricas.${contextoIA}`;
 
   const resp  = await client.chat.completions.create({
     model:           'gpt-4o-mini',
@@ -106,10 +107,20 @@ async function gerarConteudo(periodo) {
   const dia     = agora.getDay(); // 0=dom … 6=sab
   const dataStr = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
+  // Busca top performers para dar contexto à IA (silencioso se falhar)
+  let contextoIA = '';
+  try {
+    const topPosts = await buscarTopPerformers(5);
+    contextoIA = formatarContextoIA(topPosts);
+    if (contextoIA) console.log('[ia] Contexto de performance carregado.');
+  } catch (e) {
+    console.log('[ia] Sem contexto de performance (insights indisponíveis).');
+  }
+
   console.log(`[ia] Gerando conteúdo ${periodo} para ${dataStr}...`);
   const entrada = periodo === 'manha'
-    ? await gerarManha(dia, dataStr)
-    : await gerarNoite(dia, dataStr);
+    ? await gerarManha(dia, dataStr, contextoIA)
+    : await gerarNoite(dia, dataStr, contextoIA);
 
   console.log(`[ia] Conteúdo gerado — tipo: ${entrada.tipo}`);
   return entrada;
