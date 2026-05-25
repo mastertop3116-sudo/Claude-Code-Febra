@@ -4,6 +4,7 @@ const path         = require('path');
 const fs           = require('fs');
 const config       = require('./config');
 const { getFontStyle } = require('./fonts');
+const { gerarFundo } = require('./gerar-bg-ia');
 
 function carregarTemplate(tipo, estilo) {
   const estilos = ['dark', 'color', 'premium'];
@@ -37,7 +38,15 @@ async function gerarPost(entrada) {
   const templateFn = carregarTemplate(tipo, estilo);
   if (!templateFn) throw new Error(`Template desconhecido: "${tipo}" / "${estilo}"`);
 
-  const html = buildHtml(templateFn(conteudo), fontes);
+  // Gera fundo 3D cartoon via DALL-E para posts únicos
+  let bgImage = null;
+  try {
+    bgImage = await gerarFundo(tipo);
+  } catch (e) {
+    console.warn(`[gerar-post] Fundo IA indisponível, usando textura padrão: ${e.message}`);
+  }
+
+  const html = buildHtml(templateFn({ ...conteudo, bgImage }), fontes);
   garantirOutputDir();
 
   const timestamp  = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);

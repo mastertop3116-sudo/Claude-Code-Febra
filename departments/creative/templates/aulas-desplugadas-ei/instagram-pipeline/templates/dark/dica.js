@@ -1,7 +1,7 @@
 // Template: DICA DO TATAME — Dark Fighter com textura de fundo
 const { getTexture } = require('../../textures');
 
-module.exports = function templateDica({ titulo, dica, destaque, resposta, cta, textura = 'grunge' }) {
+module.exports = function templateDica({ titulo, dica, destaque, resposta, cta, textura = 'grunge', bgImage = null }) {
   const linhas = (resposta || '').split('\n').map(l => l.trim()).filter(Boolean);
   const linhasHtml = linhas.map(l =>
     `<div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;">
@@ -10,10 +10,14 @@ module.exports = function templateDica({ titulo, dica, destaque, resposta, cta, 
     </div>`
   ).join('');
 
+  const fundo = bgImage
+    ? `<img src="data:image/png;base64,${bgImage}" style="position:absolute;top:0;left:0;width:1080px;height:1080px;object-fit:cover;z-index:0;">`
+    : getTexture(textura);
+
   return `
 <div style="width:1080px;height:1080px;background:#0a0a0f;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:80px 88px;">
 
-  ${getTexture(textura)}
+  ${fundo}
 
   <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(10,10,15,0.55);z-index:1;pointer-events:none;"></div>
   <div style="position:absolute;top:0;right:0;width:500px;height:350px;background:radial-gradient(ellipse at top right,rgba(249,115,22,0.2) 0%,transparent 70%);z-index:2;pointer-events:none;"></div>

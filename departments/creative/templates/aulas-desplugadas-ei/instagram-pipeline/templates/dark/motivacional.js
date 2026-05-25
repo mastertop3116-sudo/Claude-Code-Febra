@@ -2,11 +2,15 @@
 // Estética: fundo preto, frase em destaque enorme, detalhe laranja, impacto emocional
 const { getTexture } = require('../../textures');
 
-module.exports = function templateMotivacional({ frase, contexto, cta, textura = 'concrete' }) {
+module.exports = function templateMotivacional({ frase, contexto, cta, textura = 'concrete', bgImage = null }) {
+  const fundo = bgImage
+    ? `<img src="data:image/png;base64,${bgImage}" style="position:absolute;top:0;left:0;width:1080px;height:1080px;object-fit:cover;z-index:0;">`
+    : getTexture(textura);
+
   return `
 <div style="width:1080px;height:1080px;background:#0a0a0f;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:80px 88px;">
 
-  ${getTexture(textura)}
+  ${fundo}
   <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(10,10,15,0.65);z-index:1;pointer-events:none;"></div>
 
   <!-- Gradiente sutil central -->

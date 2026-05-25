@@ -2,7 +2,7 @@
 // Estética: fundo escuro, opções com bordas, linguagem direta de comunidade
 const { getTexture } = require('../../textures');
 
-module.exports = function templateEngajamento({ pergunta, opcoes, contexto, cta, textura = 'halftone' }) {
+module.exports = function templateEngajamento({ pergunta, opcoes, contexto, cta, textura = 'halftone', bgImage = null }) {
   const estilos = [
     { border: 'rgba(249,115,22,0.5)', bg: 'rgba(249,115,22,0.07)', letra: '#f97316', num: 'A' },
     { border: 'rgba(255,255,255,0.12)', bg: 'rgba(255,255,255,0.04)', letra: '#94a3b8', num: 'B' },
@@ -19,10 +19,14 @@ module.exports = function templateEngajamento({ pergunta, opcoes, contexto, cta,
       </div>`;
   }).join('');
 
+  const fundo = bgImage
+    ? `<img src="data:image/png;base64,${bgImage}" style="position:absolute;top:0;left:0;width:1080px;height:1080px;object-fit:cover;z-index:0;">`
+    : getTexture(textura);
+
   return `
 <div style="width:1080px;height:1080px;background:#0a0a0f;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:80px 88px;">
 
-  ${getTexture(textura)}
+  ${fundo}
   <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(10,10,15,0.60);z-index:1;pointer-events:none;"></div>
 
   <!-- Gradiente laranja sutil -->
