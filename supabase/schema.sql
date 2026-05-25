@@ -43,6 +43,45 @@ create table if not exists criativos (
   created_at    timestamptz default now()
 );
 
+-- ============================================================
+-- PlanIA Desplugado — Gerador de Planos de Aula BNCC
+-- ============================================================
+
+-- Acessos comprados (token = código de acesso)
+create table if not exists plania_acessos (
+  id             uuid primary key default gen_random_uuid(),
+  token          text unique not null,
+  email          text,
+  tipo           text default '30dias', -- '30dias' | 'vitalicio'
+  planos_gerados int  default 0,
+  expira_em      timestamptz,           -- null = vitalício
+  created_at     timestamptz default now()
+);
+
+create index if not exists idx_plania_token on plania_acessos(token);
+
+-- Planos gerados (histórico por acesso)
+create table if not exists plania_planos (
+  id         uuid primary key default gen_random_uuid(),
+  acesso_id  uuid references plania_acessos(id),
+  serie      text,
+  componente text,
+  tema       text,
+  duracao    text,
+  plano      jsonb not null,
+  created_at timestamptz default now()
+);
+
+create index if not exists idx_plania_planos_acesso on plania_planos(acesso_id);
+
+-- Função RPC para incrementar planos_gerados com segurança
+create or replace function plania_incrementar_planos(acesso_id uuid)
+returns void language sql as $$
+  update plania_acessos set planos_gerados = planos_gerados + 1 where id = acesso_id;
+$$;
+
+-- ============================================================
+
 -- Índices para buscas comuns
 create index if not exists idx_produtos_telegram on produtos(telegram_id);
 create index if not exists idx_lancamentos_produto on lancamentos(produto_id);

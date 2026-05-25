@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PlanIA Desplugado — Plano de Aula BNCC com IA em 60 Segundos</title>
+<meta name="description" content="Gere planos de aula de Computação BNCC completos e prontos para imprimir em 60 segundos. Atividades desplugadas incluídas."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+/* ── Reset & Base ─────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:#07070e;color:#e2e8f0;min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* ── CSS Variables ────────────────────────────────── */
+:root{
+  --indigo:#6366f1;
+  --indigo-dark:#4f46e5;
+  --emerald:#10b981;
+  --amber:#f59e0b;
+  --rose:#f43f5e;
+  --bg:#07070e;
+  --bg-card:rgba(255,255,255,0.04);
+  --bg-card-hover:rgba(255,255,255,0.07);
+  --border:rgba(255,255,255,0.08);
+  --border-active:rgba(99,102,241,0.5);
+  --text:#e2e8f0;
+  --text-muted:#94a3b8;
+  --text-dim:#475569;
+  --radius:12px;
+  --shadow:0 4px 24px rgba(0,0,0,0.4);
+}
+
+/* ── Header ───────────────────────────────────────── */
+header{
+  position:sticky;top:0;z-index:50;
+  background:rgba(7,7,14,0.85);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{
+  width:34px;height:34px;border-radius:8px;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+}
+.logo-text{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:17px;color:#fff;letter-spacing:-0.3px}
+.logo-badge{font-size:10px;font-weight:700;background:#6366f1;color:#fff;padding:2px 7px;border-radius:20px;letter-spacing:0.5px;text-transform:uppercase}
+
+.token-area{display:flex;align-items:center;gap:8px}
+.token-input{
+  background:var(--bg-card);border:1px solid var(--border);
+  color:#fff;padding:7px 12px;border-radius:8px;font-size:12px;
+  font-family:'DM Sans',sans-serif;outline:none;width:160px;
+  letter-spacing:1px;text-transform:uppercase;
+  transition:border-color 0.2s;
+}
+.token-input::placeholder{color:var(--text-dim);letter-spacing:0;text-transform:none}
+.token-input:focus{border-color:var(--border-active)}
+.btn-token{
+  background:var(--bg-card);border:1px solid var(--border);
+  color:var(--text-muted);padding:7px 12px;border-radius:8px;
+  font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;
+  white-space:nowrap;
+}
+.btn-token:hover{border-color:var(--indigo);color:#fff}
+.token-status{font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;display:none}
+.token-status.ok{background:rgba(16,185,129,0.15);color:#10b981;display:inline-block}
+.token-status.fail{background:rgba(244,63,94,0.15);color:#f43f5e;display:inline-block}
+
+/* ── Hero ─────────────────────────────────────────── */
+.hero{
+  text-align:center;padding:72px 24px 48px;
+  background:radial-gradient(ellipse at 50% 0%,rgba(99,102,241,0.15) 0%,transparent 60%);
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.3);
+  color:#a5b4fc;padding:8px 16px;border-radius:20px;
+  font-size:12px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;
+  margin-bottom:24px;
+}
+.hero h1{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:clamp(32px,5vw,60px);font-weight:800;
+  line-height:1.05;letter-spacing:-1.5px;
+  color:#fff;margin-bottom:20px;
+}
+.hero h1 span{
+  background:linear-gradient(135deg,#818cf8,#c4b5fd);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero p{
+  font-size:clamp(15px,2vw,19px);color:var(--text-muted);
+  max-width:560px;margin:0 auto 40px;line-height:1.65;
+}
+.stats-row{
+  display:flex;justify-content:center;gap:32px;flex-wrap:wrap;
+  margin-bottom:56px;
+}
+.stat{text-align:center}
+.stat-num{font-family:'Bricolage Grotesque',sans-serif;font-size:28px;font-weight:800;color:#fff}
+.stat-label{font-size:12px;color:var(--text-muted);margin-top:2px}
+
+/* ── Form Card ────────────────────────────────────── */
+.form-section{padding:0 24px 64px;max-width:720px;margin:0 auto}
+.form-card{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:20px;padding:32px;
+  box-shadow:var(--shadow);
+}
+.form-card h2{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:22px;font-weight:800;color:#fff;margin-bottom:6px;letter-spacing:-0.3px;
+}
+.form-card p{font-size:14px;color:var(--text-muted);margin-bottom:28px}
+
+.form-row{margin-bottom:20px}
+.form-row label{
+  display:block;font-size:13px;font-weight:600;
+  color:var(--text-muted);margin-bottom:8px;letter-spacing:0.3px;text-transform:uppercase;
+}
+.form-row select,
+.form-row input[type=text]{
+  width:100%;background:rgba(255,255,255,0.05);
+  border:1px solid var(--border);border-radius:10px;
+  color:#fff;padding:12px 16px;font-size:15px;
+  font-family:'DM Sans',sans-serif;outline:none;
+  transition:border-color 0.2s,box-shadow 0.2s;
+  appearance:none;-webkit-appearance:none;
+}
+.form-row select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;
+  padding-right:38px;cursor:pointer;
+}
+.form-row select option{background:#1e1e2e;color:#fff}
+.form-row select:focus,
+.form-row input[type=text]:focus{
+  border-color:var(--border-active);
+  box-shadow:0 0 0 3px rgba(99,102,241,0.15);
+}
+.form-row input::placeholder{color:var(--text-dim)}
+
+.form-two-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:540px){.form-two-cols{grid-template-columns:1fr}}
+
+/* duracao radio */
+.duracao-group{display:flex;gap:8px;flex-wrap:wrap}
+.duracao-btn{
+  flex:1;min-width:80px;background:var(--bg-card);
+  border:1px solid var(--border);border-radius:10px;
+  color:var(--text-muted);padding:10px 8px;text-align:center;
+  font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;
+}
+.duracao-btn.active,.duracao-btn:hover{
+  border-color:var(--indigo);color:#fff;
+  background:rgba(99,102,241,0.12);
+}
+
+.componente-group{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:540px){.componente-group{grid-template-columns:1fr}}
+.comp-btn{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:10px;padding:12px;cursor:pointer;transition:all 0.2s;
+  display:flex;align-items:center;gap:10px;
+}
+.comp-btn:hover{border-color:var(--indigo);background:rgba(99,102,241,0.08)}
+.comp-btn.active{border-color:var(--indigo);background:rgba(99,102,241,0.15)}
+.comp-icon{font-size:20px;line-height:1}
+.comp-info{text-align:left}
+.comp-name{font-size:13px;font-weight:700;color:#fff}
+.comp-desc{font-size:11px;color:var(--text-muted);margin-top:2px}
+
+.btn-gerar{
+  width:100%;background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  border:none;border-radius:12px;color:#fff;
+  padding:16px;font-size:17px;font-weight:700;
+  font-family:'Bricolage Grotesque',sans-serif;
+  cursor:pointer;transition:all 0.2s;letter-spacing:-0.2px;
+  margin-top:8px;display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.btn-gerar:hover:not(:disabled){
+  transform:translateY(-1px);
+  box-shadow:0 8px 32px rgba(99,102,241,0.4);
+}
+.btn-gerar:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+
+.demo-notice{
+  margin-top:14px;text-align:center;font-size:12px;color:var(--text-dim);
+}
+.demo-counter{color:var(--indigo);font-weight:700}
+
+/* ── Loading ──────────────────────────────────────── */
+.loading-state{
+  display:none;text-align:center;padding:48px 24px;
+}
+.loading-state.active{display:block}
+.spinner{
+  width:48px;height:48px;border:3px solid var(--border);
+  border-top-color:var(--indigo);border-radius:50%;
+  animation:spin 0.8s linear infinite;margin:0 auto 20px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-steps{list-style:none;display:inline-flex;flex-direction:column;gap:8px;text-align:left;margin-top:16px}
+.loading-steps li{font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:8px}
+.loading-steps li.done{color:var(--emerald)}
+.loading-steps li.done::before{content:'✓';font-weight:700}
+.loading-steps li.active{color:#fff}
+.loading-steps li.active::before{content:'›';color:var(--indigo);font-weight:700}
+.loading-steps li:not(.done):not(.active)::before{content:'·';color:var(--text-dim)}
+
+/* ── Output ───────────────────────────────────────── */
+#output{display:none;padding:0 24px 80px;max-width:720px;margin:0 auto}
+#output.active{display:block}
+
+.output-toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;margin-bottom:20px;
+}
+.output-toolbar h3{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.3px;
+}
+.toolbar-actions{display:flex;gap:8px}
+.btn-action{
+  background:var(--bg-card);border:1px solid var(--border);
+  color:var(--text-muted);padding:8px 16px;border-radius:8px;
+  font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;
+  display:flex;align-items:center;gap:6px;
+}
+.btn-action:hover{border-color:var(--indigo);color:#fff}
+.btn-action.primary{
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  border-color:transparent;color:#fff;
+}
+.btn-action.primary:hover{box-shadow:0 4px 16px rgba(99,102,241,0.4)}
+
+.plano-card{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:20px;overflow:hidden;
+}
+
+/* Plano header */
+.plano-header{
+  background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(139,92,246,0.15));
+  border-bottom:1px solid var(--border);padding:28px 28px 24px;
+}
+.plano-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 11px;border-radius:20px;font-size:11px;font-weight:700;
+  letter-spacing:0.3px;text-transform:uppercase;
+}
+.badge-serie{background:rgba(99,102,241,0.2);color:#a5b4fc;border:1px solid rgba(99,102,241,0.3)}
+.badge-componente{background:rgba(16,185,129,0.15);color:#6ee7b7;border:1px solid rgba(16,185,129,0.3)}
+.badge-duracao{background:rgba(245,158,11,0.15);color:#fcd34d;border:1px solid rgba(245,158,11,0.3)}
+
+.plano-titulo{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:clamp(20px,3vw,28px);font-weight:800;
+  color:#fff;letter-spacing:-0.5px;line-height:1.2;
+}
+
+/* BNCC codes */
+.bncc-section{padding:20px 28px;border-bottom:1px solid var(--border)}
+.section-label{
+  font-size:11px;font-weight:700;color:var(--indigo);
+  text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;
+}
+.bncc-codes{display:flex;flex-wrap:wrap;gap:6px}
+.bncc-code{
+  background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);
+  color:#a5b4fc;padding:4px 10px;border-radius:6px;
+  font-size:11px;font-weight:700;font-family:monospace;letter-spacing:0.5px;
+}
+.bncc-habilidade{font-size:12px;color:var(--text-muted);margin-top:6px;line-height:1.5}
+
+/* Sections */
+.plano-section{padding:20px 28px;border-bottom:1px solid var(--border)}
+.plano-section:last-child{border-bottom:none}
+
+.objetivos-list,.materiais-list,.passos-list{
+  list-style:none;display:flex;flex-direction:column;gap:6px;margin-top:8px;
+}
+.objetivos-list li{
+  font-size:14px;color:var(--text);line-height:1.5;
+  display:flex;align-items:flex-start;gap:10px;
+}
+.objetivos-list li::before{
+  content:'✓';color:var(--emerald);font-weight:700;flex-shrink:0;margin-top:1px;
+}
+.materiais-list li{
+  font-size:14px;color:var(--text);line-height:1.5;
+  display:flex;align-items:flex-start;gap:10px;
+}
+.materiais-list li::before{
+  content:'·';color:var(--indigo);font-size:18px;flex-shrink:0;line-height:1;
+}
+
+/* Timeline desenvolvimento */
+.timeline{display:flex;flex-direction:column;gap:0;margin-top:12px}
+.timeline-item{
+  display:flex;gap:16px;align-items:flex-start;
+  padding-bottom:20px;position:relative;
+}
+.timeline-item:not(:last-child)::before{
+  content:'';position:absolute;left:19px;top:38px;
+  width:2px;height:calc(100% - 20px);
+  background:linear-gradient(to bottom,var(--indigo),transparent);
+  z-index:0;
+}
+.timeline-dot{
+  width:38px;height:38px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;z-index:1;
+}
+.dot-aquecimento{background:rgba(245,158,11,0.15);border:2px solid rgba(245,158,11,0.4)}
+.dot-principal{background:rgba(99,102,241,0.15);border:2px solid rgba(99,102,241,0.4)}
+.dot-encerramento{background:rgba(16,185,129,0.15);border:2px solid rgba(16,185,129,0.4)}
+.timeline-content{flex:1;padding-top:6px}
+.timeline-header{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
+.timeline-fase{font-size:13px;font-weight:700;color:#fff}
+.timeline-tempo{font-size:11px;color:var(--text-muted);background:var(--bg-card);padding:2px 8px;border-radius:20px}
+.timeline-desc{font-size:14px;color:var(--text-muted);line-height:1.6}
+
+/* Atividade Desplugada */
+.desplugada-box{
+  background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(16,185,129,0.04));
+  border:1px solid rgba(16,185,129,0.25);
+  border-radius:14px;padding:20px;margin-top:8px;
+}
+.desplugada-nome{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.3px;
+  margin-bottom:6px;
+}
+.desplugada-desc{font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:14px}
+.passos-list li{
+  font-size:14px;color:var(--text);line-height:1.5;
+  display:flex;align-items:flex-start;gap:10px;
+}
+.passo-num{
+  min-width:24px;height:24px;background:rgba(16,185,129,0.2);
+  border:1px solid rgba(16,185,129,0.4);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#6ee7b7;flex-shrink:0;
+}
+
+/* Info cards */
+.info-card{
+  background:rgba(255,255,255,0.03);border-radius:10px;
+  padding:14px;margin-top:8px;font-size:14px;color:var(--text-muted);line-height:1.6;
+}
+.info-card.inclusao{border-left:3px solid var(--amber)}
+.info-card.avaliacao{border-left:3px solid var(--indigo)}
+.info-card.para-casa{border-left:3px solid var(--emerald)}
+
+/* CTA upgrade */
+.upgrade-cta{
+  margin-top:24px;
+  background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.1));
+  border:1px solid rgba(99,102,241,0.3);border-radius:16px;
+  padding:24px;text-align:center;
+}
+.upgrade-cta h4{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:18px;font-weight:800;color:#fff;margin-bottom:8px;
+}
+.upgrade-cta p{font-size:14px;color:var(--text-muted);margin-bottom:16px}
+.btn-upgrade{
+  display:inline-block;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  color:#fff;text-decoration:none;
+  padding:12px 28px;border-radius:10px;
+  font-size:15px;font-weight:700;
+  font-family:'Bricolage Grotesque',sans-serif;
+  transition:all 0.2s;border:none;cursor:pointer;
+}
+.btn-upgrade:hover{box-shadow:0 6px 24px rgba(99,102,241,0.4);transform:translateY(-1px)}
+.upgrade-price{
+  display:inline-flex;align-items:center;gap:8px;
+  margin-top:12px;font-size:13px;
+}
+.price-de{color:var(--text-dim);text-decoration:line-through}
+.price-por{font-weight:700;color:#fff}
+.price-label{color:var(--emerald);font-weight:600}
+
+/* ── Social Proof ─────────────────────────────────── */
+.proof-section{
+  padding:48px 24px;text-align:center;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  max-width:720px;margin:0 auto;
+}
+.proof-section h3{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:22px;font-weight:800;color:#fff;margin-bottom:24px;
+}
+.proof-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;text-align:left}
+.proof-card{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:12px;padding:16px;
+}
+.proof-stars{color:#f59e0b;font-size:13px;margin-bottom:8px}
+.proof-text{font-size:13px;color:var(--text-muted);line-height:1.5;margin-bottom:8px;font-style:italic}
+.proof-author{font-size:12px;color:var(--text-dim);font-weight:600}
+
+/* ── Footer ───────────────────────────────────────── */
+footer{
+  text-align:center;padding:32px 24px;
+  color:var(--text-dim);font-size:12px;
+  border-top:1px solid var(--border);
+}
+
+/* ── Print ────────────────────────────────────────── */
+@media print{
+  header,footer,.form-section,.loading-state,.output-toolbar,.upgrade-cta,.proof-section,
+  .hero,.demo-notice,.btn-action{display:none!important}
+  #output{display:block!important;padding:0;max-width:none}
+  body{background:#fff;color:#111}
+  .plano-card{border:1px solid #e2e8f0;box-shadow:none;border-radius:8px}
+  .plano-header{background:#f1f5f9}
+  .plano-titulo,.timeline-fase,.desplugada-nome,.section-label{color:#1e293b}
+  .badge-serie{background:#e0e7ff;color:#4f46e5}
+  .badge-componente{background:#d1fae5;color:#059669}
+  .badge-duracao{background:#fef3c7;color:#d97706}
+  .bncc-code{background:#f1f5f9;color:#4f46e5}
+  .timeline-desc,.desplugada-desc,.info-card,.objetivos-list li,.materiais-list li,.passos-list li{color:#374151}
+  .timeline-dot{border-color:#4f46e5}
+  .desplugada-box{background:#f0fdf4;border-color:#86efac}
+  .info-card{background:#f8fafc}
+  .plano-section{border-color:#e2e8f0}
+  .bncc-section{border-color:#e2e8f0}
+  .bncc-habilidade{color:#64748b}
+  .text-muted{color:#64748b}
+}
+
+/* ── Responsive ───────────────────────────────────── */
+@media(max-width:600px){
+  .token-area{gap:6px}
+  .token-input{width:120px;font-size:11px}
+  .plano-section,.bncc-section,.plano-header{padding:16px 18px}
+  .stats-row{gap:20px}
+}
+
+/* ── Error state ──────────────────────────────────── */
+.error-msg{
+  background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.3);
+  border-radius:10px;padding:14px 16px;font-size:14px;color:#fda4af;
+  margin-top:14px;display:none;
+}
+.error-msg.active{display:block}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🧠</div>
+    <span class="logo-text">PlanIA</span>
+    <span class="logo-badge">Desplugado</span>
+  </div>
+  <div class="token-area">
+    <input class="token-input" id="tokenInput" type="text" placeholder="Seu código de acesso" maxlength="11" autocomplete="off"/>
+    <button class="btn-token" onclick="verificarToken()">Ativar</button>
+    <span class="token-status" id="tokenStatus"></span>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">✨ BNCC Computação 2026 — obrigatório nas escolas</div>
+  <h1>Seu plano de aula<br/><span>BNCC pronto em 60s</span></h1>
+  <p>Chega de perder horas montando planejamento do zero. Digite o tema e receba um plano de aula completo — com atividade desplugada, códigos BNCC e dica de inclusão.</p>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-label">BNCC 2024</div></div>
+    <div class="stat"><div class="stat-num">60s</div><div class="stat-label">de espera</div></div>
+    <div class="stat"><div class="stat-num">5 séries</div><div class="stat-label">Infantil ao 5º ano</div></div>
+    <div class="stat"><div class="stat-num">0</div><div class="stat-label">computador necessário</div></div>
+  </div>
+</section>
+
+<!-- FORM -->
+<section class="form-section">
+  <div class="form-card">
+    <h2>Gerar Plano de Aula</h2>
+    <p>Preencha os campos abaixo e clique em gerar. O plano aparece aqui mesmo, pronto para imprimir.</p>
+
+    <!-- Série -->
+    <div class="form-row">
+      <label>Série / Ano</label>
+      <select id="serie">
+        <option value="">Selecione a série...</option>
+        <optgroup label="Educação Infantil">
+          <option value="Educação Infantil — Maternal (3 anos)">Maternal (3 anos)</option>
+          <option value="Educação Infantil — Pré I (4 anos)">Pré I (4 anos)</option>
+          <option value="Educação Infantil — Pré II (5 anos)">Pré II (5 anos)</option>
+        </optgroup>
+        <optgroup label="Ensino Fundamental I">
+          <option value="1º ano do Ensino Fundamental">1º Ano</option>
+          <option value="2º ano do Ensino Fundamental">2º Ano</option>
+          <option value="3º ano do Ensino Fundamental">3º Ano</option>
+          <option value="4º ano do Ensino Fundamental">4º Ano</option>
+          <option value="5º ano do Ensino Fundamental">5º Ano</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <!-- Componente -->
+    <div class="form-row">
+      <label>Componente Curricular</label>
+      <div class="componente-group" id="componenteGroup">
+        <div class="comp-btn active" data-value="Pensamento Computacional e Programação Desplugada" onclick="selectComp(this)">
+          <span class="comp-icon">🧩</span>
+          <div class="comp-info">
+            <div class="comp-name">Pensamento Computacional</div>
+            <div class="comp-desc">Algoritmos sem computador</div>
+          </div>
+        </div>
+        <div class="comp-btn" data-value="Mundo Digital e Letramento em Dados" onclick="selectComp(this)">
+          <span class="comp-icon">🌐</span>
+          <div class="comp-info">
+            <div class="comp-name">Mundo Digital</div>
+            <div class="comp-desc">Internet, dados e cidadania</div>
+          </div>
+        </div>
+        <div class="comp-btn" data-value="Cultura Digital e Uso Crítico da Tecnologia" onclick="selectComp(this)">
+          <span class="comp-icon">💡</span>
+          <div class="comp-info">
+            <div class="comp-name">Cultura Digital</div>
+            <div class="comp-desc">Uso crítico e responsável</div>
+          </div>
+        </div>
+        <div class="comp-btn" data-value="Robótica e Computação Física Desplugada" onclick="selectComp(this)">
+          <span class="comp-icon">🤖</span>
+          <div class="comp-info">
+            <div class="comp-name">Robótica Desplugada</div>
+            <div class="comp-desc">Sistemas e automação</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tema -->
+    <div class="form-row">
+      <label>Tema da Aula</label>
+      <input type="text" id="tema" placeholder="Ex: sequências e algoritmos com receita de bolo" maxlength="120"/>
+    </div>
+
+    <!-- Duração e Turma -->
+    <div class="form-two-cols">
+      <div class="form-row">
+        <label>Duração</label>
+        <div class="duracao-group" id="duracaoGroup">
+          <div class="duracao-btn active" data-value="50 minutos" onclick="selectDuracao(this)">50 min</div>
+          <div class="duracao-btn" data-value="100 minutos (2 aulas)" onclick="selectDuracao(this)">100 min</div>
+          <div class="duracao-btn" data-value="30 minutos" onclick="selectDuracao(this)">30 min</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Tamanho da Turma</label>
+        <select id="turma">
+          <option value="até 20 alunos">Até 20 alunos</option>
+          <option value="21 a 30 alunos" selected>21 a 30 alunos</option>
+          <option value="mais de 30 alunos">Mais de 30 alunos</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn-gerar" id="btnGerar" onclick="gerarPlano()">
+      <span id="btnIcon">⚡</span>
+      <span id="btnText">Gerar Plano de Aula Agora</span>
+    </button>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <div class="demo-notice" id="demoNotice">
+      Modo demonstração · <span class="demo-counter" id="demoCounter">3</span> geração(ões) gratuita(s) restante(s) · <a href="#upgrade" style="color:var(--indigo)">Ver planos</a>
+    </div>
+  </div>
+</section>
+
+<!-- LOADING -->
+<div class="loading-state" id="loadingState">
+  <div class="spinner"></div>
+  <p style="color:var(--text-muted);font-size:15px;margin-bottom:8px">Gerando seu plano de aula...</p>
+  <ul class="loading-steps" id="loadingSteps">
+    <li id="step1">Identificando habilidades BNCC</li>
+    <li id="step2">Criando atividade desplugada</li>
+    <li id="step3">Estruturando o desenvolvimento</li>
+    <li id="step4">Revisando códigos e objetivos</li>
+    <li id="step5">Finalizando plano completo</li>
+  </ul>
+</div>
+
+<!-- OUTPUT -->
+<div id="output">
+  <div class="output-toolbar">
+    <h3>📋 Plano de Aula Gerado</h3>
+    <div class="toolbar-actions">
+      <button class="btn-action" onclick="novoPlano()">↺ Novo</button>
+      <button class="btn-action" onclick="copiarPlano()">⎘ Copiar</button>
+      <button class="btn-action primary" onclick="window.print()">🖨️ Imprimir</button>
+    </div>
+  </div>
+
+  <div class="plano-card" id="planoCard">
+    <!-- preenchido via JS -->
+  </div>
+
+  <div class="upgrade-cta" id="upgradeCta" style="display:none">
+    <h4>🔓 Acesso ilimitado por R$47</h4>
+    <p>Gere planos ilimitados, salve no histórico e receba as atividades desplugadas em PDF separado.</p>
+    <button class="btn-upgrade" onclick="abrirCompra()">Quero acesso completo</button>
+    <div class="upgrade-price">
+      <span class="price-de">De R$97</span>
+      <span class="price-por">por R$47</span>
+      <span class="price-label">· pagamento único · acesso vitalício</span>
+    </div>
+  </div>
+</div>
+
+<!-- SOCIAL PROOF -->
+<section class="proof-section" id="upgrade">
+  <h3>O que professoras estão dizendo</h3>
+  <div class="proof-grid">
+    <div class="proof-card">
+      <div class="proof-stars">★★★★★</div>
+      <div class="proof-text">"Economizei meu domingo inteiro. O plano saiu perfeito para o 3º ano, com todos os códigos BNCC que minha coordenação exige."</div>
+      <div class="proof-author">Prof.ª Carla S. — SP</div>
+    </div>
+    <div class="proof-card">
+      <div class="proof-stars">★★★★★</div>
+      <div class="proof-text">"A atividade desplugada foi incrível! Os alunos adoraram e eu não precisei de nenhum computador. Recomendo pra todo mundo."</div>
+      <div class="proof-author">Prof.ª Fernanda M. — MG</div>
+    </div>
+    <div class="proof-card">
+      <div class="proof-stars">★★★★★</div>
+      <div class="proof-text">"Com a BNCC de Computação obrigatória em 2026, isso vai ser essencial. Já gerei planos para o semestre inteiro."</div>
+      <div class="proof-author">Prof.ª Juliana R. — RJ</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>PlanIA Desplugado — Gerador de Planos de Aula BNCC com Inteligência Artificial</p>
+  <p style="margin-top:6px">Material 100% alinhado à Base Nacional Comum Curricular · Computação obrigatória 2026</p>
+</footer>
+
+<script>
+// ── Estado global ────────────────────────────────────
+const STATE = {
+  token: localStorage.getItem('plania_token') || '',
+  tokenValido: false,
+  demoRestantes: parseInt(localStorage.getItem('plania_demo') ?? '3'),
+  componenteSelecionado: 'Pensamento Computacional e Programação Desplugada',
+  duracaoSelecionada: '50 minutos',
+  planoAtual: null,
+};
+
+// ── Init ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  atualizarDemoNotice();
+  if (STATE.token) {
+    document.getElementById('tokenInput').value = STATE.token;
+    verificarToken(true);
+  }
+});
+
+// ── Token ────────────────────────────────────────────
+async function verificarToken(silencioso = false) {
+  const input = document.getElementById('tokenInput');
+  const token = input.value.trim().toUpperCase();
+  if (!token) return;
+
+  const statusEl = document.getElementById('tokenStatus');
+  statusEl.className = 'token-status';
+  statusEl.textContent = '…';
+  statusEl.style.display = 'inline-block';
+
+  try {
+    const r = await fetch('/api/plania/verificar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    });
+    const d = await r.json();
+
+    if (d.valido) {
+      STATE.token = token;
+      STATE.tokenValido = true;
+      localStorage.setItem('plania_token', token);
+      statusEl.className = 'token-status ok';
+      statusEl.textContent = '✓ Ativo';
+      document.getElementById('demoNotice').style.display = 'none';
+    } else {
+      STATE.tokenValido = false;
+      statusEl.className = 'token-status fail';
+      statusEl.textContent = silencioso ? '' : '✗ Inválido';
+      if (silencioso) statusEl.style.display = 'none';
+    }
+  } catch {
+    statusEl.className = 'token-status fail';
+    statusEl.textContent = 'Erro';
+  }
+}
+
+// ── Componente e Duração ─────────────────────────────
+function selectComp(el) {
+  document.querySelectorAll('.comp-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  STATE.componenteSelecionado = el.dataset.value;
+}
+function selectDuracao(el) {
+  document.querySelectorAll('.duracao-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  STATE.duracaoSelecionada = el.dataset.value;
+}
+
+// ── Demo notice ──────────────────────────────────────
+function atualizarDemoNotice() {
+  if (STATE.tokenValido) return;
+  const el = document.getElementById('demoCounter');
+  if (el) el.textContent = STATE.demoRestantes;
+}
+
+// ── Gerar plano ───────────────────────────────────────
+async function gerarPlano() {
+  const serie = document.getElementById('serie').value;
+  const tema  = document.getElementById('tema').value.trim();
+  const turma = document.getElementById('turma').value;
+  const errorEl = document.getElementById('errorMsg');
+
+  errorEl.className = 'error-msg';
+
+  if (!serie) { showError('Selecione a série/ano.'); return; }
+  if (!tema)  { showError('Digite o tema da aula.'); return; }
+  if (tema.length < 3) { showError('Tema muito curto. Descreva melhor o assunto.'); return; }
+
+  if (!STATE.tokenValido) {
+    if (STATE.demoRestantes <= 0) {
+      showError('Você usou todas as suas gerações gratuitas. Ative seu código de acesso ou adquira um plano.');
+      document.getElementById('upgradeCta').style.display = 'block';
+      return;
+    }
+    STATE.demoRestantes--;
+    localStorage.setItem('plania_demo', STATE.demoRestantes);
+    atualizarDemoNotice();
+  }
+
+  setLoading(true);
+  animarSteps();
+
+  try {
+    const r = await fetch('/api/plania/gerar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        serie,
+        componente: STATE.componenteSelecionado,
+        tema,
+        duracao: STATE.duracaoSelecionada,
+        turma,
+        token: STATE.token || undefined,
+      }),
+    });
+
+    const d = await r.json();
+    if (!r.ok) { showError(d.error || 'Erro ao gerar. Tente novamente.'); setLoading(false); return; }
+
+    STATE.planoAtual = d.plano;
+    renderPlano(d.plano);
+    setLoading(false);
+
+    document.getElementById('output').style.display = 'block';
+    document.getElementById('output').classList.add('active');
+    document.getElementById('output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    if (d.demo && STATE.demoRestantes <= 0) {
+      document.getElementById('upgradeCta').style.display = 'block';
+    } else {
+      document.getElementById('upgradeCta').style.display = 'none';
+    }
+
+  } catch (e) {
+    showError('Erro de conexão. Verifique sua internet e tente novamente.');
+    setLoading(false);
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg;
+  el.className = 'error-msg active';
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function setLoading(on) {
+  const btn = document.getElementById('btnGerar');
+  const loading = document.getElementById('loadingState');
+  btn.disabled = on;
+  document.getElementById('btnIcon').textContent = on ? '' : '⚡';
+  document.getElementById('btnText').textContent = on ? 'Gerando...' : 'Gerar Plano de Aula Agora';
+  loading.className = on ? 'loading-state active' : 'loading-state';
+  if (!on) resetSteps();
+}
+
+// ── Loading steps animation ───────────────────────────
+const STEP_DELAYS = [0, 2500, 5000, 8000, 11000];
+let stepTimers = [];
+function animarSteps() {
+  resetSteps();
+  STEP_DELAYS.forEach((delay, i) => {
+    const t = setTimeout(() => {
+      const prev = document.getElementById(`step${i}`);
+      if (prev) prev.className = 'done';
+      const curr = document.getElementById(`step${i + 1}`);
+      if (curr) curr.className = 'active';
+    }, delay);
+    stepTimers.push(t);
+  });
+}
+function resetSteps() {
+  stepTimers.forEach(clearTimeout);
+  stepTimers = [];
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById(`step${i}`);
+    if (el) el.className = '';
+  }
+  const s1 = document.getElementById('step1');
+  if (s1) s1.className = 'active';
+}
+
+// ── Render plano ──────────────────────────────────────
+function renderPlano(p) {
+  const card = document.getElementById('planoCard');
+
+  const codigos = (p.bncc_codigos || []).map(c =>
+    `<span class="bncc-code">${esc(c)}</span>`).join('');
+
+  const habilidades = (p.bncc_habilidades || []).map((h, i) =>
+    `<div class="bncc-habilidade">· ${esc(h)}</div>`).join('');
+
+  const objetivos = (p.objetivos || []).map(o =>
+    `<li>${esc(o)}</li>`).join('');
+
+  const materiais = (p.materiais || []).map(m =>
+    `<li>${esc(m)}</li>`).join('');
+
+  const ad = p.atividade_desplugada || {};
+  const passos = (ad.passo_a_passo || []).map((ps, i) =>
+    `<li><span class="passo-num">${i + 1}</span>${esc(ps)}</li>`).join('');
+
+  const dev = p.desenvolvimento || {};
+
+  card.innerHTML = `
+    <div class="plano-header">
+      <div class="plano-meta">
+        <span class="badge badge-serie">📚 ${esc(p.serie || '')}</span>
+        <span class="badge badge-componente">💻 ${esc(p.componente || '')}</span>
+        <span class="badge badge-duracao">⏱ ${esc(p.duracao || '')}</span>
+      </div>
+      <div class="plano-titulo">${esc(p.titulo || '')}</div>
+    </div>
+
+    <div class="bncc-section">
+      <div class="section-label">📐 Habilidades BNCC</div>
+      <div class="bncc-codes">${codigos}</div>
+      ${habilidades}
+    </div>
+
+    <div class="plano-section">
+      <div class="section-label">🎯 Objetivos de Aprendizagem</div>
+      <ul class="objetivos-list">${objetivos}</ul>
+    </div>
+
+    <div class="plano-section">
+      <div class="section-label">🧰 Materiais Necessários</div>
+      <ul class="materiais-list">${materiais}</ul>
+    </div>
+
+    <div class="plano-section">
+      <div class="section-label">⏰ Desenvolvimento da Aula</div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot dot-aquecimento">🔥</div>
+          <div class="timeline-content">
+            <div class="timeline-header">
+              <span class="timeline-fase">Aquecimento</span>
+              <span class="timeline-tempo">${esc(dev.aquecimento?.tempo || '10 min')}</span>
+            </div>
+            <div class="timeline-desc">${esc(dev.aquecimento?.descricao || '')}</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot dot-principal">⭐</div>
+          <div class="timeline-content">
+            <div class="timeline-header">
+              <span class="timeline-fase">Atividade Principal</span>
+              <span class="timeline-tempo">${esc(dev.principal?.tempo || '30 min')}</span>
+            </div>
+            <div class="timeline-desc">${esc(dev.principal?.descricao || '')}</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot dot-encerramento">✅</div>
+          <div class="timeline-content">
+            <div class="timeline-header">
+              <span class="timeline-fase">Encerramento</span>
+              <span class="timeline-tempo">${esc(dev.encerramento?.tempo || '10 min')}</span>
+            </div>
+            <div class="timeline-desc">${esc(dev.encerramento?.descricao || '')}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="plano-section">
+      <div class="section-label">🎮 Atividade Desplugada (sem computador)</div>
+      <div class="desplugada-box">
+        <div class="desplugada-nome">${esc(ad.nome || '')}</div>
+        <div class="desplugada-desc">${esc(ad.descricao || '')}</div>
+        <ul class="passos-list">${passos}</ul>
+      </div>
+    </div>
+
+    <div class="plano-section">
+      <div class="section-label">📊 Avaliação Formativa</div>
+      <div class="info-card avaliacao">${esc(p.avaliacao_formativa || '')}</div>
+    </div>
+
+    <div class="plano-section">
+      <div class="section-label">♿ Dica de Inclusão</div>
+      <div class="info-card inclusao">${esc(p.dica_inclusao || '')}</div>
+    </div>
+
+    <div class="plano-section">
+      <div class="section-label">🏠 Para Casa (opcional)</div>
+      <div class="info-card para-casa">${esc(p.para_casa || '')}</div>
+    </div>
+  `;
+}
+
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br/>');
+}
+
+// ── Actions ───────────────────────────────────────────
+function novoPlano() {
+  document.getElementById('output').style.display = 'none';
+  document.getElementById('output').classList.remove('active');
+  document.getElementById('tema').value = '';
+  document.getElementById('tema').focus();
+  document.getElementById('errorMsg').className = 'error-msg';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function copiarPlano() {
+  if (!STATE.planoAtual) return;
+  const p = STATE.planoAtual;
+  const ad = p.atividade_desplugada || {};
+  const dev = p.desenvolvimento || {};
+
+  const txt = [
+    `PLANO DE AULA — ${p.titulo}`,
+    `Série: ${p.serie} | Componente: ${p.componente} | Duração: ${p.duracao}`,
+    `BNCC: ${(p.bncc_codigos || []).join(', ')}`,
+    '',
+    'OBJETIVOS:',
+    ...(p.objetivos || []).map(o => `• ${o}`),
+    '',
+    'MATERIAIS:',
+    ...(p.materiais || []).map(m => `• ${m}`),
+    '',
+    'DESENVOLVIMENTO:',
+    `Aquecimento (${dev.aquecimento?.tempo}): ${dev.aquecimento?.descricao}`,
+    `Atividade Principal (${dev.principal?.tempo}): ${dev.principal?.descricao}`,
+    `Encerramento (${dev.encerramento?.tempo}): ${dev.encerramento?.descricao}`,
+    '',
+    `ATIVIDADE DESPLUGADA: ${ad.nome}`,
+    ad.descricao,
+    ...(ad.passo_a_passo || []).map((ps, i) => `${i + 1}. ${ps}`),
+    '',
+    `AVALIAÇÃO: ${p.avaliacao_formativa}`,
+    `INCLUSÃO: ${p.dica_inclusao}`,
+    `PARA CASA: ${p.para_casa}`,
+    '',
+    'Gerado por PlanIA Desplugado — plania.nexus',
+  ].join('\n');
+
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = document.querySelector('.btn-action:nth-child(2)');
+    if (btn) { btn.textContent = '✓ Copiado!'; setTimeout(() => btn.textContent = '⎘ Copiar', 2000); }
+  });
+}
+
+function abrirCompra() {
+  // URL do GG Checkout — substituir com URL real do produto
+  window.open('https://pay.ggcheckout.com/plania-desplugado', '_blank');
+}
+</script>
+</body>
+</html>

@@ -1102,6 +1102,8 @@ app.post("/api/gerar-pdf", async (req, res) => {
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-api-key, Authorization");
     if (req.method === "OPTIONS") return res.sendStatus(204);
+    // Rota pública — palavras não são dados sensíveis
+    if (req.path === "/palavras-tema") return next();
     const expectedKey = process.env.NEXUS_API_KEY;
     if (expectedKey) {
       const provided = req.headers["x-api-key"] || req.headers["authorization"]?.replace("Bearer ", "");
@@ -1469,6 +1471,202 @@ Responda APENAS com o HTML completo começando com <!DOCTYPE html> e terminando 
     res.setHeader("Content-Disposition", `attachment; filename="${slug}-${Date.now()}.pdf"`);
     res.send(j.pdf);
   });
+})();
+
+// ══════════════════════════════════════════
+// NexusPDF Dinâmico — Folhinhas com variantes
+// POST /api/nexuspdf/gerar-dinamico → { escola, professor, ano, nivel, tema_id } → PDF
+// GET  /api/nexuspdf/variantes      → lista temas e níveis disponíveis
+// POST /api/nexuspdf/sugestao       → { sugestao, email? } → salva sugestão
+// GET  /api/nexuspdf/sugestoes      → lista sugestões (admin)
+// ══════════════════════════════════════════
+(function setupFolhinhasDinamico() {
+  const fs   = require("fs");
+  const path = require("path");
+  const { renderTemplate } = require("./departments/creative/pdf_puppeteer");
+
+  const VARIANTS_FILE = path.join(__dirname, "departments/creative/templates/kit-worksheet-dinamico/variants.json");
+  const SUGESTOES_FILE = path.join(__dirname, "data/sugestoes.json");
+  const BASE_TMPL = path.join(__dirname, "departments/creative/templates/kit-worksheet-dinamico/base.html");
+
+  function loadVariants() { return JSON.parse(fs.readFileSync(VARIANTS_FILE, "utf8")); }
+
+  // Mapeia uuid → nome-desejado.pdf para o endpoint de download
+  const downloadMap = new Map();
+  function loadSugestoes() {
+    try { return JSON.parse(fs.readFileSync(SUGESTOES_FILE, "utf8")); } catch { return []; }
+  }
+
+  // Middleware API Key
+  const authMw = (req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-api-key, Authorization");
+    if (req.method === "OPTIONS") return res.sendStatus(204);
+    const key = req.headers["x-api-key"] || (req.headers["authorization"] || "").replace("Bearer ", "");
+    if (key !== process.env.NEXUS_API_KEY) return res.status(401).json({ error: "Chave inválida." });
+    next();
+  };
+
+  // GET /api/nexuspdf/palavras-tema?tema_id=X&nivel=N  (público — palavras não são sensíveis)
+  app.get("/api/nexuspdf/palavras-tema", (req, res) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    const { tema_id, nivel } = req.query;
+    if (!tema_id) return res.status(400).json({ error: "tema_id obrigatório" });
+    const variants = loadVariants();
+    let pool = variants.filter(v => v.tema_id === tema_id);
+    if (nivel) {
+      const nivelN = parseInt(nivel);
+      const sub = pool.filter(v => v.nivel === nivelN);
+      if (sub.length) pool = sub;
+    }
+    if (!pool.length) return res.status(404).json({ error: "Tema não encontrado" });
+    res.json({ palavras: pool[0].palavras, tema_id, nivel: pool[0].nivel });
+  });
+
+  // GET /api/nexuspdf/variantes
+  app.get("/api/nexuspdf/variantes", authMw, (req, res) => {
+    const variants = loadVariants();
+    const temas = {};
+    for (const v of variants) {
+      if (!temas[v.tema_id]) temas[v.tema_id] = { tema_id: v.tema_id, label: v.label, icon: v.icon, sazonal: v.sazonal, mes: v.mes, niveis: [] };
+      temas[v.tema_id].niveis.push(v.nivel);
+    }
+    res.json(Object.values(temas));
+  });
+
+  // Helper: gera um PDF do base.html com os dados fornecidos e salva no tmp
+  async function gerarFolhinhasPdf({ escola, professor, ano, variant, gabarito = false, pb = false, palavras = null, atividades = null, nomePdf }) {
+    let baseHtml = fs.readFileSync(BASE_TMPL, "utf8");
+    const data = { escola, professor, ano, variant };
+    if (gabarito) data.gabarito = true;
+    if (pb) data.pb = true;
+    if (palavras && Array.isArray(palavras)) data.palavras = palavras;
+    if (atividades && Array.isArray(atividades) && atividades.length) data.atividades = atividades;
+    const dataScript = `<script>window.__DATA__ = ${JSON.stringify(data)};</script>`;
+    baseHtml = baseHtml.replace("<script>", dataScript + "\n<script>");
+
+    const pdf = await renderInlineHtml(baseHtml);
+    const suffix = gabarito ? '-gabarito' : '';
+    const base = nomePdf || `folhinhas-${variant.tema_id}-n${variant.nivel}`;
+    const slug = (base + suffix).replace(/[^a-zA-Z0-9À-ÿ\s\-_]/g, '').replace(/\s+/g, '-').slice(0, 80);
+    const fname = slug + '.pdf';
+
+    const tmpDir = path.join(__dirname, 'public', 'folhinhas-tmp');
+    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+
+    // Limpa arquivos com mais de 2 horas
+    try {
+      const agora = Date.now();
+      fs.readdirSync(tmpDir).forEach(f => {
+        const fpath = path.join(tmpDir, f);
+        if (agora - fs.statSync(fpath).mtimeMs > 2 * 60 * 60 * 1000) fs.unlinkSync(fpath);
+      });
+    } catch {}
+
+    const uuid = require('crypto').randomUUID();
+    const filepath = path.join(tmpDir, uuid + '.pdf');
+    fs.writeFileSync(filepath, pdf);
+    downloadMap.set(uuid, fname);
+    return { uuid, fname, url: `/folhinhas-dl/${uuid}` };
+  }
+
+  // POST /api/nexuspdf/gerar-dinamico
+  app.post("/api/nexuspdf/gerar-dinamico", authMw, async (req, res) => {
+    const { escola, professor, ano, nivel, tema_id, gabarito, pb, palavras, atividades, nomePdf } = req.body;
+    if (!escola || !professor || !ano) return res.status(400).json({ error: "escola, professor e ano são obrigatórios." });
+    if (!tema_id) return res.status(400).json({ error: "tema_id é obrigatório." });
+
+    const variants = loadVariants();
+    let pool = variants.filter(v => v.tema_id === tema_id);
+    if (!pool.length) return res.status(404).json({ error: `Tema "${tema_id}" não encontrado.` });
+
+    if (nivel) {
+      const nivelN = parseInt(nivel);
+      const sub = pool.filter(v => v.nivel === nivelN);
+      if (sub.length) pool = sub;
+    }
+
+    // Sorteia variante aleatória
+    const variant = pool[Math.floor(Math.random() * pool.length)];
+
+    try {
+      const args = { escola, professor, ano, variant, pb: !!pb, palavras, atividades, nomePdf };
+      const [alunoResult, gabaritoResult] = await Promise.all([
+        gerarFolhinhasPdf({ ...args, gabarito: false }),
+        gabarito ? gerarFolhinhasPdf({ ...args, gabarito: true }) : Promise.resolve(null),
+      ]);
+
+      res.json({
+        ok: true,
+        url: alunoResult.url,
+        fname: alunoResult.fname,
+        ...(gabaritoResult ? { gabaritoUrl: gabaritoResult.url, gabaritoFname: gabaritoResult.fname } : {}),
+      });
+    } catch (e) {
+      console.error("[/api/nexuspdf/gerar-dinamico]", e.message);
+      res.status(500).json({ error: "Erro ao gerar PDF: " + e.message });
+    }
+  });
+
+  // Renderiza HTML puro (sem arquivo de template)
+  async function renderInlineHtml(html) {
+    let browser;
+    const LAUNCH_ARGS = ["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage","--disable-gpu","--font-render-hinting=none"];
+    if (process.env.NODE_ENV === "production" || process.env.RENDER) {
+      const chromium = require("@sparticuz/chromium");
+      const puppeteerCore = require("puppeteer-core");
+      browser = await puppeteerCore.launch({ args: [...chromium.args, ...LAUNCH_ARGS], executablePath: await chromium.executablePath(), headless: chromium.headless });
+    } else {
+      const puppeteer = require("puppeteer");
+      browser = await puppeteer.launch({ headless: "new", args: LAUNCH_ARGS });
+    }
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: "networkidle0" });
+    await page.waitForFunction(() => document.body.children.length > 1, { timeout: 30000 });
+    const pdf = await page.pdf({ format: "A4", printBackground: true, margin: { top: "0", right: "0", bottom: "0", left: "0" } });
+    await browser.close();
+    return pdf;
+  }
+
+  // GET /folhinhas-dl/:uuid — público, usa res.download() para forçar nome correto
+  app.get("/folhinhas-dl/:uuid", (req, res) => {
+    const { uuid } = req.params;
+    const tmpDir = path.join(__dirname, 'public', 'folhinhas-tmp');
+    const filepath = path.join(tmpDir, uuid + '.pdf');
+    if (!fs.existsSync(filepath)) return res.status(404).json({ error: "Arquivo não encontrado." });
+    const fname = downloadMap.get(uuid) || `folhinhas-${uuid.slice(0,8)}.pdf`;
+    res.download(filepath, fname);
+  });
+
+  // POST /api/nexuspdf/sugestao
+  app.post("/api/nexuspdf/sugestao", (req, res) => {
+    const { sugestao, email, escola } = req.body;
+    if (!sugestao || sugestao.trim().length < 3) return res.status(400).json({ error: "Sugestão muito curta." });
+    const lista = loadSugestoes();
+    const nova = { id: Date.now(), sugestao: sugestao.trim(), email: email || null, escola: escola || null, votos: 1, data: new Date().toISOString() };
+    lista.unshift(nova);
+    fs.writeFileSync(SUGESTOES_FILE, JSON.stringify(lista, null, 2));
+    res.json({ ok: true, id: nova.id });
+  });
+
+  // POST /api/nexuspdf/sugestao/:id/voto
+  app.post("/api/nexuspdf/sugestao/:id/voto", (req, res) => {
+    const lista = loadSugestoes();
+    const item = lista.find(s => s.id === parseInt(req.params.id));
+    if (!item) return res.status(404).json({ error: "Sugestão não encontrada." });
+    item.votos = (item.votos || 0) + 1;
+    fs.writeFileSync(SUGESTOES_FILE, JSON.stringify(lista, null, 2));
+    res.json({ ok: true, votos: item.votos });
+  });
+
+  // GET /api/nexuspdf/sugestoes
+  app.get("/api/nexuspdf/sugestoes", (req, res) => {
+    const lista = loadSugestoes().sort((a,b) => (b.votos||0) - (a.votos||0));
+    res.json(lista);
+  });
+
+  console.log("[NexusPDF Dinâmico] Endpoints registrados.");
 })();
 
 // ──────────────────────────────────────────
@@ -2203,6 +2401,155 @@ app.post('/api/dashboard/integrations/test/:service', async (req, res) => {
     res.status(404).json({ error: 'Serviço não encontrado' });
   } catch (e) {
     res.json({ ok: false, message: e.message });
+  }
+});
+
+// ══════════════════════════════════════════
+// PlanIA Desplugado — Gerador de Planos de Aula BNCC
+// GET  /plania              → página web
+// POST /api/plania/gerar    → gera plano via OpenAI
+// POST /api/plania/verificar → valida token de acesso
+// POST /api/plania/ativar   → ativa token (chamado pelo webhook GG)
+// ══════════════════════════════════════════
+
+app.get('/plania', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.sendFile(path.join(__dirname, 'public', 'plania.html'));
+});
+
+app.post('/api/plania/verificar', async (req, res) => {
+  const { token } = req.body;
+  if (!token) return res.json({ valido: false, motivo: 'Token não informado' });
+
+  try {
+    const { supabase } = require('./integrations/supabase');
+    const { data, error } = await supabase
+      .from('plania_acessos')
+      .select('id, tipo, email, planos_gerados, expira_em')
+      .eq('token', token.trim().toUpperCase())
+      .single();
+
+    if (error || !data) return res.json({ valido: false, motivo: 'Token inválido ou não encontrado' });
+    if (data.expira_em && new Date(data.expira_em) < new Date()) {
+      return res.json({ valido: false, motivo: 'Acesso expirado. Renove em nexus-febra.com/plania' });
+    }
+    res.json({ valido: true, tipo: data.tipo, planos_gerados: data.planos_gerados, email: data.email });
+  } catch (e) {
+    res.status(500).json({ valido: false, motivo: 'Erro interno. Tente novamente.' });
+  }
+});
+
+app.post('/api/plania/ativar', async (req, res) => {
+  const { email, tipo = '30dias', secret } = req.body;
+  if (secret !== (process.env.PLANIA_ADMIN_SECRET || 'nexus-plania-2026')) {
+    return res.status(403).json({ error: 'Não autorizado' });
+  }
+  if (!email) return res.status(400).json({ error: 'email obrigatório' });
+
+  const { supabase } = require('./integrations/supabase');
+  const token = Math.random().toString(36).substring(2, 7).toUpperCase() +
+                '-' + Math.random().toString(36).substring(2, 7).toUpperCase();
+  const expira_em = tipo === 'vitalicio' ? null
+    : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+  const { error } = await supabase.from('plania_acessos').insert({
+    token, email, tipo, expira_em, planos_gerados: 0,
+  });
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ ok: true, token, email, tipo, expira_em });
+});
+
+app.post('/api/plania/gerar', async (req, res) => {
+  const { serie, componente, tema, duracao, turma, token } = req.body;
+
+  if (!serie || !componente || !tema?.trim()) {
+    return res.status(400).json({ error: 'Preencha série, componente e tema.' });
+  }
+  if (tema.trim().length < 3) {
+    return res.status(400).json({ error: 'Tema muito curto. Descreva melhor o assunto.' });
+  }
+
+  let acessoId = null;
+  let modoDemo = true;
+
+  if (token) {
+    try {
+      const { supabase } = require('./integrations/supabase');
+      const { data } = await supabase
+        .from('plania_acessos')
+        .select('id, tipo, expira_em, planos_gerados')
+        .eq('token', token.trim().toUpperCase())
+        .single();
+
+      if (!data) return res.status(403).json({ error: 'Token inválido. Verifique e tente novamente.' });
+      if (data.expira_em && new Date(data.expira_em) < new Date()) {
+        return res.status(403).json({ error: 'Seu acesso expirou. Renove para continuar gerando planos.' });
+      }
+      acessoId = data.id;
+      modoDemo = false;
+    } catch (e) {
+      return res.status(500).json({ error: 'Erro ao verificar token.' });
+    }
+  }
+
+  const SYSTEM = `Você é Dr. Plano — o maior especialista em planejamento educacional BNCC do Brasil.
+Você conhece todos os códigos de habilidades da BNCC, especialmente os de Computação (EF01CO ao EF05CO) e Educação Infantil.
+Cria planos de aula que são ao mesmo tempo academicamente rigorosos e práticos para aplicar em sala hoje.
+Sempre inclui uma Atividade Desplugada criativa (sem uso de computador ou internet).
+Responda APENAS com JSON válido, sem markdown.`;
+
+  const PROMPT = `Crie um plano de aula COMPLETO para:
+- Série/Ano: ${serie}
+- Componente Curricular: ${componente}
+- Tema: ${tema}
+- Duração: ${duracao || '50 minutos'}
+- Tamanho da turma: ${turma || 'até 30 alunos'}
+
+Retorne JSON com EXATAMENTE esta estrutura:
+{
+  "titulo": "título criativo e motivador da aula",
+  "serie": "${serie}",
+  "componente": "${componente}",
+  "duracao": "${duracao || '50 minutos'}",
+  "bncc_codigos": ["EF01CO01", "EF01CO02"],
+  "bncc_habilidades": ["descrição da habilidade BNCC real para cada código"],
+  "objetivos": ["objetivo específico 1", "objetivo específico 2", "objetivo específico 3"],
+  "materiais": ["material necessário 1", "material necessário 2"],
+  "atividade_desplugada": {
+    "nome": "nome criativo da dinâmica",
+    "descricao": "o que é essa atividade e por que funciona",
+    "passo_a_passo": ["Passo 1: ...", "Passo 2: ...", "Passo 3: ...", "Passo 4: ...", "Passo 5: ..."]
+  },
+  "desenvolvimento": {
+    "aquecimento": { "tempo": "10 min", "descricao": "atividade de engajamento inicial" },
+    "principal": { "tempo": "30 min", "descricao": "desenvolvimento principal detalhado" },
+    "encerramento": { "tempo": "10 min", "descricao": "síntese e reflexão final" }
+  },
+  "avaliacao_formativa": "como observar e avaliar a aprendizagem durante a aula",
+  "dica_inclusao": "como adaptar para alunos com necessidades especiais ou dificuldades de aprendizagem",
+  "para_casa": "atividade simples e opcional para fazer em casa sem computador"
+}`;
+
+  try {
+    const { openaiJson } = require('./integrations/openai');
+    const resposta = await openaiJson(PROMPT, SYSTEM);
+    const plano = JSON.parse(resposta);
+
+    if (acessoId) {
+      const { supabase } = require('./integrations/supabase');
+      await supabase.rpc('plania_incrementar_planos', { acesso_id: acessoId });
+      await supabase.from('plania_planos').insert({
+        acesso_id: acessoId, serie, componente, tema,
+        duracao: duracao || '50 minutos',
+        plano,
+      });
+    }
+
+    res.json({ ok: true, plano, demo: modoDemo });
+  } catch (e) {
+    console.error('[/api/plania/gerar]', e.message);
+    res.status(500).json({ error: 'Erro ao gerar o plano. Tente novamente em alguns segundos.' });
   }
 });
 

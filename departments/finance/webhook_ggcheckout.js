@@ -43,7 +43,6 @@ router.post("/ggcheckout", async (req, res) => {
       });
 
       // Atualiza meta de faturamento no Caderno Preto
-      // (incrementa o valor atual)
       const { supabase } = require("../../integrations/supabase");
       const { data: meta } = await supabase
         .from("caderno_preto")
@@ -56,6 +55,27 @@ router.post("/ggcheckout", async (req, res) => {
           "Faturamento Mensal (R$)",
           Number(meta.valor_atual) + valorNum
         );
+      }
+
+      // ── PlanIA: gerar token de acesso automaticamente ─────
+      const nomeProduto = produto.toLowerCase();
+      const ePlania = nomeProduto.includes("plania") || nomeProduto.includes("plano de aula");
+      if (ePlania) {
+        try {
+          const email = payload.customer?.email || payload.buyer_email || payload.email || "";
+          const tipo  = valorNum >= 70 ? "vitalicio" : "30dias";
+          const token = Math.random().toString(36).substring(2, 7).toUpperCase()
+                      + "-" + Math.random().toString(36).substring(2, 7).toUpperCase();
+          const expira_em = tipo === "vitalicio"
+            ? null
+            : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+          await supabase.from("plania_acessos").insert({ token, email, tipo, expira_em, planos_gerados: 0 });
+
+          console.log(`[PlanIA] Token gerado: ${token} → ${email} (${tipo})`);
+        } catch (e) {
+          console.error("[PlanIA] Erro ao gerar token:", e.message);
+        }
       }
     }
 
