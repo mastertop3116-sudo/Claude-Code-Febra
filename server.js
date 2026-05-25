@@ -2493,11 +2493,27 @@ app.post('/api/plania/gerar', async (req, res) => {
     }
   }
 
+  // Mapa de prefixos BNCC por série para guiar o modelo
+  const BNCC_PREFIXO = serie.includes('Infantil') ? 'EI'
+    : serie.includes('1º') ? 'EF01'
+    : serie.includes('2º') ? 'EF02'
+    : serie.includes('3º') ? 'EF03'
+    : serie.includes('4º') ? 'EF04'
+    : serie.includes('5º') ? 'EF05'
+    : 'EF';
+
+  const BNCC_EXEMPLOS = serie.includes('Infantil')
+    ? 'EI03ET06, EI03EF09'
+    : `${BNCC_PREFIXO}CO01, ${BNCC_PREFIXO}CO02, ${BNCC_PREFIXO}CO03`;
+
   const SYSTEM = `Você é Dr. Plano — o maior especialista em planejamento educacional BNCC do Brasil.
-Você conhece todos os códigos de habilidades da BNCC, especialmente os de Computação (EF01CO ao EF05CO) e Educação Infantil.
-Cria planos de aula que são ao mesmo tempo academicamente rigorosos e práticos para aplicar em sala hoje.
-Sempre inclui uma Atividade Desplugada criativa (sem uso de computador ou internet).
-Responda APENAS com JSON válido, sem markdown.`;
+Você conhece TODOS os códigos reais da BNCC 2024, especialmente Computação (BNCC/Computação, resolução CNE/CP 2/2022).
+REGRA CRÍTICA: Os códigos BNCC devem ser EXATAMENTE do ano/série solicitado.
+- 1º ano → EF01CO0X  | 2º ano → EF02CO0X  | 3º ano → EF03CO0X
+- 4º ano → EF04CO0X  | 5º ano → EF05CO0X  | Ed. Infantil → EI0XET0X / EI0XEF0X
+Nunca misture códigos de anos diferentes. Nunca invente códigos.
+Cria planos rigorosos, práticos, com atividade DESPLUGADA obrigatória (zero computador/internet).
+Responda APENAS com JSON válido, sem markdown, sem texto fora do JSON.`;
 
   const PROMPT = `Crie um plano de aula COMPLETO para:
 - Série/Ano: ${serie}
@@ -2506,29 +2522,32 @@ Responda APENAS com JSON válido, sem markdown.`;
 - Duração: ${duracao || '50 minutos'}
 - Tamanho da turma: ${turma || 'até 30 alunos'}
 
-Retorne JSON com EXATAMENTE esta estrutura:
+ATENÇÃO: A série é "${serie}". Os códigos BNCC DEVEM começar com "${BNCC_PREFIXO}".
+Exemplos de códigos corretos para esta série: ${BNCC_EXEMPLOS}
+
+Retorne JSON com EXATAMENTE esta estrutura (substitua os placeholders com conteúdo real):
 {
-  "titulo": "título criativo e motivador da aula",
+  "titulo": "título criativo e motivador para a aula",
   "serie": "${serie}",
   "componente": "${componente}",
   "duracao": "${duracao || '50 minutos'}",
-  "bncc_codigos": ["EF01CO01", "EF01CO02"],
-  "bncc_habilidades": ["descrição da habilidade BNCC real para cada código"],
-  "objetivos": ["objetivo específico 1", "objetivo específico 2", "objetivo específico 3"],
-  "materiais": ["material necessário 1", "material necessário 2"],
+  "bncc_codigos": ["${BNCC_PREFIXO}CO01", "${BNCC_PREFIXO}CO02"],
+  "bncc_habilidades": ["descrição real da habilidade para o 1º código", "descrição real para o 2º código"],
+  "objetivos": ["objetivo de aprendizagem específico 1", "objetivo específico 2", "objetivo específico 3"],
+  "materiais": ["material concreto necessário 1", "material necessário 2", "material necessário 3"],
   "atividade_desplugada": {
-    "nome": "nome criativo da dinâmica",
-    "descricao": "o que é essa atividade e por que funciona",
-    "passo_a_passo": ["Passo 1: ...", "Passo 2: ...", "Passo 3: ...", "Passo 4: ...", "Passo 5: ..."]
+    "nome": "nome criativo da dinâmica sem computador",
+    "descricao": "o que é essa atividade, como funciona e por que desenvolve o pensamento computacional",
+    "passo_a_passo": ["Passo 1: instrução clara", "Passo 2: instrução clara", "Passo 3: instrução clara", "Passo 4: instrução clara", "Passo 5: instrução clara"]
   },
   "desenvolvimento": {
-    "aquecimento": { "tempo": "10 min", "descricao": "atividade de engajamento inicial" },
-    "principal": { "tempo": "30 min", "descricao": "desenvolvimento principal detalhado" },
-    "encerramento": { "tempo": "10 min", "descricao": "síntese e reflexão final" }
+    "aquecimento": { "tempo": "10 min", "descricao": "atividade de engajamento e conexão com o tema" },
+    "principal": { "tempo": "30 min", "descricao": "desenvolvimento detalhado da atividade principal, passo a passo" },
+    "encerramento": { "tempo": "10 min", "descricao": "síntese dos aprendizados e reflexão coletiva" }
   },
-  "avaliacao_formativa": "como observar e avaliar a aprendizagem durante a aula",
-  "dica_inclusao": "como adaptar para alunos com necessidades especiais ou dificuldades de aprendizagem",
-  "para_casa": "atividade simples e opcional para fazer em casa sem computador"
+  "avaliacao_formativa": "como o professor observa e avalia a aprendizagem durante a aula",
+  "dica_inclusao": "adaptação concreta para alunos com necessidades especiais, TEA ou dificuldades específicas",
+  "para_casa": "atividade simples e divertida para fazer em casa sem nenhuma tecnologia"
 }`;
 
   try {
