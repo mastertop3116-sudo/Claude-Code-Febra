@@ -2593,6 +2593,23 @@ async function runMigrations() {
   }
 }
 
+// ── INSTAGRAM TEST ENDPOINT ──────────────────────────────────────────────────
+app.get('/instagram-test/:periodo', async (req, res) => {
+  const secret  = req.query.secret;
+  const periodo = req.params.periodo; // 'manha' | 'noite'
+  if (secret !== process.env.INSTAGRAM_APP_SECRET) {
+    return res.status(401).json({ erro: 'Não autorizado' });
+  }
+  try {
+    const { executar } = require('./departments/creative/templates/aulas-desplugadas-ei/instagram-pipeline/pipeline');
+    res.json({ status: 'disparando', periodo });
+    executar(periodo).then(() => console.log(`[instagram-test] ${periodo} concluído`))
+                     .catch(err => console.error(`[instagram-test] ERRO: ${err.message}`));
+  } catch (e) {
+    res.status(500).json({ erro: e.message });
+  }
+});
+
 app.listen(PORT, async () => {
   console.log(`NEXUS — Servidor rodando na porta ${PORT}`);
   console.log(`[Gamma] API KEY: ${process.env.GAMMA_API_KEY ? "✅ configurada" : "❌ NÃO CONFIGURADA — geração PDF usará apenas PDFKit"}`);
