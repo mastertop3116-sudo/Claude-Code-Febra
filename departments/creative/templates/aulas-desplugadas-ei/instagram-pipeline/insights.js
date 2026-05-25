@@ -7,10 +7,12 @@ const config       = require('./config');
 
 const BASE = 'https://graph.facebook.com/v19.0';
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+function getSupabase() {
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error('Supabase não configurado');
+  }
+  return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+}
 
 // Busca os últimos N posts da conta
 async function buscarPosts(limite = 20) {
@@ -90,8 +92,8 @@ async function coletarEsalvar() {
     });
   }
 
-  // Upsert no Supabase (cria tabela se não existir via seed)
-  const { error } = await supabase
+  // Salva no banco
+  const { error } = await getSupabase()
     .from('ig_post_insights')
     .upsert(registros, { onConflict: 'post_id' });
 
@@ -103,7 +105,7 @@ async function coletarEsalvar() {
 
 // Retorna os top N posts por score para alimentar a IA
 async function buscarTopPerformers(limite = 5) {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from('ig_post_insights')
     .select('media_type, tema, like_count, comments, saved, reach, engagement_score')
     .order('engagement_score', { ascending: false })
