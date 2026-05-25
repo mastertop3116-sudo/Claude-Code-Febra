@@ -3,7 +3,7 @@
 // Períodos: 'manha' (carrossel) | 'noite' (post único)
 
 const config    = require('./config');
-const calendar  = require('./content-calendar');
+const { gerarConteudo } = require('./gerar-conteudo-ia');
 const { gerarPost, gerarCarrossel } = require('./gerar-post');
 const { uploadImagem }              = require('./upload');
 const { postar, postarCarrossel }   = require('./instagram');
@@ -31,8 +31,7 @@ async function executar(periodo, diaSemana) {
   const periodoLabel = periodo || 'manha';
   console.log(`\n========== PIPELINE [${periodoLabel.toUpperCase()}] — ${new Date().toLocaleString('pt-BR')} ==========`);
 
-  const entrada = calendar.getConteudoHoje(periodoLabel, diaSemana);
-  if (!entrada) throw new Error(`Sem conteúdo para período "${periodoLabel}" no dia ${diaSemana ?? new Date().getDay()}`);
+  const entrada = await gerarConteudo(periodoLabel);
 
   console.log(`[pipeline] Tipo: ${entrada.tipo}`);
 
