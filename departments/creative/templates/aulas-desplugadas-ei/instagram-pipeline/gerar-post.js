@@ -15,9 +15,11 @@ function buildHtml(bodyHtml, fontes) {
   const fontStyle = getFontStyle(fontes);
   return `<!DOCTYPE html>
 <html><head><meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=block" rel="stylesheet">
 ${fontStyle}
 <style>
-  * { box-sizing:border-box; margin:0; padding:0; font-family:'${fontes[0] || 'Arial'}',Arial,Helvetica,sans-serif; }
+  * { box-sizing:border-box; margin:0; padding:0; font-family:'${fontes[0] || 'Arial'}','Noto Color Emoji',Arial,sans-serif; }
   body { width:1080px; height:1080px; overflow:hidden; }
 </style>
 </head><body>${bodyHtml}</body></html>`;
@@ -45,8 +47,8 @@ async function gerarPost(entrada) {
   const browser = await puppeteer.launch({ headless: 'new' });
   const page    = await browser.newPage();
   await page.setViewport({ width: 1080, height: 1080 });
-  await page.setContent(html, { waitUntil: 'domcontentloaded' });
-  await new Promise(r => setTimeout(r, 600));
+  await page.setContent(html, { waitUntil: 'networkidle2' });
+  await new Promise(r => setTimeout(r, 400));
   await page.screenshot({ path: outputPath, type: 'png' });
   await browser.close();
 
@@ -75,8 +77,8 @@ async function gerarCarrossel(entrada) {
 
     const page = await browser.newPage();
     await page.setViewport({ width: 1080, height: 1080 });
-    await page.setContent(html, { waitUntil: 'domcontentloaded' });
-    await new Promise(r => setTimeout(r, 600));
+    await page.setContent(html, { waitUntil: 'networkidle2' });
+    await new Promise(r => setTimeout(r, 400));
 
     const filename   = `carrossel-${timestamp}-slide${i + 1}.png`;
     const outputPath = path.join(config.posting.outputDir, filename);
