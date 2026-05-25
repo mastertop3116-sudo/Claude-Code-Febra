@@ -1,0 +1,23 @@
+{
+  "name": "instagram-pipeline-atividades-dinamicas",
+  "version": "1.0.0",
+  "description": "Pipeline de posts diários no Instagram para Atividades e Dinâmicas",
+  "main": "pipeline.js",
+  "scripts": {
+    "start":    "node agendar.js",
+    "testar":   "node pipeline.js",
+    "segunda":  "node pipeline.js 1",
+    "terca":    "node pipeline.js 2",
+    "quarta":   "node pipeline.js 3",
+    "quinta":   "node pipeline.js 4",
+    "sexta":    "node pipeline.js 5",
+    "sabado":   "node pipeline.js 6",
+    "domingo":  "node pipeline.js 0"
+  },
+  "dependencies": {
+    "axios":      "^1.6.0",
+    "cloudinary": "^1.41.0",
+    "node-cron":  "^3.0.3",
+    "puppeteer":  "^21.0.0"
+  }
+}

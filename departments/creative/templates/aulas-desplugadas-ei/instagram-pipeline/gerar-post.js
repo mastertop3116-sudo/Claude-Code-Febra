@@ -1,0 +1,94 @@
+// Renderiza posts e carrosséis em PNG via Puppeteer
+const puppeteer    = require('puppeteer');
+const path         = require('path');
+const fs           = require('fs');
+const config       = require('./config');
+const { getFontStyle } = require('./fonts');
+
+function carregarTemplate(tipo, estilo) {
+  const estilos = ['dark', 'color', 'premium'];
+  const pasta = estilos.includes(estilo) ? `./templates/${estilo}` : './templates/dark';
+  return require(`${pasta}/${tipo}`);
+}
+
+function buildHtml(bodyHtml, fontes) {
+  const fontStyle = getFontStyle(fontes);
+  return `<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+${fontStyle}
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; font-family:'${fontes[0] || 'Arial'}',Arial,Helvetica,sans-serif; }
+  body { width:1080px; height:1080px; overflow:hidden; }
+</style>
+</head><body>${bodyHtml}</body></html>`;
+}
+
+function garantirOutputDir() {
+  if (!fs.existsSync(config.posting.outputDir)) {
+    fs.mkdirSync(config.posting.outputDir, { recursive: true });
+  }
+}
+
+async function gerarPost(entrada) {
+  const { tipo, estilo = 'dark', fontes = [], conteudo } = entrada;
+
+  const templateFn = carregarTemplate(tipo, estilo);
+  if (!templateFn) throw new Error(`Template desconhecido: "${tipo}" / "${estilo}"`);
+
+  const html = buildHtml(templateFn(conteudo), fontes);
+  garantirOutputDir();
+
+  const timestamp  = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  const filename   = `post-${estilo}-${tipo}-${timestamp}.png`;
+  const outputPath = path.join(config.posting.outputDir, filename);
+
+  const browser = await puppeteer.launch({ headless: 'new' });
+  const page    = await browser.newPage();
+  await page.setViewport({ width: 1080, height: 1080 });
+  await page.setContent(html, { waitUntil: 'domcontentloaded' });
+  await new Promise(r => setTimeout(r, 600));
+  await page.screenshot({ path: outputPath, type: 'png' });
+  await browser.close();
+
+  console.log(`[gerar-post] ${outputPath}`);
+  return outputPath;
+}
+
+async function gerarCarrossel(entrada) {
+  const { estilo = 'dark', fontes = [], textura = 'grunge', badge, emoji, slides } = entrada;
+
+  const slideFn = carregarTemplate('slide', estilo);
+  if (!slideFn) throw new Error(`Template de slide desconhecido para estilo "${estilo}"`);
+
+  garantirOutputDir();
+
+  const total = slides.length;
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  const paths = [];
+
+  const browser = await puppeteer.launch({ headless: 'new' });
+
+  for (let i = 0; i < slides.length; i++) {
+    const slide = slides[i];
+    const bodyHtml = slideFn({ ...slide, total, textura, badge, emoji });
+    const html = buildHtml(bodyHtml, fontes);
+
+    const page = await browser.newPage();
+    await page.setViewport({ width: 1080, height: 1080 });
+    await page.setContent(html, { waitUntil: 'domcontentloaded' });
+    await new Promise(r => setTimeout(r, 600));
+
+    const filename   = `carrossel-${timestamp}-slide${i + 1}.png`;
+    const outputPath = path.join(config.posting.outputDir, filename);
+    await page.screenshot({ path: outputPath, type: 'png' });
+    await page.close();
+
+    console.log(`[gerar-carrossel] slide ${i + 1}/${total}: ${outputPath}`);
+    paths.push(outputPath);
+  }
+
+  await browser.close();
+  return paths;
+}
+
+module.exports = { gerarPost, gerarCarrossel };
