@@ -2598,4 +2598,12 @@ app.listen(PORT, async () => {
   console.log(`[Gamma] API KEY: ${process.env.GAMMA_API_KEY ? "✅ configurada" : "❌ NÃO CONFIGURADA — geração PDF usará apenas PDFKit"}`);
   await runMigrations();
   await registerWebhook();
+
+  // Instagram pipeline — posts automáticos @jiujitsudinamicas
+  try {
+    const { iniciar } = require('./departments/creative/instagram-scheduler');
+    iniciar();
+  } catch (e) {
+    console.warn('[instagram-scheduler] Não iniciado:', e.message);
+  }
 });
