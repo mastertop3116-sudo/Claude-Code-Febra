@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kit Retenção Kids — Área de Membros</title>
+<style>
+:root {
+  --bg: #0a0a14;
+  --surface: #111120;
+  --card: #181828;
+  --border: rgba(255,255,255,.08);
+  --border-hi: rgba(249,115,22,.35);
+  --text: #eeeef8;
+  --text-2: #8888b0;
+  --text-3: #44445e;
+  --orange: #f97316;
+  --orange-dim: rgba(249,115,22,.12);
+  --orange-glow: rgba(249,115,22,.3);
+  --sidebar-w: 220px;
+  --topbar-h: 54px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; display: grid; grid-template-rows: var(--topbar-h) 1fr; }
+
+/* ── TOPBAR ── */
+#topbar {
+  height: var(--topbar-h); background: rgba(10,10,20,.97); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 20px; gap: 14px; flex-shrink: 0;
+  box-shadow: 0 1px 0 var(--border-hi); position: relative; z-index: 100;
+}
+#topbar::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 35%; height: 1px; background: linear-gradient(90deg, var(--orange), transparent); }
+.tb-logo { font-size: 1.15rem; font-weight: 900; letter-spacing: -0.5px; color: var(--orange); }
+.tb-logo span { color: var(--text-2); font-weight: 400; }
+.tb-sep { color: var(--border); }
+.tb-section { font-size: 0.8rem; color: var(--text-2); flex: 1; }
+.tb-badge { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 4px 12px; border-radius: 99px; background: var(--orange-dim); border: 1px solid var(--border-hi); color: var(--orange); }
+
+/* ── LAYOUT ── */
+#layout { display: flex; overflow: hidden; height: 100%; }
+
+/* ── SIDEBAR ── */
+#sidebar {
+  width: var(--sidebar-w); min-width: var(--sidebar-w); height: 100%;
+  background: rgba(10,10,20,.98); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0;
+  box-shadow: 1px 0 0 rgba(249,115,22,.06), 4px 0 24px rgba(0,0,0,.4);
+}
+.sb-brand { padding: 18px 16px 12px; border-bottom: 1px solid var(--border); }
+.sb-brand-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--orange); }
+.sb-brand-sub { font-size: 0.72rem; color: var(--text-3); margin-top: 2px; }
+.sb-nav { flex: 1; padding: 8px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+.sb-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 10px;
+  border-radius: 8px; cursor: pointer; transition: all .15s; border: none;
+  background: transparent; width: 100%; color: var(--text-2); text-align: left; position: relative;
+}
+.sb-item:hover { background: rgba(255,255,255,.06); color: var(--text); }
+.sb-item.active { background: var(--orange-dim); color: var(--orange); }
+.sb-item.active::before { content: ''; position: absolute; left: 0; top: 15%; height: 70%; width: 3px; border-radius: 0 4px 4px 0; background: var(--orange); box-shadow: 0 0 8px var(--orange); }
+.sb-icon { font-size: 1.1rem; flex-shrink: 0; width: 22px; text-align: center; }
+.sb-label { font-size: 0.82rem; font-weight: 500; line-height: 1.3; }
+.sb-sub { font-size: 0.68rem; color: var(--text-3); margin-top: 1px; }
+.sb-item.active .sb-sub { color: rgba(249,115,22,.6); }
+.sb-footer { padding: 12px; border-top: 1px solid var(--border); }
+.sb-footer p { font-size: 0.68rem; color: var(--text-3); line-height: 1.5; }
+
+/* ── MAIN ── */
+#main { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.view { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+.view.active { display: flex; }
+.view-scroll { flex: 1; overflow-y: auto; padding: 28px; }
+.view-scroll::-webkit-scrollbar { width: 4px; }
+.view-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ── HOME ── */
+#view-home .hero { text-align: center; padding: 40px 20px 32px; }
+#view-home .hero-icon { font-size: 3.5rem; margin-bottom: 16px; }
+#view-home .hero-title { font-size: 1.8rem; font-weight: 900; color: var(--text); letter-spacing: -1px; margin-bottom: 6px; }
+#view-home .hero-title span { color: var(--orange); }
+#view-home .hero-sub { font-size: 0.9rem; color: var(--text-2); max-width: 480px; margin: 0 auto; line-height: 1.6; }
+.kit-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; max-width: 900px; margin: 0 auto; }
+.kit-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; cursor: pointer; transition: all .2s; position: relative; overflow: hidden; }
+.kit-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--orange); opacity: 0; transition: opacity .2s; }
+.kit-card:hover { border-color: var(--border-hi); transform: translateY(-3px); box-shadow: 0 8px 32px rgba(0,0,0,.5), 0 0 20px var(--orange-glow); }
+.kit-card:hover::after { opacity: 1; }
+.kit-card-icon { font-size: 2rem; margin-bottom: 10px; }
+.kit-card-num { font-size: 0.68rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-3); margin-bottom: 4px; }
+.kit-card-title { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.kit-card:hover .kit-card-title { color: var(--orange); }
+.kit-card-desc { font-size: 0.78rem; color: var(--text-2); line-height: 1.5; }
+.kit-card-arrow { position: absolute; bottom: 16px; right: 16px; font-size: 1rem; color: var(--text-3); transition: color .2s; }
+.kit-card:hover .kit-card-arrow { color: var(--orange); }
+.info-tip { background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--orange); border-radius: 10px; padding: 14px 16px; max-width: 900px; margin: 20px auto 0; font-size: 0.82rem; color: var(--text-2); line-height: 1.6; }
+.info-tip strong { color: var(--orange); }
+
+/* ── MENSAGENS ── */
+.search-bar { display: flex; gap: 8px; margin-bottom: 16px; }
+.search-bar input { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 8px 12px; font-size: 0.85rem; font-family: inherit; }
+.search-bar input:focus { outline: none; border-color: var(--orange); }
+.filter-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+.filter-btn { padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text-2); font-size: 0.78rem; cursor: pointer; transition: all .15s; font-family: inherit; }
+.filter-btn.active, .filter-btn:hover { border-color: var(--orange); color: var(--orange); background: var(--orange-dim); }
+.bloco-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--orange); margin: 20px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.msg-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 8px; display: flex; gap: 12px; align-items: flex-start; transition: border-color .15s; }
+.msg-card:hover { border-color: rgba(249,115,22,.2); }
+.msg-text { flex: 1; font-size: 0.85rem; color: var(--text-2); line-height: 1.6; white-space: pre-line; }
+.msg-copy-btn { flex-shrink: 0; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text-3); font-size: 0.75rem; cursor: pointer; transition: all .15s; font-family: inherit; white-space: nowrap; }
+.msg-copy-btn:hover { border-color: var(--orange); color: var(--orange); }
+.msg-copy-btn.copied { border-color: #22c55e; color: #22c55e; background: rgba(34,197,94,.1); }
+
+/* ── CADERNETA ── */
+.section-block { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 22px; margin-bottom: 18px; }
+.section-block-title { font-size: 0.78rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--orange); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-grid.c3 { grid-template-columns: 1fr 1fr 1fr; }
+.fg { display: flex; flex-direction: column; gap: 5px; }
+.fg.full { grid-column: 1/-1; }
+.fg label { font-size: 0.7rem; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--text-3); }
+.fg input, .fg textarea, .fg select { background: var(--bg); border: 1px solid var(--border); border-radius: 7px; color: var(--text); padding: 8px 10px; font-size: 0.85rem; font-family: inherit; transition: border-color .15s; }
+.fg input:focus, .fg textarea:focus { outline: none; border-color: var(--orange); }
+.fg textarea { resize: vertical; min-height: 70px; }
+.belt-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.belt-btn { background: var(--bg); border: 2px solid var(--border); border-radius: 8px; padding: 10px 6px; text-align: center; cursor: pointer; transition: all .15s; }
+.belt-btn.on { border-color: var(--orange); background: var(--orange-dim); }
+.belt-btn .bi { font-size: 1.3rem; }
+.belt-btn .bn { font-size: 0.68rem; color: var(--text-3); margin-top: 4px; }
+.belt-btn.on .bn { color: var(--orange); }
+.belt-btn input { background: transparent; border: none; border-bottom: 1px solid var(--border); color: var(--text-3); font-size: 0.68rem; width: 100%; text-align: center; padding: 2px; margin-top: 4px; }
+.pres-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 14px; }
+.pres-mes h5 { font-size: 0.75rem; color: var(--orange); margin-bottom: 6px; }
+.pres-dia { width: 30px; height: 30px; border-radius: 5px; background: var(--bg); border: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--text-3); transition: all .15s; }
+.pres-dia.P { background: var(--orange); border-color: var(--orange); color: #fff; font-weight: 700; }
+.pres-dia.F { background: rgba(239,68,68,.2); border-color: rgba(239,68,68,.4); color: #fca5a5; }
+.pres-dia.vazio { opacity: 0; pointer-events: none; }
+.list-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+.list-row input { flex: 1; }
+.btn-remove { background: transparent; border: 1px solid var(--border); color: var(--text-3); padding: 5px 9px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; transition: all .15s; }
+.btn-remove:hover { border-color: #ef4444; color: #ef4444; }
+.btn-add-row { width: 100%; background: transparent; border: 1px dashed var(--border); color: var(--text-3); padding: 7px; border-radius: 7px; cursor: pointer; font-size: 0.82rem; transition: all .15s; margin-top: 6px; font-family: inherit; }
+.btn-add-row:hover { border-color: var(--orange); color: var(--orange); }
+.momento-card { background: var(--bg); border-left: 3px solid var(--orange); border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+.momento-head { display: flex; gap: 8px; margin-bottom: 8px; }
+.momento-head input { flex: 1; }
+.momento-head input:first-child { max-width: 130px; }
+
+/* ── PROTOCOLO ── */
+.proto-header { background: var(--card); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
+.proto-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.progress-global { display: flex; align-items: center; gap: 14px; }
+.progress-bar-wrap { flex: 1; background: var(--bg); border-radius: 99px; height: 10px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--orange), #fbbf24); border-radius: 99px; transition: width .4s; }
+.progress-pct { font-size: 1.1rem; font-weight: 700; color: var(--orange); min-width: 40px; text-align: right; }
+.fase-block { background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 14px; overflow: hidden; }
+.fase-header { padding: 14px 16px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background .15s; }
+.fase-header:hover { background: rgba(255,255,255,.03); }
+.fase-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.fase-nome { font-size: 0.88rem; font-weight: 700; flex: 1; }
+.fase-prog { font-size: 0.75rem; color: var(--text-3); font-family: monospace; }
+.fase-chevron { font-size: 0.75rem; color: var(--text-3); transition: transform .2s; }
+.fase-body { display: none; padding: 4px 16px 16px; }
+.fase-body.open { display: block; }
+.semana-block { margin-bottom: 12px; }
+.semana-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-3); margin: 10px 0 6px; }
+.check-row { display: flex; align-items: flex-start; gap: 10px; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background .1s; margin-bottom: 2px; }
+.check-row:hover { background: rgba(255,255,255,.04); }
+.check-box { width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 4px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 1px; transition: all .15s; }
+.check-box.done { background: var(--orange); border-color: var(--orange); }
+.check-box.done::after { content: '✓'; font-size: 11px; color: #fff; font-weight: 700; }
+.check-label { font-size: 0.83rem; color: var(--text-2); line-height: 1.4; transition: color .15s; }
+.check-label.done { color: var(--text-3); text-decoration: line-through; }
+.check-row.alerta .check-label { color: #fbbf24; }
+.check-row.alerta .check-box { border-color: rgba(251,191,36,.5); }
+
+/* ── CONQUISTAS ── */
+.cat-title-bar { font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--orange); margin: 20px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+.missoes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-bottom: 8px; }
+.missao-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; cursor: pointer; transition: all .2s; position: relative; }
+.missao-card:hover { border-color: rgba(249,115,22,.3); transform: translateY(-2px); }
+.missao-card.done { border-color: var(--orange); background: var(--orange-dim); }
+.missao-card.done::after { content: '✓'; position: absolute; top: 10px; right: 12px; color: var(--orange); font-size: 1rem; font-weight: 700; }
+.missao-icon { font-size: 1.6rem; margin-bottom: 8px; }
+.missao-nome { font-size: 0.85rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.missao-card.done .missao-nome { color: var(--orange); }
+.missao-desc { font-size: 0.75rem; color: var(--text-2); }
+.missao-pts { font-size: 0.7rem; color: var(--text-3); margin-top: 6px; }
+.missao-data { font-size: 0.68rem; color: var(--orange); margin-top: 4px; font-style: italic; }
+.prog-bar { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 16px; }
+.cert-form { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.cert-form h4 { font-size: 0.78rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--orange); margin-bottom: 14px; }
+.cert-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; flex-wrap: wrap; }
+.cert-preview { background: #fff; color: #111; border-radius: 12px; overflow: hidden; border: 3px solid var(--orange); }
+.cert-top { background: var(--orange); color: #fff; padding: 16px 30px; display: flex; justify-content: space-between; align-items: center; }
+.cert-top h3 { font-size: 0.95rem; font-weight: 900; letter-spacing: 2px; }
+.cert-body { padding: 28px 30px; text-align: center; }
+.cert-trophy { font-size: 3rem; margin-bottom: 10px; }
+.cert-aluno { font-size: 1.6rem; font-weight: 900; color: var(--orange); margin: 8px 0 4px; }
+.cert-missao { font-size: 1rem; font-weight: 700; color: #333; margin-bottom: 6px; }
+.cert-missao-desc { font-size: 0.82rem; color: #666; }
+.cert-footer { display: flex; justify-content: space-between; padding: 16px 30px; border-top: 1px solid #eee; }
+.cert-assin { text-align: center; }
+.cert-assin-linha { width: 130px; border-top: 1px solid #333; margin: 0 auto 5px; }
+.cert-assin-nome { font-size: 0.82rem; font-weight: 700; }
+.cert-assin-cargo { font-size: 0.7rem; color: #888; }
+
+/* ── CARTA ── */
+.modelos-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
+.modelo-opt { background: var(--card); border: 2px solid var(--border); border-radius: 10px; padding: 12px; cursor: pointer; transition: all .15s; text-align: center; }
+.modelo-opt:hover { border-color: rgba(249,115,22,.3); }
+.modelo-opt.on { border-color: var(--orange); background: var(--orange-dim); }
+.modelo-opt .mo-icon { font-size: 1.4rem; margin-bottom: 5px; }
+.modelo-opt .mo-nome { font-size: 0.78rem; font-weight: 700; color: var(--text); }
+.modelo-opt.on .mo-nome { color: var(--orange); }
+.modelo-opt .mo-desc { font-size: 0.68rem; color: var(--text-3); margin-top: 2px; }
+.carta-preview { background: #fff; color: #111; border-radius: 10px; border: 3px solid var(--orange); overflow: hidden; margin-top: 16px; }
+.carta-header { background: var(--orange); color: #fff; padding: 18px 30px; display: flex; justify-content: space-between; align-items: center; }
+.carta-header h2 { font-size: 1.1rem; font-weight: 900; }
+.carta-body { padding: 28px 30px; }
+.carta-data { font-size: 0.8rem; color: #888; text-align: right; margin-bottom: 20px; }
+.carta-saudacao { font-size: 1rem; font-weight: 700; color: var(--orange); margin-bottom: 16px; }
+.carta-texto { font-size: 0.88rem; line-height: 1.8; color: #222; white-space: pre-line; }
+.carta-footer { display: flex; justify-content: space-between; align-items: flex-end; padding: 16px 30px; border-top: 1px solid #eee; }
+.carta-assin { text-align: center; }
+.carta-assin-linha { width: 130px; border-top: 1px solid #333; margin: 0 auto 5px; }
+
+/* ── UTILS ── */
+.topbar-inner { height: 54px; background: rgba(10,10,20,.9); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 22px; gap: 14px; flex-shrink: 0; }
+.tbi-title { font-size: 0.9rem; font-weight: 700; }
+.tbi-desc { font-size: 0.75rem; color: var(--text-2); }
+.tbi-spacer { flex: 1; }
+.btn-imprimir { padding: 7px 16px; background: var(--orange); color: #fff; border: none; border-radius: 8px; font-size: 0.82rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: background .15s; }
+.btn-imprimir:hover { background: #ea6c0a; }
+.btn-sec { padding: 7px 14px; background: transparent; color: var(--text-2); border: 1px solid var(--border); border-radius: 8px; font-size: 0.82rem; cursor: pointer; font-family: inherit; transition: all .15s; }
+.btn-sec:hover { border-color: var(--border-hi); color: var(--text); }
+.saved-pill { font-size: 0.72rem; color: #22c55e; }
+
+/* ── TABS CONQUISTAS ── */
+.tabs-row { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+.tab-btn { padding: 10px 18px; cursor: pointer; font-size: 0.8rem; font-weight: 600; color: var(--text-3); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s; background: transparent; border-top: none; border-left: none; border-right: none; font-family: inherit; }
+.tab-btn.active { color: var(--orange); border-bottom-color: var(--orange); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+@media (max-width: 640px) {
+  #sidebar { display: none; }
+  .form-grid { grid-template-columns: 1fr; }
+  .belt-grid { grid-template-columns: repeat(3, 1fr); }
+  .cert-grid { grid-template-columns: 1fr; }
+  .modelos-row { grid-template-columns: 1fr 1fr; }
+}
+
+@media print {
+  #topbar, #sidebar { display: none !important; }
+  #layout { display: block; }
+  #main { overflow: visible; }
+  .view { display: block !important; overflow: visible; }
+  .view:not(.active) { display: none !important; }
+  .view-scroll { overflow: visible; padding: 0; }
+  .topbar-inner { display: none !important; }
+  body { background: #fff; color: #111; overflow: visible; }
+  .section-block, .fase-block { background: #fff; border: 1px solid #ddd; break-inside: avoid; }
+  .msg-card { background: #fff; border: 1px solid #ddd; }
+  .msg-copy-btn { display: none; }
+  .btn-imprimir, .btn-sec, .btn-add-row, .btn-remove, .search-bar, .filter-btns, .tabs-row, .cert-form { display: none !important; }
+  .cert-preview, .carta-preview { break-inside: avoid; border: 2px solid #f97316; }
+  .cert-top, .carta-header { background: #f97316 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="tb-logo">Kit Retenção <span>Kids</span></div>
+  <div class="tb-sep">·</div>
+  <div class="tb-section" id="topbarSection">Área de Membros</div>
+  <div class="tb-badge">🥋 Jiu-Jitsu</div>
+</div>
+
+<div id="layout">
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="sb-brand">
+      <div class="sb-brand-title">Kit Retenção Kids</div>
+      <div class="sb-brand-sub">5 ferramentas para o sensei</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-item active" data-view="home">
+        <span class="sb-icon">🏠</span>
+        <div><div class="sb-label">Início</div><div class="sb-sub">Visão geral</div></div>
+      </div>
+      <div class="sb-item" data-view="mensagens">
+        <span class="sb-icon">💬</span>
+        <div><div class="sb-label">Mensagens WhatsApp</div><div class="sb-sub">50 prontas · copiar 1 clique</div></div>
+      </div>
+      <div class="sb-item" data-view="caderneta">
+        <span class="sb-icon">📓</span>
+        <div><div class="sb-label">Caderneta do Aluno</div><div class="sb-sub">Ficha completa · salva automático</div></div>
+      </div>
+      <div class="sb-item" data-view="protocolo">
+        <span class="sb-icon">📋</span>
+        <div><div class="sb-label">Protocolo 90 Dias</div><div class="sb-sub">Checklist · progresso</div></div>
+      </div>
+      <div class="sb-item" data-view="conquistas">
+        <span class="sb-icon">🏅</span>
+        <div><div class="sb-label">Kit de Conquistas</div><div class="sb-sub">Missões · certificados</div></div>
+      </div>
+      <div class="sb-item" data-view="carta">
+        <span class="sb-icon">✉️</span>
+        <div><div class="sb-label">Carta de Boas-Vindas</div><div class="sb-sub">4 modelos · imprimir</div></div>
+      </div>
+    </nav>
+    <div class="sb-footer">
+      <p>Dados salvos no seu navegador.<br>Para imprimir, use o botão em cada seção.</p>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="main">
+
+    <!-- ════════════ HOME ════════════ -->
+    <div id="view-home" class="view active">
+      <div class="view-scroll">
+        <div class="hero">
+          <div class="hero-icon">🥋</div>
+          <div class="hero-title">Kit Retenção <span>Kids</span></div>
+          <p class="hero-sub">Seu sistema completo para reduzir a evasão de alunos infantis no Jiu-Jitsu. Escolha uma ferramenta abaixo para começar.</p>
+        </div>
+        <div class="kit-cards">
+          <div class="kit-card" onclick="nav('mensagens')">
+            <div class="kit-card-icon">💬</div>
+            <div class="kit-card-num">Material 1</div>
+            <div class="kit-card-title">Mensagens WhatsApp</div>
+            <div class="kit-card-desc">50 mensagens em 8 blocos — copie com 1 clique e cole direto no WhatsApp</div>
+            <div class="kit-card-arrow">→</div>
+          </div>
+          <div class="kit-card" onclick="nav('caderneta')">
+            <div class="kit-card-icon">📓</div>
+            <div class="kit-card-num">Material 2</div>
+            <div class="kit-card-title">Caderneta do Aluno</div>
+            <div class="kit-card-desc">Ficha completa: faixas, golpes, presença, momentos especiais e notas</div>
+            <div class="kit-card-arrow">→</div>
+          </div>
+          <div class="kit-card" onclick="nav('protocolo')">
+            <div class="kit-card-icon">📋</div>
+            <div class="kit-card-num">Material 3</div>
+            <div class="kit-card-title">Protocolo 90 Dias</div>
+            <div class="kit-card-desc">Checklist com 4 fases e controle de progresso — marca cada ação concluída</div>
+            <div class="kit-card-arrow">→</div>
+          </div>
+          <div class="kit-card" onclick="nav('conquistas')">
+            <div class="kit-card-icon">🏅</div>
+            <div class="kit-card-num">Material 4</div>
+            <div class="kit-card-title">Kit de Conquistas</div>
+            <div class="kit-card-desc">16 missões + gerador de certificado personalizado para imprimir</div>
+            <div class="kit-card-arrow">→</div>
+          </div>
+          <div class="kit-card" onclick="nav('carta')">
+            <div class="kit-card-icon">✉️</div>
+            <div class="kit-card-num">Material 5</div>
+            <div class="kit-card-title">Carta de Boas-Vindas</div>
+            <div class="kit-card-desc">4 modelos — preencha o nome do aluno e imprima em segundos</div>
+            <div class="kit-card-arrow">→</div>
+          </div>
+        </div>
+        <div class="info-tip"><strong>Como usar:</strong> clique em qualquer material. Preencha os campos — os dados são salvos automaticamente no seu navegador. Para imprimir, use o botão "Imprimir" dentro de cada seção.</div>
+      </div>
+    </div>
+
+    <!-- ════════════ MENSAGENS ════════════ -->
+    <div id="view-mensagens" class="view">
+      <div class="topbar-inner">
+        <span>💬</span>
+        <div><div class="tbi-title">Mensagens WhatsApp</div><div class="tbi-desc">50 mensagens prontas em 8 blocos</div></div>
+        <div class="tbi-spacer"></div>
+        <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
+      </div>
+      <div class="view-scroll">
+        <div class="search-bar">
+          <input type="text" id="msgSearch" placeholder="Buscar mensagem..." oninput="filtrarMsg()">
+        </div>
+        <div class="filter-btns" id="msgFiltros"></div>
+        <div id="msgLista"></div>
+      </div>
+    </div>
+
+    <!-- ════════════ CADERNETA ════════════ -->
+    <div id="view-caderneta" class="view">
+      <div class="topbar-inner">
+        <span>📓</span>
+        <div><div class="tbi-title">Caderneta do Aluno</div><div class="tbi-desc">Ficha completa — salva automaticamente</div></div>
+        <div class="tbi-spacer"></div>
+        <span class="saved-pill" id="cadSaved"></span>
+        <button class="btn-sec" onclick="resetCad()">Resetar</button>
+        <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
+      </div>
+      <div class="view-scroll">
+
+        <div class="section-block">
+          <div class="section-block-title"><span>🥋</span> Identificação do Aluno</div>
+          <div class="form-grid">
+            <div class="fg"><label>Nome Completo</label><input id="cNome" oninput="saveCad()" placeholder="Nome do aluno"></div>
+            <div class="fg"><label>Apelido</label><input id="cApelido" oninput="saveCad()" placeholder="Como prefere ser chamado"></div>
+            <div class="fg"><label>Data de Nascimento</label><input type="date" id="cNasc" oninput="saveCad()"></div>
+            <div class="fg"><label>Início no Jiu-Jitsu</label><input type="date" id="cInicio" oninput="saveCad()"></div>
+            <div class="fg"><label>Responsável</label><input id="cResp" oninput="saveCad()" placeholder="Nome dos pais"></div>
+            <div class="fg"><label>WhatsApp</label><input id="cWa" oninput="saveCad()" placeholder="(99) 99999-9999"></div>
+            <div class="fg full"><label>Objetivo da família</label><textarea id="cObj" oninput="saveCad()" placeholder="Ex: disciplina, respeito, autoconfiança..."></textarea></div>
+          </div>
+        </div>
+
+        <div class="section-block">
+          <div class="section-block-title"><span>🏆</span> Jornada de Faixas</div>
+          <div class="belt-grid" id="beltGrid"></div>
+        </div>
+
+        <div class="section-block">
+          <div class="section-block-title"><span>⚡</span> Técnicas Favoritas</div>
+          <div id="golpeList"></div>
+          <button class="btn-add-row" onclick="addGolpe()">+ Adicionar técnica</button>
+        </div>
+
+        <div class="section-block">
+          <div class="section-block-title"><span>📅</span> Presença</div>
+          <div id="presContainer"></div>
+        </div>
+
+        <div class="section-block">
+          <div class="section-block-title"><span>📝</span> Notas do Sensei</div>
+          <div class="form-grid">
+            <div class="fg"><label>Ponto forte</label><textarea id="cForte" oninput="saveCad()" placeholder="Dedicação, respeito..."></textarea></div>
+            <div class="fg"><label>Área a desenvolver</label><textarea id="cDesenv" oninput="saveCad()" placeholder="Concentração, disciplina..."></textarea></div>
+            <div class="fg full"><label>Observações gerais</label><textarea id="cObs" oninput="saveCad()" rows="3" placeholder="Saúde, família, situação especial..."></textarea></div>
+          </div>
+        </div>
+
+        <div class="section-block">
+          <div class="section-block-title"><span>⭐</span> Momentos Especiais</div>
+          <div id="momentosList"></div>
+          <button class="btn-add-row" onclick="addMomento()">+ Adicionar momento</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ════════════ PROTOCOLO ════════════ -->
+    <div id="view-protocolo" class="view">
+      <div class="topbar-inner">
+        <span>📋</span>
+        <div><div class="tbi-title">Protocolo 90 Dias</div><div class="tbi-desc">Checklist de retenção em 4 fases</div></div>
+        <div class="tbi-spacer"></div>
+        <span class="saved-pill" id="protoSaved"></span>
+        <button class="btn-sec" onclick="resetProto()">Resetar</button>
+        <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
+      </div>
+      <div class="view-scroll">
+        <div class="proto-header">
+          <div class="proto-fields">
+            <div class="fg"><label>Nome do aluno</label><input id="pNome" oninput="saveProto()" placeholder="Nome"></div>
+            <div class="fg"><label>Data de início</label><input type="date" id="pData" oninput="saveProto()"></div>
+          </div>
+          <div class="progress-global">
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" id="protoBar" style="width:0%"></div></div>
+            <div class="progress-pct" id="protoPct">0%</div>
+          </div>
+        </div>
+        <div id="faseContainer"></div>
+      </div>
+    </div>
+
+    <!-- ════════════ CONQUISTAS ════════════ -->
+    <div id="view-conquistas" class="view">
+      <div class="topbar-inner">
+        <span>🏅</span>
+        <div><div class="tbi-title">Kit de Conquistas</div><div class="tbi-desc">Missões + gerador de certificado</div></div>
+        <div class="tbi-spacer"></div>
+        <span class="saved-pill" id="conquSaved"></span>
+        <button class="btn-sec" onclick="resetConq()">Resetar</button>
+        <button class="btn-imprimir" onclick="imprimirCert()">🖨️ Imprimir Certificado</button>
+      </div>
+      <div class="view-scroll">
+        <div class="tabs-row">
+          <button class="tab-btn active" onclick="switchConqTab('missoes',this)">🎯 Missões</button>
+          <button class="tab-btn" onclick="switchConqTab('certificado',this)">📜 Certificado</button>
+        </div>
+
+        <div id="conq-tab-missoes" class="tab-panel active">
+          <div class="prog-bar">
+            <div>
+              <div style="font-size:0.7rem;color:var(--text-3)">Progresso geral</div>
+              <div style="font-size:1.1rem;font-weight:700;color:var(--orange)" id="conqProg">0 / 0</div>
+            </div>
+            <div class="progress-bar-wrap" style="flex:1"><div class="progress-bar-fill" id="conqBar" style="width:0%"></div></div>
+          </div>
+          <div id="missaoContainer"></div>
+        </div>
+
+        <div id="conq-tab-certificado" class="tab-panel">
+          <div class="cert-form">
+            <h4>Dados do Certificado</h4>
+            <div class="cert-grid">
+              <div class="fg"><label>Nome do Aluno</label><input id="certNome" oninput="atualizarCert()" placeholder="Nome completo"></div>
+              <div class="fg"><label>Academia</label><input id="certAcad" oninput="atualizarCert()" placeholder="Nome da academia"></div>
+              <div class="fg"><label>Sensei</label><input id="certSensei" oninput="atualizarCert()" placeholder="Seu nome"></div>
+              <div class="fg"><label>Missão</label>
+                <select id="certMissaoSel" onchange="atualizarCert()">
+                  <option value="">Selecione...</option>
+                </select>
+              </div>
+              <div class="fg"><label>Data</label><input type="date" id="certData" oninput="atualizarCert()"></div>
+            </div>
+          </div>
+          <div class="cert-preview" id="certPreview">
+            <div class="cert-top">
+              <h3>CERTIFICADO DE CONQUISTA</h3>
+              <div id="certAcadTop" style="font-size:0.8rem;opacity:.8">Academia</div>
+            </div>
+            <div class="cert-body">
+              <div class="cert-trophy" id="certEmoji">🏆</div>
+              <div style="font-size:0.78rem;color:#777;letter-spacing:1px;text-transform:uppercase">Certificamos que</div>
+              <div class="cert-aluno" id="certAlunoView">Nome do Aluno</div>
+              <div style="font-size:0.78rem;color:#777;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">completou a missão</div>
+              <div class="cert-missao" id="certMissaoView">— Selecione uma missão —</div>
+              <div class="cert-missao-desc" id="certMissaoDescView"></div>
+            </div>
+            <div class="cert-footer">
+              <div class="cert-assin">
+                <div class="cert-assin-linha"></div>
+                <div class="cert-assin-nome" id="certSenseiView">Sensei</div>
+                <div class="cert-assin-cargo">Instrutor de Jiu-Jitsu</div>
+              </div>
+              <div style="font-size:0.78rem;color:#888" id="certDataView"></div>
+              <div class="cert-assin">
+                <div class="cert-assin-linha"></div>
+                <div class="cert-assin-nome" id="certAlunoAssin">Aluno</div>
+                <div class="cert-assin-cargo">Guerreiro Certificado</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════ CARTA ════════════ -->
+    <div id="view-carta" class="view">
+      <div class="topbar-inner">
+        <span>✉️</span>
+        <div><div class="tbi-title">Carta de Boas-Vindas</div><div class="tbi-desc">Personalize e imprima em segundos</div></div>
+        <div class="tbi-spacer"></div>
+        <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
+      </div>
+      <div class="view-scroll">
+        <div class="section-block">
+          <div class="section-block-title"><span>✏️</span> Dados</div>
+          <div class="form-grid">
+            <div class="fg"><label>Nome do Aluno</label><input id="cartaAluno" oninput="atualizarCarta()" placeholder="Ex: Pedro Silva" value="[Nome do Aluno]"></div>
+            <div class="fg"><label>Academia</label><input id="cartaAcad" oninput="atualizarCarta()" placeholder="Nome da academia" value="Minha Academia"></div>
+            <div class="fg full"><label>Nome do Sensei</label><input id="cartaSensei" oninput="atualizarCarta()" placeholder="Seu nome"></div>
+          </div>
+        </div>
+        <div class="section-block">
+          <div class="section-block-title"><span>📄</span> Modelo</div>
+          <div class="modelos-row" id="modelosRow"></div>
+        </div>
+        <div class="carta-preview" id="cartaPreview">
+          <div class="carta-header">
+            <h2 id="cartaAcadView">Minha Academia</h2>
+            <div style="font-size:1.6rem">🥋</div>
+          </div>
+          <div class="carta-body">
+            <div class="carta-data" id="cartaDataView"></div>
+            <div class="carta-saudacao" id="cartaSaudacaoView"></div>
+            <div class="carta-texto" id="cartaTextoView"></div>
+          </div>
+          <div class="carta-footer">
+            <div class="carta-assin">
+              <div class="carta-assin-linha"></div>
+              <div style="font-size:0.82rem;font-weight:700" id="cartaSenseiView">Sensei</div>
+              <div style="font-size:0.7rem;color:#888">Instrutor de Jiu-Jitsu</div>
+            </div>
+            <div style="text-align:right;font-size:0.78rem;color:#888">
+              <div style="font-weight:700;color:var(--orange);font-size:0.9rem" id="cartaAcad2View">Minha Academia</div>
+              Escola de Jiu-Jitsu
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<script>
+/* ══════════════════════ NAV ══════════════════════ */
+const VIEWS = { home:'Início', mensagens:'Mensagens WhatsApp', caderneta:'Caderneta do Aluno', protocolo:'Protocolo 90 Dias', conquistas:'Kit de Conquistas', carta:'Carta de Boas-Vindas' };
+function nav(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  document.querySelector(`[data-view="${id}"]`).classList.add('active');
+  document.getElementById('topbarSection').textContent = VIEWS[id] || '';
+}
+document.querySelectorAll('.sb-item[data-view]').forEach(el => {
+  el.addEventListener('click', () => nav(el.dataset.view));
+});
+
+/* ══════════════════════ MENSAGENS ══════════════════════ */
+const BLOCOS = [
+  { nome: 'Boas-Vindas', msgs: [
+    'Olá, [nome]! 🥋 Seja muito bem-vindo(a) à nossa família do Jiu-Jitsu! Estamos super felizes em ter você no tatame. Qualquer dúvida, pode falar comigo aqui. Vamos juntos nessa jornada! OSS!',
+    'Oi, [nome]! Passando para dar as boas-vindas oficialmente. 😊 O primeiro treino é sempre especial. Pode vir sem medo — aqui todo mundo começa do zero e a gente cuida de você!',
+    '[nome], que bom ter você com a gente! 🤜🤛 Hoje é só o começo de uma jornada incrível. Qualquer coisa que precisar, estarei aqui. Te vejo no tatame!',
+    'Bem-vindo(a), [nome]! 🏆 Na nossa academia, a gente não treina só o corpo — treina o caráter. Fico animado(a) em acompanhar a sua evolução!',
+    'Olá, [nome]! Aqui é o sensei [seu nome]. Seja bem-vindo(a) ao nosso grupo. Se tiver qualquer dúvida sobre horários, kimono ou qualquer coisa, me manda mensagem! 😊',
+  ]},
+  { nome: 'Motivação', msgs: [
+    '🔥 [nome], você foi incrível hoje no treino! Continue assim — cada dia no tatame é um dia de evolução. OSS!',
+    'Ei, [nome]! Vi o quanto você se dedicou hoje. Isso é o que faz a diferença. Continue firme! 💪',
+    '[nome], sabe aquele golpe que você tentou hoje? Em breve estará saindo automático. Acredita no processo! 🥋',
+    'Você pode não perceber, mas a sua evolução tem sido ENORME, [nome]. Fico orgulhoso(a) de acompanhar isso de perto. 🏆',
+    '[nome], cada treino é um tijolo na construção do seu melhor eu. Continue colocando os tijolos! 🧱💪',
+  ]},
+  { nome: 'Avisos', msgs: [
+    '📢 Lembrando, [nome]: amanhã temos treino especial às [horário]. Confirme sua presença! OSS 🥋',
+    'Oi, [nome]! Só avisando que na próxima semana não haverá treino na [data] por causa de [motivo]. Na dúvida, me manda mensagem!',
+    '[nome], esta semana teremos uma aula diferente: [tema]. Ótima oportunidade para aprender algo novo. Não falta!',
+    'Aviso importante: o kimono precisa vir limpo e passado para o treino. Isso faz parte da nossa disciplina e respeito pelo tatame. 🥋',
+    '[nome], lembra de trazer sua caderneta no próximo treino! Vamos atualizar seu progresso. 📓',
+  ]},
+  { nome: 'Conquistas', msgs: [
+    '🏆 Parabéns, [nome]! Você conquistou sua faixa [cor] hoje. É o resultado de muito esforço e dedicação. Família toda orgulhosa!',
+    '⭐ [nome] foi nosso destaque da semana! Que evolução incrível. Continue assim, guerreiro(a)!',
+    'Ei família! 🥋 Nosso pequeno guerreiro [nome] fez sua primeira competição hoje. Resultado? Aprendizado e coragem de sobra! Parabéns!',
+    '[nome], hoje você completou sua primeira missão do Kit de Conquistas! 🎯 Continue assim — cada missão te deixa mais guerreiro(a)!',
+    'Um aplauso para [nome]! 👏 Conseguiu chegar ao 10º treino consecutivo sem faltar. Isso é dedicação real!',
+  ]},
+  { nome: 'Faltas', msgs: [
+    'Oi, [nome]! Sentimos sua falta hoje no treino. Tudo bem? Qualquer coisa me avisa. Te esperamos na próxima! 🥋',
+    '[nome], você faltou nos últimos treinos e ficamos com saudade! Se tiver algum problema, pode me contar. Estamos aqui para apoiar! 💪',
+    'Oi [nome], notamos que você não veio essa semana. Sem julgamento — a vida às vezes aperta. Mas queremos você de volta no tatame! Quando puder, é só aparecer. OSS! 🤜🤛',
+    'Ei, [nome]! Você sabe que o tatame não é o mesmo sem você, né? 😊 Quando puder voltar, vai ser como se nunca tivesse saído. Te esperamos!',
+    '[nome], o sensei [nome] perguntou por você hoje. Sua vaga no tatame está garantida — é só aparecer! 🥋',
+  ]},
+  { nome: 'Datas Especiais', msgs: [
+    '🎂 Feliz aniversário, [nome]! Que esse novo ano de vida seja tão cheio de garra quanto você traz para o tatame. OSS!',
+    'Hoje é o aniversário de [X meses/anos] no Jiu-Jitsu, [nome]! 🥋 Que jornada incrível essa tem sido. Fico muito feliz de ter você na nossa família!',
+    '🎄 Feliz natal, [nome] e família! Que o próximo ano traga muita saúde, alegria e muito Jiu-Jitsu! OSS!',
+    'Feliz Ano Novo, [nome]! 🎆 Que 2026 seja o seu ano de mais conquistas no tatame e na vida. Prontos para o próximo nível?',
+    'Ei [nome], semana que vem é o aniversário da nossa academia! 🎉 Vai ter uma aula especial. Não pode faltar!',
+  ]},
+  { nome: 'Dicas', msgs: [
+    '💡 Dica do dia para [nome]: a queda bem feita salva você de lesões e te dá confiança. Pratique o ukemi em casa — pode ser de frente, atrás e lateral!',
+    'Dica rápida: antes do treino, beba bastante água e coma algo leve. Um corpo hidratado e alimentado aprende muito mais rápido! 💪',
+    '[nome], se quiser evoluir mais rápido: assiste vídeos de Jiu-Jitsu por 10 minutinhos por dia. Vai absorver muito mais nas aulas!',
+    'Lembra de lavar o kimono depois de cada treino, [nome]! Além da higiene, faz parte do respeito com os colegas e com o tatame. 🥋',
+    'Dica para os pais de [nome]: pergunte sobre o treino quando chegar em casa! Crianças que falam sobre o que aprenderam fixam muito mais. 😊',
+  ]},
+  { nome: 'Fidelização', msgs: [
+    '[nome], você já treina com a gente há [tempo] meses. É uma honra acompanhar sua evolução! O Jiu-Jitsu está transformando você, e isso é incrível. 🏆',
+    'Oi, [nome]! Só passando para dizer que sua presença faz a nossa academia melhor. Você é parte essencial da nossa família do tatame. OSS! 🥋',
+    '[nome], você tem um potencial enorme. Não desiste — os melhores resultados ainda estão por vir. Fico animado(a) com o que vem pela frente! 💪',
+    'Mensagem especial para [nome]: o Jiu-Jitsu que você está aprendendo vai muito além do esporte. É para a vida. Obrigado(a) por confiar a gente com isso! 🙏',
+    '🤜🤛 OSS, [nome]! Você é a prova de que com dedicação e tempo no tatame, qualquer um pode se tornar um guerreiro. Seguimos juntos!',
+  ]},
+];
+
+let msgBlocoAtivo = null;
+function initMensagens() {
+  const filtros = document.getElementById('msgFiltros');
+  const btnTodos = document.createElement('button');
+  btnTodos.className = 'filter-btn active'; btnTodos.textContent = 'Todos';
+  btnTodos.onclick = () => { msgBlocoAtivo = null; filtrarMsg(); document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); btnTodos.classList.add('active'); };
+  filtros.appendChild(btnTodos);
+  BLOCOS.forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn'; btn.textContent = b.nome;
+    btn.onclick = () => { msgBlocoAtivo = b.nome; filtrarMsg(); document.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active')); btn.classList.add('active'); };
+    filtros.appendChild(btn);
+  });
+  filtrarMsg();
+}
+function filtrarMsg() {
+  const q = document.getElementById('msgSearch').value.toLowerCase();
+  const lista = document.getElementById('msgLista');
+  lista.innerHTML = '';
+  BLOCOS.forEach(b => {
+    if (msgBlocoAtivo && b.nome !== msgBlocoAtivo) return;
+    const msgs = b.msgs.filter(m => !q || m.toLowerCase().includes(q));
+    if (!msgs.length) return;
+    const title = document.createElement('div'); title.className = 'bloco-title'; title.textContent = b.nome;
+    lista.appendChild(title);
+    msgs.forEach(m => {
+      const card = document.createElement('div'); card.className = 'msg-card';
+      card.innerHTML = `<div class="msg-text">${m}</div><button class="msg-copy-btn" onclick="copiarMsg(this,'${encodeURIComponent(m)}')">Copiar</button>`;
+      lista.appendChild(card);
+    });
+  });
+}
+function copiarMsg(btn, encoded) {
+  navigator.clipboard.writeText(decodeURIComponent(encoded)).then(() => {
+    btn.textContent = '✓ Copiado!'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+/* ══════════════════════ CADERNETA ══════════════════════ */
+const CAD_KEY = 'kit_cad_v1';
+const FAIXAS = [
+  {e:'🤍',n:'Branca'},{e:'🩶',n:'Cinza'},{e:'💛',n:'Amarela'},{e:'🧡',n:'Laranja'},{e:'💚',n:'Verde'},
+  {e:'💙',n:'Azul'},{e:'💜',n:'Roxa'},{e:'🤎',n:'Marrom'},{e:'❤️',n:'Vermelha'},{e:'🖤',n:'Preta'}
+];
+const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+let cadData = { faixas:{}, golpes:[], presenca:{}, momentos:[] };
+
+function initCad() {
+  const s = localStorage.getItem(CAD_KEY); if(s) cadData = JSON.parse(s);
+  const campos = ['cNome','cApelido','cNasc','cInicio','cResp','cWa','cObj','cForte','cDesenv','cObs'];
+  campos.forEach(c => { if(cadData[c]) document.getElementById(c).value = cadData[c]; });
+  renderBelts(); renderGolpes(); renderPresenca(); renderMomentos();
+}
+function saveCad() {
+  const campos = ['cNome','cApelido','cNasc','cInicio','cResp','cWa','cObj','cForte','cDesenv','cObs'];
+  campos.forEach(c => { cadData[c] = document.getElementById(c).value; });
+  localStorage.setItem(CAD_KEY, JSON.stringify(cadData));
+  flash('cadSaved');
+}
+function flash(id) {
+  const el = document.getElementById(id); if(!el) return;
+  el.textContent = '✓ Salvo'; setTimeout(() => el.textContent = '', 2000);
+}
+function renderBelts() {
+  const g = document.getElementById('beltGrid'); g.innerHTML = '';
+  FAIXAS.forEach((f,i) => {
+    const on = cadData.faixas[i]?.on;
+    const d = cadData.faixas[i]?.data || '';
+    const el = document.createElement('div'); el.className = 'belt-btn'+(on?' on':'');
+    el.innerHTML = `<div class="bi" onclick="toggleFaixa(${i})">${f.e}</div><div class="bn">${f.n}</div><input type="date" value="${d}" title="Data" onchange="setFaixaData(${i},this.value)">`;
+    g.appendChild(el);
+  });
+}
+function toggleFaixa(i) {
+  if(!cadData.faixas[i]) cadData.faixas[i]={};
+  cadData.faixas[i].on = !cadData.faixas[i].on;
+  saveCad(); renderBelts();
+}
+function setFaixaData(i,v) {
+  if(!cadData.faixas[i]) cadData.faixas[i]={};
+  cadData.faixas[i].data=v; if(v) cadData.faixas[i].on=true;
+  saveCad(); renderBelts();
+}
+function renderGolpes() {
+  const l = document.getElementById('golpeList'); l.innerHTML = '';
+  if(!cadData.golpes.length) cadData.golpes=[''];
+  cadData.golpes.forEach((g,i) => {
+    const row = document.createElement('div'); row.className='list-row';
+    row.innerHTML=`<input class="fg" style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:8px 10px;font-size:0.85rem" type="text" value="${g}" placeholder="Técnica favorita" oninput="cadData.golpes[${i}]=this.value;saveCad()"><button class="btn-remove" onclick="cadData.golpes.splice(${i},1);saveCad();renderGolpes()">✕</button>`;
+    l.appendChild(row);
+  });
+}
+function addGolpe() { cadData.golpes.push(''); saveCad(); renderGolpes(); }
+function renderPresenca() {
+  const c = document.getElementById('presContainer'); c.innerHTML = '';
+  const ano = new Date().getFullYear();
+  for(let m=0;m<12;m++) {
+    const div = document.createElement('div'); div.className='pres-mes';
+    const prim = new Date(ano,m,1).getDay();
+    const dias = new Date(ano,m+1,0).getDate();
+    let h = `<h5>${MESES[m]} ${ano}</h5><div class="pres-grid">`;
+    for(let v=0;v<prim;v++) h+=`<div class="pres-dia vazio"></div>`;
+    for(let d=1;d<=dias;d++) {
+      const k=`${ano}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const e=cadData.presenca[k]||'';
+      h+=`<div class="pres-dia ${e}" onclick="togglePres('${k}',this)">${d}</div>`;
+    }
+    h+='</div>'; div.innerHTML=h; c.appendChild(div);
+  }
+}
+function togglePres(k,el) {
+  const cur=cadData.presenca[k]||'';
+  cadData.presenca[k]=cur===''?'P':cur==='P'?'F':'';
+  el.className='pres-dia '+(cadData.presenca[k]);
+  saveCad();
+}
+function renderMomentos() {
+  const l=document.getElementById('momentosList'); l.innerHTML='';
+  if(!cadData.momentos.length) cadData.momentos=[{data:'',titulo:'',desc:''}];
+  cadData.momentos.forEach((m,i) => {
+    const d=document.createElement('div'); d.className='momento-card';
+    d.innerHTML=`<div class="momento-head"><input type="date" value="${m.data}" style="background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:6px 8px;font-size:0.8rem;max-width:130px" onchange="cadData.momentos[${i}].data=this.value;saveCad()"><input type="text" value="${m.titulo}" placeholder="Título do momento" style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:6px 8px;font-size:0.82rem" oninput="cadData.momentos[${i}].titulo=this.value;saveCad()"><button class="btn-remove" onclick="cadData.momentos.splice(${i},1);saveCad();renderMomentos()">✕</button></div><textarea placeholder="Descreva o momento..." style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:8px;font-size:0.82rem;font-family:inherit;resize:vertical;margin-top:6px" oninput="cadData.momentos[${i}].desc=this.value;saveCad()">${m.desc}</textarea>`;
+    l.appendChild(d);
+  });
+}
+function addMomento() { cadData.momentos.push({data:'',titulo:'',desc:''}); saveCad(); renderMomentos(); }
+function resetCad() {
+  if(!confirm('Apagar todos os dados da caderneta?')) return;
+  cadData={faixas:{},golpes:[],presenca:{},momentos:[]};
+  localStorage.removeItem(CAD_KEY);
+  ['cNome','cApelido','cNasc','cInicio','cResp','cWa','cObj','cForte','cDesenv','cObs'].forEach(c=>document.getElementById(c).value='');
+  initCad();
+}
+
+/* ══════════════════════ PROTOCOLO ══════════════════════ */
+const PROTO_KEY = 'kit_proto_v1';
+const FASES = [
+  { nome:'Fase 1 — Encantamento', cor:'#f97316', semanas:[
+    { nome:'Semana 1', itens:['⚠️ Dar boas-vindas ao aluno pelo nome no 1º treino', 'Apresentar a academia e a família do tatame', 'Enviar mensagem de boas-vindas pelo WhatsApp', 'Entregar a Carta de Boas-Vindas impressa'] },
+    { nome:'Semana 2', itens:['Perguntar como foi o 1º treino para os pais', 'Verificar se o kimono está adequado', 'Incluir o aluno nas brincadeiras e dinâmicas', 'Enviar mensagem de incentivo no WhatsApp'] },
+    { nome:'Semanas 3 e 4', itens:['⚠️ Verificar frequência — faltou? Acionar Protocolo de Faltas', 'Destacar 1 ponto positivo do aluno na aula', 'Registrar técnica favorita na Caderneta', 'Enviar foto do treino para os pais'] },
+  ]},
+  { nome:'Fase 2 — Consolidação', cor:'#f59e0b', semanas:[
+    { nome:'Semanas 5 a 8', itens:['Marcar 1ª missão do Kit de Conquistas', 'Registrar presença semanal na Caderneta', 'Enviar mensagem motivacional no WhatsApp', 'Verificar engajamento com colegas do tatame'] },
+    { nome:'Semanas 9 a 12', itens:['⚠️ Verificar frequência — 2 faltas seguidas = contato imediato', 'Presentear aluno destaque da turma', 'Atualizar faixas e técnicas na Caderneta', 'Conversar com os pais sobre evolução'] },
+  ]},
+  { nome:'Fase 3 — Pertencimento', cor:'#22c55e', semanas:[
+    { nome:'Semanas 13 a 17', itens:['Convidar para evento ou campeonato', 'Criar memória positiva (foto, certificado, destaque)', 'Marcar 2ª missão do Kit de Conquistas', 'Enviar mensagem de parabéns por 3 meses'] },
+    { nome:'Semanas 18 a 22', itens:['Registrar momentos especiais na Caderneta', 'Enviar mensagem de fidelização no WhatsApp', 'Identificar se aluno tem amizades no tatame', 'Verificar se há outra pessoa na família interessada'] },
+  ]},
+  { nome:'Fase 4 — Primeira Conquista', cor:'#a855f7', semanas:[
+    { nome:'Semanas 23 a 30', itens:['⚠️ Avaliar aluno para grau ou faixa', 'Gerar certificado de conquista no Kit', 'Registrar conquista na Caderneta', 'Enviar mensagem especial de parabéns para família'] },
+    { nome:'Dia 90', itens:['Celebrar 90 dias com aluno e família', 'Imprimir Caderneta completa como lembrança', 'Planejar próximos 90 dias de retenção', '⚠️ Oferecer renovação / plano semestral/anual'] },
+  ]},
+];
+
+let protoData = {};
+function initProto() {
+  const s = localStorage.getItem(PROTO_KEY); if(s) protoData = JSON.parse(s);
+  if(protoData.nome) document.getElementById('pNome').value = protoData.nome;
+  if(protoData.data) document.getElementById('pData').value = protoData.data;
+  renderFases();
+}
+function saveProto() {
+  protoData.nome = document.getElementById('pNome').value;
+  protoData.data = document.getElementById('pData').value;
+  localStorage.setItem(PROTO_KEY, JSON.stringify(protoData));
+  atualizarProtoBar();
+  flash('protoSaved');
+}
+function renderFases() {
+  const c = document.getElementById('faseContainer'); c.innerHTML = '';
+  FASES.forEach((fase,fi) => {
+    const div = document.createElement('div'); div.className = 'fase-block';
+    let bodyHtml = '';
+    fase.semanas.forEach(sem => {
+      bodyHtml += `<div class="semana-block"><div class="semana-title">${sem.nome}</div>`;
+      sem.itens.forEach((item, ii) => {
+        const key = `f${fi}_s${fase.semanas.indexOf(sem)}_${ii}`;
+        const done = protoData[key] || false;
+        const alerta = item.startsWith('⚠️');
+        bodyHtml += `<div class="check-row${alerta?' alerta':''}" onclick="toggleCheck('${key}',this)"><div class="check-box${done?' done':''}"></div><div class="check-label${done?' done':''}">${item}</div></div>`;
+      });
+      bodyHtml += '</div>';
+    });
+    div.innerHTML = `<div class="fase-header" onclick="toggleFase(this)"><div class="fase-dot" style="background:${fase.cor}"></div><div class="fase-nome">${fase.nome}</div><div class="fase-prog" id="fase-prog-${fi}"></div><div class="fase-chevron">▼</div></div><div class="fase-body">${bodyHtml}</div>`;
+    c.appendChild(div);
+  });
+  atualizarProtoBar();
+}
+function toggleFase(header) {
+  const body = header.nextElementSibling;
+  const ch = header.querySelector('.fase-chevron');
+  body.classList.toggle('open');
+  ch.style.transform = body.classList.contains('open') ? 'rotate(180deg)' : '';
+}
+function toggleCheck(key, row) {
+  protoData[key] = !protoData[key];
+  const box = row.querySelector('.check-box'); const lbl = row.querySelector('.check-label');
+  box.classList.toggle('done', protoData[key]);
+  lbl.classList.toggle('done', protoData[key]);
+  saveProto();
+}
+function atualizarProtoBar() {
+  let total=0,done=0;
+  FASES.forEach((fase,fi) => {
+    fase.semanas.forEach((sem,si) => {
+      sem.itens.forEach((_,ii) => {
+        total++;
+        if(protoData[`f${fi}_s${si}_${ii}`]) done++;
+      });
+    });
+    const el = document.getElementById(`fase-prog-${fi}`);
+    if(el) {
+      let ft=0,fd=0;
+      fase.semanas.forEach((sem,si) => { sem.itens.forEach((_,ii) => { ft++; if(protoData[`f${fi}_s${si}_${ii}`]) fd++; }); });
+      el.textContent = `${fd}/${ft}`;
+    }
+  });
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('protoBar').style.width = pct+'%';
+  document.getElementById('protoPct').textContent = pct+'%';
+}
+function resetProto() {
+  if(!confirm('Apagar todo o progresso do protocolo?')) return;
+  protoData={};
+  localStorage.removeItem(PROTO_KEY);
+  document.getElementById('pNome').value=''; document.getElementById('pData').value='';
+  initProto();
+}
+
+/* ══════════════════════ CONQUISTAS ══════════════════════ */
+const CONQ_KEY = 'kit_conq_v1';
+const MISSOES = [
+  { cat:'🥋 Primeiros Passos', items:[
+    {id:'m1',icon:'👟',nome:'Primeiro Treino',desc:'Completou o 1º treino sem desistir',pts:10},
+    {id:'m2',icon:'📅',nome:'Frequência de Ferro',desc:'Não faltou nenhum treino em 1 mês',pts:20},
+    {id:'m3',icon:'🤝',nome:'Primeiro Amigo',desc:'Fez amizade com um colega do tatame',pts:15},
+    {id:'m4',icon:'👔',nome:'Kimono Impecável',desc:'Kimono limpo por 1 mês consecutivo',pts:15},
+  ]},
+  { cat:'⚡ Técnica & Evolução', items:[
+    {id:'m5',icon:'🔵',nome:'Queda Perfeita',desc:'Dominou o ukemi sem medo',pts:20},
+    {id:'m6',icon:'🔴',nome:'Primeiro Golpe',desc:'Aplicou técnica com sucesso no sparring',pts:25},
+    {id:'m7',icon:'🌀',nome:'Equilíbrio de Mestre',desc:'Manteve guarda por 3 minutos',pts:25},
+    {id:'m8',icon:'🐉',nome:'Guerreiro Completo',desc:'Treinou ataque e defesa no mesmo dia',pts:30},
+  ]},
+  { cat:'💪 Caráter & Valores', items:[
+    {id:'m9',icon:'🙏',nome:'Respeito em Primeiro',desc:'Cumprimentou todos por 1 semana',pts:20},
+    {id:'m10',icon:'🌟',nome:'Guerreiro Positivo',desc:'Incentivou colega mais novo',pts:25},
+    {id:'m11',icon:'🦁',nome:'Coragem de Leão',desc:'Treinou mesmo quando queria desistir',pts:30},
+    {id:'m12',icon:'🎯',nome:'Foco Total',desc:'Atenção total por 1 semana',pts:20},
+  ]},
+  { cat:'🏆 Conquistas Especiais', items:[
+    {id:'m13',icon:'🥇',nome:'Primeira Competição',desc:'Participou de campeonato pela 1ª vez',pts:50},
+    {id:'m14',icon:'🌈',nome:'Troca de Faixa',desc:'Conquistou nova faixa ou grau',pts:60},
+    {id:'m15',icon:'⭐',nome:'Estrela da Semana',desc:'Foi destaque da turma',pts:40},
+    {id:'m16',icon:'🎂',nome:'Aniversário no Tatame',desc:'Treinou no dia do aniversário',pts:35},
+  ]},
+];
+
+let conqData = {};
+function initConq() {
+  const s = localStorage.getItem(CONQ_KEY); if(s) conqData = JSON.parse(s);
+  renderMissoes();
+  popularSelectMissao();
+  document.getElementById('certData').value = new Date().toISOString().split('T')[0];
+  atualizarCert();
+}
+function savConq() { localStorage.setItem(CONQ_KEY, JSON.stringify(conqData)); flash('conquSaved'); }
+function renderMissoes() {
+  const c = document.getElementById('missaoContainer'); c.innerHTML = '';
+  let tot=0, done=0;
+  MISSOES.forEach(cat => {
+    const div = document.createElement('div');
+    const cd = cat.items.filter(m=>conqData[m.id]?.done).length;
+    div.innerHTML = `<div class="cat-title-bar"><span>${cat.cat}</span><span>${cd}/${cat.items.length}</span></div>`;
+    const grid = document.createElement('div'); grid.className = 'missoes-grid';
+    cat.items.forEach(m => {
+      tot++;
+      const info = conqData[m.id]||{};
+      if(info.done) done++;
+      const card = document.createElement('div'); card.className='missao-card'+(info.done?' done':'');
+      card.innerHTML=`<div class="missao-icon">${m.icon}</div><div class="missao-nome">${m.nome}</div><div class="missao-desc">${m.desc}</div><div class="missao-pts">${m.pts} pts${info.done?' ✓':''}</div>${info.data?`<div class="missao-data">Conquistada ${formatDate(info.data)}</div>`:''}`;
+      card.onclick=()=>toggleMissao(m.id);
+      grid.appendChild(card);
+    });
+    div.appendChild(grid);
+    c.appendChild(div);
+  });
+  const pct=tot?Math.round(done/tot*100):0;
+  document.getElementById('conqProg').textContent=`${done} / ${tot} missões`;
+  document.getElementById('conqBar').style.width=pct+'%';
+}
+function toggleMissao(id) {
+  if(!conqData[id]) conqData[id]={};
+  if(conqData[id].done) { conqData[id].done=false; conqData[id].data=null; }
+  else { conqData[id].done=true; conqData[id].data=new Date().toISOString().split('T')[0]; }
+  savConq(); renderMissoes();
+}
+function popularSelectMissao() {
+  const sel = document.getElementById('certMissaoSel');
+  MISSOES.forEach(cat => {
+    const og = document.createElement('optgroup'); og.label=cat.cat;
+    cat.items.forEach(m => {
+      const o=document.createElement('option'); o.value=m.id; o.textContent=m.nome; o.dataset.desc=m.desc; o.dataset.icon=m.icon;
+      og.appendChild(o);
+    });
+    sel.appendChild(og);
+  });
+}
+function atualizarCert() {
+  const nome=document.getElementById('certNome').value||'Nome do Aluno';
+  const acad=document.getElementById('certAcad').value||'Academia';
+  const sensei=document.getElementById('certSensei').value||'Sensei';
+  const sel=document.getElementById('certMissaoSel');
+  const data=document.getElementById('certData').value;
+  document.getElementById('certAcadTop').textContent=acad;
+  document.getElementById('certAlunoView').textContent=nome;
+  document.getElementById('certAlunoAssin').textContent=nome;
+  document.getElementById('certSenseiView').textContent=sensei;
+  document.getElementById('certDataView').textContent=data?formatDate(data):'';
+  if(sel.value) {
+    const opt=sel.options[sel.selectedIndex];
+    document.getElementById('certEmoji').textContent=opt.dataset.icon;
+    document.getElementById('certMissaoView').textContent=opt.textContent;
+    document.getElementById('certMissaoDescView').textContent=opt.dataset.desc;
+  } else {
+    document.getElementById('certEmoji').textContent='🏆';
+    document.getElementById('certMissaoView').textContent='— Selecione uma missão —';
+    document.getElementById('certMissaoDescView').textContent='';
+  }
+}
+function switchConqTab(id,el) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('conq-tab-'+id).classList.add('active');
+  el.classList.add('active');
+}
+function imprimirCert() {
+  switchConqTab('certificado', document.querySelectorAll('.tab-btn')[1]);
+  setTimeout(()=>window.print(),150);
+}
+function resetConq() {
+  if(!confirm('Apagar todas as missões?')) return;
+  conqData={}; localStorage.removeItem(CONQ_KEY); savConq(); renderMissoes();
+}
+function formatDate(iso) { const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`; }
+
+/* ══════════════════════ CARTA ══════════════════════ */
+const MODELOS_CARTA = {
+  classica: {icon:'🥋',nome:'Clássica',desc:'Formal e acolhedora',
+    saudacao: n=>`Bem-vindo(a) ao tatame, ${n}!`,
+    texto: (n,a)=>`É com grande satisfação que recebemos você, ${n}, na família ${a}.\n\nAo entrar no tatame, você dá um passo que vai muito além do esporte. Você está escolhendo disciplina, respeito, perseverança e amizades que podem durar a vida inteira.\n\nO Jiu-Jitsu não é apenas uma arte marcial — é uma filosofia de vida. Aqui, você vai aprender que cada queda é uma oportunidade de se levantar mais forte, e que o verdadeiro adversário não está na frente de você, mas dentro de você.\n\nNossa equipe está aqui para te apoiar em cada passo da sua jornada. Treine com dedicação, respeite seus colegas e nunca perca a vontade de evoluir.\n\nO tatame espera por você. Vamos juntos!`},
+  motivacional: {icon:'🔥',nome:'Motivacional',desc:'Energética e inspiradora',
+    saudacao: n=>`${n}, a jornada começa agora!`,
+    texto: (n,a)=>`Você acabou de tomar uma das melhores decisões da sua vida.\n\n${n}, entrar no tatame da ${a} significa que você escolheu ser mais. Mais forte, mais disciplinado, mais confiante — um guerreiro.\n\nO Jiu-Jitsu vai te colocar à prova. Vai ter dias difíceis, treinos pesados e momentos em que tudo parecerá impossível. E é exatamente nesses momentos que você vai descobrir do que é capaz.\n\nCada faixa conquistada é uma versão melhor de você mesmo. Cada treino é um investimento no seu caráter.\n\nNão venha ao tatame para ganhar — venha para crescer. A vitória virá naturalmente para quem não desiste.`},
+  emocional: {icon:'💛',nome:'Emocional',desc:'Tocante, para a família',
+    saudacao: n=>`Querido(a) ${n},`,
+    texto: (n,a)=>`Este é um dia especial — o dia em que você se torna parte da nossa família.\n\nQuando crianças entram no tatame da ${a} pela primeira vez, elas trazem consigo esperanças, medos e sorrisos. Você trouxe os seus, e nós prometemos cuidar de cada um deles com carinho e responsabilidade.\n\nO Jiu-Jitsu vai te ensinar coisas que vão muito além das técnicas. Você vai aprender a respeitar, a ajudar, a ter coragem mesmo quando estiver com medo, e a ser gentil com quem está aprendendo.\n\nAqui, você nunca estará sozinho. Cada colega, cada sensei, cada abraço no final do treino é a prova de que você pertence a algo maior.\n\nSeja muito bem-vindo(a). Com carinho,`},
+  kids: {icon:'🦁',nome:'Super Guerreiro',desc:'Épica para crianças',
+    saudacao: n=>`🦁 GUERREIRO ${n.toUpperCase()}, VOCÊ FOI ESCOLHIDO!`,
+    texto: (n,a)=>`Uma missão secreta acaba de começar...\n\n${n}, você foi selecionado para entrar na equipe de GUERREIROS DA ${a.toUpperCase()}!\n\nNesta missão, você vai:\n⚡ Aprender golpes incríveis\n🥋 Treinar como um verdadeiro ninja\n🏆 Conquistar faixas e evoluir\n🤝 Fazer amigos corajosos\n💪 Ficar mais forte e mais esperto\n\nCada treino é uma nova fase do jogo. Cada faixa é um upgrade no seu personagem. Cada desafio é uma missão a cumprir.\n\nO tatame espera pelo novo herói da equipe! OSS! 🤜🤛`},
+};
+let cartaModelo = 'classica';
+function initCarta() {
+  const row = document.getElementById('modelosRow');
+  Object.entries(MODELOS_CARTA).forEach(([k,m]) => {
+    const div = document.createElement('div'); div.className='modelo-opt'+(k==='classica'?' on':'');
+    div.innerHTML=`<div class="mo-icon">${m.icon}</div><div class="mo-nome">${m.nome}</div><div class="mo-desc">${m.desc}</div>`;
+    div.onclick=()=>{ cartaModelo=k; document.querySelectorAll('.modelo-opt').forEach(x=>x.classList.remove('on')); div.classList.add('on'); atualizarCarta(); };
+    row.appendChild(div);
+  });
+  atualizarCarta();
+}
+function atualizarCarta() {
+  const aluno=document.getElementById('cartaAluno').value||'[Nome do Aluno]';
+  const acad=document.getElementById('cartaAcad').value||'Minha Academia';
+  const sensei=document.getElementById('cartaSensei').value||'Sensei';
+  const m=MODELOS_CARTA[cartaModelo];
+  document.getElementById('cartaAcadView').textContent=acad;
+  document.getElementById('cartaAcad2View').textContent=acad;
+  document.getElementById('cartaSenseiView').textContent=sensei;
+  document.getElementById('cartaSaudacaoView').textContent=m.saudacao(aluno);
+  document.getElementById('cartaTextoView').textContent=m.texto(aluno,acad);
+  const hoje=new Date();
+  const ms=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  document.getElementById('cartaDataView').textContent=`${hoje.getDate()} de ${ms[hoje.getMonth()]} de ${hoje.getFullYear()}`;
+}
+
+/* ══════════════════════ INIT ══════════════════════ */
+initMensagens();
+initCad();
+initProto();
+initConq();
+initCarta();
+</script>
+</body>
+</html>
