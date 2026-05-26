@@ -2,7 +2,6 @@
 // Usada nos posts únicos (dica, motivacional, engajamento)
 
 const OpenAI = require('openai');
-const https  = require('https');
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -35,17 +34,6 @@ function escolherCena(tipo) {
   return cenas[Math.floor(Math.random() * cenas.length)];
 }
 
-function baixarImagem(url) {
-  return new Promise((resolve, reject) => {
-    https.get(url, (res) => {
-      const chunks = [];
-      res.on('data', c => chunks.push(c));
-      res.on('end', () => resolve(Buffer.concat(chunks).toString('base64')));
-      res.on('error', reject);
-    }).on('error', reject);
-  });
-}
-
 async function gerarFundo(tipo) {
   const cena = escolherCena(tipo);
 
@@ -54,18 +42,16 @@ async function gerarFundo(tipo) {
   console.log(`[bg-ia] Gerando fundo 3D cartoon para tipo: ${tipo}...`);
 
   const resp = await client.images.generate({
-    model:   'dall-e-3',
+    model:           'dall-e-3',
     prompt,
-    size:    '1024x1024',
-    quality: 'standard',
-    style:   'vivid',
-    n:       1,
+    size:            '1024x1024',
+    quality:         'standard',
+    style:           'vivid',
+    response_format: 'b64_json',
+    n:               1,
   });
 
-  const imageUrl = resp.data[0].url;
-  console.log('[bg-ia] Imagem gerada, baixando...');
-
-  const base64 = await baixarImagem(imageUrl);
+  const base64 = resp.data[0].b64_json;
   console.log('[bg-ia] Fundo pronto.');
   return base64;
 }
