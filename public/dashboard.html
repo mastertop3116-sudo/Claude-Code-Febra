@@ -332,6 +332,13 @@ body::after{content:'';position:fixed;inset:0;z-index:9990;pointer-events:none;o
 .brn-card-bottom{padding:16px 20px}
 .brn-tickets{display:flex;gap:8px;flex-wrap:wrap}
 .bt{font-size:11px;font-family:'JetBrains Mono',monospace;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid var(--border-md)}
+.ig-action-btn{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:12px;border:1px solid rgba(255,255,255,0.07);background:var(--surface);cursor:pointer;text-align:left;transition:all .2s;font-family:'Outfit',sans-serif;width:100%}
+.ig-action-btn:hover{background:var(--elevated);border-color:var(--ig-color);box-shadow:0 0 0 1px var(--ig-color)22}
+.ig-action-btn:active{transform:scale(.98)}
+.ig-action-btn.loading{opacity:.6;pointer-events:none}
+.ig-btn-icon{font-size:26px;flex-shrink:0}
+.ig-btn-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+.ig-btn-desc{font-size:11px;color:var(--text-3);line-height:1.4}
 .bt.premium{color:var(--bc-color,var(--brn));border-color:rgba(16,185,129,0.25)}
 .brn-links{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .brn-link-card{background:var(--elevated);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
@@ -1087,6 +1094,48 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
         <div class="info-card"><div class="ic-label">Senha de Acesso</div><div class="ic-value" style="color:var(--brn);font-size:18px;font-weight:700">jiujitsu2026</div><div class="ic-copy" onclick="copyText('jiujitsu2026')">📋 Copiar senha</div></div>
         <div class="info-card" style="grid-column:1/-1"><div class="ic-label">Bônus do Premium</div><div style="margin-top:6px;display:flex;gap:10px;flex-wrap:wrap"><span class="bt">🥊 Certificado de Jiu-Jiteiro</span><span class="bt">🎮 Jogos de Luta Interativos</span><span class="bt">💪 100 Drills de Preparação Física</span></div></div>
       </div>
+
+      <!-- INSTAGRAM PIPELINE -->
+      <div class="section-heading" style="margin-top:28px">Instagram Automático</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+
+        <button onclick="igAction('noite')" class="ig-action-btn" style="--ig-color:#f97316">
+          <div class="ig-btn-icon">🌙</div>
+          <div class="ig-btn-info">
+            <div class="ig-btn-title">Postar Agora (Noite)</div>
+            <div class="ig-btn-desc">Post único 3D cartoon · publica no Instagram</div>
+          </div>
+        </button>
+
+        <button onclick="igAction('manha')" class="ig-action-btn" style="--ig-color:#facc15">
+          <div class="ig-btn-icon">☀️</div>
+          <div class="ig-btn-info">
+            <div class="ig-btn-title">Postar Agora (Manhã)</div>
+            <div class="ig-btn-desc">Carrossel educativo · publica no Instagram</div>
+          </div>
+        </button>
+
+        <button onclick="igAction('insights')" class="ig-action-btn" style="--ig-color:#60a5fa">
+          <div class="ig-btn-icon">📊</div>
+          <div class="ig-btn-info">
+            <div class="ig-btn-title">Coletar Métricas</div>
+            <div class="ig-btn-desc">Salva curtidas, comentários e alcance dos posts</div>
+          </div>
+        </button>
+
+        <button onclick="igAction('fundos')" class="ig-action-btn" style="--ig-color:#a78bfa">
+          <div class="ig-btn-icon">🖼️</div>
+          <div class="ig-btn-info">
+            <div class="ig-btn-title">Gerar Fundos 3D</div>
+            <div class="ig-btn-desc">Recria os 15 fundos cartoon · leva ~10 minutos</div>
+          </div>
+        </button>
+
+      </div>
+
+      <!-- STATUS DO RESULTADO -->
+      <div id="ig-status-box" style="display:none;padding:16px 20px;border-radius:12px;border:1px solid;font-size:13px;line-height:1.6;margin-bottom:8px"></div>
+
     </div>
   </div>
 
@@ -3054,6 +3103,62 @@ window.fillInput=fillInput;
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
 function fmtCurrency(v){ return Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function copyText(text){ navigator.clipboard.writeText(text).then(()=>showToast('✓ Copiado!')).catch(()=>{ const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('✓ Copiado!'); }); }
+
+async function igAction(tipo) {
+  const SECRET = '83fd013af3383e7891bb95f4359a8a91';
+  const BASE   = 'https://claude-code-febra.onrender.com';
+  const URLS   = {
+    noite:    `${BASE}/instagram-test/noite?secret=${SECRET}`,
+    manha:    `${BASE}/instagram-test/manha?secret=${SECRET}`,
+    insights: `${BASE}/instagram-insights?secret=${SECRET}`,
+    fundos:   `${BASE}/instagram-gerar-fundos?secret=${SECRET}`,
+  };
+  const LABELS = {
+    noite:    'Gerando e postando (noite)…',
+    manha:    'Gerando e postando (manhã)…',
+    insights: 'Coletando métricas…',
+    fundos:   'Solicitando geração dos fundos…',
+  };
+
+  const box = document.getElementById('ig-status-box');
+  const btn = document.querySelector(`[onclick="igAction('${tipo}')"]`);
+  btn.classList.add('loading');
+  btn.querySelector('.ig-btn-title').textContent = LABELS[tipo];
+
+  box.style.display = 'block';
+  box.style.background = 'rgba(255,255,255,0.03)';
+  box.style.borderColor = 'rgba(255,255,255,0.1)';
+  box.style.color = 'var(--text-2)';
+  box.innerHTML = '⏳ Aguardando resposta do servidor…';
+
+  try {
+    const r = await fetch(URLS[tipo]);
+    const txt = await r.text();
+    let msg;
+    try { msg = JSON.parse(txt); } catch { msg = { mensagem: txt }; }
+
+    if (r.ok) {
+      box.style.background = 'rgba(16,185,129,0.07)';
+      box.style.borderColor = 'rgba(16,185,129,0.3)';
+      box.style.color = '#34d399';
+      box.innerHTML = '✅ ' + (msg.mensagem || msg.message || 'Concluído com sucesso!');
+    } else {
+      box.style.background = 'rgba(239,68,68,0.07)';
+      box.style.borderColor = 'rgba(239,68,68,0.3)';
+      box.style.color = '#f87171';
+      box.innerHTML = '❌ Erro: ' + (msg.mensagem || msg.error || r.status);
+    }
+  } catch(e) {
+    box.style.background = 'rgba(239,68,68,0.07)';
+    box.style.borderColor = 'rgba(239,68,68,0.3)';
+    box.style.color = '#f87171';
+    box.innerHTML = '❌ Não foi possível conectar ao servidor. Verifique se ele está online.';
+  }
+
+  btn.classList.remove('loading');
+  const ORIG = { noite:'Postar Agora (Noite)', manha:'Postar Agora (Manhã)', insights:'Coletar Métricas', fundos:'Gerar Fundos 3D' };
+  btn.querySelector('.ig-btn-title').textContent = ORIG[tipo];
+}
 window.copyText=copyText;
 function showToast(msg){ const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200); }
 
