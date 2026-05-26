@@ -7,6 +7,7 @@ const { gerarConteudo } = require('./gerar-conteudo-ia');
 const { gerarPost, gerarCarrossel } = require('./gerar-post');
 const { uploadImagem }              = require('./upload');
 const { postar, postarCarrossel }   = require('./instagram');
+const { gerarFundo, TIPOS_NOITE }   = require('./gerar-bg-ia');
 
 const hashtags = config.marca.hashtags.join(' ');
 
@@ -31,12 +32,39 @@ async function executar(periodo, diaSemana) {
   const periodoLabel = periodo || 'manha';
   console.log(`\n========== PIPELINE [${periodoLabel.toUpperCase()}] — ${new Date().toLocaleString('pt-BR')} ==========`);
 
-  const entrada = await gerarConteudo(periodoLabel);
+  // ── POST ÚNICO: texto e imagem gerados em paralelo ─────────────────────────
+  if (periodoLabel === 'noite') {
+    const dia = new Date().getDay();
+    const tipoAntecipado = TIPOS_NOITE[dia];
+    console.log(`[pipeline] Gerando conteúdo e fundo 3D em paralelo (tipo: ${tipoAntecipado})...`);
 
-  console.log(`[pipeline] Tipo: ${entrada.tipo}`);
+    const [entrada, bgBase64] = await Promise.all([
+      gerarConteudo(periodoLabel),
+      gerarFundo(tipoAntecipado).catch(e => {
+        console.warn('[pipeline] Fundo 3D indisponível, usando textura padrão:', e.message);
+        return null;
+      }),
+    ]);
 
-  // ── CARROSSEL ──────────────────────────────────────────────────────────────
-  if (entrada.tipo === 'carrossel') {
+    console.log(`[pipeline] Tipo confirmado: ${entrada.tipo}`);
+
+    const caminho = await gerarPost(entrada, bgBase64);
+
+    if (config.posting.dryRun) {
+      console.log('[pipeline] DRY RUN — imagem gerada, NÃO postada.');
+      console.log(`[pipeline] Arquivo: ${caminho}`);
+      return;
+    }
+
+    const url     = await uploadImagem(caminho);
+    const caption = montarCaption(entrada.tipo, entrada.conteudo);
+    await postar(url, caption);
+
+  // ── CARROSSEL (manhã) ──────────────────────────────────────────────────────
+  } else {
+    const entrada = await gerarConteudo(periodoLabel);
+    console.log(`[pipeline] Tipo: ${entrada.tipo}`);
+
     const caminhos = await gerarCarrossel(entrada);
 
     if (config.posting.dryRun) {
@@ -53,20 +81,6 @@ async function executar(periodo, diaSemana) {
 
     const caption = montarCaptionCarrossel(entrada);
     await postarCarrossel(urls, caption);
-
-  // ── POST ÚNICO ─────────────────────────────────────────────────────────────
-  } else {
-    const caminho = await gerarPost(entrada);
-
-    if (config.posting.dryRun) {
-      console.log('[pipeline] DRY RUN — imagem gerada, NÃO postada.');
-      console.log(`[pipeline] Arquivo: ${caminho}`);
-      return;
-    }
-
-    const url     = await uploadImagem(caminho);
-    const caption = montarCaption(entrada.tipo, entrada.conteudo);
-    await postar(url, caption);
   }
 
   console.log('[pipeline] Concluído com sucesso!');

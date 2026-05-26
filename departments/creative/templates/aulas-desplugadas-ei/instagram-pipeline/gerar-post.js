@@ -40,23 +40,24 @@ function garantirOutputDir() {
   }
 }
 
-async function gerarPost(entrada) {
+async function gerarPost(entrada, bgBase64 = null) {
   const { tipo, estilo = 'dark', fontes = [], conteudo } = entrada;
 
   const templateFn = carregarTemplate(tipo, estilo);
   if (!templateFn) throw new Error(`Template desconhecido: "${tipo}" / "${estilo}"`);
 
-  // Gera fundo 3D cartoon via IA e salva em arquivo temporário
+  // Salva fundo 3D em arquivo temporário (base64 vem pronto do pipeline em paralelo)
   let bgFilePath = null;
   let bgTempFile = null;
-  try {
-    const b64 = await gerarFundo(tipo);
-    bgTempFile = path.join(os.tmpdir(), `bg-${Date.now()}.png`);
-    fs.writeFileSync(bgTempFile, Buffer.from(b64, 'base64'));
-    bgFilePath = `file://${bgTempFile.replace(/\\/g, '/')}`;
-    console.log('[gerar-post] Fundo 3D cartoon salvo em arquivo temporário.');
-  } catch (e) {
-    console.warn(`[gerar-post] Fundo IA indisponível, usando textura padrão: ${e.message}`);
+  if (bgBase64) {
+    try {
+      bgTempFile = path.join(os.tmpdir(), `bg-${Date.now()}.png`);
+      fs.writeFileSync(bgTempFile, Buffer.from(bgBase64, 'base64'));
+      bgFilePath = `file://${bgTempFile.replace(/\\/g, '/')}`;
+      console.log('[gerar-post] Fundo 3D cartoon pronto.');
+    } catch (e) {
+      console.warn(`[gerar-post] Erro ao salvar fundo: ${e.message}`);
+    }
   }
 
   // Passa bgImage=null para o template (fundo via CSS), sem embutir base64
