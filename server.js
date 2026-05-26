@@ -2617,15 +2617,17 @@ app.get('/instagram-insights', async (req, res) => {
   }
 });
 
-// ── INSTAGRAM IMAGE TEST ─────────────────────────────────────────────────────
-app.get('/instagram-img-test', async (req, res) => {
+// ── GERAR FUNDOS 3D (pré-geração do cache) ───────────────────────────────────
+app.get('/instagram-gerar-fundos', async (req, res) => {
   if (req.query.secret !== process.env.INSTAGRAM_APP_SECRET) return res.status(401).end();
+  res.json({ status: 'gerando', mensagem: 'Gerando 15 fundos 3D cartoon... pode levar ~10 minutos. Acompanhe nos logs.' });
   try {
-    const { gerarFundo } = require('./departments/creative/templates/aulas-desplugadas-ei/instagram-pipeline/gerar-bg-ia');
-    const b64 = await gerarFundo('motivacional');
-    res.json({ ok: true, tamanho_kb: Math.round(b64.length / 1024) });
+    const { gerarTodos } = require('./departments/creative/templates/aulas-desplugadas-ei/instagram-pipeline/gerar-fundos-cache');
+    const cache = await gerarTodos();
+    const total = Object.values(cache).flat().length;
+    console.log(`[instagram-gerar-fundos] ✅ ${total} fundos gerados e salvos no cache.`);
   } catch (e) {
-    res.status(500).json({ ok: false, erro: e.message });
+    console.error('[instagram-gerar-fundos] ERRO:', e.message);
   }
 });
 
