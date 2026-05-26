@@ -2617,6 +2617,30 @@ app.get('/instagram-insights', async (req, res) => {
   }
 });
 
+// ── INSTAGRAM MÉTRICAS RESUMIDAS (para o dashboard) ──────────────────────────
+app.get('/instagram-metricas', async (req, res) => {
+  if (req.query.secret !== process.env.INSTAGRAM_APP_SECRET) return res.status(401).end();
+  try {
+    const supa = getSupabase();
+    const { data, error } = await supa
+      .from('ig_post_insights')
+      .select('post_id,like_count,comments,reach,saved,engagement_score,tema,timestamp,media_type')
+      .order('timestamp', { ascending: false })
+      .limit(20);
+    if (error) throw new Error(error.message);
+    if (!data || !data.length) return res.json({ total: 0, posts: [] });
+
+    const total       = data.length;
+    const avgScore    = data.reduce((s, r) => s + Number(r.engagement_score || 0), 0) / total;
+    const totalLikes  = data.reduce((s, r) => s + (r.like_count || 0), 0);
+    const totalReach  = data.reduce((s, r) => s + (r.reach || 0), 0);
+    const best        = [...data].sort((a, b) => b.engagement_score - a.engagement_score)[0];
+    res.json({ total, avgScore: avgScore.toFixed(2), totalLikes, totalReach, best, posts: data.slice(0, 5) });
+  } catch (e) {
+    res.status(500).json({ erro: e.message });
+  }
+});
+
 // ── GERAR FUNDOS 3D (pré-geração do cache) ───────────────────────────────────
 app.get('/instagram-gerar-fundos', async (req, res) => {
   if (req.query.secret !== process.env.INSTAGRAM_APP_SECRET) return res.status(401).end();

@@ -332,6 +332,23 @@ body::after{content:'';position:fixed;inset:0;z-index:9990;pointer-events:none;o
 .brn-card-bottom{padding:16px 20px}
 .brn-tickets{display:flex;gap:8px;flex-wrap:wrap}
 .bt{font-size:11px;font-family:'JetBrains Mono',monospace;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid var(--border-md)}
+/* ── Instagram Overview (página principal) ── */
+.ig-overview-panel{border-radius:14px;border:1px solid rgba(249,115,22,.15);background:linear-gradient(160deg,rgba(249,115,22,.04),transparent 70%);margin-bottom:20px;overflow:hidden}
+.ig-ov-header{display:flex;align-items:center;gap:9px;padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.05)}
+.ig-ov-logo{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#f97316,#ec4899);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.ig-ov-title{font-size:12px;font-weight:700;color:var(--text);flex:1}
+.ig-ov-refresh{background:none;border:none;cursor:pointer;color:var(--text-3);padding:4px;border-radius:6px;display:flex;align-items:center;transition:color .15s}
+.ig-ov-refresh:hover{color:var(--text)}
+.ig-ov-loading{padding:20px 16px;font-size:12px;color:var(--text-3);text-align:center}
+.ig-ov-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.04)}
+.ig-ov-stat{padding:14px 16px;background:var(--bg)}
+.ig-ov-stat-val{font-size:20px;font-weight:800;color:var(--text);line-height:1}
+.ig-ov-stat-lbl{font-size:10px;color:var(--text-3);margin-top:4px;text-transform:uppercase;letter-spacing:.8px}
+.ig-ov-best{padding:12px 16px;border-top:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:10px}
+.ig-ov-best-badge{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:10px;background:rgba(249,115,22,.12);color:#f97316;border:1px solid rgba(249,115,22,.25);white-space:nowrap}
+.ig-ov-best-text{font-size:11px;color:var(--text-2);line-height:1.4}
+.ig-ov-empty{padding:24px 16px;font-size:12px;color:var(--text-3);text-align:center;line-height:1.6}
+
 /* ── Instagram Panel ── */
 .ig-panel{margin-top:28px;border-radius:16px;border:1px solid rgba(249,115,22,.18);background:linear-gradient(160deg,rgba(249,115,22,.05) 0%,rgba(0,0,0,0) 60%);overflow:hidden}
 .ig-panel-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.05)}
@@ -853,6 +870,23 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
         <div class="qa-card" onclick="navigate('conselho')"><div class="qa-icon">👑</div><div><div class="qa-label">Conselho de Titãs</div><div class="qa-desc">Elon · Bezos · Hang · Paulo Vieira</div></div></div>
         <div class="qa-card" onclick="window.open('/criar','_blank')"><div class="qa-icon">⬡</div><div><div class="qa-label">Nexus Forge Studio</div><div class="qa-desc">Ebooks, roteiros e entregáveis</div></div></div>
       </div>
+      <!-- INSTAGRAM PERFORMANCE -->
+      <div class="section-heading" style="margin-top:4px">Instagram · Jiu-Jitsu</div>
+      <div class="ig-overview-panel" id="ig-overview-panel">
+        <div class="ig-ov-header">
+          <div class="ig-ov-logo">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          </div>
+          <span class="ig-ov-title">Desempenho dos Posts</span>
+          <button class="ig-ov-refresh" onclick="loadIgMetricas()" title="Atualizar">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+          </button>
+        </div>
+        <div id="ig-ov-body">
+          <div class="ig-ov-loading">Carregando métricas…</div>
+        </div>
+      </div>
+
       <div class="section-heading">Produtos · UTMify</div>
       <div class="products-grid" id="products-grid">
         <div class="product-mini skeleton" style="height:110px"></div>
@@ -1771,7 +1805,7 @@ function navigate(view){
   const titleEl = document.getElementById('statusbar-title');
   if(titleEl) titleEl.textContent = VIEW_TITLES[view] || (SECTOR_CFG[view]?.name || 'MAX');
   if(view==='briefing'){ loadMetrics(); loadBriefing(); }
-  else if(view==='overview'){ loadMetrics(); }
+  else if(view==='overview'){ loadMetrics(); loadIgMetricas(); }
   else if(view==='gastos'){ loadGastos(); }
   else if(view==='integrations'){ if(!intLoaded) loadIntegrations(); }
   else if(view==='radar'){ loadRadar(); }
@@ -3210,6 +3244,38 @@ async function igAction(tipo) {
   btn.classList.remove('ig-loading');
 }
 window.igAction=igAction;
+
+async function loadIgMetricas() {
+  const body = document.getElementById('ig-ov-body');
+  if (!body) return;
+  body.innerHTML = '<div class="ig-ov-loading">Carregando métricas…</div>';
+  const SECRET = '83fd013af3383e7891bb95f4359a8a91';
+  try {
+    const r = await fetch(`/instagram-metricas?secret=${SECRET}`);
+    const d = await r.json();
+    if (!r.ok || d.erro) throw new Error(d.erro || 'Erro');
+    if (!d.total) {
+      body.innerHTML = '<div class="ig-ov-empty">Nenhuma métrica ainda.<br>Clique em <strong>Jiu-Jitsu → Coletar Métricas</strong> para começar.</div>';
+      return;
+    }
+    const fmt = n => Number(n).toLocaleString('pt-BR');
+    body.innerHTML = `
+      <div class="ig-ov-stats">
+        <div class="ig-ov-stat"><div class="ig-ov-stat-val">${d.total}</div><div class="ig-ov-stat-lbl">Posts</div></div>
+        <div class="ig-ov-stat"><div class="ig-ov-stat-val">${fmt(d.totalLikes)}</div><div class="ig-ov-stat-lbl">Curtidas</div></div>
+        <div class="ig-ov-stat"><div class="ig-ov-stat-val">${fmt(d.totalReach)}</div><div class="ig-ov-stat-lbl">Alcance</div></div>
+        <div class="ig-ov-stat"><div class="ig-ov-stat-val">${d.avgScore}</div><div class="ig-ov-stat-lbl">Eng. médio</div></div>
+      </div>
+      ${d.best ? `<div class="ig-ov-best">
+        <span class="ig-ov-best-badge">⭐ Melhor post</span>
+        <span class="ig-ov-best-text">${d.best.tema || d.best.media_type || 'Post'} · ${fmt(d.best.like_count)} curtidas · ${fmt(d.best.reach)} alcance · score ${Number(d.best.engagement_score).toFixed(2)}</span>
+      </div>` : ''}
+    `;
+  } catch(e) {
+    body.innerHTML = `<div class="ig-ov-empty" style="color:var(--text-3)">Métricas indisponíveis agora.</div>`;
+  }
+}
+window.loadIgMetricas = loadIgMetricas;
 window.copyText=copyText;
 function showToast(msg){ const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200); }
 
