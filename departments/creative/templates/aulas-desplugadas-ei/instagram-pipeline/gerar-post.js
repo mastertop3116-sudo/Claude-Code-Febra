@@ -71,8 +71,8 @@ async function gerarPost(entrada, bgBase64 = null) {
   const browser = await puppeteer.launch({ headless: 'new' });
   const page    = await browser.newPage();
   await page.setViewport({ width: 1080, height: 1080 });
-  await page.setContent(html, { waitUntil: 'networkidle2', timeout: 30000 });
-  await new Promise(r => setTimeout(r, 500));
+  await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await new Promise(r => setTimeout(r, 3000));
   await page.screenshot({ path: outputPath, type: 'png' });
   await browser.close();
 
@@ -104,8 +104,8 @@ async function gerarCarrossel(entrada) {
 
     const page = await browser.newPage();
     await page.setViewport({ width: 1080, height: 1080 });
-    await page.setContent(html, { waitUntil: 'networkidle2', timeout: 30000 });
-    await new Promise(r => setTimeout(r, 400));
+    await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await new Promise(r => setTimeout(r, 3000));
 
     const filename   = `carrossel-${timestamp}-slide${i + 1}.png`;
     const outputPath = path.join(config.posting.outputDir, filename);
