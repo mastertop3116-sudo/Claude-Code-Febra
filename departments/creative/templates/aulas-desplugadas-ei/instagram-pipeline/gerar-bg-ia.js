@@ -42,7 +42,7 @@ async function gerarFundo(tipo) {
   console.log(`[bg-ia] Gerando fundo 3D cartoon para tipo: ${tipo}...`);
 
   const resp = await client.images.generate({
-    model: 'gpt-image-1',
+    model: 'gpt-image-2',
     prompt,
     size:  '1024x1024',
     n:     1,
