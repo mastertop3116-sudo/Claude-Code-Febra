@@ -2,9 +2,12 @@
 // Chamado pelo pipeline antes de gerar imagem — evita repetição, sempre fresco
 
 const OpenAI = require('openai');
-const { buscarTopPerformers, formatarContextoIA } = require('./insights');
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+function carregarInsights() {
+  try { return require('./insights'); } catch (e) { return null; }
+}
 
 const FONTES_POR_DIA   = [['bebas'], ['anton'], ['gagalin'], ['oswald'], ['bebas'], ['anton'], ['gagalin']];
 const TEXTURAS_POR_DIA = ['grunge', 'halftone', 'noise', 'grunge', 'halftone', 'noise', 'grunge'];
@@ -110,9 +113,12 @@ async function gerarConteudo(periodo) {
   // Busca top performers para dar contexto à IA (silencioso se falhar)
   let contextoIA = '';
   try {
-    const topPosts = await buscarTopPerformers(5);
-    contextoIA = formatarContextoIA(topPosts);
-    if (contextoIA) console.log('[ia] Contexto de performance carregado.');
+    const ins = carregarInsights();
+    if (ins) {
+      const topPosts = await ins.buscarTopPerformers(5);
+      contextoIA = ins.formatarContextoIA(topPosts);
+      if (contextoIA) console.log('[ia] Contexto de performance carregado.');
+    }
   } catch (e) {
     console.log('[ia] Sem contexto de performance (insights indisponíveis).');
   }
