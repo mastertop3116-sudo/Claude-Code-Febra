@@ -92,6 +92,21 @@
 
 ---
 
+## Instagram Automático — Jiu-Jitsu
+
+Sistema de posts diários automáticos. Documentação completa: [[produtos/instagram-pipeline-jiujitsu]]
+
+| Item | Detalhe |
+|------|---------|
+| Posts | 09:00 carrossel · 19:00 post único 3D cartoon |
+| IA texto | GPT-4o Mini |
+| IA imagem | GPT Image 1 (cache de 14 fundos no Cloudinary) |
+| Métricas | Tabela `ig_post_insights` no Supabase |
+| Controle | Dashboard → Jiu-Jitsu (botões visuais) |
+| Desempenho | Visível no Overview do dashboard |
+
+---
+
 ## Funil padrão
 
 ```
