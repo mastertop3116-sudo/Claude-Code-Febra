@@ -42,13 +42,10 @@ async function gerarFundo(tipo) {
   console.log(`[bg-ia] Gerando fundo 3D cartoon para tipo: ${tipo}...`);
 
   const resp = await client.images.generate({
-    model:           'dall-e-3',
+    model: 'gpt-image-1',
     prompt,
-    size:            '1024x1024',
-    quality:         'standard',
-    style:           'vivid',
-    response_format: 'b64_json',
-    n:               1,
+    size:  '1024x1024',
+    n:     1,
   });
 
   const base64 = resp.data[0].b64_json;
