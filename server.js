@@ -2617,6 +2617,18 @@ app.get('/instagram-insights', async (req, res) => {
   }
 });
 
+// ── INSTAGRAM IMAGE TEST ─────────────────────────────────────────────────────
+app.get('/instagram-img-test', async (req, res) => {
+  if (req.query.secret !== process.env.INSTAGRAM_APP_SECRET) return res.status(401).end();
+  try {
+    const { gerarFundo } = require('./departments/creative/templates/aulas-desplugadas-ei/instagram-pipeline/gerar-bg-ia');
+    const b64 = await gerarFundo('motivacional');
+    res.json({ ok: true, tamanho_kb: Math.round(b64.length / 1024) });
+  } catch (e) {
+    res.status(500).json({ ok: false, erro: e.message });
+  }
+});
+
 // ── INSTAGRAM TEST ENDPOINT ──────────────────────────────────────────────────
 app.get('/instagram-test/:periodo', async (req, res) => {
   const secret  = req.query.secret;
