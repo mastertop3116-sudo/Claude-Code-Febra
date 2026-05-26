@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kit de Conquistas — Jiu-Jitsu Kids</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0f0f1a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
+
+  .header { background: linear-gradient(135deg, #1e293b, #0f172a); padding: 24px; border-bottom: 2px solid #f97316; }
+  .header h1 { font-size: 1.6rem; color: #f97316; }
+  .header p { color: #94a3b8; font-size: 0.9rem; margin-top: 4px; }
+
+  .toolbar { background: #1e293b; padding: 12px 24px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; border-bottom: 1px solid #334155; }
+  .btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all .2s; }
+  .btn-primary { background: #f97316; color: #fff; }
+  .btn-primary:hover { background: #ea6c0a; }
+  .btn-secondary { background: #334155; color: #94a3b8; }
+  .btn-secondary:hover { background: #475569; color: #e2e8f0; }
+  .saved-badge { font-size: 0.75rem; color: #22c55e; margin-left: auto; }
+
+  .tabs { display: flex; gap: 0; border-bottom: 2px solid #334155; background: #1e293b; padding: 0 24px; }
+  .tab { padding: 12px 20px; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .2s; }
+  .tab.active { color: #f97316; border-bottom-color: #f97316; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 24px; }
+
+  /* MISSOES */
+  .categoria { margin-bottom: 32px; }
+  .categoria-title { font-size: 0.95rem; font-weight: 700; color: #f97316; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #334155; display: flex; align-items: center; gap: 8px; }
+  .categoria-progress { font-size: 0.75rem; color: #64748b; margin-left: auto; }
+
+  .missoes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .missao-card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 16px; cursor: pointer; transition: all .2s; position: relative; overflow: hidden; }
+  .missao-card:hover { border-color: #f97316; transform: translateY(-2px); }
+  .missao-card.completa { border-color: #f97316; background: #1a0d00; }
+  .missao-card.completa::after { content: '✓'; position: absolute; top: 10px; right: 12px; color: #f97316; font-size: 1.2rem; font-weight: 700; }
+  .missao-icon { font-size: 2rem; margin-bottom: 10px; }
+  .missao-nome { font-size: 0.9rem; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
+  .missao-desc { font-size: 0.8rem; color: #94a3b8; line-height: 1.4; }
+  .missao-card.completa .missao-nome { color: #f97316; }
+  .missao-pts { font-size: 0.75rem; color: #475569; margin-top: 8px; }
+  .missao-card.completa .missao-pts { color: #f97316; }
+  .missao-data { font-size: 0.72rem; color: #f97316; margin-top: 6px; font-style: italic; }
+
+  .progress-total { background: #1e293b; border-radius: 12px; padding: 20px 24px; margin-bottom: 24px; display: flex; align-items: center; gap: 20px; border: 1px solid #334155; }
+  .progress-bar-wrap { flex: 1; background: #0f172a; border-radius: 99px; height: 12px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #f97316, #fbbf24); border-radius: 99px; transition: width .4s; }
+  .progress-text { font-size: 1.2rem; font-weight: 700; color: #f97316; white-space: nowrap; }
+  .progress-label { font-size: 0.8rem; color: #64748b; }
+
+  /* CERTIFICADO */
+  .cert-form { background: #1e293b; border-radius: 12px; padding: 24px; margin-bottom: 24px; border: 1px solid #334155; }
+  .cert-form h3 { color: #f97316; margin-bottom: 16px; font-size: 0.95rem; }
+  .cert-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  label { font-size: 0.8rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+  input, select { background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #e2e8f0; padding: 10px 12px; font-size: 0.9rem; font-family: inherit; transition: border-color .2s; }
+  input:focus, select:focus { outline: none; border-color: #f97316; }
+
+  .cert-preview { background: #fff; color: #111; border-radius: 12px; padding: 0; margin-bottom: 24px; overflow: hidden; border: 3px solid #f97316; }
+  .cert-inner { padding: 40px; text-align: center; }
+  .cert-top { background: #f97316; color: #fff; padding: 20px 40px; text-align: center; }
+  .cert-top h2 { font-size: 1.4rem; font-weight: 900; letter-spacing: 2px; }
+  .cert-top p { font-size: 0.85rem; opacity: .8; }
+  .cert-body { padding: 40px; text-align: center; }
+  .cert-trophy { font-size: 4rem; margin-bottom: 16px; }
+  .cert-titulo { font-size: 1rem; color: #64748b; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  .cert-nome { font-size: 2rem; font-weight: 900; color: #f97316; margin-bottom: 16px; line-height: 1.2; }
+  .cert-missao-nome { font-size: 1.2rem; font-weight: 700; color: #111; margin-bottom: 8px; }
+  .cert-missao-desc { font-size: 0.9rem; color: #555; margin-bottom: 24px; line-height: 1.5; }
+  .cert-linha { border: none; border-top: 1px solid #ddd; margin: 24px 40px; }
+  .cert-footer { display: flex; justify-content: space-between; align-items: flex-end; padding: 0 40px 40px; }
+  .cert-assinatura { text-align: center; }
+  .cert-assinatura-linha { width: 160px; border-top: 1px solid #333; margin: 0 auto 6px; }
+  .cert-assinatura-nome { font-size: 0.85rem; font-weight: 700; color: #111; }
+  .cert-assinatura-cargo { font-size: 0.75rem; color: #555; }
+  .cert-data { font-size: 0.8rem; color: #555; }
+
+  @media (max-width: 600px) { .cert-grid { grid-template-columns: 1fr; } .missoes-grid { grid-template-columns: 1fr; } }
+
+  @media print {
+    body { background: #fff; }
+    .header, .toolbar, .tabs, .tab-content:not(#tab-certificado), .cert-form { display: none !important; }
+    #tab-certificado { display: block !important; }
+    .cert-preview { border: 3px solid #f97316; box-shadow: none; }
+    .cert-top { background: #f97316 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🏅 Kit de Conquistas</h1>
+  <p>Marque as missões cumpridas e gere certificados personalizados para imprimir</p>
+</div>
+
+<div class="toolbar">
+  <button class="btn btn-secondary" onclick="window.history.back()">← Voltar</button>
+  <button class="btn btn-primary" onclick="imprimirCert()">🖨️ Imprimir Certificado</button>
+  <button class="btn btn-secondary" onclick="resetarMissoes()">Resetar Missões</button>
+  <span class="saved-badge" id="savedBadge"></span>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="abrirTab('missoes', this)">🎯 Missões do Aluno</div>
+  <div class="tab" onclick="abrirTab('certificado', this)">📜 Gerar Certificado</div>
+</div>
+
+<div id="tab-missoes" class="tab-content active">
+  <div class="container">
+    <div class="progress-total">
+      <div>
+        <div class="progress-label">Progresso geral</div>
+        <div class="progress-text" id="progressText">0 / 0 missões</div>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+      </div>
+    </div>
+    <div id="missaoContainer"></div>
+  </div>
+</div>
+
+<div id="tab-certificado" class="tab-content">
+  <div class="container">
+    <div class="cert-form">
+      <h3>Preencha os dados do certificado</h3>
+      <div class="cert-grid">
+        <div class="form-group">
+          <label>Nome do Aluno</label>
+          <input type="text" id="certNome" placeholder="Nome completo" oninput="atualizarCert()">
+        </div>
+        <div class="form-group">
+          <label>Nome da Academia</label>
+          <input type="text" id="certAcademia" placeholder="Nome da sua academia" oninput="atualizarCert()">
+        </div>
+        <div class="form-group">
+          <label>Nome do Sensei</label>
+          <input type="text" id="certSensei" placeholder="Seu nome" oninput="atualizarCert()">
+        </div>
+        <div class="form-group">
+          <label>Missão Conquistada</label>
+          <select id="certMissao" onchange="atualizarCert()">
+            <option value="">Selecione a missão</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Data de Conquista</label>
+          <input type="date" id="certData" oninput="atualizarCert()">
+        </div>
+      </div>
+    </div>
+
+    <div class="cert-preview" id="certPreview">
+      <div class="cert-top">
+        <h2>CERTIFICADO DE CONQUISTA</h2>
+        <p id="certAcademiaTop">Jiu-Jitsu Kids</p>
+      </div>
+      <div class="cert-body">
+        <div class="cert-trophy" id="certEmoji">🏆</div>
+        <div class="cert-titulo">Certificamos que</div>
+        <div class="cert-nome" id="certNomePreview">Nome do Aluno</div>
+        <div class="cert-titulo">completou com sucesso a missão</div>
+        <div class="cert-missao-nome" id="certMissaoNome">— Selecione uma missão —</div>
+        <div class="cert-missao-desc" id="certMissaoDesc"></div>
+      </div>
+      <hr class="cert-linha">
+      <div class="cert-footer">
+        <div class="cert-assinatura">
+          <div class="cert-assinatura-linha"></div>
+          <div class="cert-assinatura-nome" id="certSenseiPreview">Sensei</div>
+          <div class="cert-assinatura-cargo">Instrutor de Jiu-Jitsu</div>
+        </div>
+        <div class="cert-data" id="certDataPreview"></div>
+        <div class="cert-assinatura">
+          <div class="cert-assinatura-linha"></div>
+          <div class="cert-assinatura-nome" id="certAlunoAssin">Aluno</div>
+          <div class="cert-assinatura-cargo">Guerreiro Certificado</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY = 'conquistas_v1';
+const MISSOES = [
+  {
+    cat: '🥋 Primeiros Passos', items: [
+      { id: 'm1', icon: '👟', nome: 'Primeiro Treino', desc: 'Completou o primeiro treino sem desistir', pts: 10 },
+      { id: 'm2', icon: '📅', nome: 'Frequência de Ferro', desc: 'Não faltou nenhum treino em um mês', pts: 20 },
+      { id: 'm3', icon: '🤝', nome: 'Primeiro Amigo', desc: 'Fez amizade com um colega do tatame', pts: 15 },
+      { id: 'm4', icon: '👔', nome: 'Kimono Impecável', desc: 'Veio com o kimono limpo e passado por 1 mês', pts: 15 },
+    ]
+  },
+  {
+    cat: '⚡ Técnica & Evolução', items: [
+      { id: 'm5', icon: '🔵', nome: 'Queda Perfeita', desc: 'Dominou a queda (ukemi) sem medo', pts: 20 },
+      { id: 'm6', icon: '🔴', nome: 'Primeiro Golpe', desc: 'Aplicou sua primeira técnica com sucesso no sparring', pts: 25 },
+      { id: 'm7', icon: '🌀', nome: 'Equilíbrio de Mestre', desc: 'Manteve a guarda por 3 minutos sem ser passada', pts: 25 },
+      { id: 'm8', icon: '🐉', nome: 'Guerreiro Completo', desc: 'Treinou ataque e defesa no mesmo dia', pts: 30 },
+    ]
+  },
+  {
+    cat: '💪 Caráter & Valores', items: [
+      { id: 'm9', icon: '🙏', nome: 'Respeito em Primeiro', desc: 'Cumprimentou todos os colegas e sensei antes e depois do treino por 1 semana', pts: 20 },
+      { id: 'm10', icon: '🌟', nome: 'Guerreiro Positivo', desc: 'Incentivou um colega mais novo durante o treino', pts: 25 },
+      { id: 'm11', icon: '🦁', nome: 'Coragem de Leão', desc: 'Treinou mesmo quando queria desistir', pts: 30 },
+      { id: 'm12', icon: '🎯', nome: 'Foco Total', desc: 'Prestou atenção em toda a aula sem distrações por 1 semana', pts: 20 },
+    ]
+  },
+  {
+    cat: '🏆 Conquistas Especiais', items: [
+      { id: 'm13', icon: '🥇', nome: 'Primeira Competição', desc: 'Participou de um campeonato pela primeira vez', pts: 50 },
+      { id: 'm14', icon: '🌈', nome: 'Troca de Faixa', desc: 'Conquistou uma nova faixa ou grau', pts: 60 },
+      { id: 'm15', icon: '⭐', nome: 'Estrela da Semana', desc: 'Foi escolhido como destaque da turma', pts: 40 },
+      { id: 'm16', icon: '🎂', nome: 'Aniversário no Tatame', desc: 'Treinou no dia do seu aniversário', pts: 35 },
+    ]
+  },
+];
+
+let dados = {};
+
+function init() {
+  const saved = localStorage.getItem(KEY);
+  if (saved) dados = JSON.parse(saved);
+  renderMissoes();
+  popularSelectMissao();
+  const hoje = new Date();
+  document.getElementById('certData').value = hoje.toISOString().split('T')[0];
+  atualizarCert();
+}
+
+function salvar() {
+  localStorage.setItem(KEY, JSON.stringify(dados));
+  const badge = document.getElementById('savedBadge');
+  badge.textContent = '✓ Salvo';
+  setTimeout(() => badge.textContent = '', 2000);
+}
+
+function renderMissoes() {
+  const container = document.getElementById('missaoContainer');
+  container.innerHTML = '';
+  let totalCompletas = 0, totalMissoes = 0;
+  MISSOES.forEach(cat => {
+    const completas = cat.items.filter(m => dados[m.id] && dados[m.id].completa).length;
+    totalCompletas += completas;
+    totalMissoes += cat.items.length;
+    const div = document.createElement('div');
+    div.className = 'categoria';
+    div.innerHTML = `<div class="categoria-title"><span>${cat.cat}</span><span class="categoria-progress">${completas}/${cat.items.length}</span></div>`;
+    const grid = document.createElement('div');
+    grid.className = 'missoes-grid';
+    cat.items.forEach(m => {
+      const info = dados[m.id] || {};
+      const card = document.createElement('div');
+      card.className = 'missao-card' + (info.completa ? ' completa' : '');
+      card.innerHTML = `
+        <div class="missao-icon">${m.icon}</div>
+        <div class="missao-nome">${m.nome}</div>
+        <div class="missao-desc">${m.desc}</div>
+        <div class="missao-pts">${m.pts} pontos${info.completa ? ' ✓' : ''}</div>
+        ${info.data ? `<div class="missao-data">Conquistada em ${formatarData(info.data)}</div>` : ''}
+      `;
+      card.onclick = () => toggleMissao(m.id);
+      grid.appendChild(card);
+    });
+    div.appendChild(grid);
+    container.appendChild(div);
+  });
+  const pct = totalMissoes ? Math.round((totalCompletas / totalMissoes) * 100) : 0;
+  document.getElementById('progressText').textContent = `${totalCompletas} / ${totalMissoes} missões`;
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function toggleMissao(id) {
+  if (!dados[id]) dados[id] = {};
+  if (dados[id].completa) {
+    dados[id].completa = false;
+    dados[id].data = null;
+  } else {
+    dados[id].completa = true;
+    dados[id].data = new Date().toISOString().split('T')[0];
+  }
+  salvar();
+  renderMissoes();
+}
+
+function formatarData(iso) {
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function popularSelectMissao() {
+  const sel = document.getElementById('certMissao');
+  MISSOES.forEach(cat => {
+    const optgroup = document.createElement('optgroup');
+    optgroup.label = cat.cat;
+    cat.items.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m.id;
+      opt.textContent = m.nome;
+      opt.dataset.desc = m.desc;
+      opt.dataset.icon = m.icon;
+      optgroup.appendChild(opt);
+    });
+    sel.appendChild(optgroup);
+  });
+}
+
+function atualizarCert() {
+  const nome = document.getElementById('certNome').value || 'Nome do Aluno';
+  const academia = document.getElementById('certAcademia').value || 'Jiu-Jitsu Kids';
+  const sensei = document.getElementById('certSensei').value || 'Sensei';
+  const missaoId = document.getElementById('certMissao').value;
+  const dataRaw = document.getElementById('certData').value;
+
+  document.getElementById('certAcademiaTop').textContent = academia;
+  document.getElementById('certNomePreview').textContent = nome;
+  document.getElementById('certSenseiPreview').textContent = sensei;
+  document.getElementById('certAlunoAssin').textContent = nome;
+  document.getElementById('certDataPreview').textContent = dataRaw ? formatarData(dataRaw) : '';
+
+  if (missaoId) {
+    const sel = document.getElementById('certMissao');
+    const opt = sel.options[sel.selectedIndex];
+    document.getElementById('certEmoji').textContent = opt.dataset.icon;
+    document.getElementById('certMissaoNome').textContent = opt.textContent;
+    document.getElementById('certMissaoDesc').textContent = opt.dataset.desc;
+  } else {
+    document.getElementById('certEmoji').textContent = '🏆';
+    document.getElementById('certMissaoNome').textContent = '— Selecione uma missão —';
+    document.getElementById('certMissaoDesc').textContent = '';
+  }
+}
+
+function abrirTab(nome, el) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + nome).classList.add('active');
+  el.classList.add('active');
+}
+
+function imprimirCert() {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-certificado').classList.add('active');
+  setTimeout(() => window.print(), 200);
+}
+
+function resetarMissoes() {
+  if (!confirm('Apagar todas as missões concluídas?')) return;
+  dados = {};
+  salvar();
+  renderMissoes();
+}
+
+init();
+</script>
+</body>
+</html>

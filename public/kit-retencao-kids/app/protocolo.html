@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Protocolo dos 90 Dias — Kit Retenção Kids</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#0f0f1a;color:#f1f5f9;min-height:100vh}
+  header{background:linear-gradient(135deg,#1a1a2e,#0f0f1a);border-bottom:2px solid #f97316;padding:20px 24px;position:sticky;top:0;z-index:100}
+  .header-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .kit-badge{background:#f97316;color:white;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:20px}
+  h1{font-size:18px;font-weight:800;color:white}
+  .progress-wrap{margin-left:auto;display:flex;align-items:center;gap:12px}
+  .progress-bar{width:160px;height:8px;background:#1e293b;border-radius:4px;overflow:hidden}
+  .progress-fill{height:100%;background:#f97316;border-radius:4px;transition:width .3s}
+  .progress-label{font-size:13px;color:#94a3b8;white-space:nowrap}
+  .btn-print{background:transparent;border:1px solid #f97316;color:#f97316;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer}
+  .btn-print:hover{background:#f97316;color:white}
+  .btn-reset{background:transparent;border:1px solid #475569;color:#64748b;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;margin-left:4px}
+  main{max-width:900px;margin:0 auto;padding:24px 16px}
+  .aluno-bar{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px 20px;margin-bottom:28px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .aluno-bar label{font-size:13px;color:#94a3b8;font-weight:600}
+  .aluno-input{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 14px;color:white;font-size:14px;outline:none;min-width:200px}
+  .aluno-input:focus{border-color:#f97316}
+  .fase{margin-bottom:32px}
+  .fase-header{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:10px;margin-bottom:16px}
+  .fase-1{background:linear-gradient(135deg,#1e3a5f,#1e293b)}
+  .fase-2{background:linear-gradient(135deg,#1a3a2a,#1e293b)}
+  .fase-3{background:linear-gradient(135deg,#3a1a1a,#1e293b)}
+  .fase-4{background:linear-gradient(135deg,#3a2a0a,#1e293b)}
+  .fase-icon{font-size:24px}
+  .fase-title{font-size:16px;font-weight:800;color:white}
+  .fase-sub{font-size:12px;color:rgba(255,255,255,.6);margin-top:2px}
+  .fase-prog{margin-left:auto;font-size:12px;color:#94a3b8}
+  .semana{background:#1e293b;border:1px solid #334155;border-radius:10px;margin-bottom:12px;overflow:hidden}
+  .semana-header{padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+  .semana-header:hover{background:#263347}
+  .semana-num{background:#f97316;color:white;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0}
+  .semana-title{font-size:14px;font-weight:700;color:#e2e8f0}
+  .semana-sub{font-size:12px;color:#64748b;margin-top:1px}
+  .semana-count{margin-left:auto;font-size:12px;color:#64748b}
+  .semana-body{padding:4px 16px 12px;display:none}
+  .semana-body.open{display:block}
+  .check-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #1e293b}
+  .check-item:last-child{border-bottom:none}
+  .check-box{width:20px;height:20px;border:2px solid #475569;border-radius:5px;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;margin-top:1px}
+  .check-box.done{background:#22c55e;border-color:#22c55e}
+  .check-box.done::after{content:'✓';color:white;font-size:13px;font-weight:700}
+  .check-label{font-size:13px;color:#94a3b8;line-height:1.5;cursor:pointer}
+  .check-label.done{text-decoration:line-through;color:#475569}
+  .alerta{background:#2d1515;border:1px solid #dc2626;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#fca5a5}
+  .nota{background:#1a2a1a;border:1px solid #22c55e;border-radius:8px;padding:12px 16px;font-size:13px;color:#86efac;margin:8px 0 4px}
+  @media print{
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body{background:white;color:#1a1a2e}
+    header{position:static;background:white;border-bottom:2px solid #f97316}
+    .kit-badge{background:#f97316}
+    .btn-print,.btn-reset,.progress-wrap{display:none}
+    .aluno-bar{background:#f8fafc;border:1px solid #e5e7eb}
+    .aluno-input{background:white;border:1px solid #d1d5db;color:#1a1a2e}
+    .fase-header{-webkit-print-color-adjust:exact}
+    .semana{background:white;border:1px solid #e5e7eb;break-inside:avoid}
+    .semana-body{display:block!important}
+    .check-box{border-color:#d1d5db}
+    .check-box.done{background:#22c55e}
+    .check-label{color:#374151}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="kit-badge">Kit Retenção Kids</div>
+    <h1>📋 Protocolo dos 90 Dias</h1>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="pfill"></div></div>
+      <span class="progress-label" id="plabel">0% concluído</span>
+      <button class="btn-print" onclick="window.print()">🖨️ Imprimir</button>
+      <button class="btn-reset" onclick="resetar()">Resetar</button>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="aluno-bar">
+    <label>👦 Aluno:</label>
+    <input class="aluno-input" id="nomeAluno" type="text" placeholder="Nome da criança" oninput="salvar()">
+    <label style="margin-left:16px">📅 Início:</label>
+    <input class="aluno-input" id="dataInicio" type="date" oninput="salvar()" style="min-width:auto;width:160px">
+  </div>
+
+  <div class="fase">
+    <div class="fase-header fase-1">
+      <div class="fase-icon">🌟</div>
+      <div><div class="fase-title">Fase 1 — Encantamento</div><div class="fase-sub">Semanas 1 e 2 • Dias 1–14</div></div>
+      <div class="fase-prog" id="prog-fase1"></div>
+    </div>
+
+    <div class="semana" id="s-dia1">
+      <div class="semana-header" onclick="toggle('s-dia1')">
+        <div class="semana-num">D1</div>
+        <div><div class="semana-title">Dia 1 — Primeiro Contato</div><div class="semana-sub">⚠️ Crítico — não pule nenhum item</div></div>
+        <div class="semana-count" id="ct-s-dia1"></div>
+      </div>
+      <div class="semana-body" id="bd-s-dia1">
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Receber a criança pelo nome na entrada ("Ei, [Nome]! Você chegou!")</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Apresentar a criança a pelo menos 2 colegas de turma</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Mostrar o espaço: vestiário, tatame, bebedouro</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Entregar a Caderneta do Pequeno Guerreiro — pedir pra escrever o nome na capa</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Tirar foto da criança com a caderneta (com permissão dos pais)</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Corrigir com paciência durante a aula, nunca com impaciência</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Elogiar em público pelo menos 1 vez na frente dos colegas</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Observar: criança é introvertida ou extrovertida?</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Enviar Mensagem #2 para os pais no mesmo dia</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Enviar a foto da criança com a caderneta para os pais</div></div>
+      </div>
+    </div>
+
+    <div class="semana" id="s1">
+      <div class="semana-header" onclick="toggle('s1')">
+        <div class="semana-num">S1</div>
+        <div><div class="semana-title">Semana 1</div><div class="semana-sub">Aulas 1 a 3 — Primeiros vínculos</div></div>
+        <div class="semana-count" id="ct-s1"></div>
+      </div>
+      <div class="semana-body" id="bd-s1">
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Chamar a criança pelo nome em TODA aula</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Enviar pelo menos 1 mensagem aos pais durante a semana</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Anotar as presenças na caderneta junto com a criança</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Identificar um ponto forte e verbalizar: "você tem um jeito natural pra isso"</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Script de encerramento: "Guerreiros, o que cada um aprendeu hoje?" (falar pra turma)</div></div>
+      </div>
+    </div>
+
+    <div class="semana" id="s2">
+      <div class="semana-header" onclick="toggle('s2')">
+        <div class="semana-num">S2</div>
+        <div><div class="semana-title">Semana 2</div><div class="semana-sub">Aulas 4 a 6 — Aprofundando</div></div>
+        <div class="semana-count" id="ct-s2"></div>
+      </div>
+      <div class="semana-body" id="bd-s2">
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Enviar Mensagem #3 (explicando a metodologia)</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Fazer o primeiro check-in emocional: "Está gostando? Tem algo difícil?"</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Se detectar insegurança: 5 min de treino individual ao final da aula</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Apresentar a ideia dos Desafios Semanais para a criança</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fase">
+    <div class="fase-header fase-2">
+      <div class="fase-icon">🔗</div>
+      <div><div class="fase-title">Fase 2 — Consolidação</div><div class="fase-sub">Semanas 3 a 6 • Dias 15–42</div></div>
+      <div class="fase-prog" id="prog-fase2"></div>
+    </div>
+
+    <div class="semana" id="s3">
+      <div class="semana-header" onclick="toggle('s3')">
+        <div class="semana-num">S3</div>
+        <div><div class="semana-title">Semana 3</div><div class="semana-sub">Início dos Desafios Semanais</div></div>
+        <div class="semana-count" id="ct-s3"></div>
+      </div>
+      <div class="semana-body" id="bd-s3">
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Primeiro Desafio Semanal oficial com a turma</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Reunião rápida com os pais (WhatsApp): "Como o [Nome] está respondendo em casa?"</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Atualizar a caderneta: golpes favoritos e conquistas da semana</div></div>
+      </div>
+    </div>
+
+    <div class="semana" id="s4">
+      <div class="semana-header" onclick="toggle('s4')">
+        <div class="semana-num">S4</div>
+        <div><div class="semana-title">Semana 4 — 1 MÊS! 🎉</div><div class="semana-sub">Marco importante de retenção</div></div>
+        <div class="semana-count" id="ct-s4"></div>
+      </div>
+      <div class="semana-body" id="bd-s4">
+        <div class="nota">🎉 Parabéns! A criança chegou ao primeiro marco. Celebre isso com ela e com os pais.</div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Enviar Mensagem #25 (completando 1 mês!)</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Enviar vídeo ou áudio personalizado falando o nome da criança</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Avaliar frequência — irregular? Ativar Protocolo de Faltas</div></div>
+      </div>
+    </div>
+
+    <div class="semana" id="s56">
+      <div class="semana-header" onclick="toggle('s56')">
+        <div class="semana-num">S5-6</div>
+        <div><div class="semana-title">Semanas 5 e 6</div><div class="semana-sub">Aprofundando o vínculo</div></div>
+        <div class="semana-count" id="ct-s56"></div>
+      </div>
+      <div class="semana-body" id="bd-s56">
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Criar um apelido positivo para a criança no tatame</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Enviar mensagem de conquista (qualquer evolução visível)</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Registrar golpes favoritos na caderneta</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fase">
+    <div class="fase-header fase-3">
+      <div class="fase-icon">🏠</div>
+      <div><div class="fase-title">Fase 3 — Pertencimento</div><div class="fase-sub">Semanas 7 a 10 • Dias 43–70</div></div>
+      <div class="fase-prog" id="prog-fase3"></div>
+    </div>
+
+    <div class="semana" id="s78">
+      <div class="semana-header" onclick="toggle('s78')">
+        <div class="semana-num">S7-8</div>
+        <div><div class="semana-title">Semanas 7 e 8</div><div class="semana-sub">Dando protagonismo</div></div>
+        <div class="semana-count" id="ct-s78"></div>
+      </div>
+      <div class="semana-body" id="bd-s78">
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Dar tarefa de liderança: "ajude esse coleguinha nesse movimento"</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Elogiar em frente à turma por evolução técnica específica</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Perguntar à criança: "Qual coleguinha você mais gosta de treinar junto?"</div></div>
+      </div>
+    </div>
+
+    <div class="semana" id="s910">
+      <div class="semana-header" onclick="toggle('s910')">
+        <div class="semana-num">S9-10</div>
+        <div><div class="semana-title">Semanas 9 e 10</div><div class="semana-sub">Preparando para a 1ª conquista</div></div>
+        <div class="semana-count" id="ct-s910"></div>
+      </div>
+      <div class="semana-body" id="bd-s910">
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Comunicar aos pais que a criança está próxima da avaliação</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Aumentar os desafios técnicos gradualmente</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Preparar certificado e missão de conquista do Kit</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fase">
+    <div class="fase-header fase-4">
+      <div class="fase-icon">🏆</div>
+      <div><div class="fase-title">Fase 4 — Primeira Conquista</div><div class="fase-sub">Semanas 11 a 13 • Dias 71–90</div></div>
+      <div class="fase-prog" id="prog-fase4"></div>
+    </div>
+
+    <div class="alerta">🚨 <strong>Protocolo de Faltas:</strong> 1ª falta → Mensagem #28 no mesmo dia. 2 faltas → ligue ou mande áudio + Mensagem #29. 1 semana → contato direto, entenda o motivo. Retorno → comemore! Mensagem #30.</div>
+
+    <div class="semana" id="s1112">
+      <div class="semana-header" onclick="toggle('s1112')">
+        <div class="semana-num">S11-12</div>
+        <div><div class="semana-title">Semanas 11 e 12</div><div class="semana-sub">Avaliação e preparação</div></div>
+        <div class="semana-count" id="ct-s1112"></div>
+      </div>
+      <div class="semana-body" id="bd-s1112">
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Comunicar formalmente a data da avaliação para os pais</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Preparar o certificado impresso do Kit de Conquistas</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Conversar com a criança sobre o que aprendeu nesses 90 dias</div></div>
+      </div>
+    </div>
+
+    <div class="semana" id="s13">
+      <div class="semana-header" onclick="toggle('s13')">
+        <div class="semana-num">S13</div>
+        <div><div class="semana-title">Semana 13 — DIA DA CONQUISTA 🎉</div><div class="semana-sub">O momento mais importante dos 90 dias</div></div>
+        <div class="semana-count" id="ct-s13"></div>
+      </div>
+      <div class="semana-body" id="bd-s13">
+        <div class="nota">🏆 Este é o momento que garante a fidelização. Faça com carinho!</div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Realizar cerimônia de entrega da faixa/grau (mesmo que simples)</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Entregar o certificado impresso em aula</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Enviar Mensagem #21 para os pais no mesmo dia</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Pedir para os pais compartilharem nas redes sociais e marcarem a academia</div></div>
+        <div class="check-item"><div class="check-box" onclick="marcar(this)"></div><div class="check-label" onclick="marcar(this.previousElementSibling)">Fotografar o momento da entrega para o arquivo da academia</div></div>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+const KEY = 'protocolo90_v1';
+
+function salvar() {
+  const dados = { nome: document.getElementById('nomeAluno').value, data: document.getElementById('dataInicio').value, checks: {} };
+  document.querySelectorAll('.check-box').forEach((b,i) => { dados.checks[i] = b.classList.contains('done'); });
+  localStorage.setItem(KEY, JSON.stringify(dados));
+  atualizarProgresso();
+}
+
+function carregar() {
+  const raw = localStorage.getItem(KEY);
+  if (!raw) return;
+  const dados = JSON.parse(raw);
+  document.getElementById('nomeAluno').value = dados.nome || '';
+  document.getElementById('dataInicio').value = dados.data || '';
+  document.querySelectorAll('.check-box').forEach((b,i) => {
+    if (dados.checks[i]) { b.classList.add('done'); b.nextElementSibling.classList.add('done'); }
+  });
+  atualizarProgresso();
+}
+
+function marcar(box) {
+  box.classList.toggle('done');
+  box.nextElementSibling.classList.toggle('done');
+  salvar();
+}
+
+function toggle(id) {
+  document.getElementById('bd-'+id).classList.toggle('open');
+}
+
+function atualizarProgresso() {
+  const all = document.querySelectorAll('.check-box');
+  const done = document.querySelectorAll('.check-box.done');
+  const pct = all.length ? Math.round(done.length/all.length*100) : 0;
+  document.getElementById('pfill').style.width = pct+'%';
+  document.getElementById('plabel').textContent = pct+'% concluído';
+
+  const fases = [['fase1',['s-dia1','s1','s2']],['fase2',['s3','s4','s56']],['fase3',['s78','s910']],['fase4',['s1112','s13']]];
+  fases.forEach(([fid, semanas]) => {
+    let t=0,d=0;
+    semanas.forEach(s => {
+      const el = document.getElementById('bd-'+s);
+      if (!el) return;
+      const boxes = el.querySelectorAll('.check-box');
+      t += boxes.length;
+      d += el.querySelectorAll('.check-box.done').length;
+      const ct = document.getElementById('ct-'+s);
+      if (ct) ct.textContent = d+'/'+t+' feitos';
+    });
+    const prog = document.getElementById('prog-'+fid);
+    if (prog) prog.textContent = d+'/'+t;
+  });
+
+  document.querySelectorAll('.semana').forEach(s => {
+    const boxes = s.querySelectorAll('.check-box');
+    const doneBoxes = s.querySelectorAll('.check-box.done');
+    const ct = s.querySelector('[id^="ct-"]');
+    if (ct) ct.textContent = doneBoxes.length+'/'+boxes.length+' feitos';
+  });
+}
+
+function resetar() {
+  if (!confirm('Resetar todo o progresso?')) return;
+  localStorage.removeItem(KEY);
+  document.querySelectorAll('.check-box').forEach(b => { b.classList.remove('done'); b.nextElementSibling.classList.remove('done'); });
+  document.getElementById('nomeAluno').value = '';
+  document.getElementById('dataInicio').value = '';
+  atualizarProgresso();
+}
+
+document.getElementById('s-dia1').querySelector('.semana-body').classList.add('open');
+carregar();
+</script>
+</body>
+</html>

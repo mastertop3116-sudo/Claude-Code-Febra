@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>50 Mensagens de WhatsApp — Kit Retenção Kids</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#0f0f1a;color:#f1f5f9;min-height:100vh}
+  header{background:linear-gradient(135deg,#1a1a2e,#0f0f1a);border-bottom:2px solid #f97316;padding:20px 24px;position:sticky;top:0;z-index:100}
+  .header-inner{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .kit-badge{background:#f97316;color:white;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:20px}
+  h1{font-size:18px;font-weight:800;color:white}
+  .subtitle{color:#94a3b8;font-size:13px;margin-left:auto}
+  .search-bar{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:10px 14px;color:white;font-size:14px;width:100%;max-width:400px;outline:none}
+  .search-bar:focus{border-color:#f97316}
+  main{max-width:860px;margin:0 auto;padding:24px 16px}
+  .bloco{margin-bottom:36px}
+  .bloco-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #f97316}
+  .bloco-num{background:#f97316;color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+  .bloco-title{font-size:15px;font-weight:700;color:#f97316;text-transform:uppercase;letter-spacing:1px}
+  .bloco-count{margin-left:auto;color:#64748b;font-size:12px}
+  .msg-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px;margin-bottom:10px;position:relative;transition:border-color .2s}
+  .msg-card:hover{border-color:#f97316}
+  .msg-num{font-size:10px;font-weight:700;color:#f97316;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+  .msg-title{font-size:13px;font-weight:700;color:#cbd5e1;margin-bottom:8px}
+  .msg-text{font-size:14px;color:#94a3b8;line-height:1.7;background:#0f172a;border-radius:8px;padding:12px 14px;border-left:3px solid #22c55e;white-space:pre-wrap}
+  .copy-btn{position:absolute;top:12px;right:12px;background:#f97316;color:white;border:none;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s}
+  .copy-btn:hover{background:#ea580c;transform:scale(1.05)}
+  .copy-btn.copied{background:#22c55e}
+  .hidden{display:none}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+  .filter-btn{background:#1e293b;border:1px solid #334155;color:#94a3b8;padding:6px 14px;border-radius:20px;font-size:12px;cursor:pointer;transition:all .2s}
+  .filter-btn:hover,.filter-btn.active{background:#f97316;border-color:#f97316;color:white}
+  .empty{text-align:center;padding:48px;color:#475569}
+  @media print{
+    body{background:white;color:#1a1a2e}
+    header{background:white;border-bottom:2px solid #f97316;position:static}
+    .kit-badge{background:#f97316}
+    .subtitle,.search-bar,.filters,.copy-btn{display:none}
+    .msg-card{background:white;border:1px solid #e5e7eb;break-inside:avoid}
+    .msg-text{background:#f8fafc;color:#374151}
+    .bloco-header{break-after:avoid}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="kit-badge">Kit Retenção Kids</div>
+    <h1>50 Mensagens de WhatsApp</h1>
+    <span class="subtitle">Clique em qualquer mensagem para copiar</span>
+    <input class="search-bar" type="text" placeholder="🔍 Buscar mensagem..." id="search" oninput="filtrar()">
+  </div>
+</header>
+<main>
+  <div class="filters">
+    <button class="filter-btn active" onclick="filtrarBloco('todos',this)">Todos</button>
+    <button class="filter-btn" onclick="filtrarBloco('1',this)">👋 Boas-Vindas</button>
+    <button class="filter-btn" onclick="filtrarBloco('2',this)">💪 Motivação</button>
+    <button class="filter-btn" onclick="filtrarBloco('3',this)">📢 Avisos</button>
+    <button class="filter-btn" onclick="filtrarBloco('4',this)">🏆 Conquistas</button>
+    <button class="filter-btn" onclick="filtrarBloco('5',this)">❗ Faltas</button>
+    <button class="filter-btn" onclick="filtrarBloco('6',this)">🎂 Datas</button>
+    <button class="filter-btn" onclick="filtrarBloco('7',this)">💡 Dicas</button>
+    <button class="filter-btn" onclick="filtrarBloco('8',this)">🔗 Fidelização</button>
+  </div>
+
+  <div id="blocos">
+
+  <div class="bloco" data-bloco="1">
+    <div class="bloco-header"><div class="bloco-num">1</div><div class="bloco-title">Boas-Vindas</div><div class="bloco-count">Use na 1ª semana</div></div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #1</div>
+      <div class="msg-title">Chegada na academia</div>
+      <div class="msg-text">Olá, [Nome do pai/mãe]! 🥋 Seja bem-vindo(a) à nossa família! O [Nome da criança] começou hoje uma jornada incrível. O Jiu-Jitsu vai desenvolver muito mais do que golpes — vai formar o caráter dele(a). Qualquer dúvida, estou aqui!</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #2</div>
+      <div class="msg-title">Após a primeira aula</div>
+      <div class="msg-text">E aí, [Nome do pai/mãe]? Como o [Nome da criança] voltou pra casa? 😄 Primeira aula é sempre especial. Ele(a) foi muito bem! Pode ficar tranquilo(a), vamos caminhar no ritmo dele(a).</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #3</div>
+      <div class="msg-title">Explicando a metodologia</div>
+      <div class="msg-text">[Nome do pai/mãe], quero te contar como funciona aqui. Trabalhamos com foco em 3 pilares: respeito, disciplina e confiança. O Jiu-Jitsu é só o meio. O que sai daqui é um filho(a) mais seguro(a) e centrado(a). 🙏</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #4</div>
+      <div class="msg-title">Primeiros dias — tranquilizando</div>
+      <div class="msg-text">Normal a criança chegar em casa cansada e ainda animada ao mesmo tempo nos primeiros dias! 😂 O corpo está se adaptando. É sinal que a aula foi de qualidade. Descansando bem, amanhã ela está 100%!</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #5</div>
+      <div class="msg-title">Apresentando os próximos passos</div>
+      <div class="msg-text">[Nome do pai/mãe], nas próximas semanas o [Nome da criança] vai aprender os fundamentos básicos do Jiu-Jitsu. Não se preocupe com evolução rápida — aqui valorizamos o processo. Cada aula é uma vitória! 🏆</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+  </div>
+
+  <div class="bloco" data-bloco="2">
+    <div class="bloco-header"><div class="bloco-num">2</div><div class="bloco-title">Motivação e Encorajamento</div><div class="bloco-count">Use quando quiser</div></div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #6</div>
+      <div class="msg-title">Elogio do dia</div>
+      <div class="msg-text">[Nome do pai/mãe], quero te contar: o [Nome da criança] se destacou muito hoje! A dedicação dele(a) dentro do tatame é muito bonita de ver. Você pode se orgulhar! 💪</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #7</div>
+      <div class="msg-title">Quando a criança está evoluindo</div>
+      <div class="msg-text">Ei! Precisava te contar: o [Nome da criança] está evoluindo muito! Dá pra ver a diferença da primeira aula até agora. Isso é resultado de consistência — e da parceria de vocês em trazê-lo(a) aqui. Valeu demais! 🥋</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #8</div>
+      <div class="msg-title">Reforço de comportamento positivo</div>
+      <div class="msg-text">Hoje o [Nome da criança] ajudou um coleguinha que estava com dificuldade no movimento. Sem eu pedir. Isso é Jiu-Jitsu de verdade. Parabéns pra vocês pela criação! 🙏❤️</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #9</div>
+      <div class="msg-title">Mensagem de segunda-feira</div>
+      <div class="msg-text">Boa semana, família [Sobrenome]! O tatame está esperando o [Nome da criança]. Essa semana vai ser incrível — tenho certeza! 💪🥋</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #10</div>
+      <div class="msg-title">Motivacional geral</div>
+      <div class="msg-text">Todo grande campeão um dia foi um iniciante que não desistiu. O [Nome da criança] está construindo algo sólido aqui. Bloco por bloco. Aula por aula. 🏆</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #11</div>
+      <div class="msg-title">Após uma aula difícil</div>
+      <div class="msg-text">A aula de hoje foi puxada, mas o [Nome da criança] não largou! Esses momentos difíceis são os que mais formam o caráter. Diga pra ele(a) que o sensei se orgulha muito. 💙</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #12</div>
+      <div class="msg-title">Frase de impacto</div>
+      <div class="msg-text">"A faixa muda. O caráter construído no tatame, ninguém tira." 🥋 O [Nome da criança] está nesse caminho. Continue apoiando — faz toda a diferença!</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #13</div>
+      <div class="msg-title">Quando a criança superou um desafio</div>
+      <div class="msg-text">Que aula hoje, hein! O [Nome da criança] tentou aquele movimento 10 vezes e na 10ª saiu perfeito. Isso chamamos de garra. Ele(a) tem muito! 🔥</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #14</div>
+      <div class="msg-title">Fim de semana</div>
+      <div class="msg-text">Bom fim de semana, família! Aproveitem bastante o [Nome da criança]. Na segunda, a gente recebe ele(a) aqui com tudo! 😄🥋</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #15</div>
+      <div class="msg-title">Reconhecimento da família</div>
+      <div class="msg-text">[Nome do pai/mãe], quero agradecer por confiar o [Nome da criança] pra gente. Não é simples trazer uma criança toda semana, manter a rotina, incentivar. Isso é família comprometida. 🙏</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+  </div>
+
+  <div class="bloco" data-bloco="3">
+    <div class="bloco-header"><div class="bloco-num">3</div><div class="bloco-title">Avisos e Comunicados</div><div class="bloco-count">Use com frequência</div></div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #16</div>
+      <div class="msg-title">Lembrete de aula</div>
+      <div class="msg-text">Oi, [Nome do pai/mãe]! Só lembrando: amanhã tem aula às [HORÁRIO]. O [Nome da criança] não pode faltar, né? 😄🥋 Qualquer imprevisto me avisa!</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #17</div>
+      <div class="msg-title">Aula especial / temática</div>
+      <div class="msg-text">Aviso importante! Na próxima [DIA], teremos uma aula especial: [TEMA DA AULA]. Vai ser incrível! Traga o [Nome da criança] com a kimono limpa e boa energia. 🔥</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #18</div>
+      <div class="msg-title">Cancelamento de aula</div>
+      <div class="msg-text">[Nome do pai/mãe], informamos que a aula de [DIA] está cancelada por [MOTIVO]. Já reagendamos para [NOVA DATA]. Desculpe o inconveniente! Qualquer dúvida, estou à disposição. 🙏</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #19</div>
+      <div class="msg-title">Aviso de evento / torneio</div>
+      <div class="msg-text">Atenção, família [Sobrenome]! No dia [DATA] teremos nosso [NOME DO EVENTO]. Seria ótimo ter o [Nome da criança] presente — é uma experiência incrível! Mais detalhes em breve. 🏆</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #20</div>
+      <div class="msg-title">Aviso de feriado</div>
+      <div class="msg-text">Oi! Lembrando que no dia [DATA] — [NOME DO FERIADO] — não haverá aula. Aproveitem o feriado em família! Na [DIA] retomamos normalmente. 🙏</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+  </div>
+
+  <div class="bloco" data-bloco="4">
+    <div class="bloco-header"><div class="bloco-num">4</div><div class="bloco-title">Conquistas e Celebrações</div><div class="bloco-count">Momentos de ouro</div></div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #21</div>
+      <div class="msg-title">Nova faixa / grau</div>
+      <div class="msg-text">🎉 PARABÉNS, [Nome da criança]! Hoje você conquistou [FAIXA/GRAU]! Essa conquista é resultado de muito esforço, dedicação e coragem. Família [Sobrenome], vocês têm motivo enorme pra se orgulhar! 🥋❤️</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #22</div>
+      <div class="msg-title">Primeiro galão</div>
+      <div class="msg-text">Ei, [Nome do pai/mãe]! O [Nome da criança] ganhou o primeiro galão hoje! Parece pequeno, mas é um marco enorme. Ele(a) está construindo a base de um campeão(ã)! 🔥🏅</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #23</div>
+      <div class="msg-title">Primeiro sparring</div>
+      <div class="msg-text">Grande dia hoje! O [Nome da criança] fez o primeiro treino de luta. Ficou nervoso(a) no começo, mas foi de cabeça — e se saiu muito bem! Esse é o Jiu-Jitsu que forma pessoas de verdade. 💪</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #24</div>
+      <div class="msg-title">Primeiro torneio</div>
+      <div class="msg-text">[Nome do pai/mãe], participar de um torneio já é uma vitória enorme, independente do resultado. O [Nome da criança] mostrou coragem hoje e isso vale qualquer medalha. Parabéns pra toda a família! 🏅🎉</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #25</div>
+      <div class="msg-title">Completando 1 mês</div>
+      <div class="msg-text">Um mês de Jiu-Jitsu! 🎉 O [Nome da criança] chegou tímido(a) e hoje já faz os movimentos com naturalidade. Em 1 mês de aula, a evolução é visível. Imagina em 1 ano! 🥋💙</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #26</div>
+      <div class="msg-title">Completando 6 meses</div>
+      <div class="msg-text">6 meses de tatame! Isso não é pouca coisa. Muitas crianças desistem antes. O [Nome da criança] mostrou consistência e caráter. Que os próximos 6 sejam ainda melhores! 🏆</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #27</div>
+      <div class="msg-title">Completando 1 ano</div>
+      <div class="msg-text">1 ANO DE JIU-JITSU! 🎉🏆 O [Nome da criança] faz parte de um grupo seleto. A maioria desiste antes disso. Mas vocês ficaram. E o resultado tá aí — em cada atitude, em cada escolha, em cada treino. Muito obrigado pela confiança!</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+  </div>
+
+  <div class="bloco" data-bloco="5">
+    <div class="bloco-header"><div class="bloco-num">5</div><div class="bloco-title">Gestão de Faltas</div><div class="bloco-count">Crítico para retenção</div></div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #28</div>
+      <div class="msg-title">1ª falta (mesmo dia)</div>
+      <div class="msg-text">Oi, [Nome do pai/mãe]! O [Nome da criança] faltou hoje. Está tudo bem? Qualquer coisa, estou à disposição! A gente sente falta dele(a) no tatame. 🥋</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #29</div>
+      <div class="msg-title">2 faltas seguidas</div>
+      <div class="msg-text">[Nome do pai/mãe], o [Nome da criança] está sumido! 😅 Ficamos com saudade. Algum problema? Me conta pra ver se consigo ajudar. Não desista — vocês chegaram longe demais pra parar agora!</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #30</div>
+      <div class="msg-title">Retorno após falta</div>
+      <div class="msg-text">QUE SAUDADE! O [Nome da criança] voltou e a turma ficou feliz de verdade! Isso aqui é uma família. Bem-vindo(a) de volta! 🥋❤️</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #31</div>
+      <div class="msg-title">Motivação para voltar</div>
+      <div class="msg-text">[Nome do pai/mãe], sei que a vida é corrida. Mas o [Nome da criança] tem um talento real pra isso. Seria uma pena desperdiçar. O tatame está esperando. 💪</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #32</div>
+      <div class="msg-title">1 semana sem aparecer</div>
+      <div class="msg-text">[Nome do pai/mãe], faz uma semana que o [Nome da criança] não aparece. Fico preocupado(a). Pode me contar o que está acontecendo? Quero ajudar se tiver algo no meu alcance. 🙏</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+  </div>
+
+  <div class="bloco" data-bloco="6">
+    <div class="bloco-header"><div class="bloco-num">6</div><div class="bloco-title">Datas Especiais</div><div class="bloco-count">Cria vínculo emocional</div></div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #33</div>
+      <div class="msg-title">Aniversário da criança</div>
+      <div class="msg-text">🎂 Parabéns, [Nome da criança]! Hoje é o seu dia especial. Que você cresça sempre com garra, respeito e muita alegria — dentro e fora do tatame! Abraço do sensei! 🥋🎉</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #34</div>
+      <div class="msg-title">Aniversário dos pais</div>
+      <div class="msg-text">[Nome do pai/mãe], hoje é o seu dia! 🎂 Obrigado por confiar o [Nome da criança] pra gente. É uma honra fazer parte da jornada dessa família. Feliz aniversário! 🙏</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #35</div>
+      <div class="msg-title">Natal</div>
+      <div class="msg-text">Feliz Natal, família [Sobrenome]! 🎄 Que esse fim de ano seja cheio de paz, saúde e motivos pra sorrir. Nos vemos em [DATA DE RETORNO]! 🥋❤️</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #36</div>
+      <div class="msg-title">Ano Novo</div>
+      <div class="msg-text">Feliz Ano Novo, família [Sobrenome]! 🎆 Que [ANO] seja de muito tatame, evolução e saúde pra toda a família. O [Nome da criança] começa o ano com muito a conquistar! 🥋</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #37</div>
+      <div class="msg-title">Dia das Crianças</div>
+      <div class="msg-text">Feliz Dia das Crianças, [Nome da criança]! 🎈 Que você sempre tenha a alegria de hoje — dentro e fora do tatame. Você é especial pra nossa academia! 🥋❤️</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+  </div>
+
+  <div class="bloco" data-bloco="7">
+    <div class="bloco-header"><div class="bloco-num">7</div><div class="bloco-title">Dicas para Pais</div><div class="bloco-count">Educa e cria parceria</div></div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #38</div>
+      <div class="msg-title">Como ajudar em casa</div>
+      <div class="msg-text">[Nome do pai/mãe], uma dica simples que faz diferença: pergunte ao [Nome da criança] o que ele(a) aprendeu hoje na aula. Isso reforça o aprendizado e mostra que você valoriza o esforço dele(a). 🧠🥋</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #39</div>
+      <div class="msg-title">Importância da regularidade</div>
+      <div class="msg-text">A maior lição do Jiu-Jitsu é: consistência. Uma criança que vem toda semana evolui 3x mais rápido. A rotina é o maior presente que vocês podem dar a ele(a). 🏆</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #40</div>
+      <div class="msg-title">Sobre comparação com outros</div>
+      <div class="msg-text">[Nome do pai/mãe], cada criança evolui no seu ritmo. Não compare o [Nome da criança] com os colegas — compare com ele(a) mesmo(a) da semana passada. A evolução é real e individual. 🥋</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #41</div>
+      <div class="msg-title">Nutrição e descanso</div>
+      <div class="msg-text">Dica rápida: criança que vem cansada e com fome aprende menos e se frustra mais. Uma alimentação leve 1h antes da aula e sono adequado fazem diferença enorme no rendimento! 💪😴</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+  </div>
+
+  <div class="bloco" data-bloco="8">
+    <div class="bloco-header"><div class="bloco-num">8</div><div class="bloco-title">Fidelização</div><div class="bloco-count">Retém e gera indicações</div></div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #42</div>
+      <div class="msg-title">Pedido de indicação</div>
+      <div class="msg-text">[Nome do pai/mãe], se você conhece algum amigo com filho(a) que se beneficiaria do Jiu-Jitsu, adoraríamos receber! Crianças que treinam com amigos evoluem ainda mais rápido. 🥋😄</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #43</div>
+      <div class="msg-title">Pedido de avaliação / depoimento</div>
+      <div class="msg-text">[Nome do pai/mãe], sua opinião vale muito pra nós. Se puder deixar um comentário rápido sobre a experiência do [Nome da criança] aqui, ficaria muito grato(a)! Pode ser no Google ou no Instagram da academia. 🙏</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #44</div>
+      <div class="msg-title">Gratidão pelo ano</div>
+      <div class="msg-text">Fim de ano chegando e eu só tenho gratidão! Obrigado, família [Sobrenome], por cada aula, cada treino, cada conquista do [Nome da criança]. O ano foi especial por causa de vocês. 🙏❤️</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #45</div>
+      <div class="msg-title">Renovação de matrícula</div>
+      <div class="msg-text">[Nome do pai/mãe], o próximo período se aproxima. Quero contar com o [Nome da criança] mais uma vez! Se tiver qualquer dúvida sobre renovação, me chama. 🥋</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #46</div>
+      <div class="msg-title">Compartilhar nas redes sociais</div>
+      <div class="msg-text">[Nome do pai/mãe], se puder postar uma foto ou vídeo do [Nome da criança] no tatame e marcar a gente, fica ótimo! Além de guardar a memória, ajuda outras famílias a conhecerem o Jiu-Jitsu. 📱🥋</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #47</div>
+      <div class="msg-title">Check-in emocional semestral</div>
+      <div class="msg-text">[Nome do pai/mãe], já faz alguns meses que o [Nome da criança] treina aqui. Queria saber: como você avalia a evolução dele(a)? Tem alguma coisa que posso melhorar? Sua opinião é muito importante! 🙏</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #48</div>
+      <div class="msg-title">Quando o pai/mãe assiste a aula</div>
+      <div class="msg-text">[Nome do pai/mãe], foi ótimo ter você aqui assistindo hoje! Ver os pais presentes motiva demais as crianças. O [Nome da criança] brilhou mais ainda com você aqui. Volta sempre! 😄🥋</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #49</div>
+      <div class="msg-title">Mensagem de gratidão simples</div>
+      <div class="msg-text">Só passando pra dizer: obrigado por confiar no nosso trabalho. Cuidar do [Nome da criança] é uma responsabilidade que levamos muito a sério. 🙏🥋</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+    <div class="msg-card">
+      <div class="msg-num">Mensagem #50</div>
+      <div class="msg-title">A mensagem mais importante</div>
+      <div class="msg-text">[Nome do pai/mãe], o [Nome da criança] é especial pra nossa academia. Não é só um aluno — é parte da nossa família. Obrigado por fazer parte dessa história. 🥋❤️</div>
+      <button class="copy-btn" onclick="copiar(this)">Copiar</button>
+    </div>
+  </div>
+
+  </div><!-- #blocos -->
+  <div class="empty hidden" id="empty">Nenhuma mensagem encontrada.</div>
+</main>
+
+<script>
+let blocoAtivo = 'todos';
+
+function copiar(btn) {
+  const texto = btn.parentElement.querySelector('.msg-text').innerText;
+  navigator.clipboard.writeText(texto).then(() => {
+    btn.textContent = '✓ Copiado!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function filtrarBloco(bloco, el) {
+  blocoAtivo = bloco;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  filtrar();
+}
+
+function filtrar() {
+  const q = document.getElementById('search').value.toLowerCase();
+  let algum = false;
+  document.querySelectorAll('.bloco').forEach(bloco => {
+    const blocoNum = bloco.dataset.bloco;
+    const blocoOk = blocoAtivo === 'todos' || blocoAtivo === blocoNum;
+    let blocoTemAlgo = false;
+    bloco.querySelectorAll('.msg-card').forEach(card => {
+      const texto = card.innerText.toLowerCase();
+      const ok = blocoOk && (!q || texto.includes(q));
+      card.classList.toggle('hidden', !ok);
+      if (ok) blocoTemAlgo = true;
+    });
+    bloco.classList.toggle('hidden', !blocoTemAlgo);
+    if (blocoTemAlgo) algum = true;
+  });
+  document.getElementById('empty').classList.toggle('hidden', algum);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caderneta do Pequeno Guerreiro</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0f0f1a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
+
+  .header { background: linear-gradient(135deg, #1e293b, #0f172a); padding: 24px; border-bottom: 2px solid #f97316; }
+  .header h1 { font-size: 1.6rem; color: #f97316; }
+  .header p { color: #94a3b8; font-size: 0.9rem; margin-top: 4px; }
+
+  .toolbar { background: #1e293b; padding: 12px 24px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; border-bottom: 1px solid #334155; }
+  .btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all .2s; }
+  .btn-primary { background: #f97316; color: #fff; }
+  .btn-primary:hover { background: #ea6c0a; }
+  .btn-secondary { background: #334155; color: #94a3b8; }
+  .btn-secondary:hover { background: #475569; color: #e2e8f0; }
+  .btn-danger { background: #7f1d1d; color: #fca5a5; }
+  .btn-danger:hover { background: #991b1b; }
+  .saved-badge { font-size: 0.75rem; color: #22c55e; margin-left: auto; }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 24px; }
+
+  .section { background: #1e293b; border-radius: 12px; padding: 24px; margin-bottom: 24px; border: 1px solid #334155; }
+  .section-title { font-size: 1rem; font-weight: 700; color: #f97316; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+  .section-title span { font-size: 1.2rem; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+  label { font-size: 0.8rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+  input, textarea, select {
+    background: #0f172a; border: 1px solid #334155; border-radius: 8px;
+    color: #e2e8f0; padding: 10px 12px; font-size: 0.9rem; font-family: inherit;
+    transition: border-color .2s;
+  }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: #f97316; }
+  textarea { resize: vertical; min-height: 80px; }
+
+  .belt-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+  .belt-item { background: #0f172a; border: 2px solid #334155; border-radius: 10px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all .2s; }
+  .belt-item.conquistada { border-color: #f97316; background: #1a0d00; }
+  .belt-item .belt-icon { font-size: 1.6rem; margin-bottom: 6px; }
+  .belt-item .belt-name { font-size: 0.75rem; color: #94a3b8; }
+  .belt-item.conquistada .belt-name { color: #f97316; }
+  .belt-item .belt-date { font-size: 0.7rem; color: #475569; margin-top: 4px; }
+  .belt-item input { background: transparent; border: none; border-bottom: 1px solid #334155; border-radius: 0; padding: 2px 4px; font-size: 0.7rem; color: #94a3b8; text-align: center; width: 100%; margin-top: 4px; }
+
+  .presenca-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .presenca-mes { margin-bottom: 16px; }
+  .presenca-mes h4 { font-size: 0.8rem; color: #f97316; margin-bottom: 8px; }
+  .presenca-dia { width: 36px; height: 36px; border-radius: 6px; background: #0f172a; border: 1px solid #334155; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #475569; transition: all .2s; }
+  .presenca-dia.presente { background: #f97316; border-color: #f97316; color: #fff; font-weight: 700; }
+  .presenca-dia.falta { background: #7f1d1d; border-color: #991b1b; color: #fca5a5; }
+  .presenca-dia.vazio { opacity: 0; pointer-events: none; }
+  .presenca-legenda { display: flex; gap: 16px; margin-top: 10px; font-size: 0.78rem; }
+  .leg-dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; margin-right: 4px; }
+
+  .golpe-list { display: flex; flex-direction: column; gap: 8px; }
+  .golpe-row { display: flex; gap: 8px; align-items: center; }
+  .golpe-row input { flex: 1; }
+  .golpe-row .btn-remove { background: transparent; border: 1px solid #475569; color: #94a3b8; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
+  .golpe-row .btn-remove:hover { border-color: #ef4444; color: #ef4444; }
+  .btn-add { margin-top: 8px; background: transparent; border: 1px dashed #334155; color: #64748b; padding: 8px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 0.85rem; transition: all .2s; }
+  .btn-add:hover { border-color: #f97316; color: #f97316; }
+
+  .momentos-list { display: flex; flex-direction: column; gap: 12px; }
+  .momento-card { background: #0f172a; border-radius: 8px; padding: 14px; border-left: 3px solid #f97316; }
+  .momento-card-header { display: flex; gap: 8px; margin-bottom: 8px; }
+  .momento-card-header input { flex: 1; }
+  .momento-card-header input:first-child { max-width: 140px; }
+
+  @media (max-width: 600px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .form-grid.cols-3 { grid-template-columns: 1fr 1fr; }
+    .belt-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media print {
+    body { background: #fff; color: #111; }
+    .header { background: #fff; border-bottom: 2px solid #f97316; }
+    .header h1 { color: #f97316; }
+    .header p { color: #555; }
+    .toolbar { display: none; }
+    .section { background: #fff; border: 1px solid #ddd; break-inside: avoid; }
+    .section-title { color: #f97316; }
+    label { color: #555; }
+    input, textarea, select { background: #fff; border: 1px solid #ccc; color: #111; }
+    .belt-item { border-color: #ddd; background: #fff; }
+    .belt-item.conquistada { border-color: #f97316; background: #fff8f0; }
+    .belt-item .belt-name { color: #555; }
+    .belt-item.conquistada .belt-name { color: #f97316; }
+    .presenca-dia { background: #f5f5f5; border-color: #ccc; color: #333; }
+    .presenca-dia.presente { background: #f97316; color: #fff; }
+    .presenca-dia.falta { background: #fee2e2; color: #991b1b; }
+    .golpe-row .btn-remove, .btn-add { display: none; }
+    .btn-remove-momento { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📓 Caderneta do Pequeno Guerreiro</h1>
+  <p>Acompanhe a jornada completa do seu aluno — preencha, salve e imprima a qualquer momento</p>
+</div>
+
+<div class="toolbar">
+  <button class="btn btn-secondary" onclick="window.history.back()">← Voltar</button>
+  <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir</button>
+  <button class="btn btn-secondary" onclick="novaFicha()">+ Nova Ficha</button>
+  <button class="btn btn-danger" onclick="resetar()">Resetar</button>
+  <span class="saved-badge" id="savedBadge"></span>
+</div>
+
+<div class="container">
+
+  <!-- IDENTIFICAÇÃO -->
+  <div class="section">
+    <div class="section-title"><span>🥋</span> Identificação do Aluno</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Nome Completo</label>
+        <input type="text" id="nome" placeholder="Nome do aluno" oninput="salvar()">
+      </div>
+      <div class="form-group">
+        <label>Apelido / Como prefere ser chamado</label>
+        <input type="text" id="apelido" placeholder="Apelido" oninput="salvar()">
+      </div>
+      <div class="form-group">
+        <label>Data de Nascimento</label>
+        <input type="date" id="nascimento" oninput="salvar()">
+      </div>
+      <div class="form-group">
+        <label>Data de Início no Jiu-Jitsu</label>
+        <input type="date" id="inicio" oninput="salvar()">
+      </div>
+      <div class="form-group">
+        <label>Nome dos Pais / Responsável</label>
+        <input type="text" id="responsavel" placeholder="Nome do responsável" oninput="salvar()">
+      </div>
+      <div class="form-group">
+        <label>WhatsApp do Responsável</label>
+        <input type="tel" id="whatsapp" placeholder="(99) 99999-9999" oninput="salvar()">
+      </div>
+      <div class="form-group full">
+        <label>Objetivo do Aluno (o que a família quer desenvolver)</label>
+        <textarea id="objetivo" placeholder="Ex: disciplina, respeito, autoconfiança, competições..." oninput="salvar()"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAIXAS -->
+  <div class="section">
+    <div class="section-title"><span>🏆</span> Jornada de Faixas</div>
+    <div class="belt-grid" id="beltGrid"></div>
+  </div>
+
+  <!-- GOLPES FAVORITOS -->
+  <div class="section">
+    <div class="section-title"><span>⚡</span> Golpes & Técnicas Favoritas</div>
+    <div class="golpe-list" id="golpeList"></div>
+    <button class="btn-add" onclick="addGolpe()">+ Adicionar técnica</button>
+  </div>
+
+  <!-- PRESENÇA -->
+  <div class="section">
+    <div class="section-title"><span>📅</span> Registro de Presença</div>
+    <div id="presencaContainer"></div>
+    <div class="presenca-legenda">
+      <span><span class="leg-dot" style="background:#f97316"></span>Presente</span>
+      <span><span class="leg-dot" style="background:#7f1d1d"></span>Falta</span>
+      <span><span class="leg-dot" style="background:#1e293b;border:1px solid #334155"></span>Sem marcação</span>
+    </div>
+  </div>
+
+  <!-- COMPORTAMENTO / NOTAS -->
+  <div class="section">
+    <div class="section-title"><span>📝</span> Notas do Sensei</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Ponto forte do aluno</label>
+        <textarea id="pontoForte" placeholder="Ex: dedicação, respeito, coordenação motora..." oninput="salvar()"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Área para desenvolver</label>
+        <textarea id="areaDesenvolver" placeholder="Ex: concentração, disciplina fora do tatame..." oninput="salvar()"></textarea>
+      </div>
+      <div class="form-group full">
+        <label>Observações gerais</label>
+        <textarea id="observacoes" placeholder="Alguma situação especial, saúde, família..." rows="4" oninput="salvar()"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOMENTOS ESPECIAIS -->
+  <div class="section">
+    <div class="section-title"><span>⭐</span> Momentos Especiais</div>
+    <div class="momentos-list" id="momentosList"></div>
+    <button class="btn-add" onclick="addMomento()">+ Adicionar momento</button>
+  </div>
+
+</div>
+
+<script>
+const KEY = 'caderneta_v1';
+const FAIXAS = [
+  { nome: 'Branca', cor: '#e2e8f0', emoji: '🤍' },
+  { nome: 'Cinza', cor: '#94a3b8', emoji: '🩶' },
+  { nome: 'Amarela', cor: '#facc15', emoji: '💛' },
+  { nome: 'Laranja', cor: '#f97316', emoji: '🧡' },
+  { nome: 'Verde', cor: '#22c55e', emoji: '💚' },
+  { nome: 'Azul', cor: '#3b82f6', emoji: '💙' },
+  { nome: 'Roxa', cor: '#a855f7', emoji: '💜' },
+  { nome: 'Marrom', cor: '#92400e', emoji: '🤎' },
+  { nome: 'Vermelha', cor: '#ef4444', emoji: '❤️' },
+  { nome: 'Preta', cor: '#111827', emoji: '🖤' },
+];
+const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+let dados = { faixas: {}, golpes: [], presenca: {}, momentos: [] };
+
+function init() {
+  const saved = localStorage.getItem(KEY);
+  if (saved) dados = JSON.parse(saved);
+  renderBelts();
+  renderGolpes();
+  renderPresenca();
+  renderMomentos();
+  carregarCampos();
+}
+
+function carregarCampos() {
+  const campos = ['nome','apelido','nascimento','inicio','responsavel','whatsapp','objetivo','pontoForte','areaDesenvolver','observacoes'];
+  campos.forEach(c => { if (dados[c]) document.getElementById(c).value = dados[c]; });
+}
+
+function salvar() {
+  const campos = ['nome','apelido','nascimento','inicio','responsavel','whatsapp','objetivo','pontoForte','areaDesenvolver','observacoes'];
+  campos.forEach(c => { dados[c] = document.getElementById(c).value; });
+  localStorage.setItem(KEY, JSON.stringify(dados));
+  const badge = document.getElementById('savedBadge');
+  badge.textContent = '✓ Salvo';
+  setTimeout(() => badge.textContent = '', 2000);
+}
+
+function renderBelts() {
+  const grid = document.getElementById('beltGrid');
+  grid.innerHTML = '';
+  FAIXAS.forEach((f, i) => {
+    const conquistada = dados.faixas[i] && dados.faixas[i].conquistada;
+    const dataVal = dados.faixas[i] ? dados.faixas[i].data || '' : '';
+    const div = document.createElement('div');
+    div.className = 'belt-item' + (conquistada ? ' conquistada' : '');
+    div.innerHTML = `
+      <div class="belt-icon" onclick="toggleFaixa(${i})" style="cursor:pointer">${f.emoji}</div>
+      <div class="belt-name">${f.nome}</div>
+      <input type="date" value="${dataVal}" placeholder="Data" title="Data de conquista" onchange="setFaixaData(${i}, this.value)">
+    `;
+    grid.appendChild(div);
+  });
+}
+
+function toggleFaixa(i) {
+  if (!dados.faixas[i]) dados.faixas[i] = {};
+  dados.faixas[i].conquistada = !dados.faixas[i].conquistada;
+  salvar();
+  renderBelts();
+}
+
+function setFaixaData(i, val) {
+  if (!dados.faixas[i]) dados.faixas[i] = {};
+  dados.faixas[i].data = val;
+  if (val) dados.faixas[i].conquistada = true;
+  salvar();
+  renderBelts();
+}
+
+function renderGolpes() {
+  const list = document.getElementById('golpeList');
+  list.innerHTML = '';
+  if (!dados.golpes.length) dados.golpes = [''];
+  dados.golpes.forEach((g, i) => {
+    const row = document.createElement('div');
+    row.className = 'golpe-row';
+    row.innerHTML = `
+      <input type="text" value="${g}" placeholder="Nome da técnica ou golpe favorito" oninput="dados.golpes[${i}]=this.value;salvar()">
+      <button class="btn-remove" onclick="removeGolpe(${i})">✕</button>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function addGolpe() { dados.golpes.push(''); salvar(); renderGolpes(); }
+function removeGolpe(i) { dados.golpes.splice(i, 1); salvar(); renderGolpes(); }
+
+function renderPresenca() {
+  const container = document.getElementById('presencaContainer');
+  container.innerHTML = '';
+  const hoje = new Date();
+  const ano = hoje.getFullYear();
+  for (let m = 0; m < 12; m++) {
+    const div = document.createElement('div');
+    div.className = 'presenca-mes';
+    const primeiroDia = new Date(ano, m, 1).getDay();
+    const diasNoMes = new Date(ano, m + 1, 0).getDate();
+    let html = `<h4>${MESES[m]} ${ano}</h4><div class="presenca-grid">`;
+    for (let v = 0; v < primeiroDia; v++) html += `<div class="presenca-dia vazio"></div>`;
+    for (let d = 1; d <= diasNoMes; d++) {
+      const chave = `${ano}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const estado = dados.presenca[chave] || '';
+      const cls = estado === 'P' ? 'presente' : estado === 'F' ? 'falta' : '';
+      html += `<div class="presenca-dia ${cls}" onclick="togglePresenca('${chave}', this)">${d}</div>`;
+    }
+    html += '</div>';
+    div.innerHTML = html;
+    container.appendChild(div);
+  }
+}
+
+function togglePresenca(chave, el) {
+  const atual = dados.presenca[chave] || '';
+  const prox = atual === '' ? 'P' : atual === 'P' ? 'F' : '';
+  dados.presenca[chave] = prox;
+  el.className = 'presenca-dia' + (prox === 'P' ? ' presente' : prox === 'F' ? ' falta' : '');
+  salvar();
+}
+
+function renderMomentos() {
+  const list = document.getElementById('momentosList');
+  list.innerHTML = '';
+  if (!dados.momentos.length) dados.momentos = [{ data: '', titulo: '', descricao: '' }];
+  dados.momentos.forEach((m, i) => {
+    const div = document.createElement('div');
+    div.className = 'momento-card';
+    div.innerHTML = `
+      <div class="momento-card-header">
+        <input type="date" value="${m.data}" placeholder="Data" title="Data do momento" onchange="dados.momentos[${i}].data=this.value;salvar()">
+        <input type="text" value="${m.titulo}" placeholder="Título do momento especial (ex: Primeira vitória em competição)" oninput="dados.momentos[${i}].titulo=this.value;salvar()">
+        <button class="btn-remove btn-remove-momento" onclick="removeMomento(${i})" style="background:transparent;border:1px solid #475569;color:#94a3b8;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:0.8rem;">✕</button>
+      </div>
+      <textarea placeholder="Descreva o momento, o que aconteceu, como o aluno reagiu..." oninput="dados.momentos[${i}].descricao=this.value;salvar()">${m.descricao}</textarea>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function addMomento() { dados.momentos.push({ data: '', titulo: '', descricao: '' }); salvar(); renderMomentos(); }
+function removeMomento(i) { dados.momentos.splice(i, 1); salvar(); renderMomentos(); }
+
+function novaFicha() {
+  if (!confirm('Criar uma nova ficha em branco? Os dados atuais serão perdidos.')) return;
+  dados = { faixas: {}, golpes: [], presenca: {}, momentos: [] };
+  localStorage.removeItem(KEY);
+  init();
+  ['nome','apelido','nascimento','inicio','responsavel','whatsapp','objetivo','pontoForte','areaDesenvolver','observacoes'].forEach(c => document.getElementById(c).value = '');
+}
+
+function resetar() {
+  if (!confirm('Apagar todos os dados desta caderneta?')) return;
+  dados = { faixas: {}, golpes: [], presenca: {}, momentos: [] };
+  localStorage.removeItem(KEY);
+  init();
+  ['nome','apelido','nascimento','inicio','responsavel','whatsapp','objetivo','pontoForte','areaDesenvolver','observacoes'].forEach(c => document.getElementById(c).value = '');
+}
+
+init();
+</script>
+</body>
+</html>

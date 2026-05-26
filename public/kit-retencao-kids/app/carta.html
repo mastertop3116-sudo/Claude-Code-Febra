@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carta de Boas-Vindas — Jiu-Jitsu Kids</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0f0f1a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
+
+  .header { background: linear-gradient(135deg, #1e293b, #0f172a); padding: 24px; border-bottom: 2px solid #f97316; }
+  .header h1 { font-size: 1.6rem; color: #f97316; }
+  .header p { color: #94a3b8; font-size: 0.9rem; margin-top: 4px; }
+
+  .toolbar { background: #1e293b; padding: 12px 24px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; border-bottom: 1px solid #334155; }
+  .btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all .2s; }
+  .btn-primary { background: #f97316; color: #fff; }
+  .btn-primary:hover { background: #ea6c0a; }
+  .btn-secondary { background: #334155; color: #94a3b8; }
+  .btn-secondary:hover { background: #475569; color: #e2e8f0; }
+
+  .layout { display: grid; grid-template-columns: 300px 1fr; gap: 0; min-height: calc(100vh - 130px); }
+
+  /* PAINEL ESQUERDO */
+  .painel { background: #1e293b; border-right: 1px solid #334155; padding: 24px; overflow-y: auto; }
+  .painel h3 { font-size: 0.85rem; font-weight: 700; color: #f97316; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1px; }
+
+  .form-group { margin-bottom: 16px; }
+  label { display: block; font-size: 0.78rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+  input { background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #e2e8f0; padding: 10px 12px; font-size: 0.9rem; font-family: inherit; width: 100%; transition: border-color .2s; }
+  input:focus { outline: none; border-color: #f97316; }
+
+  .modelo-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+  .modelo-opt { background: #0f172a; border: 2px solid #334155; border-radius: 10px; padding: 12px; cursor: pointer; transition: all .2s; }
+  .modelo-opt:hover { border-color: #475569; }
+  .modelo-opt.ativo { border-color: #f97316; background: #1a0d00; }
+  .modelo-opt .modelo-nome { font-size: 0.85rem; font-weight: 700; color: #e2e8f0; margin-bottom: 2px; }
+  .modelo-opt.ativo .modelo-nome { color: #f97316; }
+  .modelo-opt .modelo-desc { font-size: 0.75rem; color: #64748b; }
+
+  .divider { border: none; border-top: 1px solid #334155; margin: 20px 0; }
+
+  /* ÁREA DA CARTA */
+  .carta-area { padding: 32px; overflow-y: auto; background: #0f172a; }
+  .carta-wrap { max-width: 680px; margin: 0 auto; }
+
+  .carta { background: #fff; color: #111; border-radius: 4px; box-shadow: 0 8px 40px rgba(0,0,0,.5); overflow: hidden; }
+  .carta-topo { background: #f97316; padding: 28px 40px; color: #fff; }
+  .carta-topo-linha { display: flex; justify-content: space-between; align-items: flex-start; }
+  .carta-academia { font-size: 1.3rem; font-weight: 900; letter-spacing: 1px; }
+  .carta-subtitulo { font-size: 0.8rem; opacity: .75; margin-top: 2px; }
+  .carta-badge { background: rgba(255,255,255,.2); border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
+
+  .carta-corpo { padding: 36px 40px; }
+  .carta-data { font-size: 0.85rem; color: #888; text-align: right; margin-bottom: 28px; }
+  .carta-saudacao { font-size: 1.15rem; font-weight: 700; color: #f97316; margin-bottom: 20px; }
+  .carta-texto { font-size: 0.95rem; line-height: 1.8; color: #222; white-space: pre-line; }
+  .carta-texto strong { color: #f97316; }
+
+  .carta-rodape { padding: 24px 40px; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: flex-end; }
+  .carta-assinatura { text-align: center; }
+  .carta-assinatura-linha { width: 160px; border-top: 1px solid #333; margin: 0 auto 6px; }
+  .carta-assinatura-nome { font-size: 0.9rem; font-weight: 700; color: #111; }
+  .carta-assinatura-cargo { font-size: 0.78rem; color: #888; }
+  .carta-logo { font-size: 0.8rem; color: #bbb; text-align: right; }
+  .carta-logo strong { display: block; color: #f97316; font-size: 1rem; }
+
+  @media (max-width: 768px) {
+    .layout { grid-template-columns: 1fr; }
+    .painel { border-right: none; border-bottom: 1px solid #334155; }
+    .carta-area { padding: 20px; }
+    .carta-corpo { padding: 24px; }
+    .carta-rodape { padding: 16px 24px; }
+    .carta-topo { padding: 20px 24px; }
+  }
+
+  @media print {
+    body { background: #fff; }
+    .header, .toolbar, .painel { display: none !important; }
+    .layout { display: block; }
+    .carta-area { padding: 0; background: #fff; }
+    .carta { box-shadow: none; }
+    .carta-topo { background: #f97316 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .carta-topo * { color: #fff !important; }
+    .carta-saudacao { color: #f97316 !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>✉️ Carta de Boas-Vindas</h1>
+  <p>Escolha o modelo, personalize com o nome do aluno e imprima em segundos</p>
+</div>
+
+<div class="toolbar">
+  <button class="btn btn-secondary" onclick="window.history.back()">← Voltar</button>
+  <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir Carta</button>
+</div>
+
+<div class="layout">
+  <div class="painel">
+    <h3>Dados</h3>
+
+    <div class="form-group">
+      <label>Nome do Aluno</label>
+      <input type="text" id="inputNome" placeholder="Ex: Pedro Silva" oninput="atualizar()" value="[Nome do Aluno]">
+    </div>
+
+    <div class="form-group">
+      <label>Nome da Academia</label>
+      <input type="text" id="inputAcademia" placeholder="Ex: Team Dragão Jiu-Jitsu" oninput="atualizar()" value="Minha Academia">
+    </div>
+
+    <div class="form-group">
+      <label>Nome do Sensei</label>
+      <input type="text" id="inputSensei" placeholder="Seu nome" oninput="atualizar()">
+    </div>
+
+    <hr class="divider">
+
+    <h3>Modelo de Carta</h3>
+    <div class="modelo-list">
+      <div class="modelo-opt ativo" onclick="selecionarModelo('classica', this)">
+        <div class="modelo-nome">🥋 Clássica</div>
+        <div class="modelo-desc">Formal e acolhedora, ideal para todas as idades</div>
+      </div>
+      <div class="modelo-opt" onclick="selecionarModelo('motivacional', this)">
+        <div class="modelo-nome">🔥 Motivacional</div>
+        <div class="modelo-desc">Energética, focada em superação e desafios</div>
+      </div>
+      <div class="modelo-opt" onclick="selecionarModelo('emocional', this)">
+        <div class="modelo-nome">💛 Emocional</div>
+        <div class="modelo-desc">Tocante, voltada para a família e para o coração</div>
+      </div>
+      <div class="modelo-opt" onclick="selecionarModelo('kids', this)">
+        <div class="modelo-nome">🦁 Super Guerreiro</div>
+        <div class="modelo-desc">Divertida e épica, para crianças de 5 a 10 anos</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="carta-area">
+    <div class="carta-wrap">
+      <div class="carta">
+        <div class="carta-topo">
+          <div class="carta-topo-linha">
+            <div>
+              <div class="carta-academia" id="cartaAcademia">Minha Academia</div>
+              <div class="carta-subtitulo">Escola de Jiu-Jitsu</div>
+            </div>
+            <div class="carta-badge">🥋</div>
+          </div>
+        </div>
+        <div class="carta-corpo">
+          <div class="carta-data" id="cartaData"></div>
+          <div class="carta-saudacao" id="cartaSaudacao"></div>
+          <div class="carta-texto" id="cartaTexto"></div>
+        </div>
+        <div class="carta-rodape">
+          <div class="carta-assinatura">
+            <div class="carta-assinatura-linha"></div>
+            <div class="carta-assinatura-nome" id="cartaSensei">Sensei</div>
+            <div class="carta-assinatura-cargo">Instrutor de Jiu-Jitsu</div>
+          </div>
+          <div class="carta-logo">
+            <strong id="cartaAcademia2">Minha Academia</strong>
+            Escola de Jiu-Jitsu
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let modeloAtivo = 'classica';
+
+const MODELOS = {
+  classica: {
+    saudacao: nome => `Bem-vindo(a) ao tatame, ${nome}!`,
+    texto: (nome, academia) => `É com grande satisfação que recebemos você, ${nome}, na família ${academia}.
+
+Ao entrar no tatame, você dá um passo que vai muito além do esporte. Você está escolhendo disciplina, respeito, perseverança e amizades que podem durar a vida inteira.
+
+O Jiu-Jitsu não é apenas uma arte marcial — é uma filosofia de vida. Aqui, você vai aprender que cada queda é uma oportunidade de se levantar mais forte, e que o verdadeiro adversário não está na frente de você, mas dentro de você.
+
+Nossa equipe está aqui para te apoiar em cada passo da sua jornada. Treine com dedicação, respeite seus colegas e nunca perca a vontade de evoluir.
+
+O tatame espera por você. Vamos juntos!`,
+  },
+  motivacional: {
+    saudacao: nome => `${nome}, a jornada começa agora!`,
+    texto: (nome, academia) => `Você acabou de tomar uma das melhores decisões da sua vida.
+
+${nome}, entrar no tatame da ${academia} significa que você escolheu ser mais. Mais forte, mais disciplinado, mais confiante — um guerreiro.
+
+O Jiu-Jitsu vai te colocar à prova. Vai ter dias difíceis, treinos pesados e momentos em que tudo parecerá impossível. E é exatamente nesses momentos que você vai descobrir do que é capaz.
+
+Cada faixa conquistada é uma versão melhor de você mesmo. Cada treino é um investimento no seu caráter. Cada desafio superado te prepara para os obstáculos da vida real.
+
+Não venha ao tatame para ganhar — venha para crescer. A vitória virá naturalmente para quem não desiste.
+
+Estamos prontos para te ajudar a chegar lá. Agora é a sua vez.`,
+  },
+  emocional: {
+    saudacao: nome => `Querido(a) ${nome},`,
+    texto: (nome, academia) => `Este é um dia especial — o dia em que você se torna parte da nossa família.
+
+Quando crianças entram no tatame da ${academia} pela primeira vez, elas trazem consigo esperanças, medos e sorrisos. Você trouxe os seus, e nós prometemos cuidar de cada um deles com carinho e responsabilidade.
+
+O Jiu-Jitsu vai te ensinar coisas que vão muito além das técnicas. Você vai aprender a respeitar, a ajudar, a ter coragem mesmo quando estiver com medo, e a ser gentil com quem está aprendendo.
+
+Seus pais confiaram a nós um pedaço precioso da sua infância. E nós levamos esse compromisso muito a sério.
+
+Aqui, você nunca estará sozinho. Cada colega, cada sensei, cada abraço no final do treino é a prova de que você pertence a algo maior.
+
+Seja muito bem-vindo(a). Com carinho,`,
+  },
+  kids: {
+    saudacao: nome => `🦁 GUERREIRO ${nome.toUpperCase()}, VOCÊ FOI ESCOLHIDO!`,
+    texto: (nome, academia) => `Uma missão secreta acaba de começar...
+
+${nome}, você foi selecionado para entrar na equipe de GUERREIROS DA ${academia.toUpperCase()}! Isso significa que você é ESPECIAL — e estamos aqui para provar isso juntos.
+
+Nesta missão, você vai:
+⚡ Aprender golpes incríveis que poucos conhecem
+🥋 Treinar como um verdadeiro ninja do tatame
+🏆 Conquistar faixas e mostrar sua evolução
+🤝 Fazer amigos corajosos como você
+💪 Ficar mais forte, mais rápido e mais esperto
+
+Cada treino é uma nova fase do jogo. Cada faixa é um upgrade no seu personagem. Cada desafio é uma missão a cumprir.
+
+Você está pronto para se tornar um GUERREIRO NINJA?
+
+O tatame espera pelo novo herói da equipe!
+
+Seu sensei e toda a equipe acreditam em você! OSS! 🤜🤛`,
+  },
+};
+
+function atualizar() {
+  const nome = document.getElementById('inputNome').value || '[Nome do Aluno]';
+  const academia = document.getElementById('inputAcademia').value || 'Minha Academia';
+  const sensei = document.getElementById('inputSensei').value || 'Sensei';
+  const modelo = MODELOS[modeloAtivo];
+
+  document.getElementById('cartaAcademia').textContent = academia;
+  document.getElementById('cartaAcademia2').textContent = academia;
+  document.getElementById('cartaSensei').textContent = sensei;
+  document.getElementById('cartaSaudacao').textContent = modelo.saudacao(nome);
+  document.getElementById('cartaTexto').textContent = modelo.texto(nome, academia);
+
+  const hoje = new Date();
+  const meses = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  document.getElementById('cartaData').textContent = `${hoje.getDate()} de ${meses[hoje.getMonth()]} de ${hoje.getFullYear()}`;
+}
+
+function selecionarModelo(modelo, el) {
+  modeloAtivo = modelo;
+  document.querySelectorAll('.modelo-opt').forEach(m => m.classList.remove('ativo'));
+  el.classList.add('ativo');
+  atualizar();
+}
+
+atualizar();
+</script>
+</body>
+</html>
