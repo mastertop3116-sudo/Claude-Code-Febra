@@ -2,6 +2,7 @@
 const puppeteer    = require('puppeteer');
 const path         = require('path');
 const fs           = require('fs');
+const os           = require('os');
 const config       = require('./config');
 const { getFontStyle } = require('./fonts');
 const { gerarFundo } = require('./gerar-bg-ia');
@@ -12,8 +13,14 @@ function carregarTemplate(tipo, estilo) {
   return require(`${pasta}/${tipo}`);
 }
 
-function buildHtml(bodyHtml, fontes) {
+function buildHtml(bodyHtml, fontes, bgFilePath = null) {
   const fontStyle = getFontStyle(fontes);
+
+  // Fundo via file:// evita base64 gigante no HTML
+  const bgCss = bgFilePath
+    ? `body::before { content:''; position:absolute; top:0; left:0; width:1080px; height:1080px; background:url('${bgFilePath}') center/cover; z-index:0; }`
+    : '';
+
   return `<!DOCTYPE html>
 <html><head><meta charset="UTF-8">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,7 +28,8 @@ function buildHtml(bodyHtml, fontes) {
 ${fontStyle}
 <style>
   * { box-sizing:border-box; margin:0; padding:0; font-family:'${fontes[0] || 'Arial'}','Noto Color Emoji',Arial,sans-serif; }
-  body { width:1080px; height:1080px; overflow:hidden; }
+  body { width:1080px; height:1080px; overflow:hidden; position:relative; }
+  ${bgCss}
 </style>
 </head><body>${bodyHtml}</body></html>`;
 }
@@ -38,15 +46,21 @@ async function gerarPost(entrada) {
   const templateFn = carregarTemplate(tipo, estilo);
   if (!templateFn) throw new Error(`Template desconhecido: "${tipo}" / "${estilo}"`);
 
-  // Gera fundo 3D cartoon via DALL-E para posts únicos
-  let bgImage = null;
+  // Gera fundo 3D cartoon via IA e salva em arquivo temporário
+  let bgFilePath = null;
+  let bgTempFile = null;
   try {
-    bgImage = await gerarFundo(tipo);
+    const b64 = await gerarFundo(tipo);
+    bgTempFile = path.join(os.tmpdir(), `bg-${Date.now()}.png`);
+    fs.writeFileSync(bgTempFile, Buffer.from(b64, 'base64'));
+    bgFilePath = `file://${bgTempFile.replace(/\\/g, '/')}`;
+    console.log('[gerar-post] Fundo 3D cartoon salvo em arquivo temporário.');
   } catch (e) {
     console.warn(`[gerar-post] Fundo IA indisponível, usando textura padrão: ${e.message}`);
   }
 
-  const html = buildHtml(templateFn({ ...conteudo, bgImage }), fontes);
+  // Passa bgImage=null para o template (fundo via CSS), sem embutir base64
+  const html = buildHtml(templateFn({ ...conteudo, bgImage: null }), fontes, bgFilePath);
   garantirOutputDir();
 
   const timestamp  = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
@@ -56,10 +70,13 @@ async function gerarPost(entrada) {
   const browser = await puppeteer.launch({ headless: 'new' });
   const page    = await browser.newPage();
   await page.setViewport({ width: 1080, height: 1080 });
-  await page.setContent(html, { waitUntil: 'networkidle2' });
-  await new Promise(r => setTimeout(r, 400));
+  await page.setContent(html, { waitUntil: 'networkidle2', timeout: 30000 });
+  await new Promise(r => setTimeout(r, 500));
   await page.screenshot({ path: outputPath, type: 'png' });
   await browser.close();
+
+  // Limpa arquivo temporário do fundo
+  if (bgTempFile && fs.existsSync(bgTempFile)) fs.unlinkSync(bgTempFile);
 
   console.log(`[gerar-post] ${outputPath}`);
   return outputPath;
@@ -86,7 +103,7 @@ async function gerarCarrossel(entrada) {
 
     const page = await browser.newPage();
     await page.setViewport({ width: 1080, height: 1080 });
-    await page.setContent(html, { waitUntil: 'networkidle2' });
+    await page.setContent(html, { waitUntil: 'networkidle2', timeout: 30000 });
     await new Promise(r => setTimeout(r, 400));
 
     const filename   = `carrossel-${timestamp}-slide${i + 1}.png`;
