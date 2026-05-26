@@ -109,25 +109,26 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, te
   <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:900px;height:900px;background:radial-gradient(ellipse at center,rgba(249,115,22,0.18) 0%,transparent 60%);z-index:2;pointer-events:none;"></div>
   `)}
 
-  <div style="position:absolute;top:0;left:0;width:100%;height:calc(100% - 100px);z-index:4;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:0 96px;">
+  <!-- Conteúdo central: ocupa do topo até antes do botão -->
+  <div style="position:absolute;top:0;left:0;width:100%;height:780px;z-index:4;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:0 96px;">
 
     <!-- Label -->
-    <div style="font-size:13px;font-weight:800;color:#f97316;letter-spacing:3.5px;text-transform:uppercase;margin-bottom:44px;">${emoji}  ${badge}</div>
+    <div style="font-size:13px;font-weight:800;color:#f97316;letter-spacing:3.5px;text-transform:uppercase;margin-bottom:36px;">${emoji}  ${badge}</div>
 
-    <!-- Título -->
-    <div style="font-size:76px;font-weight:900;color:#ffffff;line-height:0.92;letter-spacing:-3px;margin-bottom:32px;text-transform:uppercase;">${titulo}</div>
+    <!-- Título (fonte menor para não transbordar) -->
+    <div style="font-size:62px;font-weight:900;color:#ffffff;line-height:0.95;letter-spacing:-2.5px;margin-bottom:28px;text-transform:uppercase;max-height:260px;overflow:hidden;">${titulo}</div>
 
     <!-- Divisor -->
-    <div style="width:64px;height:4px;background:#f97316;margin-bottom:44px;"></div>
+    <div style="width:64px;height:4px;background:#f97316;margin-bottom:36px;"></div>
 
     <!-- Texto -->
-    <div style="font-size:26px;color:#94a3b8;line-height:1.65;max-width:700px;margin-bottom:80px;">${texto}</div>
+    <div style="font-size:24px;color:#94a3b8;line-height:1.6;max-width:700px;max-height:160px;overflow:hidden;">${texto}</div>
 
-    <!-- Botão CTA — largura total da área de conteúdo -->
-    <div style="background:#f97316;border-radius:4px;padding:30px 0;width:100%;display:flex;align-items:center;justify-content:center;">
-      <span style="font-size:28px;font-weight:900;color:#000000;letter-spacing:0.5px;">💾 Salva esse carrossel!</span>
-    </div>
+  </div>
 
+  <!-- Botão CTA fixo no fundo — nunca some -->
+  <div style="position:absolute;bottom:100px;left:96px;right:96px;z-index:5;background:#f97316;border-radius:4px;padding:30px 0;display:flex;align-items:center;justify-content:center;">
+    <span style="font-size:28px;font-weight:900;color:#000000;letter-spacing:0.5px;">💾 Salva esse carrossel!</span>
   </div>
 
   ${dots(total)}
