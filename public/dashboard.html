@@ -3209,6 +3209,7 @@ async function igAction(tipo) {
 
   btn.classList.remove('ig-loading');
 }
+window.igAction=igAction;
 window.copyText=copyText;
 function showToast(msg){ const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200); }
 
