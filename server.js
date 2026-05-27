@@ -2673,6 +2673,9 @@ app.get('/instagram-test/:periodo', async (req, res) => {
   }
 });
 
+// ── HEALTH CHECK ─────────────────────────────────────────────────────────────
+app.get('/health', (req, res) => res.json({ status: 'ok', ts: Date.now() }));
+
 app.listen(PORT, async () => {
   console.log(`NEXUS — Servidor rodando na porta ${PORT}`);
   console.log(`[Gamma] API KEY: ${process.env.GAMMA_API_KEY ? "✅ configurada" : "❌ NÃO CONFIGURADA — geração PDF usará apenas PDFKit"}`);
@@ -2686,4 +2689,11 @@ app.listen(PORT, async () => {
   } catch (e) {
     console.warn('[instagram-scheduler] Não iniciado:', e.message);
   }
+
+    // Keep-alive: auto-ping a cada 4 min para o Render não dormir
+  const SELF_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+  setInterval(() => {
+    fetch(`${SELF_URL}/health`).catch(() => {});
+  }, 4 * 60 * 1000);
+  console.log(`[keep-alive] Auto-ping ativado → ${SELF_URL}/health a cada 4 min`);
 });
