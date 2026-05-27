@@ -2665,11 +2665,10 @@ app.get('/instagram-test/:periodo', async (req, res) => {
   }
   try {
     const { executar } = require('./departments/creative/templates/aulas-desplugadas-ei/instagram-pipeline/pipeline');
-    res.json({ status: 'disparando', periodo });
-    executar(periodo).then(() => console.log(`[instagram-test] ${periodo} concluído`))
-                     .catch(err => console.error(`[instagram-test] ERRO: ${err.message}`));
+    await executar(periodo);
+    res.json({ status: 'ok', periodo });
   } catch (e) {
-    res.status(500).json({ erro: e.message });
+    res.status(500).json({ erro: e.message, stack: e.stack?.split('\n').slice(0,5) });
   }
 });
 
