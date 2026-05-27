@@ -2621,7 +2621,8 @@ app.get('/instagram-insights', async (req, res) => {
 app.get('/instagram-metricas', async (req, res) => {
   if (req.query.secret !== process.env.INSTAGRAM_APP_SECRET) return res.status(401).end();
   try {
-    const supa = getSupabase();
+    const { createClient } = require('@supabase/supabase-js');
+    const supa = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
     const { data, error } = await supa
       .from('ig_post_insights')
       .select('post_id,like_count,comments,reach,saved,engagement_score,tema,timestamp,media_type')
