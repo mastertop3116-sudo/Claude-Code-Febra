@@ -68,8 +68,11 @@ async function gerarPost(entrada, bgBase64 = null) {
   const filename   = `post-${estilo}-${tipo}-${timestamp}.png`;
   const outputPath = path.join(config.posting.outputDir, filename);
 
-  const browser = await puppeteer.launch({ headless: 'new' });
-  const page    = await browser.newPage();
+  const browser = await puppeteer.launch({
+    headless: 'new',
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
+  });
+  const page = await browser.newPage();
   await page.setViewport({ width: 1080, height: 1080 });
   await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await new Promise(r => setTimeout(r, 3000));
@@ -95,7 +98,10 @@ async function gerarCarrossel(entrada) {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
   const paths = [];
 
-  const browser = await puppeteer.launch({ headless: 'new' });
+  const browser = await puppeteer.launch({
+    headless: 'new',
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
+  });
 
   for (let i = 0; i < slides.length; i++) {
     const slide = slides[i];
