@@ -80,7 +80,7 @@ async function gerarNoite(dia, dataStr, contextoIA = '') {
     schema = `{
   "pergunta": "pergunta direta e provocante (máx 12 palavras)",
   "contexto": "contexto ou situação curta que justifica a pergunta (máx 30 palavras)",
-  "opcoes": "2-3 opções separadas por \\n com letra e emoji (ex: A) 🥋 opção aqui)",
+  "opcoes": ["A) 🥋 opção aqui", "B) 🏆 outra opção", "C) 💪 terceira opção"],
   "cta": "incentivo para responder nos comentários (máx 10 palavras)"
 }`;
   }
