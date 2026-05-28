@@ -358,18 +358,16 @@ function validarConteudo(conteudo, tipo, extensao) {
 }
 
 // ── Upload do PDF para Supabase Storage ────────────────────
-async function uploadPDF(pdfBuffer, filename) {
+async function uploadArquivo(buffer, filename) {
   try {
     const { createClient } = require('@supabase/supabase-js');
-    // Usa service role se disponível, senão anon key (Render só tem anon)
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
     const supa = createClient(process.env.SUPABASE_URL, key);
-    const { data, error } = await supa.storage
+    const isJpeg = filename.endsWith('.jpg') || filename.endsWith('.jpeg');
+    const contentType = isJpeg ? 'image/jpeg' : 'application/pdf';
+    const { error } = await supa.storage
       .from('criador-pdfs')
-      .upload(filename, Buffer.from(pdfBuffer), {
-        contentType: 'application/pdf',
-        upsert: true,
-      });
+      .upload(filename, Buffer.from(buffer), { contentType, upsert: true });
     if (error) return null;
     const { data: urlData } = supa.storage.from('criador-pdfs').getPublicUrl(filename);
     return urlData?.publicUrl || null;
@@ -377,6 +375,8 @@ async function uploadPDF(pdfBuffer, filename) {
     return null;
   }
 }
+// Alias para compatibilidade com chamadas existentes
+const uploadPDF = uploadArquivo;
 
 // ── Renderização PDF via Puppeteer ──────────────────────────
 async function renderizarPDF(conteudo, params) {
