@@ -337,7 +337,9 @@ function validarConteudo(conteudo, tipo, extensao) {
 async function uploadPDF(pdfBuffer, filename) {
   try {
     const { createClient } = require('@supabase/supabase-js');
-    const supa = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+    // Usa service role se disponível, senão anon key (Render só tem anon)
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+    const supa = createClient(process.env.SUPABASE_URL, key);
     const { data, error } = await supa.storage
       .from('criador-pdfs')
       .upload(filename, Buffer.from(pdfBuffer), {
