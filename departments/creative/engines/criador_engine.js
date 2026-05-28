@@ -112,14 +112,15 @@ OBRIGATÓRIO: gere de ${qtd} passos detalhados`,
   "introducao": "por que usar este checklist e como ele ajuda (80 a 120 palavras)",
   "secoes": [
     {
-      "titulo": "nome da seção",
-      "descricao": "contexto breve da seção (1 a 2 frases)",
-      "itens": ["item específico 1", "item específico 2", "item específico 3", "item específico 4", "item específico 5"]
+      "titulo": "nome da seção (substantivo + contexto, ex: 'Preparação Inicial', 'Revisão Final')",
+      "descricao": "contexto breve da seção em 1 frase direta",
+      "itens": ["Verbo + ação específica + detalhes do nicho (ex: Verifique se o contrato tem cláusula de rescisão)"]
     }
   ],
   "dica_final": "dica para usar o checklist ao máximo (60 a 80 palavras)"
 }
-OBRIGATÓRIO: gere de 5 a 8 seções, cada uma com 5 a 8 itens específicos`,
+OBRIGATÓRIO: gere de 5 a 8 seções, cada uma com 5 a 8 itens
+REGRA DE OURO para os itens: SEMPRE comece com verbo no imperativo (Verifique, Confirme, Liste, Revise, Defina, Teste, Documente, Calcule, Contate, Organize...) — nunca substantivos soltos. Cada item deve ser específico ao nicho, acionável e verificável`,
 
     desafio: `Retorne JSON com exatamente esta estrutura:
 {
@@ -196,17 +197,17 @@ OBRIGATÓRIO: gere exatamente 7 dias completos`,
   "titulo": "nome do produto sendo vendido",
   "autor": "nome do apresentador",
   "partes": [
-    { "nome": "GANCHO",       "duracao_seg": 30,  "script": "texto completo (100 a 150 palavras) — abre com declaração ousada ou pergunta provocante" },
-    { "nome": "PROBLEMA",     "duracao_seg": 60,  "script": "texto completo (150 a 200 palavras) — identifica dor específica e consequências" },
-    { "nome": "AGITAÇÃO",     "duracao_seg": 60,  "script": "texto completo (150 a 200 palavras) — aprofunda o problema, gera urgência emocional" },
-    { "nome": "SOLUÇÃO",      "duracao_seg": 90,  "script": "texto completo (200 a 250 palavras) — apresenta o produto como única saída" },
-    { "nome": "AUTORIDADE",   "duracao_seg": 45,  "script": "texto completo (100 a 150 palavras) — credenciais, história, prova de expertise" },
-    { "nome": "PROVA SOCIAL", "duracao_seg": 60,  "script": "texto completo (150 a 200 palavras) — depoimentos e resultados de clientes" },
-    { "nome": "OFERTA",       "duracao_seg": 90,  "script": "texto completo (200 a 250 palavras) — preço, bônus, garantia, ancoragem" },
-    { "nome": "CTA",          "duracao_seg": 30,  "script": "texto completo (80 a 120 palavras) — urgência, escassez, chamada clara para ação" }
+    { "nome": "GANCHO",       "duracao_seg": 30,  "script": "texto completo (100 a 150 palavras) — abre com declaração ousada ou pergunta que paralisa. Use [pausa] para respiração, [olha para a câmera] para conexão direta" },
+    { "nome": "PROBLEMA",     "duracao_seg": 60,  "script": "texto completo (150 a 200 palavras) — identifica dor específica com detalhes do nicho. Tom: empático, como quem viveu isso" },
+    { "nome": "AGITAÇÃO",     "duracao_seg": 60,  "script": "texto completo (150 a 200 palavras) — aprofunda o problema, mostra o custo de não agir. Tom: [tom mais grave] urgência real, sem drama falso" },
+    { "nome": "SOLUÇÃO",      "duracao_seg": 90,  "script": "texto completo (200 a 250 palavras) — apresenta o produto. [pausa 2s antes de revelar o nome] Tom: confiante, revelação estratégica" },
+    { "nome": "AUTORIDADE",   "duracao_seg": 45,  "script": "texto completo (100 a 150 palavras) — história pessoal + credenciais. Tom: natural, sem soar arrogante. [gesticula ao mencionar resultados]" },
+    { "nome": "PROVA SOCIAL", "duracao_seg": 60,  "script": "texto completo (150 a 200 palavras) — 2 a 3 histórias de clientes reais com resultado específico (números, tempo, transformação)" },
+    { "nome": "OFERTA",       "duracao_seg": 90,  "script": "texto completo (200 a 250 palavras) — preço com ancoragem, bônus listados, garantia destacada. [mostra dedos ao contar bônus] Tom: animado mas controlado" },
+    { "nome": "CTA",          "duracao_seg": 30,  "script": "texto completo (80 a 120 palavras) — urgência real, escassez justificada, instrução de ação em 1 passo. [aponta para a tela] Termine com frase de encorajamento" }
   ]
 }
-OBRIGATÓRIO: preencha o script de TODAS as 8 partes com texto persuasivo e específico`,
+OBRIGATÓRIO: preencha TODAS as 8 partes. O script deve soar como fala, não como texto escrito — frases curtas, pausas marcadas, ritmo de quem está na câmera. Específico ao nicho em todos os blocos`,
   };
 
   return schemas[tipo] || schemas.ebook;

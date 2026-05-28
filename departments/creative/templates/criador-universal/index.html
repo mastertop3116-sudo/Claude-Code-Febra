@@ -348,6 +348,32 @@ body {
   line-height: 1.55;
 }
 
+/* Checklist: header de seção compacto */
+.cl-sec-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 3mm 5mm 3mm 5mm;
+  background: color-mix(in srgb, var(--p, #6366f1) 7%, #fff);
+  border-left: 3.5mm solid var(--p, #6366f1);
+  border-radius: 0 2mm 2mm 0;
+  margin-bottom: 3mm;
+}
+.cl-sec-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10.5pt; font-weight: 700; color: #141424;
+}
+.cl-sec-count {
+  font-family: 'Inter', sans-serif;
+  font-size: 7.5pt; font-weight: 600; color: var(--p, #6366f1);
+  background: color-mix(in srgb, var(--p, #6366f1) 12%, #fff);
+  padding: 1mm 3mm; border-radius: 10mm; white-space: nowrap;
+}
+.cl-desc {
+  font-family: 'Inter', sans-serif; font-size: 9pt; color: #7a7a9a;
+  margin-bottom: 2mm; line-height: 1.5; font-style: italic;
+}
+.cl-section-wrap { margin-bottom: 5mm; }
+.cl-section-wrap:last-child { margin-bottom: 0; }
+
 /* Linhas de exercício */
 .ex-line {
   border-bottom: 0.5mm solid #e0e0ee;
@@ -772,28 +798,54 @@ body {
 
   // ── CHECKLIST ──
   } else if (d.tipo === 'checklist') {
+    // Intro page
     if (d.introducao) {
+      const totalItens = (d.secoes||[]).reduce((s,sec)=>s+(sec.itens||[]).length, 0);
       html += `<div class="page intro-page">
         ${pgHeader('Sobre')}
         <div class="intro-label">Sobre Este Checklist</div>
         <div class="intro-titulo">${esc(d.titulo)}</div>
         <div class="intro-texto">${paras(d.introducao)}</div>
+        <div class="tip" style="margin-top:7mm">
+          <div class="tip-icon">✅</div>
+          <div class="tip-text">
+            <strong>${(d.secoes||[]).length} seções</strong> · <strong>${totalItens} itens verificáveis</strong>
+            ${d.subtitulo ? ` · ${esc(d.subtitulo)}` : ''}
+          </div>
+        </div>
         ${footer()}
       </div>`;
     }
+    // Pack sections: group by density (≤14 itens por página)
+    const grupos = [];
+    let cur = [], curN = 0;
     (d.secoes||[]).forEach(sec=>{
+      const n = (sec.itens||[]).length;
+      if (curN + n > 14 && cur.length > 0) {
+        grupos.push(cur); cur = [sec]; curN = n;
+      } else {
+        cur.push(sec); curN += n;
+      }
+    });
+    if (cur.length) grupos.push(cur);
+
+    grupos.forEach(grupo=>{
       html += `<div class="page">
         ${pgHeader('Checklist')}
-        <div class="sec-header">
-          <div class="sec-label">Checklist</div>
-          <div class="sec-titulo">${esc(sec.titulo||'')}</div>
-        </div>
-        <div class="pg-body">
-          ${sec.descricao?`<div class="intro-texto" style="margin-bottom:4mm;font-size:9.5pt">${esc(sec.descricao)}</div>`:''}
-          ${(sec.itens||[]).map(item=>`
-            <div class="check-item">
-              <div class="check-box"></div>
-              <div class="check-text">${esc(item)}</div>
+        <div class="pg-body" style="padding-top:4mm">
+          ${grupo.map(sec=>`
+            <div class="cl-section-wrap">
+              <div class="cl-sec-hdr">
+                <div class="cl-sec-title">${esc(sec.titulo||'')}</div>
+                <div class="cl-sec-count">${(sec.itens||[]).length} itens</div>
+              </div>
+              ${sec.descricao?`<div class="cl-desc">${esc(sec.descricao)}</div>`:''}
+              ${(sec.itens||[]).map(item=>`
+                <div class="check-item">
+                  <div class="check-box"></div>
+                  <div class="check-text">${esc(item)}</div>
+                </div>
+              `).join('')}
             </div>
           `).join('')}
         </div>
@@ -936,18 +988,34 @@ body {
 
   // ── SCRIPT VSL ──
   } else if (d.tipo === 'script_vsl') {
+    const partes = d.partes||[];
+    const durTotal = partes.reduce((s,p)=>s+(p.duracao_seg||0),0);
+    const durMin = Math.floor(durTotal/60);
+    const durSeg = durTotal%60;
+    // Intro page: estrutura geral do script
     html += `<div class="page intro-page">
       ${pgHeader('Script VSL')}
-      <div class="intro-label">Script de Vendas</div>
+      <div class="intro-label">Script de Vendas em Vídeo</div>
       <div class="intro-titulo">${esc(d.titulo)}</div>
-      <div class="intro-texto" style="margin-bottom:5mm">Roteiro completo de Video Sales Letter.</div>
+      <div class="tip" style="margin-bottom:6mm">
+        <div class="tip-icon">🎬</div>
+        <div class="tip-text">Apresentador: <strong>${esc(d.autor)}</strong> &nbsp;·&nbsp; Duração estimada: <strong>${durMin}min ${String(durSeg).padStart(2,'0')}s</strong></div>
+      </div>
+      <div class="kp-label" style="margin-bottom:3mm">Estrutura do Script</div>
+      ${partes.map((p,i)=>`
+        <div style="display:flex;align-items:center;gap:3mm;padding:2.5mm 3mm;border-bottom:0.3mm solid #f0f0f7">
+          <div style="width:6mm;height:6mm;border-radius:50%;background:var(--p);color:#fff;font-family:'Montserrat',sans-serif;font-size:7pt;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</div>
+          <div style="font-family:'Inter',sans-serif;font-size:10pt;font-weight:600;color:#141424;flex:1">${esc(p.nome||'')}</div>
+          <div style="font-family:'Inter',sans-serif;font-size:8pt;color:var(--p);font-weight:500">~${p.duracao_seg||0}s</div>
+        </div>
+      `).join('')}
       ${footer()}
     </div>`;
-    const partes = d.partes||[];
-    for (let i = 0; i < partes.length; i += 3) {
-      const grupo = partes.slice(i, i+3);
+    // 2 blocos por página para dar espaço de leitura
+    for (let i = 0; i < partes.length; i += 2) {
+      const grupo = partes.slice(i, i+2);
       html += `<div class="page intro-page" style="padding-top:10mm">
-        ${pgHeader('Script')}
+        ${pgHeader('Script VSL')}
         ${grupo.map(p=>`<div class="vsl-block">
           <div class="vsl-header">
             <div class="vsl-badge">${esc(p.nome||'')}</div>
