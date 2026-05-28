@@ -12,7 +12,31 @@ const aprendizados  = require('../../../utils/aprendizados');
 
 const TEMPLATE_PATH = path.join(__dirname, '../templates/criador-universal/index.html');
 
-// ── Cores e labels por tipo ─────────────────────────────────
+// ── Paletas por NICHO (sobrepõe paleta por tipo) ────────────
+const PALETAS_NICHO = [
+  { palavras: ['emagrecimento','dieta','saúde','saudável','treino','fitness','academia','nutrição','peso','corpo'], primaria: '#10b981', secundaria: '#34d399', bg: '#051a10' },
+  { palavras: ['finanças','financeiro','dinheiro','renda','investimento','lucro','mei','empreendedor','negócio','vender','vendas','marketing'], primaria: '#f59e0b', secundaria: '#fcd34d', bg: '#181000' },
+  { palavras: ['beleza','cabelo','maquiagem','pele','estética','unhas','moda','skincare'], primaria: '#ec4899', secundaria: '#f9a8d4', bg: '#180710' },
+  { palavras: ['espiritualidade','fé','bíblia','deus','oração','devocional','cristão','cristã','missão'], primaria: '#d97706', secundaria: '#fbbf24', bg: '#181000' },
+  { palavras: ['fotografia','foto','câmera','imagem','vídeo','edição','design','criativo','arte','instagram'], primaria: '#a855f7', secundaria: '#d8b4fe', bg: '#0f0718' },
+  { palavras: ['educação','professor','escola','bncc','criança','pedagogia','infantil','aula','plano'], primaria: '#3b82f6', secundaria: '#93c5fd', bg: '#070f18' },
+  { palavras: ['jiu','luta','esporte','marcial','treino','atleta','competição'], primaria: '#ef4444', secundaria: '#fca5a5', bg: '#180707' },
+  { palavras: ['confeitaria','bolo','doce','culinária','gastronomia','receita','cozinha','buffet'], primaria: '#f472b6', secundaria: '#fbcfe8', bg: '#180810' },
+  { palavras: ['relacionamento','amor','namoro','casamento','autoestima','ansiedade','mental','psicologia'], primaria: '#8b5cf6', secundaria: '#c4b5fd', bg: '#0d0718' },
+  { palavras: ['pet','cachorro','gato','animal','veterinário','adestramento'], primaria: '#22d3a5', secundaria: '#5eead4', bg: '#051812' },
+];
+
+function detectarPaletaNicho(nicho) {
+  const n = (nicho || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  for (const p of PALETAS_NICHO) {
+    if (p.palavras.some(w => n.includes(w.normalize('NFD').replace(/[̀-ͯ]/g, '')))) {
+      return { primaria: p.primaria, secundaria: p.secundaria, bg: p.bg };
+    }
+  }
+  return null; // sem match — usa paleta por tipo
+}
+
+// ── Paletas padrão por tipo ──────────────────────────────────
 const CORES = {
   ebook:      { primaria: '#6366f1', secundaria: '#818cf8', bg: '#0f0e1f' },
   workbook:   { primaria: '#10b981', secundaria: '#34d399', bg: '#071810' },
@@ -205,7 +229,7 @@ OBRIGATÓRIO: gere exatamente 7 dias completos`,
     { "nome": "SOLUÇÃO",      "duracao_seg": 90,  "script": "texto completo (200 a 250 palavras) — apresenta o produto. [pausa 2s antes de revelar o nome] Tom: confiante, revelação estratégica" },
     { "nome": "AUTORIDADE",   "duracao_seg": 45,  "script": "texto completo (100 a 150 palavras) — história pessoal + credenciais. Tom: natural, sem soar arrogante. [gesticula ao mencionar resultados]" },
     { "nome": "PROVA SOCIAL", "duracao_seg": 60,  "script": "texto completo (150 a 200 palavras) — 2 a 3 histórias de clientes reais com resultado específico (números, tempo, transformação)" },
-    { "nome": "OFERTA",       "duracao_seg": 90,  "script": "texto completo (200 a 250 palavras) — preço com ancoragem, bônus listados, garantia destacada. [mostra dedos ao contar bônus] Tom: animado mas controlado" },
+    { "nome": "OFERTA",       "duracao_seg": 90,  "script": "texto completo (200 a 250 palavras) — use [SEU_PRECO_ORIGINAL] e [SEU_PRECO_OFERTA] como placeholders de preço (o usuário vai substituir), liste 2-3 bônus, destaque a garantia. [mostra dedos ao contar bônus] Tom: animado mas controlado" },
     { "nome": "CTA",          "duracao_seg": 30,  "script": "texto completo (80 a 120 palavras) — urgência real, escassez justificada, instrução de ação em 1 passo. [aponta para a tela] Termine com frase de encorajamento" }
   ]
 }
@@ -356,8 +380,8 @@ async function uploadPDF(pdfBuffer, filename) {
 
 // ── Renderização PDF via Puppeteer ──────────────────────────
 async function renderizarPDF(conteudo, params) {
-  const { tipo } = params;
-  const cores = CORES[tipo] || CORES.ebook;
+  const { tipo, nicho } = params;
+  const cores = detectarPaletaNicho(nicho) || CORES[tipo] || CORES.ebook;
 
   const templateHtml = fs.readFileSync(TEMPLATE_PATH, 'utf8');
 
@@ -399,14 +423,37 @@ async function renderizarPDF(conteudo, params) {
     await page.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 });
     await new Promise(r => setTimeout(r, 1500));
 
-    const buffer = await page.pdf({
+    const rawBuffer = await page.pdf({
       format: 'A4',
       printBackground: true,
       margin: { top: 0, right: 0, bottom: 0, left: 0 },
     });
 
+    // Gera thumbnail PNG da capa (primeira página visível)
+    let thumbnailBuffer = null;
+    try {
+      await page.setViewport({ width: 794, height: 1123 }); // A4 em 96dpi
+      thumbnailBuffer = await page.screenshot({ type: 'jpeg', quality: 80, clip: { x: 0, y: 0, width: 794, height: 500 } });
+    } catch (_) {}
+
     await page.close();
-    return buffer;
+
+    // Injeta metadados internos no PDF (Author, Title, Subject)
+    try {
+      const { PDFDocument } = require('pdf-lib');
+      const pdfDoc = await PDFDocument.load(rawBuffer);
+      const titulo = conteudo?.titulo || params?.nicho || 'Produto Digital';
+      const autor  = conteudo?.autor  || params?.autor  || 'Autor';
+      pdfDoc.setTitle(titulo);
+      pdfDoc.setAuthor(autor);
+      pdfDoc.setSubject(params?.nicho || '');
+      pdfDoc.setCreator('MAX Criador — Powered by GPT-4o');
+      pdfDoc.setProducer('MAX Criador');
+      const pdfBytes = await pdfDoc.save();
+      return { pdfBuffer: Buffer.from(pdfBytes), thumbnailBuffer };
+    } catch (_) {
+      return { pdfBuffer: rawBuffer, thumbnailBuffer };
+    }
   } finally {
     await browser.close();
   }
@@ -490,21 +537,26 @@ async function executar(params, onProgress = () => {}) {
     }
 
     onProgress(68, 'Renderizando PDF profissional...');
-    const pdfBuffer = await renderizarPDF(conteudo, { tipo, nicho, autor });
+    const { pdfBuffer, thumbnailBuffer } = await renderizarPDF(conteudo, { tipo, nicho, autor });
 
     onProgress(92, 'Salvando resultado...');
     const titulo = conteudo.titulo || tema || nicho || tipo;
     const pdfFilename = `${entregaId || Date.now()}-${tipo}.pdf`;
 
-    // Upload para Storage e obtém URL permanente
+    // Upload PDF e thumbnail para Storage
     const pdfUrl = await uploadPDF(pdfBuffer, pdfFilename);
+    let thumbUrl = null;
+    if (thumbnailBuffer) {
+      thumbUrl = await uploadPDF(thumbnailBuffer, pdfFilename.replace('.pdf', '-thumb.jpg'));
+    }
 
     if (entregaId) {
       await supa.from('entregas').update({
         status: 'pronto',
         titulo,
         conteudo,
-        pdf_url: pdfUrl,
+        pdf_url:   pdfUrl,
+        thumb_url: thumbUrl,
       }).eq('id', entregaId);
     }
 
@@ -521,12 +573,20 @@ async function executar(params, onProgress = () => {}) {
       fonte: 'engine',
     });
 
+    const slugTitulo = titulo.slice(0, 45)
+      .toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '') // remove acentos
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
     return {
       pdf:         pdfBuffer,
+      pdf_url:     pdfUrl,
+      thumb_url:   thumbUrl,
       titulo,
       tipo,
       conteudo,
-      pdfFilename: `${tipo}-${titulo.slice(0, 45).toLowerCase().replace(/[^\w]/g, '-').replace(/-+/g, '-')}.pdf`,
+      pdfFilename: `${tipo}-${slugTitulo}.pdf`,
     };
 
   } catch (erro) {

@@ -402,6 +402,8 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);
 }
 .hist-dl:hover{background:rgba(124,109,250,.18);border-color:var(--p)}
 .hist-no-pdf{display:inline-block;margin-top:6px;font-size:10px;color:var(--dim);font-style:italic}
+.vsl-aviso{margin-top:14px;padding:10px 14px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:10px;font-size:12px;color:#fbbf24;line-height:1.5;text-align:left}
+.result-thumb{display:block;width:100%;max-width:320px;border-radius:10px;margin:0 auto 20px;box-shadow:0 6px 28px rgba(0,0,0,.55);border:1px solid var(--border)}
 
 /* ── ERRO ─────────────────────────────────────────── */
 .erro-wrap{
@@ -612,7 +614,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);
 
 <script>
 // ─── estado ─────────────────────────────────────────
-let tipo = null, jobId = null, pdfB64 = null, pdfName = 'produto.pdf';
+let tipo = null, jobId = null, pdfB64 = null, pdfName = 'produto.pdf', pdfUrl = null, thumbUrl = null;
 
 // ─── card selection ───────────────────────────────────
 document.querySelectorAll('.tipo-card').forEach(c => {
@@ -724,6 +726,7 @@ async function iniciar() {
     const r = await fetch('/api/criador/iniciar', {
       method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(params)
     });
+    if (r.status === 429) { goTo(2); mostrarErro('Você atingiu o limite de gerações por hora. Aguarde e tente novamente.'); return; }
     if (!r.ok) throw new Error('Servidor retornou '+r.status);
     const { jobId: id } = await r.json();
     jobId = id;
@@ -757,8 +760,13 @@ async function fetchResultado(id) {
   try {
     const r = await fetch('/api/criador/resultado/'+id);
     const d = await r.json();
-    if (d.pdf) { pdfB64 = d.pdf; pdfName = d.pdfFilename || 'produto.pdf'; showResultado(d.titulo, d.tipo); }
-    else mostrarErro(d.error || 'PDF não encontrado.');
+    if (d.pdf || d.pdfUrl) {
+      pdfB64   = d.pdf       || null;
+      pdfName  = d.pdfFilename || 'produto.pdf';
+      pdfUrl   = d.pdfUrl   || null;
+      thumbUrl = d.thumbUrl || null;
+      showResultado(d.titulo, d.tipo);
+    } else mostrarErro(d.error || 'PDF não encontrado.');
   } catch(e) { mostrarErro(e.message); }
 }
 
@@ -803,6 +811,7 @@ function showResultado(titulo, t) {
   p.innerHTML = `
     <div class="result-wrap">
       <div class="result-card-wrap">
+        ${thumbUrl ? `<img class="result-thumb" src="${esc(thumbUrl)}" alt="Preview da capa">` : ''}
         <span class="result-confetti">🎉</span>
         <div class="result-titulo">${esc(titulo)}</div>
         <div class="result-meta">Seu ${LABELS[t]||t} está pronto para vender</div>
@@ -815,6 +824,7 @@ function showResultado(titulo, t) {
           <button class="btn btn-download" onclick="baixar()">⬇ Baixar PDF</button>
           <button class="btn btn-ghost btn-novo" onclick="resetar()">+ Criar outro</button>
         </div>
+        ${t === 'script_vsl' ? `<div class="vsl-aviso">⚠️ Personalize o <strong>preço</strong>, o nome da <strong>oferta</strong> e os <strong>depoimentos</strong> antes de usar o script.</div>` : ''}
       </div>
       <div id="hist-wrap"></div>
     </div>`;
@@ -831,14 +841,21 @@ function mostrarErro(msg) {
 }
 
 function baixar() {
-  if (!pdfB64) return;
+  // Preferir URL pública (funciona no Safari iOS) — base64 como fallback
+  const href = pdfUrl || (pdfB64 ? 'data:application/pdf;base64,'+pdfB64 : null);
+  if (!href) return;
   const a = document.createElement('a');
-  a.href = 'data:application/pdf;base64,'+pdfB64;
-  a.download = pdfName; a.click();
+  a.href = href;
+  a.download = pdfName;
+  a.target = '_blank';
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 function resetar() {
-  tipo = null; jobId = null; pdfB64 = null;
+  tipo = null; jobId = null; pdfB64 = null; pdfUrl = null; thumbUrl = null;
   document.querySelectorAll('.tipo-card').forEach(c => c.classList.remove('selected'));
   document.getElementById('btn-tipo-next').disabled = true;
   // Limpa campos do formulário

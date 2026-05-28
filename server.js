@@ -2693,8 +2693,17 @@ function limparCriadorJobs() {
   }
 }
 
+// Rate limit: 8 gerações por hora por IP
+const criadorLimiter = require('express-rate-limit').rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 8,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Limite de gerações atingido. Aguarde 1 hora e tente novamente.' },
+});
+
 // POST /api/criador/iniciar → inicia geração, retorna jobId
-app.post('/api/criador/iniciar', (req, res) => {
+app.post('/api/criador/iniciar', criadorLimiter, (req, res) => {
   limparCriadorJobs();
   const jobId = Math.random().toString(36).slice(2, 11);
   criadorJobs.set(jobId, { status: 'running', progress: 0, message: 'Iniciando...', criadoEm: Date.now() });
@@ -2726,6 +2735,8 @@ app.post('/api/criador/iniciar', (req, res) => {
         tipo:        resultado.tipo,
         pdf:         resultado.pdf ? Buffer.from(resultado.pdf).toString('base64') : null,
         pdfFilename: resultado.pdfFilename,
+        pdfUrl:      resultado.pdf_url   || null,
+        thumbUrl:    resultado.thumb_url  || null,
       });
     })
     .catch(e => {
@@ -2767,7 +2778,7 @@ app.get('/api/criador/resultado/:jobId', (req, res) => {
   const j = criadorJobs.get(req.params.jobId);
   if (!j)                  return res.status(404).json({ error: 'Resultado não encontrado ou expirado' });
   if (j.status !== 'done') return res.status(202).json({ status: j.status, progress: j.progress, message: j.message });
-  const result = { titulo: j.titulo, tipo: j.tipo, pdf: j.pdf, pdfFilename: j.pdfFilename };
+  const result = { titulo: j.titulo, tipo: j.tipo, pdf: j.pdf, pdfFilename: j.pdfFilename, pdfUrl: j.pdfUrl || null, thumbUrl: j.thumbUrl || null };
   criadorJobs.delete(req.params.jobId);
   res.json(result);
 });
