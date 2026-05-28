@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MAX Criador — Gerador de Entregáveis</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -175,6 +176,9 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);
   border-color:var(--p);box-shadow:0 0 0 3px var(--p-dim);
 }
 .field textarea{resize:vertical;min-height:66px;line-height:1.55}
+.field-error-msg{font-size:11px;color:#f87171;margin-top:2px;display:none}
+.field input.input-error{border-color:#f87171!important;box-shadow:0 0 0 3px rgba(248,113,113,.18)!important}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 
 /* ── STEP 2: LAYOUT 2 COLUNAS ──────────────────────── */
 .det-layout{
@@ -397,6 +401,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);
   transition:all .15s;width:fit-content;
 }
 .hist-dl:hover{background:rgba(124,109,250,.18);border-color:var(--p)}
+.hist-no-pdf{display:inline-block;margin-top:6px;font-size:10px;color:var(--dim);font-style:italic}
 
 /* ── ERRO ─────────────────────────────────────────── */
 .erro-wrap{
@@ -508,6 +513,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);
         <div class="field">
           <label>Nicho <span class="field-req">*</span></label>
           <input id="f-nicho" type="text" placeholder="Ex: emagrecimento para mulheres acima de 40 anos" required>
+          <span class="field-error-msg" id="nicho-error">⚠ Preencha o nicho para continuar</span>
         </div>
 
         <div class="field">
@@ -686,8 +692,19 @@ function atualizarTypeRecap() {
 
 // ─── geração ────────────────────────────────────────────
 async function iniciar() {
-  const nicho = document.getElementById('f-nicho').value.trim();
-  if (!nicho) { document.getElementById('f-nicho').focus(); return; }
+  const nichoEl = document.getElementById('f-nicho');
+  const nichoErr = document.getElementById('nicho-error');
+  const nicho = nichoEl.value.trim();
+  if (!nicho) {
+    nichoEl.classList.add('input-error');
+    nichoEl.style.animation = 'shake .35s ease';
+    nichoErr.style.display = 'block';
+    nichoEl.focus();
+    setTimeout(() => { nichoEl.style.animation = ''; }, 400);
+    return;
+  }
+  nichoEl.classList.remove('input-error');
+  nichoErr.style.display = 'none';
 
   goTo(3);
   setProg(0, 'Iniciando…');
@@ -824,6 +841,21 @@ function resetar() {
   tipo = null; jobId = null; pdfB64 = null;
   document.querySelectorAll('.tipo-card').forEach(c => c.classList.remove('selected'));
   document.getElementById('btn-tipo-next').disabled = true;
+  // Limpa campos do formulário
+  ['f-nicho','f-publico','f-tema','f-autor'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.value = ''; el.classList.remove('input-error'); }
+  });
+  const nichoErr = document.getElementById('nicho-error');
+  if (nichoErr) nichoErr.style.display = 'none';
+  document.querySelectorAll('.tom-pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.tom === 'conversacional');
+  });
+  document.querySelectorAll('.ext-card').forEach(c => {
+    c.classList.toggle('active', c.dataset.ext === 'medio');
+  });
+  document.getElementById('f-tom').value = 'conversacional';
+  document.getElementById('f-extensao').value = 'medio';
   document.getElementById('panel-resultado').style.display = 'none';
   const g = document.getElementById('panel-gerar');
   g.style.display = ''; g.classList.remove('active');
@@ -855,7 +887,9 @@ async function carregarHistorico() {
           <div class="hist-tipo">${esc(LABELS[e.tipo]||e.tipo)}</div>
           <div class="hist-titulo">${esc(e.titulo||e.nicho||'—')}</div>
           <div class="hist-date">${new Date(e.created_at).toLocaleDateString('pt-BR')}</div>
-          ${e.pdf_url ? `<a class="hist-dl" href="${esc(e.pdf_url)}" download target="_blank">⬇ Baixar PDF</a>` : ''}
+          ${e.pdf_url
+            ? `<a class="hist-dl" href="${esc(e.pdf_url)}" download target="_blank">⬇ Baixar PDF</a>`
+            : `<span class="hist-no-pdf">PDF não disponível</span>`}
         </div>`).join('')}
       </div>`;
   } catch(_) {}
