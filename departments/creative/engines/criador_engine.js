@@ -64,27 +64,28 @@ OBRIGATÓRIO: gere de ${qtd} capítulos completos e detalhados`,
     workbook: `Retorne JSON com exatamente esta estrutura:
 {
   "titulo": "título do workbook (máx 12 palavras)",
-  "subtitulo": "resultado esperado após completar o workbook",
+  "subtitulo": "resultado concreto que o leitor terá ao completar",
   "autor": "nome do autor",
   "introducao": "como usar este workbook e o que esperar (100 a 150 palavras)",
   "modulos": [
     {
       "numero": 1,
       "titulo": "nome do módulo",
-      "objetivo": "objetivo de aprendizado (1 frase clara)",
-      "teoria": "base conceitual do módulo (200 a 300 palavras)",
+      "objetivo": "o que o leitor será capaz de fazer após este módulo (1 frase, começa com verbo)",
+      "teoria": "base conceitual do módulo específica ao nicho (200 a 300 palavras) — com exemplos práticos, não conceitos genéricos",
       "exercicios": [
         {
-          "titulo": "nome do exercício",
-          "instrucao": "instrução clara e específica (2 a 3 frases)",
-          "linhas": 5
+          "titulo": "nome curto do exercício (ex: Mapeie Sua Situação Atual)",
+          "instrucao": "pergunta ou tarefa específica ao nicho que leva o leitor a refletir sobre SUA situação pessoal — não genérica (2 a 3 frases)",
+          "linhas": 6
         }
       ]
     }
   ],
-  "reflexao_final": "reflexão e comprometimento para fechamento (80 a 120 palavras)"
+  "reflexao_final": "reflexão e declaração de comprometimento do leitor (80 a 120 palavras)"
 }
-OBRIGATÓRIO: gere de ${qtd} módulos, cada um com 2 a 3 exercícios`,
+OBRIGATÓRIO: gere de ${qtd} módulos, cada um com 2 a 3 exercícios
+REGRA DOS EXERCÍCIOS: cada exercício deve ser uma pergunta ou tarefa aberta que só faz sentido para quem está naquele nicho específico. Ex para nicho "finanças pessoais": "Liste os 3 gastos que você mais evita analisar e escreva por que cada um causa desconforto". Nunca: "Escreva seus objetivos".`,
 
     guia: `Retorne JSON com exatamente esta estrutura:
 {
@@ -285,6 +286,72 @@ RETORNE SOMENTE O JSON COMPLETO E VÁLIDO.`;
   }
 }
 
+// ── Validação de conteúdo gerado ───────────────────────────
+function validarConteudo(conteudo, tipo, extensao) {
+  const mins = { curto: 4, medio: 6, longo: 9 };
+  const min  = mins[extensao] || 6;
+
+  const checks = {
+    ebook:      () => {
+      if (!Array.isArray(conteudo.capitulos) || conteudo.capitulos.length < min)
+        throw new Error(`E-book com apenas ${conteudo.capitulos?.length || 0} capítulos — mínimo ${min} para extensão "${extensao}"`);
+      conteudo.capitulos.forEach((c, i) => {
+        if (!c.conteudo || c.conteudo.length < 150)
+          throw new Error(`Capítulo ${i+1} com conteúdo insuficiente (${c.conteudo?.length || 0} chars)`);
+      });
+    },
+    workbook:   () => {
+      if (!Array.isArray(conteudo.modulos) || conteudo.modulos.length < min)
+        throw new Error(`Workbook com apenas ${conteudo.modulos?.length || 0} módulos — mínimo ${min}`);
+      conteudo.modulos.forEach((m, i) => {
+        if (!Array.isArray(m.exercicios) || m.exercicios.length < 2)
+          throw new Error(`Módulo ${i+1} com menos de 2 exercícios`);
+      });
+    },
+    guia:       () => {
+      if (!Array.isArray(conteudo.passos) || conteudo.passos.length < min)
+        throw new Error(`Guia com apenas ${conteudo.passos?.length || 0} passos — mínimo ${min}`);
+    },
+    checklist:  () => {
+      if (!Array.isArray(conteudo.secoes) || conteudo.secoes.length < 4)
+        throw new Error(`Checklist com apenas ${conteudo.secoes?.length || 0} seções — mínimo 4`);
+      conteudo.secoes.forEach((s, i) => {
+        if (!Array.isArray(s.itens) || s.itens.length < 3)
+          throw new Error(`Seção ${i+1} do checklist com menos de 3 itens`);
+      });
+    },
+    script_vsl: () => {
+      if (!Array.isArray(conteudo.partes) || conteudo.partes.length < 8)
+        throw new Error(`Script VSL com apenas ${conteudo.partes?.length || 0}/8 partes`);
+      conteudo.partes.forEach((p, i) => {
+        if (!p.script || p.script.length < 50)
+          throw new Error(`Parte ${i+1} do VSL sem script ou muito curta`);
+      });
+    },
+  };
+
+  if (checks[tipo]) checks[tipo]();
+}
+
+// ── Upload do PDF para Supabase Storage ────────────────────
+async function uploadPDF(pdfBuffer, filename) {
+  try {
+    const { createClient } = require('@supabase/supabase-js');
+    const supa = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+    const { data, error } = await supa.storage
+      .from('criador-pdfs')
+      .upload(filename, Buffer.from(pdfBuffer), {
+        contentType: 'application/pdf',
+        upsert: true,
+      });
+    if (error) return null;
+    const { data: urlData } = supa.storage.from('criador-pdfs').getPublicUrl(filename);
+    return urlData?.publicUrl || null;
+  } catch (_) {
+    return null;
+  }
+}
+
 // ── Renderização PDF via Puppeteer ──────────────────────────
 async function renderizarPDF(conteudo, params) {
   const { tipo } = params;
@@ -400,19 +467,42 @@ async function executar(params, onProgress = () => {}) {
     onProgress(8,  'Preparando estrutura do produto...');
 
     onProgress(20, `Gerando ${LABELS[tipo] || tipo} com IA — aguarde (30–90s)...`);
-    const conteudo = await gerarConteudo({ tipo, nicho, publico, tema, tom, extensao, autor });
+    let conteudo = await gerarConteudo({ tipo, nicho, publico, tema, tom, extensao, autor });
+
+    // Valida conteúdo — retry automático se insuficiente
+    try {
+      validarConteudo(conteudo, tipo, extensao);
+    } catch (validErr) {
+      onProgress(45, 'Conteúdo incompleto — regenerando com mais detalhe...');
+      aprendizados.salvar({
+        titulo: `Validação falhou — retry automático — ${tipo}`,
+        categoria: 'bug_fix',
+        problema: validErr.message,
+        solucao: 'Retry automático com mesmo prompt. Se persistir, revisar schema do prompt.',
+        contexto: { tipo, nicho, extensao },
+        tags: [tipo, 'validacao', 'retry'],
+        fonte: 'engine',
+      });
+      conteudo = await gerarConteudo({ tipo, nicho, publico, tema, tom, extensao, autor });
+      validarConteudo(conteudo, tipo, extensao); // lança se ainda inválido após retry
+    }
 
     onProgress(68, 'Renderizando PDF profissional...');
     const pdfBuffer = await renderizarPDF(conteudo, { tipo, nicho, autor });
 
     onProgress(92, 'Salvando resultado...');
     const titulo = conteudo.titulo || tema || nicho || tipo;
+    const pdfFilename = `${entregaId || Date.now()}-${tipo}.pdf`;
+
+    // Upload para Storage e obtém URL permanente
+    const pdfUrl = await uploadPDF(pdfBuffer, pdfFilename);
 
     if (entregaId) {
       await supa.from('entregas').update({
         status: 'pronto',
         titulo,
         conteudo,
+        pdf_url: pdfUrl,
       }).eq('id', entregaId);
     }
 

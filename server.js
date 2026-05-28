@@ -2779,7 +2779,7 @@ app.get('/api/criador/historico', async (req, res) => {
     const supa = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
     const { data, error } = await supa
       .from('entregas')
-      .select('id, tipo, nicho, titulo, status, created_at')
+      .select('id, tipo, nicho, titulo, status, pdf_url, created_at')
       .order('created_at', { ascending: false })
       .limit(12);
     if (error) return res.status(500).json({ error: error.message });
