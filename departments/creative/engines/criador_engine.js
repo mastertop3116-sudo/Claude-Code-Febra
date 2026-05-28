@@ -5,9 +5,10 @@
 
 'use strict';
 
-const path   = require('path');
-const fs     = require('fs');
-const OpenAI = require('openai');
+const path          = require('path');
+const fs            = require('fs');
+const OpenAI        = require('openai');
+const aprendizados  = require('../../../utils/aprendizados');
 
 const TEMPLATE_PATH = path.join(__dirname, '../templates/criador-universal/index.html');
 
@@ -270,7 +271,17 @@ RETORNE SOMENTE O JSON COMPLETO E VÁLIDO.`;
     return JSON.parse(raw);
   } catch (_) {
     const { jsonrepair } = require('jsonrepair');
-    return JSON.parse(jsonrepair(raw));
+    const reparado = JSON.parse(jsonrepair(raw));
+    aprendizados.salvar({
+      titulo: `JSON malformado reparado — tipo: ${tipo}`,
+      categoria: 'bug_fix',
+      problema: `GPT-4o retornou JSON inválido para tipo "${tipo}" (${nicho}). JSON.parse falhou.`,
+      solucao: 'jsonrepair aplicado com sucesso. Considerar prompt mais explícito sobre estrutura JSON se recorrente neste tipo.',
+      contexto: { tipo, nicho, extensao, raw_inicio: raw.slice(0, 120) },
+      tags: ['json', 'gpt4o', tipo, 'jsonrepair'],
+      fonte: 'engine',
+    });
+    return reparado;
   }
 }
 
@@ -406,6 +417,17 @@ async function executar(params, onProgress = () => {}) {
     }
 
     onProgress(100, 'Pronto!');
+
+    // Registra padrão de sucesso para aprendizado futuro
+    const pdfKb = Math.round(Buffer.from(pdfBuffer).length / 1024);
+    aprendizados.salvar({
+      titulo: `Geração bem-sucedida — ${LABELS[tipo]} · ${nicho}`,
+      categoria: 'padrao',
+      solucao: `${LABELS[tipo]} gerado com sucesso. Tom: ${tom}, Extensão: ${extensao}, PDF: ${pdfKb}KB.`,
+      contexto: { tipo, nicho, publico, tom, extensao, pdfKb, titulo },
+      tags: [tipo, tom, extensao, 'sucesso'],
+      fonte: 'engine',
+    });
 
     return {
       pdf:         pdfBuffer,

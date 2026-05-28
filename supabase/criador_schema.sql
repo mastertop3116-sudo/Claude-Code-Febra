@@ -34,6 +34,26 @@ CREATE TABLE IF NOT EXISTS erros_sistema (
   created_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- ============================================================
+-- Aprendizados do Sistema — padrões, soluções e melhorias
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS aprendizados (
+  id          UUID        DEFAULT gen_random_uuid() PRIMARY KEY,
+  titulo      TEXT        NOT NULL,
+  categoria   TEXT        NOT NULL,  -- 'bug_fix' | 'melhoria' | 'padrao' | 'prompt' | 'template'
+  problema    TEXT,                  -- o que estava errado ou o desafio enfrentado
+  solucao     TEXT        NOT NULL,  -- o que foi feito / como resolver
+  contexto    JSONB,                 -- dados adicionais: arquivo, função, tipo de entregável...
+  tags        TEXT[],                -- ex: ['checklist','puppeteer','pdf']
+  fonte       TEXT,                  -- 'engine' | 'template' | 'server' | 'manual'
+  created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_aprendizados_categoria ON aprendizados(categoria);
+CREATE INDEX IF NOT EXISTS idx_aprendizados_tags      ON aprendizados USING gin(tags);
+CREATE INDEX IF NOT EXISTS idx_aprendizados_created   ON aprendizados(created_at DESC);
+
 -- Índices para performance
 CREATE INDEX IF NOT EXISTS idx_entregas_status     ON entregas(status);
 CREATE INDEX IF NOT EXISTS idx_entregas_tipo       ON entregas(tipo);
