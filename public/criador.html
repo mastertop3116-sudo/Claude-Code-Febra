@@ -109,10 +109,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);
 
 /* ── TIPO GRID ─────────────────────────────────────── */
 .tipos-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  display:grid;grid-template-columns:repeat(5,1fr);gap:10px;
   margin-bottom:28px;
 }
-@media(max-width:600px){.tipos-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){.tipos-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:480px){.tipos-grid{grid-template-columns:repeat(2,1fr)}}
 
 .tipo-card{
   border:1.5px solid var(--border);border-radius:14px;
@@ -466,13 +467,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);
         <div class="tipo-desc">Listas de verificação organizadas por seção</div>
       </div>
 
-      <div class="tipo-card" data-tipo="devocional" style="--tc:#d97706">
-        <div class="tipo-check">✓</div>
-        <div class="tipo-icon">✝️</div>
-        <div class="tipo-nome">Devocional</div>
-        <div class="tipo-desc">7 dias com versículo, reflexão e oração</div>
-      </div>
-
       <div class="tipo-card" data-tipo="script_vsl" style="--tc:#3b82f6">
         <div class="tipo-check">✓</div>
         <div class="tipo-icon">🎬</div>
@@ -669,7 +663,6 @@ const TIPO_META = {
   workbook:   { icon:'📝', nome:'Workbook',   cor:'#10b981' },
   guia:       { icon:'🗺️', nome:'Guia',        cor:'#f59e0b' },
   checklist:  { icon:'✅', nome:'Checklist',  cor:'#22d3a5' },
-  devocional: { icon:'✝️', nome:'Devocional', cor:'#d97706' },
   script_vsl: { icon:'🎬', nome:'Script VSL', cor:'#3b82f6' },
 };
 function atualizarTypeRecap() {
@@ -771,7 +764,7 @@ function setStep(active) {
 }
 
 const LABELS = {ebook:'E-book',workbook:'Workbook',guia:'Guia',checklist:'Checklist',
-  devocional:'Devocional',script_vsl:'Script VSL'};
+  script_vsl:'Script VSL'};
 
 function showResultado(titulo, t) {
   document.getElementById('panel-gerar').style.display = 'none';
