@@ -70,151 +70,150 @@ function getPromptSchema(tipo, extensao) {
   "titulo": "título poderoso e específico (máx 12 palavras, sem ponto final)",
   "subtitulo": "subtítulo que reforça o benefício principal (máx 20 palavras)",
   "autor": "nome do autor",
-  "introducao": "texto de introdução envolvente (150 a 200 palavras)",
+  "introducao": "introdução em 1ª pessoa — comece com 'Quando eu...' ou 'Eu lembro de...' — conte por que o autor criou este material, inclua 1 situação concreta com número ou resultado (150 a 200 palavras)",
   "capitulos": [
     {
       "numero": 1,
-      "titulo": "título do capítulo",
-      "conteudo": "texto completo (${wpp} palavras) — rico em detalhes, exemplos e linguagem acessível",
-      "pontos_chave": ["ponto 1", "ponto 2", "ponto 3"],
-      "citacao": "frase de destaque impactante (máx 20 palavras)"
+      "titulo": "título do capítulo — direto, sem rodeios",
+      "conteudo": "texto completo (${wpp} palavras) — ESTRUTURA OBRIGATÓRIA: (1) PROBLEMA: abra com uma dor real e específica do nicho; (2) HISTÓRIA: 'Eu vi isso acontecer com [Nome], [idade] anos, [contexto] — ela/ele [situação concreta com número]'; (3) SOLUÇÃO: o que realmente funciona, com passo específico; (4) AÇÃO: 'Sua tarefa agora: [verbo imperativo] [número] [coisa concreta] em [prazo]'. PROIBIDO: 'você pode', 'é possível', 'considere', 'pense em', 'busque', 'talvez'.",
+      "pontos_chave": ["ponto direto e específico ao nicho — começa com verbo ou número", "idem", "idem"],
+      "citacao": "frase de impacto em 1ª pessoa do autor — algo que ele diria (máx 20 palavras)"
     }
   ],
-  "conclusao": "conclusão motivadora (100 a 150 palavras)",
-  "cta": "chamada para ação final (máx 50 palavras)"
+  "conclusao": "conclusão em 1ª pessoa — o que o autor quer que o leitor faça HOJE, com 1 ação concreta e numerada (100 a 150 palavras)",
+  "cta": "chamada para ação direta e específica — diz exatamente o que fazer agora (máx 50 palavras)"
 }
-OBRIGATÓRIO: gere de ${qtd} capítulos completos e detalhados`,
+OBRIGATÓRIO: gere de ${qtd} capítulos completos`,
 
     workbook: `Retorne JSON com exatamente esta estrutura:
 {
   "titulo": "título do workbook (máx 12 palavras)",
-  "subtitulo": "resultado concreto que o leitor terá ao completar",
+  "subtitulo": "resultado concreto e mensurável que o leitor terá ao completar",
   "autor": "nome do autor",
-  "introducao": "como usar este workbook e o que esperar (100 a 150 palavras)",
+  "introducao": "em 1ª pessoa — conte como o autor descobriu que precisava criar este workbook, inclua 1 resultado real ou estimado ('Quem aplica esse método em 30 dias costuma...') (100 a 150 palavras)",
   "modulos": [
     {
       "numero": 1,
       "titulo": "nome do módulo",
-      "objetivo": "o que o leitor será capaz de fazer após este módulo (1 frase, começa com verbo)",
-      "teoria": "base conceitual do módulo específica ao nicho (200 a 300 palavras) — com exemplos práticos, não conceitos genéricos",
+      "objetivo": "o que o leitor será capaz de fazer — começa com verbo de ação forte (ex: Calcular, Eliminar, Criar, Mapear)",
+      "teoria": "em 1ª pessoa (200 a 300 palavras) — comece com 'Quando eu comecei a trabalhar com isso...' ou 'Uma vez, acompanhei [Nome], [perfil] que...'; mostre o problema, a descoberta e a solução com número ou prazo concreto; termine com: 'Então aqui está o que funciona de verdade:'",
       "exercicios": [
         {
-          "titulo": "nome curto do exercício (ex: Mapeie Sua Situação Atual)",
-          "instrucao": "pergunta ou tarefa específica ao nicho que leva o leitor a refletir sobre SUA situação pessoal — não genérica (2 a 3 frases)",
+          "titulo": "nome curto do exercício — verbo + objeto específico do nicho",
+          "instrucao": "tarefa específica que só faz sentido para quem está neste nicho — use pergunta direta com número: 'Liste EXATAMENTE [N] [coisa do nicho] que você [situação]. Para cada um, escreva [o quê].' (2 a 3 frases)",
           "linhas": 6
         }
       ]
     }
   ],
-  "reflexao_final": "reflexão e declaração de comprometimento do leitor (80 a 120 palavras)"
+  "reflexao_final": "em 1ª pessoa — o autor faz uma pergunta direta ao leitor e pede 1 compromisso com prazo específico (80 a 120 palavras)"
 }
-OBRIGATÓRIO: gere de ${qtd} módulos, cada um com 2 a 3 exercícios
-REGRA DOS EXERCÍCIOS: cada exercício deve ser uma pergunta ou tarefa aberta que só faz sentido para quem está naquele nicho específico. Ex para nicho "finanças pessoais": "Liste os 3 gastos que você mais evita analisar e escreva por que cada um causa desconforto". Nunca: "Escreva seus objetivos".`,
+OBRIGATÓRIO: gere de ${qtd} módulos, cada um com 2 a 3 exercícios`,
 
     guia: `Retorne JSON com exatamente esta estrutura:
 {
   "titulo": "título do guia passo a passo (máx 12 palavras)",
-  "subtitulo": "promessa central do guia",
+  "subtitulo": "promessa central — resultado esperado em [prazo]",
   "autor": "nome do autor",
-  "introducao": "contexto e por que este guia é essencial (120 a 180 palavras)",
+  "introducao": "em 1ª pessoa — por que o autor criou este guia, 1 caso concreto de quem aplicou ('Um aluno meu, [Nome], fez isso em [tempo] e conseguiu [resultado com número]') (120 a 180 palavras)",
   "passos": [
     {
       "numero": 1,
-      "titulo": "nome do passo",
-      "descricao": "explicação detalhada e prática (300 a 500 palavras)",
-      "acoes": ["ação concreta 1", "ação concreta 2", "ação concreta 3"],
-      "dica": "dica prática ou erro comum a evitar"
+      "titulo": "nome do passo — verbo imperativo + o quê",
+      "descricao": "em 1ª pessoa (300 a 500 palavras) — ESTRUTURA: 'A maioria das pessoas erra aqui porque [erro específico].' → 'Eu mesmo errei isso quando...' → 'O que realmente funciona é [solução com detalhe]' → 'Na prática, [Nome real ou fictício plausível] fez assim: [situação concreta]' → termine com: 'Sua tarefa neste passo: [ação + número + prazo]'",
+      "acoes": ["ação concreta com verbo imperativo + número ou critério de conclusão", "idem", "idem"],
+      "dica": "dica do autor em 1ª pessoa: 'Quando eu faço isso, presto atenção em [detalhe específico]...' ou 'O erro que eu via todo mundo cometendo era...'"
     }
   ],
-  "conclusao": "próximos passos e encorajamento (80 a 120 palavras)"
+  "conclusao": "em 1ª pessoa — o autor diz exatamente o que o leitor deve fazer nas próximas 24h (80 a 120 palavras)"
 }
 OBRIGATÓRIO: gere de ${qtd} passos detalhados`,
 
     checklist: `Retorne JSON com exatamente esta estrutura:
 {
   "titulo": "título do checklist (máx 12 palavras)",
-  "subtitulo": "para quem é e o que resolve",
+  "subtitulo": "para quem é e o resultado de usá-lo",
   "autor": "nome do autor",
-  "introducao": "por que usar este checklist e como ele ajuda (80 a 120 palavras)",
+  "introducao": "em 1ª pessoa — o autor conta a situação que o fez criar este checklist ('Eu criei isso depois de ver [situação específica acontecer X vezes]...') (80 a 120 palavras)",
   "secoes": [
     {
-      "titulo": "nome da seção (substantivo + contexto, ex: 'Preparação Inicial', 'Revisão Final')",
-      "descricao": "contexto breve da seção em 1 frase direta",
-      "itens": ["Verbo + ação específica + detalhes do nicho (ex: Verifique se o contrato tem cláusula de rescisão)"]
+      "titulo": "nome da seção (substantivo + contexto direto)",
+      "descricao": "1 frase direta sobre o que esta seção previne ou garante",
+      "itens": ["Verbo imperativo + ação específica ao nicho + detalhe concreto (ex: Confirme que o contrato tem multa de X% por rescisão antecipada)"]
     }
   ],
-  "dica_final": "dica para usar o checklist ao máximo (60 a 80 palavras)"
+  "dica_final": "em 1ª pessoa — dica do autor sobre como usar o checklist, com 1 situação concreta onde ele salvou alguém (60 a 80 palavras)"
 }
 OBRIGATÓRIO: gere de 5 a 8 seções, cada uma com 5 a 8 itens
-REGRA DE OURO para os itens: SEMPRE comece com verbo no imperativo (Verifique, Confirme, Liste, Revise, Defina, Teste, Documente, Calcule, Contate, Organize...) — nunca substantivos soltos. Cada item deve ser específico ao nicho, acionável e verificável`,
+REGRA DOS ITENS: SEMPRE verbo imperativo (Verifique, Confirme, Liste, Calcule, Documente...) + detalhe específico do nicho + critério mensurável quando possível. PROIBIDO: itens genéricos que funcionariam para qualquer nicho`,
 
     desafio: `Retorne JSON com exatamente esta estrutura:
 {
   "titulo": "nome do desafio (máx 12 palavras)",
-  "subtitulo": "o que será transformado ao longo do desafio",
+  "subtitulo": "transformação concreta e mensurável em X dias",
   "autor": "nome do autor",
   "duracao": 21,
-  "introducao": "por que aceitar este desafio e o que esperar (100 a 150 palavras)",
+  "introducao": "em 1ª pessoa — o autor conta por que criou este desafio, qual transformação ele próprio viveu ou viu ('Eu criei este desafio porque vi [N] pessoas tentando [resultado] e travando em [ponto específico]') — inclua 1 resultado estimado de quem completa (100 a 150 palavras)",
   "semanas": [
     {
       "numero": 1,
-      "tema": "tema central da semana",
-      "descricao": "foco e objetivos desta semana (100 a 150 palavras)",
+      "tema": "tema central da semana — substantivo de ação",
+      "descricao": "o que muda nesta semana, em 1ª pessoa — 'Na semana 1, eu quero que você [ação concreta]. A maioria das pessoas pula essa parte e por isso [consequência específica].' (100 a 150 palavras)",
       "dias": [
         {
           "numero": 1,
-          "titulo": "nome do dia",
-          "tarefa": "tarefa específica e prática do dia (2 a 3 frases diretas)",
-          "afirmacao": "afirmação poderosa relacionada ao dia"
+          "titulo": "nome do dia — verbo + objeto direto",
+          "tarefa": "tarefa específica com número ou critério: '[Verbo] [N] [coisa concreta do nicho]. Leva [tempo estimado] e você vai perceber [resultado imediato].' (2 a 3 frases)",
+          "afirmacao": "afirmação em 1ª pessoa do participante — começa com 'Eu [verbo presente]...' — específica ao nicho"
         }
       ]
     }
   ],
-  "manifesto": "manifesto do desafio — declaração de comprometimento (60 a 80 palavras)"
+  "manifesto": "declaração em 1ª pessoa do participante — compromisso específico com prazo e número (60 a 80 palavras)"
 }
 OBRIGATÓRIO: gere exatamente 3 semanas com 7 dias cada`,
 
     planner: `Retorne JSON com exatamente esta estrutura:
 {
   "titulo": "nome do planner (máx 12 palavras)",
-  "subtitulo": "período e foco principal do planner",
+  "subtitulo": "período e resultado concreto ao final",
   "autor": "nome do autor",
-  "introducao": "como usar este planner para máximos resultados (100 a 150 palavras)",
+  "introducao": "em 1ª pessoa — o autor explica como usa este planner na própria rotina, com 1 hábito concreto e resultado mensurável ('Desde que comecei a usar esse método, eu [resultado específico]') (100 a 150 palavras)",
   "secoes": [
     {
       "titulo": "nome da seção",
-      "descricao": "propósito desta seção (1 frase)",
-      "campos": ["campo 1", "campo 2", "campo 3", "campo 4"]
+      "descricao": "propósito em 1 frase — o que esta seção resolve ou garante",
+      "campos": ["campo específico do nicho — não genérico"]
     }
   ],
   "rituais": [
     {
       "tipo": "Ritual Matinal",
-      "passos": ["passo 1", "passo 2", "passo 3", "passo 4", "passo 5"]
+      "passos": ["passo com tempo estimado e ação concreta do nicho"]
     }
   ],
-  "citacao": "citação motivacional poderosa para o planner"
+  "citacao": "frase do próprio autor em 1ª pessoa — algo que ele diz para seus alunos (não citação famosa)"
 }
-OBRIGATÓRIO: gere de 5 a 7 seções e 3 rituais (matinal, noturno, semanal)`,
+OBRIGATÓRIO: gere de 5 a 7 seções e 3 rituais (matinal, noturno, semanal). Campos devem ser específicos ao nicho.`,
 
     devocional: `Retorne JSON com exatamente esta estrutura:
 {
   "titulo": "título do devocional (máx 12 palavras)",
   "subtitulo": "tema espiritual central",
   "autor": "nome do autor",
-  "prefacio": "prefácio do devocional (100 a 150 palavras)",
+  "prefacio": "em 1ª pessoa — o autor conta o momento de vida que o levou a escrever este devocional, inclui 1 situação concreta ('Eu estava em um período de...') (100 a 150 palavras)",
   "dias": [
     {
       "numero": 1,
-      "titulo": "título do dia",
+      "titulo": "título do dia — direto, provoca curiosidade",
       "versiculo_ref": "Referência bíblica (ex: João 3:16)",
       "versiculo": "texto completo do versículo (versão NVI ou NVT)",
-      "reflexao": "reflexão devocional profunda (350 a 450 palavras) — tom conversacional e pessoal, como se estivesse falando diretamente com o leitor",
-      "perguntas": ["pergunta reflexiva 1", "pergunta reflexiva 2"],
-      "oracao": "oração curta e pessoal (5 a 8 linhas)"
+      "reflexao": "em 1ª pessoa (350 a 450 palavras) — ESTRUTURA: comece com 'Eu lembro de um dia em que...' ou 'Quando eu li esse versículo pela primeira vez...'; mostre a luta humana real por trás da passagem; conecte com uma situação cotidiana concreta ('Talvez você também esteja em um daqueles dias que...'); termine com 1 ação prática para o dia — específica e com critério ('Hoje, antes de dormir, escreva [número] coisas que...'). PROIBIDO: 'você pode', 'é possível', 'talvez queira', 'considere'",
+      "perguntas": ["pergunta reflexiva que força honestidade — não tem resposta óbvia", "idem"],
+      "oracao": "oração em 1ª pessoa do leitor — pessoal, específica ao tema do dia, como se o leitor estivesse realmente orando agora (5 a 8 linhas)"
     }
   ],
-  "oracao_final": "oração de encerramento do devocional (60 a 80 palavras)"
+  "oracao_final": "oração de encerramento em 1ª pessoa do leitor — menciona a jornada dos 7 dias, específica ao tema (60 a 80 palavras)"
 }
 OBRIGATÓRIO: gere exatamente 7 dias completos`,
 
@@ -223,17 +222,17 @@ OBRIGATÓRIO: gere exatamente 7 dias completos`,
   "titulo": "nome do produto sendo vendido",
   "autor": "nome do apresentador",
   "partes": [
-    { "nome": "GANCHO",       "duracao_seg": 30,  "script": "texto completo (100 a 150 palavras) — abre com declaração ousada ou pergunta que paralisa. Use [pausa] para respiração, [olha para a câmera] para conexão direta" },
-    { "nome": "PROBLEMA",     "duracao_seg": 60,  "script": "texto completo (150 a 200 palavras) — identifica dor específica com detalhes do nicho. Tom: empático, como quem viveu isso" },
-    { "nome": "AGITAÇÃO",     "duracao_seg": 60,  "script": "texto completo (150 a 200 palavras) — aprofunda o problema, mostra o custo de não agir. Tom: [tom mais grave] urgência real, sem drama falso" },
-    { "nome": "SOLUÇÃO",      "duracao_seg": 90,  "script": "texto completo (200 a 250 palavras) — apresenta o produto. [pausa 2s antes de revelar o nome] Tom: confiante, revelação estratégica" },
-    { "nome": "AUTORIDADE",   "duracao_seg": 45,  "script": "texto completo (100 a 150 palavras) — história pessoal + credenciais. Tom: natural, sem soar arrogante. [gesticula ao mencionar resultados]" },
-    { "nome": "PROVA SOCIAL", "duracao_seg": 60,  "script": "texto completo (150 a 200 palavras) — 2 a 3 histórias de clientes reais com resultado específico (números, tempo, transformação)" },
-    { "nome": "OFERTA",       "duracao_seg": 90,  "script": "texto completo (200 a 250 palavras) — use [SEU_PRECO_ORIGINAL] e [SEU_PRECO_OFERTA] como placeholders de preço (o usuário vai substituir), liste 2-3 bônus, destaque a garantia. [mostra dedos ao contar bônus] Tom: animado mas controlado" },
-    { "nome": "CTA",          "duracao_seg": 30,  "script": "texto completo (80 a 120 palavras) — urgência real, escassez justificada, instrução de ação em 1 passo. [aponta para a tela] Termine com frase de encorajamento" }
+    { "nome": "GANCHO", "duracao_seg": 30, "script": "em 1ª pessoa — comece com declaração ousada baseada em experiência real: 'Eu descobri que [afirmação contraintuitiva específica ao nicho].' ou pergunta que paralisa: '[Situação específica e dolorosa do nicho]? Eu sei exatamente o que você está sentindo.' [olha para a câmera] (100 a 150 palavras)" },
+    { "nome": "PROBLEMA", "duracao_seg": 60, "script": "em 1ª pessoa — 'Quando eu comecei no [nicho], eu também [erro/dor específica].' Descreva a dor com detalhes do nicho: números, situações reais, consequências concretas. Tom: empático, quem viveu isso (150 a 200 palavras)" },
+    { "nome": "AGITAÇÃO", "duracao_seg": 60, "script": "em 1ª pessoa — 'E o pior é que, enquanto você não resolve isso, [consequência específica acontece].' Mostre o custo concreto de não agir: 'Em [prazo], isso vai custar [número/resultado]. Eu vi isso acontecer com [perfil de pessoa] mais de [N] vezes.' [tom mais grave] (150 a 200 palavras)" },
+    { "nome": "SOLUÇÃO", "duracao_seg": 90, "script": "em 1ª pessoa — 'Foi aí que eu desenvolvi [nome do método/produto].' [pausa 2s] Apresente o produto como descoberta pessoal: 'Depois de [N anos/meses] trabalhando com [nicho], eu percebi que o que realmente funciona é...' Tom: revelação, não venda (200 a 250 palavras)" },
+    { "nome": "AUTORIDADE", "duracao_seg": 45, "script": "em 1ª pessoa — história pessoal real com números: 'Eu comecei no [nicho] em [situação difícil]. Em [prazo], eu [resultado concreto].' Credenciais naturais: 'Desde então, ajudei mais de [N] pessoas a [resultado].' [gesticula ao mencionar resultados] (100 a 150 palavras)" },
+    { "nome": "PROVA SOCIAL", "duracao_seg": 60, "script": "histórias em 1ª pessoa DE CLIENTES — 'A [Nome feminino], [idade], [profissão], me disse: [citação direta com resultado]. Ela foi de [situação antes] para [situação depois] em [prazo].' Repita com 2 perfis diferentes. [⚠️ ATENÇÃO: substitua por depoimentos reais antes de usar] (150 a 200 palavras)" },
+    { "nome": "OFERTA", "duracao_seg": 90, "script": "em 1ª pessoa — 'Eu poderia cobrar [SEU_PRECO_ORIGINAL] por isso, porque [justificativa concreta de valor].' Lista bônus com valor unitário. 'Mas hoje, como [razão para desconto], você tem acesso a tudo por apenas [SEU_PRECO_OFERTA].' Garantia clara com prazo. [mostra dedos ao contar bônus] (200 a 250 palavras)" },
+    { "nome": "CTA", "duracao_seg": 30, "script": "em 1ª pessoa — urgência real e justificada: 'Eu só consigo atender [N] pessoas nesta turma porque [razão real].' Instrução de ação em 1 passo. Termine: 'Eu te vejo do outro lado.' [aponta para a tela] (80 a 120 palavras)" }
   ]
 }
-OBRIGATÓRIO: preencha TODAS as 8 partes. O script deve soar como fala, não como texto escrito — frases curtas, pausas marcadas, ritmo de quem está na câmera. Específico ao nicho em todos os blocos`,
+OBRIGATÓRIO: preencha TODAS as 8 partes. Script como fala — frases curtas, pausas marcadas. 1ª pessoa em todos os blocos. PROIBIDO: 'você pode', 'é possível', 'considere', 'talvez'`,
   };
 
   return schemas[tipo] || schemas.ebook;
@@ -252,18 +251,18 @@ async function gerarConteudo(params) {
     educativo:      'didático, claro, com muitos exemplos e analogias acessíveis',
   };
 
-  const sistema = `Você é um especialista em criação de infoprodutos digitais premium para o mercado brasileiro.
-Você escreve conteúdo excepcional, específico, prático e de alto valor real.
-Tom de escrita: ${TONS[tom] || TONS.conversacional}
-Autor do produto: ${autor}
+  const sistema = `Você é ${autor}, criador de infoprodutos digitais premium para o mercado brasileiro.
+Escreva na SUA voz — primeira pessoa, histórias reais ou plausíveis, descobertas pessoais.
+Tom: ${TONS[tom] || TONS.conversacional}
 
-REGRAS ABSOLUTAS:
-- Escreva SEMPRE em português do Brasil
-- Seja ESPECÍFICO ao nicho — zero conteúdo genérico
-- Conteúdo rico, denso, com exemplos práticos do nicho
-- Linguagem natural, fluida, sem rebuscamentos
-- NUNCA mencione IA, ChatGPT, Claude ou tecnologia similar
-- Retorne SOMENTE o JSON válido, sem markdown, sem texto extra`;
+REGRAS DE OURO (inegociáveis):
+• PRIMEIRA PESSOA: "Quando eu comecei...", "Eu aprendi isso do jeito difícil...", "Uma vez, acompanhei a [Nome] que...", "Comigo, a virada aconteceu quando..."
+• PERSONAGENS REAIS: exemplos com nome brasileiro, idade, cidade, número concreto. "A Juliana, 28 anos, de BH, saiu de R$ 4.200 de dívida para zero em 6 meses."
+• ZERO VAGUEZA: BANIDO como frase principal: "você pode", "é possível", "considere", "pense em", "busque", "talvez" — troque por ações diretas e afirmações concretas
+• VARIAÇÃO NARRATIVA: cada seção/capítulo deve ter abertura diferente — às vezes inicia com história, às vezes com dado impactante, às vezes com pergunta cortante — nunca padrão idêntico
+• ANCORAGEM COM NÚMEROS: prazos, percentuais, valores estimados, quantidades — o leitor precisa sentir o chão sob os pés
+• AÇÃO AO FINAL: toda seção longa termina com 1 tarefa concreta: "[Verbo imperativo] [número] [coisa] [prazo]"
+Retorne SOMENTE JSON válido. Sem markdown. Sem menção a IA ou ChatGPT.`;
 
   const schema = getPromptSchema(tipo, extensao);
 
