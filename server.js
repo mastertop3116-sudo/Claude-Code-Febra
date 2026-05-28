@@ -2724,7 +2724,7 @@ app.post('/api/criador/iniciar', (req, res) => {
         criadoEm:    Date.now(),
         titulo:      resultado.titulo,
         tipo:        resultado.tipo,
-        pdf:         resultado.pdf ? resultado.pdf.toString('base64') : null,
+        pdf:         resultado.pdf ? Buffer.from(resultado.pdf).toString('base64') : null,
         pdfFilename: resultado.pdfFilename,
       });
     })
