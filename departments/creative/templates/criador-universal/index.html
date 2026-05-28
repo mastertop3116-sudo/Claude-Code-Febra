@@ -28,6 +28,132 @@ body {
 }
 .page:last-child { page-break-after: auto; }
 
+/* ── PÁGINA DE TRANSIÇÃO (entre capítulos/módulos/passos) ── */
+.page-transition {
+  width: 210mm;
+  min-height: 297mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg,
+    color-mix(in srgb, var(--p, #6366f1) 92%, #000) 0%,
+    color-mix(in srgb, var(--p, #6366f1) 68%, #000) 100%
+  );
+  position: relative;
+  overflow: hidden;
+  page-break-after: always;
+  page-break-inside: avoid;
+}
+.page-transition::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.55) 0.5px, transparent 0.5px);
+  background-size: 9mm 9mm;
+  opacity: 0.07;
+}
+.pt-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 120pt;
+  font-weight: 800;
+  color: rgba(255,255,255,0.06);
+  line-height: 1;
+  position: absolute;
+  right: 8mm;
+  bottom: -10mm;
+  user-select: none;
+}
+.pt-label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 7.5pt;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 5mm;
+  position: relative;
+  z-index: 2;
+}
+.pt-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 28pt;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 150mm;
+  position: relative;
+  z-index: 2;
+}
+.pt-line {
+  width: 14mm; height: 1mm;
+  background: rgba(255,255,255,0.3);
+  border-radius: 1mm;
+  margin: 6mm auto 0;
+  position: relative;
+  z-index: 2;
+}
+
+/* ── PÁGINA DE ÍNDICE ── */
+.page-toc {
+  width: 210mm;
+  min-height: 297mm;
+  position: relative;
+  overflow: hidden;
+  page-break-after: always;
+  background: #fff;
+}
+.toc-header {
+  padding: 12mm 16mm 8mm 20mm;
+  border-bottom: 0.5mm solid color-mix(in srgb, var(--p, #6366f1) 15%, #eee);
+  background: color-mix(in srgb, var(--p, #6366f1) 4%, #fff);
+}
+.toc-label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 7pt; font-weight: 700;
+  color: var(--p, #6366f1); letter-spacing: 2px;
+  text-transform: uppercase; margin-bottom: 2mm;
+}
+.toc-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 22pt; font-weight: 700;
+  color: #141424; line-height: 1.15;
+}
+.toc-body { padding: 7mm 16mm 14mm 20mm; }
+.toc-entry {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  padding: 3mm 0;
+  border-bottom: 0.3mm solid #f0f0f8;
+}
+.toc-entry:last-child { border-bottom: none; }
+.toc-num {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 7.5pt; font-weight: 700;
+  color: var(--p, #6366f1);
+  min-width: 10mm; flex-shrink: 0;
+}
+.toc-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 10pt; font-weight: 500;
+  color: #1e1e2e; flex: 1;
+  line-height: 1.4;
+}
+.toc-dots {
+  flex: 1;
+  border-bottom: 0.5mm dotted #ccc;
+  margin: 0 3mm 1.5mm;
+  min-width: 8mm;
+}
+.toc-pg {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 8pt; font-weight: 600;
+  color: color-mix(in srgb, var(--p, #6366f1) 60%, #aaa);
+  min-width: 8mm; text-align: right; flex-shrink: 0;
+}
+
 /* ══════════════════════ CAPA ══════════════════════ */
 .capa {
   width: 210mm;
@@ -117,7 +243,11 @@ body {
 .capa-icon-main {
   font-size: 46pt;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+.capa-icon-main svg { display: block; }
 
 /* ── ZONA 3: CONTEÚDO — título, subtítulo, autor */
 .capa-content {
@@ -265,7 +395,7 @@ body {
 
 /* Corpo do texto */
 .pg-body {
-  padding: 0 16mm 14mm 20mm;
+  padding: 0 16mm 18mm 20mm;
 }
 
 .texto {
@@ -773,12 +903,52 @@ body {
   let html = '';
 
   /* ═══════════════ CAPA ═══════════════ */
-  const TIPO_ICONS = {
-    ebook: '📖', workbook: '📝', guia: '🗺️',
-    checklist: '✅', script_vsl: '🎬',
-    devocional: '🙏', planner: '📅', desafio: '🎯',
+
+  // SVG inline por tipo — vetorial, sem dependência externa, sem pixelação em PDF
+  const TIPO_SVGS = {
+    ebook: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="52" height="52"><rect x="8" y="4" width="26" height="34" rx="3" fill="rgba(255,255,255,0.18)"/><rect x="12" y="4" width="26" height="34" rx="3" fill="rgba(255,255,255,0.28)" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/><line x1="18" y1="14" x2="32" y2="14" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round"/><line x1="18" y1="19" x2="32" y2="19" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round"/><line x1="18" y1="24" x2="27" y2="24" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+    workbook: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="52" height="52"><rect x="8" y="6" width="32" height="36" rx="3" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.45)" stroke-width="1.5"/><line x1="16" y1="6" x2="16" y2="42" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/><line x1="20" y1="16" x2="34" y2="16" stroke="rgba(255,255,255,0.65)" stroke-width="1.5" stroke-linecap="round"/><line x1="20" y1="22" x2="34" y2="22" stroke="rgba(255,255,255,0.45)" stroke-width="1.5" stroke-linecap="round"/><line x1="20" y1="28" x2="34" y2="28" stroke="rgba(255,255,255,0.45)" stroke-width="1.5" stroke-linecap="round"/><line x1="20" y1="34" x2="28" y2="34" stroke="rgba(255,255,255,0.45)" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+    guia: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="52" height="52"><circle cx="24" cy="20" r="10" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/><line x1="24" y1="10" x2="24" y2="6" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" stroke-linecap="round"/><line x1="30.5" y1="12" x2="33.5" y2="9" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round"/><line x1="34" y1="20" x2="38" y2="20" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round"/><circle cx="24" cy="20" r="3" fill="rgba(255,255,255,0.8)"/><path d="M19 32 L24 44 L29 32" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linejoin="round" fill="none"/></svg>`,
+    checklist: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="52" height="52"><rect x="8" y="8" width="32" height="32" rx="4" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.45)" stroke-width="1.5"/><polyline points="15,24 21,30 33,18" stroke="rgba(255,255,255,0.85)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
+    script_vsl: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="52" height="52"><rect x="6" y="10" width="36" height="24" rx="4" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.45)" stroke-width="1.5"/><polygon points="20,17 20,27 32,22" fill="rgba(255,255,255,0.75)"/><line x1="14" y1="40" x2="34" y2="40" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round"/><line x1="19" y1="37" x2="19" y2="40" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><line x1="29" y1="37" x2="29" y2="40" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/></svg>`,
+    devocional: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="52" height="52"><path d="M24 8 L24 40" stroke="rgba(255,255,255,0.65)" stroke-width="2.5" stroke-linecap="round"/><path d="M12 18 L36 18" stroke="rgba(255,255,255,0.65)" stroke-width="2.5" stroke-linecap="round"/><circle cx="24" cy="10" r="3" fill="rgba(255,255,255,0.5)"/></svg>`,
+    planner: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="52" height="52"><rect x="8" y="12" width="32" height="28" rx="3" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.45)" stroke-width="1.5"/><line x1="8" y1="20" x2="40" y2="20" stroke="rgba(255,255,255,0.45)" stroke-width="1"/><line x1="17" y1="8" x2="17" y2="16" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round"/><line x1="31" y1="8" x2="31" y2="16" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round"/><rect x="14" y="25" width="6" height="5" rx="1" fill="rgba(255,255,255,0.5)"/><rect x="24" y="25" width="6" height="5" rx="1" fill="rgba(255,255,255,0.35)"/><rect x="14" y="33" width="6" height="5" rx="1" fill="rgba(255,255,255,0.35)"/></svg>`,
+    desafio: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="52" height="52"><polygon points="24,6 30,18 44,18 33,28 37,42 24,34 11,42 15,28 4,18 18,18" fill="rgba(255,255,255,0.22)" stroke="rgba(255,255,255,0.55)" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
   };
-  const capaIcon = TIPO_ICONS[d.tipo] || '✦';
+  const capaIcon = TIPO_SVGS[d.tipo] || `<svg viewBox="0 0 48 48" width="48" height="48"><polygon points="24,8 28,20 40,20 31,27 34,40 24,33 14,40 17,27 8,20 20,20" fill="rgba(255,255,255,0.7)"/></svg>`;
+
+  // Função para gerar página de transição (antes de cada capítulo/módulo/passo)
+  function transicao(label, num, titulo) {
+    return `<div class="page-transition">
+      <div class="pt-num">${String(num).padStart(2,'0')}</div>
+      <div class="pt-label">${esc(label)}</div>
+      <div class="pt-titulo">${esc(titulo||'')}</div>
+      <div class="pt-line"></div>
+    </div>`;
+  }
+
+  // Função para gerar TOC (índice)
+  function gerarTOC(itens) {
+    // itens = [{num, titulo}]
+    return `<div class="page-toc">
+      <div class="pg-acc-bar"></div>
+      <div class="toc-header">
+        <div class="toc-label">Sumário</div>
+        <div class="toc-titulo">${esc(d.titulo||'')}</div>
+      </div>
+      <div class="toc-body">
+        ${itens.map((it,i)=>`
+          <div class="toc-entry">
+            <span class="toc-num">${String(it.num).padStart(2,'0')}</span>
+            <span class="toc-name">${esc(it.titulo||'')}</span>
+            <span class="toc-dots"></span>
+            <span class="toc-pg">${i+3}</span>
+          </div>
+        `).join('')}
+      </div>
+      ${footer()}
+    </div>`;
+  }
 
   html += `<div class="page">
     <div class="capa">
@@ -815,6 +985,10 @@ body {
 
   // ── EBOOK ──
   if (d.tipo === 'ebook') {
+    // TOC
+    if ((d.capitulos||[]).length) {
+      html += gerarTOC((d.capitulos||[]).map((c,i)=>({num: c.numero||i+1, titulo: c.titulo})));
+    }
     if (d.introducao) {
       html += `<div class="page intro-page">
         ${pgHeader('Introdução')}
@@ -825,6 +999,8 @@ body {
       </div>`;
     }
     (d.capitulos||[]).forEach((c,i)=>{
+      // Página de transição antes de cada capítulo
+      html += transicao('Capítulo', c.numero||i+1, c.titulo);
       html += `<div class="page">
         ${pgHeader('Capítulo '+(c.numero||i+1))}
         <div class="sec-header">
@@ -849,36 +1025,29 @@ body {
         <div class="intro-label">Conclusão</div>
         <div class="intro-titulo">Próximos Passos</div>
         <div class="intro-texto">${paras(d.conclusao)}</div>
-        ${d.cta?`<div class="tip" style="margin-top:7mm"><div class="tip-icon">🎯</div><div class="tip-text">${esc(d.cta)}</div></div>`:''}
+        ${d.cta?`<div class="tip" style="margin-top:7mm"><div class="tip-icon" style="font-size:11pt">→</div><div class="tip-text">${esc(d.cta)}</div></div>`:''}
         ${footer()}
       </div>`;
     }
 
   // ── WORKBOOK ──
   } else if (d.tipo === 'workbook') {
-    // Intro + índice de módulos
+    // TOC
+    if ((d.modulos||[]).length) {
+      html += gerarTOC((d.modulos||[]).map((m,i)=>({num: m.numero||i+1, titulo: m.titulo})));
+    }
     if (d.introducao) {
       html += `<div class="page intro-page">
         ${pgHeader('Como Usar')}
         <div class="intro-label">Como Usar Este Workbook</div>
         <div class="intro-titulo">${esc(d.titulo)}</div>
         <div class="intro-texto">${paras(d.introducao)}</div>
-        ${(d.modulos||[]).length ? `
-          <div class="kp-label" style="margin-top:7mm;margin-bottom:3mm">Módulos deste Workbook</div>
-          ${(d.modulos||[]).map((m,i)=>`
-            <div style="display:flex;align-items:center;gap:3mm;padding:2.5mm 3mm;border-bottom:0.3mm solid #f0f0f7">
-              <div style="width:6mm;height:6mm;border-radius:50%;background:var(--p);color:#fff;font-family:'Montserrat',sans-serif;font-size:7pt;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${m.numero||i+1}</div>
-              <div style="font-family:'Inter',sans-serif;font-size:10pt;font-weight:600;color:#141424;flex:1">${esc(m.titulo||'')}</div>
-              <div style="font-family:'Inter',sans-serif;font-size:8pt;color:#aaa">${(m.exercicios||[]).length} exerc.</div>
-            </div>
-          `).join('')}
-        ` : ''}
         ${footer()}
       </div>`;
     }
-    // Cada módulo: teoria numa página, exercícios na página seguinte
+    // Cada módulo: transição + teoria + exercícios
     (d.modulos||[]).forEach((m,i)=>{
-      // Página de teoria
+      html += transicao('Módulo', m.numero||i+1, m.titulo);
       html += `<div class="page">
         ${pgHeader('Módulo '+(m.numero||i+1))}
         <div class="sec-header">
@@ -887,12 +1056,11 @@ body {
           <div class="sec-num-bg">${String(m.numero||i+1).padStart(2,'0')}</div>
         </div>
         <div class="pg-body">
-          ${m.objetivo?`<div class="tip" style="margin-bottom:4mm"><div class="tip-icon">🎯</div><div class="tip-text"><strong>Ao final deste módulo você vai:</strong> ${esc(m.objetivo)}</div></div>`:''}
+          ${m.objetivo?`<div class="tip" style="margin-bottom:4mm"><div class="tip-icon" style="font-size:11pt">◎</div><div class="tip-text"><strong>Ao final deste módulo você vai:</strong> ${esc(m.objetivo)}</div></div>`:''}
           ${m.teoria?`<div class="texto">${paras(m.teoria)}</div>`:''}
         </div>
         ${footer()}
       </div>`;
-      // Página de exercícios
       if ((m.exercicios||[]).length) {
         html += `<div class="page">
           ${pgHeader('Módulo '+(m.numero||i+1)+' — Exercícios')}
@@ -927,6 +1095,9 @@ body {
 
   // ── GUIA ──
   } else if (d.tipo === 'guia') {
+    if ((d.passos||[]).length) {
+      html += gerarTOC((d.passos||[]).map((p,i)=>({num: p.numero||i+1, titulo: p.titulo})));
+    }
     if (d.introducao) {
       html += `<div class="page intro-page">
         ${pgHeader('Introdução')}
@@ -937,6 +1108,7 @@ body {
       </div>`;
     }
     (d.passos||[]).forEach((p,i)=>{
+      html += transicao('Passo', p.numero||i+1, p.titulo);
       html += `<div class="page">
         ${pgHeader('Passo '+(p.numero||i+1))}
         <div class="sec-header">
@@ -1202,11 +1374,26 @@ body {
     <div class="contracapa">
       <div class="contracapa-top-bar"></div>
       <div class="contracapa-circle"></div>
-      <div class="contracapa-titulo">${esc(d.titulo||'')}</div>
-      <div class="contracapa-sub">${esc(d.subtitulo||d.nicho||'')}</div>
-      <div class="contracapa-div"></div>
-      <div class="contracapa-autor">${esc(d.autor)}</div>
-      <div class="contracapa-tipo">${esc(d.label_tipo)} · ${d.ano}</div>
+      <div class="contracapa-circle" style="left:-20mm;top:-20mm;right:auto;bottom:auto;width:70mm;height:70mm"></div>
+
+      <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;width:100%">
+        <!-- Ícone SVG na contracapa -->
+        <div style="opacity:0.22;margin-bottom:8mm">${capaIcon}</div>
+
+        <div class="contracapa-titulo">${esc(d.titulo||'')}</div>
+        <div class="contracapa-sub">${esc(d.subtitulo||d.nicho||'')}</div>
+        <div class="contracapa-div"></div>
+        <div class="contracapa-autor">${esc(d.autor)}</div>
+        <div class="contracapa-tipo">${esc(d.label_tipo)} · ${d.ano}</div>
+
+        <!-- Frase de fechamento -->
+        <div style="margin-top:14mm;padding:5mm 10mm;border:0.5mm solid rgba(255,255,255,0.14);border-radius:3mm;max-width:140mm;text-align:center">
+          <div style="font-family:'Playfair Display',serif;font-size:10.5pt;font-style:italic;color:rgba(255,255,255,0.45);line-height:1.7">
+            "O conhecimento só transforma quando colocado em prática."
+          </div>
+        </div>
+      </div>
+
       <div class="contracapa-copy">© ${d.ano} ${esc(d.autor)} · Todos os direitos reservados</div>
     </div>
   </div>`;
