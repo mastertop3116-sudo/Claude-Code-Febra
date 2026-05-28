@@ -50,7 +50,14 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);
 }
 
 /* ── HERO ─────────────────────────────────────────────── */
-.hero{text-align:center;margin-bottom:44px;max-width:580px;width:100%}
+.hero{
+  text-align:center;margin-bottom:44px;max-width:580px;width:100%;
+  transition:all .35s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+}
+.hero.collapsed{
+  max-height:0!important;margin-bottom:0;opacity:0;pointer-events:none;
+}
 .hero-eyebrow{
   display:inline-flex;align-items:center;gap:8px;
   background:var(--p-dim);border:1px solid rgba(124,109,250,.25);
@@ -72,7 +79,9 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);
   display:flex;align-items:center;gap:0;margin-bottom:40px;
   background:var(--s1);border:1px solid var(--border);
   border-radius:100px;padding:6px 8px;
+  transition:margin-top .35s;
 }
+.steps.elevated{margin-top:12px}
 .step{
   display:flex;align-items:center;gap:7px;
   padding:6px 14px;border-radius:100px;
@@ -266,16 +275,22 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);
 .btn-ghost:hover{color:var(--text);border-color:var(--border-hi)}
 
 /* ── PROGRESSO ──────────────────────────────────────── */
-#panel-gerar{text-align:center;padding:12px 0}
-.prog-wrap{max-width:500px;margin:0 auto}
+#panel-gerar{text-align:center;padding:20px 0}
+.prog-wrap{
+  max-width:480px;margin:0 auto;
+  background:var(--s1);border:1px solid var(--border);border-radius:20px;
+  padding:36px 32px;
+}
 .prog-spinner{
-  width:64px;height:64px;border-radius:50%;margin:0 auto 20px;
+  width:68px;height:68px;border-radius:50%;margin:0 auto 24px;
   border:3px solid var(--border);border-top-color:var(--p);
   animation:spin 1s linear infinite;
 }
-.prog-spinner.done{border-color:var(--p);border-top-color:var(--p);animation:none;
+.prog-spinner.done{
+  border-color:var(--p);border-top-color:var(--p);animation:none;
   background:var(--p-dim);display:flex;align-items:center;justify-content:center;
-  font-size:26px;}
+  font-size:28px;
+}
 @keyframes spin{to{transform:rotate(360deg)}}
 .prog-titulo{
   font-family:'Bricolage Grotesque',sans-serif;
@@ -283,25 +298,27 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);
 }
 .prog-msg{font-size:13px;color:var(--muted);margin-bottom:24px;min-height:18px}
 .prog-track{
-  height:4px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:10px;
+  height:5px;background:var(--border);border-radius:5px;overflow:hidden;margin-bottom:8px;
 }
 .prog-fill{
   height:100%;
   background:linear-gradient(90deg,var(--p),#22d3a5);
-  border-radius:4px;transition:width .6s cubic-bezier(.4,0,.2,1);width:0%;
+  border-radius:5px;transition:width .6s cubic-bezier(.4,0,.2,1);width:0%;
 }
 .prog-pct{
-  font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-align:right;
+  font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);
+  text-align:right;margin-bottom:20px;
 }
 .prog-steps{
-  display:flex;flex-direction:column;gap:6px;margin-top:24px;text-align:left;
+  display:flex;flex-direction:column;gap:6px;text-align:left;
+  border-top:1px solid var(--border);padding-top:18px;
 }
 .prog-step{
   display:flex;align-items:center;gap:10px;
-  font-size:12px;color:var(--dim);padding:8px 12px;border-radius:8px;
+  font-size:12.5px;color:var(--dim);padding:9px 12px;border-radius:9px;
   transition:all .3s;
 }
-.prog-step.active{background:var(--s1);color:var(--text);border:1px solid var(--border)}
+.prog-step.active{background:rgba(124,109,250,.06);color:var(--text);border:1px solid rgba(124,109,250,.18)}
 .prog-step.done{color:var(--p)}
 .prog-step-dot{
   width:7px;height:7px;border-radius:50%;
@@ -312,36 +329,47 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(124,109,250,.4)}50%{box-shadow:0 0 0 5px transparent}}
 
 /* ── RESULTADO ──────────────────────────────────────── */
-.result-wrap{max-width:500px;margin:0 auto}
-.result-confetti{font-size:48px;margin-bottom:12px;animation:pop .4s ease}
+.result-wrap{max-width:600px;margin:0 auto}
+.result-confetti{font-size:52px;margin-bottom:16px;animation:pop .4s ease;display:block}
 @keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
 .result-titulo{
-  font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:700;
-  margin-bottom:6px;line-height:1.25;
+  font-family:'Bricolage Grotesque',sans-serif;font-size:24px;font-weight:800;
+  margin-bottom:8px;line-height:1.2;
 }
-.result-meta{font-size:13px;color:var(--muted);margin-bottom:28px}
+.result-meta{font-size:13px;color:var(--muted);margin-bottom:10px}
+.result-badges{
+  display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:28px;
+}
+.result-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:20px;padding:4px 12px;
+  font-size:11px;font-weight:600;color:var(--muted);
+}
 .result-btns{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
 .btn-download{
   background:linear-gradient(135deg,var(--p) 0%,#5a4be0 100%);color:#fff;
   padding:13px 32px;font-size:15px;font-weight:700;
-  box-shadow:0 4px 24px var(--p-glow);
+  box-shadow:0 4px 24px var(--p-glow);border-radius:12px;
 }
 .btn-download:hover{transform:translateY(-2px);box-shadow:0 8px 32px var(--p-glow)}
 .btn-novo{
   background:transparent;color:var(--muted);
-  border:1px solid var(--border);padding:13px 20px;
+  border:1px solid var(--border);padding:13px 20px;border-radius:12px;
 }
 .btn-novo:hover{color:var(--text);border-color:var(--border-hi)}
 
 .result-card-wrap{
-  background:var(--s1);border:1px solid var(--border);border-radius:16px;
-  padding:32px 28px;text-align:center;position:relative;overflow:hidden;
+  background:var(--s1);border:1px solid var(--border);border-radius:20px;
+  padding:36px 32px;text-align:center;position:relative;overflow:hidden;
   margin-bottom:28px;
 }
 .result-card-wrap::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--p),#22d3a5);
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--p),#22d3a5,var(--p));
+  background-size:200% 100%;animation:shimmer 2s linear infinite;
 }
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
 /* ── HISTÓRICO ─────────────────────────────────────── */
 .hist-header{
@@ -610,6 +638,13 @@ function goTo(n) {
     const sep = document.getElementById('sep'+i);
     if (sep) sep.style.background = i < n ? 'var(--p)' : 'var(--border)';
   }
+  // colapsa hero nos passos 2 e 3 para dar mais espaço ao conteúdo
+  const hero = document.querySelector('.hero');
+  const steps = document.querySelector('.steps');
+  if (hero) hero.classList.toggle('collapsed', n > 1);
+  if (steps) steps.classList.toggle('elevated', n > 1);
+  // scroll suave ao topo
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 
 document.getElementById('btn-tipo-next').addEventListener('click', () => { atualizarTypeRecap(); goTo(2); });
@@ -750,12 +785,21 @@ function showResultado(titulo, t) {
   document.getElementById('panel-gerar').style.display = 'none';
   const p = document.getElementById('panel-resultado');
   p.style.display = 'block';
+  const tomAtual = document.getElementById('f-tom')?.value || 'conversacional';
+  const extAtual = document.getElementById('f-extensao')?.value || 'medio';
+  const extLabel = {curto:'Curto',medio:'Médio',longo:'Longo'}[extAtual] || extAtual;
+  const tomLabel = {conversacional:'Conversacional',inspirador:'Inspirador',educativo:'Educativo',profissional:'Profissional'}[tomAtual] || tomAtual;
   p.innerHTML = `
     <div class="result-wrap">
       <div class="result-card-wrap">
-        <div class="result-confetti">🎉</div>
+        <span class="result-confetti">🎉</span>
         <div class="result-titulo">${esc(titulo)}</div>
-        <div class="result-meta">${LABELS[t]||t} · PDF pronto para download e venda</div>
+        <div class="result-meta">Seu ${LABELS[t]||t} está pronto para vender</div>
+        <div class="result-badges">
+          <span class="result-badge">📄 PDF digital</span>
+          <span class="result-badge">🎯 ${esc(extLabel)}</span>
+          <span class="result-badge">💬 ${esc(tomLabel)}</span>
+        </div>
         <div class="result-btns">
           <button class="btn btn-download" onclick="baixar()">⬇ Baixar PDF</button>
           <button class="btn btn-ghost btn-novo" onclick="resetar()">+ Criar outro</button>
