@@ -92,7 +92,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);
 .step-sep{width:24px;height:1px;background:var(--border);flex-shrink:0}
 
 /* ── PANEL ─────────────────────────────────────────── */
-.panel{display:none;width:100%;max-width:780px;animation:up .22s ease}
+.panel{display:none;width:100%;max-width:960px;animation:up .22s ease}
 .panel.active{display:block}
 @keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
@@ -144,40 +144,112 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);
 .tipo-nome{font-size:13px;font-weight:700;color:var(--text);line-height:1.2}
 .tipo-desc{font-size:10.5px;color:var(--muted);line-height:1.4}
 
-/* ── FORM ────────────────────────────────────────────── */
-.form-wrap{
-  background:var(--s1);border:1px solid var(--border);border-radius:16px;
-  padding:28px;margin-bottom:20px;
-}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-.form-row.full{grid-template-columns:1fr}
-@media(max-width:560px){.form-row{grid-template-columns:1fr}}
-
+/* ── FORM (base) ─────────────────────────────────────── */
 .field{display:flex;flex-direction:column;gap:6px}
 .field label{
-  font-size:11px;font-weight:600;color:var(--muted);
-  letter-spacing:.8px;text-transform:uppercase;
+  font-size:11px;font-weight:700;color:var(--muted);
+  letter-spacing:.9px;text-transform:uppercase;
+  display:flex;align-items:center;gap:5px;
 }
-.field input,.field select,.field textarea{
-  background:var(--s2);border:1px solid var(--border);border-radius:9px;
-  padding:11px 14px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--text);
+.field-req{color:var(--p);font-size:10px}
+.field-opt{font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;opacity:.45}
+.field input,.field textarea{
+  background:var(--s2);border:1px solid var(--border);border-radius:10px;
+  padding:12px 16px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--text);
   outline:none;transition:border-color .2s,box-shadow .2s;width:100%;
 }
 .field input::placeholder,.field textarea::placeholder{color:var(--dim)}
-.field input:focus,.field select:focus,.field textarea:focus{
+.field input:focus,.field textarea:focus{
   border-color:var(--p);box-shadow:0 0 0 3px var(--p-dim);
 }
-.field select option{background:#0a0a16}
 .field textarea{resize:vertical;min-height:66px;line-height:1.55}
 
-.form-tip{
-  display:flex;align-items:flex-start;gap:10px;
-  background:rgba(124,109,250,.06);border:1px solid rgba(124,109,250,.15);
-  border-radius:10px;padding:12px 14px;margin-bottom:20px;
+/* ── STEP 2: LAYOUT 2 COLUNAS ──────────────────────── */
+.det-layout{
+  display:grid;
+  grid-template-columns:1.1fr 0.9fr;
+  gap:20px;
+  margin-bottom:20px;
+  align-items:start;
 }
-.form-tip-icon{font-size:15px;flex-shrink:0;margin-top:1px}
-.form-tip-text{font-size:12.5px;color:var(--muted);line-height:1.6}
-.form-tip-text strong{color:var(--text)}
+@media(max-width:720px){.det-layout{grid-template-columns:1fr}}
+
+.det-col{display:flex;flex-direction:column;gap:14px}
+
+/* TYPE RECAP */
+.det-type-recap{
+  display:flex;align-items:center;gap:12px;
+  background:var(--s1);border:1px solid var(--border);border-radius:12px;
+  padding:12px 14px;
+}
+.det-type-icon{
+  width:40px;height:40px;border-radius:10px;
+  background:color-mix(in srgb,var(--tc,var(--p)) 15%,transparent);
+  border:1px solid color-mix(in srgb,var(--tc,var(--p)) 25%,transparent);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+}
+.det-type-info{flex:1;min-width:0}
+.det-type-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;font-weight:600}
+.det-type-name{font-size:14px;font-weight:700;color:var(--text)}
+.det-type-change{
+  font-size:11px;color:var(--p);text-decoration:none;
+  padding:5px 10px;border-radius:6px;border:1px solid rgba(124,109,250,.2);
+  transition:all .15s;white-space:nowrap;flex-shrink:0;
+}
+.det-type-change:hover{background:var(--p-dim);border-color:rgba(124,109,250,.4)}
+
+/* SECTION TITLE inside right col */
+.opt-section{
+  display:flex;flex-direction:column;gap:8px;
+}
+.opt-section-label{
+  font-size:11px;font-weight:700;color:var(--muted);
+  letter-spacing:.9px;text-transform:uppercase;
+}
+
+/* TOM PILLS */
+.tom-pills{
+  display:grid;grid-template-columns:1fr 1fr;gap:7px;
+}
+.tom-pill{
+  display:flex;flex-direction:column;align-items:flex-start;
+  gap:1px;padding:10px 12px;border-radius:10px;cursor:pointer;
+  background:var(--s2);border:1.5px solid var(--border);
+  transition:all .18s;text-align:left;
+}
+.tom-pill:hover{border-color:var(--border-hi);background:color-mix(in srgb,var(--p) 5%,var(--s2))}
+.tom-pill.active{
+  border-color:var(--p);
+  background:color-mix(in srgb,var(--p) 8%,var(--s2));
+  box-shadow:0 0 0 1px var(--p);
+}
+.tom-pill-icon{font-size:16px;margin-bottom:3px}
+.tom-pill-nome{font-size:12px;font-weight:700;color:var(--text)}
+.tom-pill-desc{font-size:10px;color:var(--muted)}
+
+/* EXTENSÃO CARDS */
+.ext-cards{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:7px;
+}
+.ext-card{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:11px 8px;border-radius:10px;cursor:pointer;
+  background:var(--s2);border:1.5px solid var(--border);
+  transition:all .18s;text-align:center;position:relative;
+}
+.ext-card:hover{border-color:var(--border-hi)}
+.ext-card.active{
+  border-color:var(--p);
+  background:color-mix(in srgb,var(--p) 8%,var(--s2));
+  box-shadow:0 0 0 1px var(--p);
+}
+.ext-card-nome{font-size:13px;font-weight:700;color:var(--text)}
+.ext-card-info{font-size:10px;color:var(--muted)}
+.ext-card-rec{
+  font-size:8.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+  color:var(--p);margin-top:3px;
+}
 
 /* ── BOTÕES ─────────────────────────────────────────── */
 .btns{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
@@ -394,55 +466,92 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);
 
   <!-- PANEL 2: DETALHES -->
   <div class="panel" id="panel-detalhes">
-    <div class="form-tip">
-      <div class="form-tip-icon">💡</div>
-      <div class="form-tip-text">Quanto mais específico você for, melhor o resultado. <strong>Nicho</strong> e <strong>público-alvo</strong> são os campos mais importantes — seja preciso.</div>
-    </div>
-    <div class="form-wrap">
-      <div class="form-row full">
+    <div class="det-layout">
+
+      <!-- COLUNA ESQUERDA: campos de conteúdo -->
+      <div class="det-col">
+        <!-- Recap do tipo selecionado -->
+        <div class="det-type-recap" id="det-type-recap" style="--tc:#6366f1">
+          <div class="det-type-icon" id="det-type-icon">📖</div>
+          <div class="det-type-info">
+            <div class="det-type-label">Criando um</div>
+            <div class="det-type-name" id="det-type-name">E-book</div>
+          </div>
+          <a href="#" class="det-type-change" id="btn-change-type" onclick="goTo(1);return false">trocar →</a>
+        </div>
+
         <div class="field">
-          <label>Nicho *</label>
+          <label>Nicho <span class="field-req">*</span></label>
           <input id="f-nicho" type="text" placeholder="Ex: emagrecimento para mulheres acima de 40 anos" required>
         </div>
-      </div>
-      <div class="form-row full">
+
         <div class="field">
-          <label>Público-alvo *</label>
+          <label>Público-alvo <span class="field-req">*</span></label>
           <input id="f-publico" type="text" placeholder="Ex: mulheres de 40-55 anos que querem emagrecer sem academia">
         </div>
-      </div>
-      <div class="form-row full">
+
         <div class="field">
-          <label>Tema central <span style="opacity:.5;font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+          <label>Tema central <span class="field-opt">(opcional)</span></label>
           <input id="f-tema" type="text" placeholder="Ex: como perder 10kg em 90 dias com alimentação simples">
         </div>
-      </div>
-      <div class="form-row">
+
         <div class="field">
           <label>Autor</label>
           <input id="f-autor" type="text" placeholder="Seu nome ou marca">
         </div>
-        <div class="field">
-          <label>Tom de escrita</label>
-          <select id="f-tom">
-            <option value="conversacional">Conversacional — próximo e direto</option>
-            <option value="inspirador">Inspirador — motivacional e energético</option>
-            <option value="educativo">Educativo — didático com exemplos</option>
-            <option value="profissional">Profissional — autoridade e formalidade</option>
-          </select>
-        </div>
       </div>
-      <div class="form-row" style="margin-bottom:0">
-        <div class="field">
-          <label>Extensão</label>
-          <select id="f-extensao">
-            <option value="curto">Curto — 5 a 6 seções</option>
-            <option value="medio" selected>Médio — 7 a 9 seções (recomendado)</option>
-            <option value="longo">Longo — 10 a 12 seções</option>
-          </select>
+
+      <!-- COLUNA DIREITA: opções de geração -->
+      <div class="det-col">
+        <div class="opt-section">
+          <div class="opt-section-label">Tom de escrita</div>
+          <div class="tom-pills">
+            <button class="tom-pill active" data-tom="conversacional" type="button">
+              <span class="tom-pill-icon">💬</span>
+              <span class="tom-pill-nome">Conversacional</span>
+              <span class="tom-pill-desc">próximo e direto</span>
+            </button>
+            <button class="tom-pill" data-tom="inspirador" type="button">
+              <span class="tom-pill-icon">⚡</span>
+              <span class="tom-pill-nome">Inspirador</span>
+              <span class="tom-pill-desc">motivacional</span>
+            </button>
+            <button class="tom-pill" data-tom="educativo" type="button">
+              <span class="tom-pill-icon">🎓</span>
+              <span class="tom-pill-nome">Educativo</span>
+              <span class="tom-pill-desc">didático</span>
+            </button>
+            <button class="tom-pill" data-tom="profissional" type="button">
+              <span class="tom-pill-icon">💼</span>
+              <span class="tom-pill-nome">Profissional</span>
+              <span class="tom-pill-desc">autoridade</span>
+            </button>
+          </div>
+          <input type="hidden" id="f-tom" value="conversacional">
+        </div>
+
+        <div class="opt-section">
+          <div class="opt-section-label">Extensão do produto</div>
+          <div class="ext-cards">
+            <button class="ext-card" data-ext="curto" type="button">
+              <span class="ext-card-nome">Curto</span>
+              <span class="ext-card-info">5–6 seções</span>
+            </button>
+            <button class="ext-card active" data-ext="medio" type="button">
+              <span class="ext-card-nome">Médio</span>
+              <span class="ext-card-info">7–9 seções</span>
+              <span class="ext-card-rec">✦ ideal</span>
+            </button>
+            <button class="ext-card" data-ext="longo" type="button">
+              <span class="ext-card-nome">Longo</span>
+              <span class="ext-card-info">10–12 seções</span>
+            </button>
+          </div>
+          <input type="hidden" id="f-extensao" value="medio">
         </div>
       </div>
     </div>
+
     <div class="btns">
       <button class="btn btn-ghost" id="btn-det-back">← Voltar</button>
       <button class="btn btn-primary" id="btn-det-next">✦ Gerar produto</button>
@@ -503,9 +612,48 @@ function goTo(n) {
   }
 }
 
-document.getElementById('btn-tipo-next').addEventListener('click', () => goTo(2));
+document.getElementById('btn-tipo-next').addEventListener('click', () => { atualizarTypeRecap(); goTo(2); });
 document.getElementById('btn-det-back').addEventListener('click', () => goTo(1));
 document.getElementById('btn-det-next').addEventListener('click', iniciar);
+
+// ─── tom pills ────────────────────────────────────────
+document.querySelectorAll('.tom-pill').forEach(p => {
+  p.addEventListener('click', () => {
+    document.querySelectorAll('.tom-pill').forEach(x => x.classList.remove('active'));
+    p.classList.add('active');
+    document.getElementById('f-tom').value = p.dataset.tom;
+  });
+});
+
+// ─── ext cards ───────────────────────────────────────
+document.querySelectorAll('.ext-card').forEach(c => {
+  c.addEventListener('click', () => {
+    document.querySelectorAll('.ext-card').forEach(x => x.classList.remove('active'));
+    c.classList.add('active');
+    document.getElementById('f-extensao').value = c.dataset.ext;
+  });
+});
+
+// ─── type recap ──────────────────────────────────────
+const TIPO_META = {
+  ebook:      { icon:'📖', nome:'E-book',     cor:'#6366f1' },
+  workbook:   { icon:'📝', nome:'Workbook',   cor:'#10b981' },
+  guia:       { icon:'🗺️', nome:'Guia',        cor:'#f59e0b' },
+  checklist:  { icon:'✅', nome:'Checklist',  cor:'#22d3a5' },
+  desafio:    { icon:'🔥', nome:'Desafio',    cor:'#ef4444' },
+  planner:    { icon:'📅', nome:'Planner',    cor:'#a855f7' },
+  devocional: { icon:'✝️', nome:'Devocional', cor:'#d97706' },
+  script_vsl: { icon:'🎬', nome:'Script VSL', cor:'#3b82f6' },
+};
+function atualizarTypeRecap() {
+  if (!tipo) return;
+  const m = TIPO_META[tipo];
+  if (!m) return;
+  const recap = document.getElementById('det-type-recap');
+  document.getElementById('det-type-icon').textContent = m.icon;
+  document.getElementById('det-type-name').textContent = m.nome;
+  recap.style.setProperty('--tc', m.cor);
+}
 
 // ─── geração ────────────────────────────────────────────
 async function iniciar() {
