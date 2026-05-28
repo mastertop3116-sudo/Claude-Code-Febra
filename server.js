@@ -2675,6 +2675,120 @@ app.get('/instagram-test/:periodo', async (req, res) => {
 // ── HEALTH CHECK ─────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => res.json({ status: 'ok', ts: Date.now() }));
 
+// ══════════════════════════════════════════════════════════════════════════════
+// MAX CRIADOR — Gerador unificado de entregáveis digitais (qualquer nicho)
+// ══════════════════════════════════════════════════════════════════════════════
+
+app.get('/criador', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.sendFile(path.join(__dirname, 'public', 'criador.html'));
+});
+
+// Jobs em memória
+const criadorJobs = new Map();
+function limparCriadorJobs() {
+  const limite = Date.now() - 45 * 60 * 1000;
+  for (const [id, job] of criadorJobs.entries()) {
+    if (job.criadoEm < limite) criadorJobs.delete(id);
+  }
+}
+
+// POST /api/criador/iniciar → inicia geração, retorna jobId
+app.post('/api/criador/iniciar', (req, res) => {
+  limparCriadorJobs();
+  const jobId = Math.random().toString(36).slice(2, 11);
+  criadorJobs.set(jobId, { status: 'running', progress: 0, message: 'Iniciando...', criadoEm: Date.now() });
+  res.json({ jobId });
+
+  // Timeout de segurança — 12 minutos
+  const killer = setTimeout(() => {
+    const j = criadorJobs.get(jobId);
+    if (j && j.status === 'running') {
+      criadorJobs.set(jobId, { status: 'error', message: 'Timeout: geração excedeu 12 minutos.', criadoEm: Date.now() });
+    }
+  }, 12 * 60 * 1000);
+
+  const { executar } = require('./departments/creative/engines/criador_engine');
+
+  Promise.resolve()
+    .then(() => executar(req.body, (pct, msg) => {
+      const j = criadorJobs.get(jobId);
+      if (j) { j.progress = pct; j.message = msg; }
+    }))
+    .then(resultado => {
+      clearTimeout(killer);
+      criadorJobs.set(jobId, {
+        status:      'done',
+        progress:    100,
+        message:     'Pronto!',
+        criadoEm:    Date.now(),
+        titulo:      resultado.titulo,
+        tipo:        resultado.tipo,
+        pdf:         resultado.pdf ? resultado.pdf.toString('base64') : null,
+        pdfFilename: resultado.pdfFilename,
+      });
+    })
+    .catch(e => {
+      clearTimeout(killer);
+      console.error('[/api/criador/iniciar]', e.message);
+      criadorJobs.set(jobId, { status: 'error', message: e.message, criadoEm: Date.now() });
+    });
+});
+
+// GET /api/criador/progresso/:jobId → SSE
+app.get('/api/criador/progresso/:jobId', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+
+  const send = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
+
+  const tick = setInterval(() => {
+    const j = criadorJobs.get(req.params.jobId);
+    if (!j) { send({ error: 'Job não encontrado' }); clearInterval(tick); res.end(); return; }
+
+    send({ progress: j.progress, message: j.message, status: j.status });
+
+    if (j.status === 'done') {
+      send({ done: true, titulo: j.titulo });
+      clearInterval(tick); res.end();
+    } else if (j.status === 'error') {
+      send({ error: j.message });
+      clearInterval(tick); criadorJobs.delete(req.params.jobId); res.end();
+    }
+  }, 700);
+
+  req.on('close', () => clearInterval(tick));
+});
+
+// GET /api/criador/resultado/:jobId → payload com PDF base64
+app.get('/api/criador/resultado/:jobId', (req, res) => {
+  const j = criadorJobs.get(req.params.jobId);
+  if (!j)                  return res.status(404).json({ error: 'Resultado não encontrado ou expirado' });
+  if (j.status !== 'done') return res.status(202).json({ status: j.status, progress: j.progress, message: j.message });
+  const result = { titulo: j.titulo, tipo: j.tipo, pdf: j.pdf, pdfFilename: j.pdfFilename };
+  criadorJobs.delete(req.params.jobId);
+  res.json(result);
+});
+
+// GET /api/criador/historico → últimas 12 entregas do Supabase
+app.get('/api/criador/historico', async (req, res) => {
+  try {
+    const { createClient } = require('@supabase/supabase-js');
+    const supa = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+    const { data, error } = await supa
+      .from('entregas')
+      .select('id, tipo, nicho, titulo, status, created_at')
+      .order('created_at', { ascending: false })
+      .limit(12);
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ entregas: data || [] });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.listen(PORT, async () => {
   console.log(`NEXUS — Servidor rodando na porta ${PORT}`);
   console.log(`[Gamma] API KEY: ${process.env.GAMMA_API_KEY ? "✅ configurada" : "❌ NÃO CONFIGURADA — geração PDF usará apenas PDFKit"}`);

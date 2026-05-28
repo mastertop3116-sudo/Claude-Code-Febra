@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Lato:ital,wght@0,300;0,400;0,700;1,400&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+@page { size: A4; margin: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { font-family: 'Lato', sans-serif; background: #fff; width: 210mm; }
+
+/* ── PÁGINA BASE ── */
+.page {
+  width: 210mm;
+  min-height: 297mm;
+  position: relative;
+  overflow: hidden;
+  page-break-after: always;
+  page-break-inside: avoid;
+}
+.page:last-child { page-break-after: auto; }
+
+/* ── CAPA ── */
+.capa {
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 0 14mm 0;
+  min-height: 297mm;
+}
+.capa-deco-top {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 180mm;
+  background: linear-gradient(150deg, var(--primaria) 0%, color-mix(in srgb, var(--primaria) 40%, #000) 100%);
+}
+.capa-deco-circle1 {
+  position: absolute;
+  top: -30mm; right: -20mm;
+  width: 120mm; height: 120mm;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+}
+.capa-deco-circle2 {
+  position: absolute;
+  top: 40mm; right: 20mm;
+  width: 60mm; height: 60mm;
+  border-radius: 50%;
+  border: 2mm solid rgba(255,255,255,0.12);
+}
+.capa-deco-line {
+  position: absolute;
+  top: 0; left: 22mm;
+  width: 0.5mm; height: 180mm;
+  background: rgba(255,255,255,0.15);
+}
+.capa-badge {
+  position: absolute;
+  top: 10mm; left: 14mm;
+  background: rgba(255,255,255,0.15);
+  border: 0.5mm solid rgba(255,255,255,0.3);
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 7pt;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 2mm 5mm;
+  border-radius: 20mm;
+}
+.capa-content {
+  position: relative;
+  z-index: 10;
+  padding: 0 14mm;
+}
+.capa-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 32pt;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.15;
+  margin-bottom: 4mm;
+  text-shadow: 0 2mm 8mm rgba(0,0,0,0.4);
+}
+.capa-subtitulo {
+  font-family: 'Lato', sans-serif;
+  font-size: 11pt;
+  font-weight: 300;
+  color: rgba(255,255,255,0.82);
+  line-height: 1.5;
+  margin-bottom: 10mm;
+}
+.capa-divider {
+  width: 16mm;
+  height: 0.8mm;
+  background: var(--secundaria);
+  margin-bottom: 6mm;
+  border-radius: 1mm;
+}
+.capa-autor {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 9pt;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+/* ── INTRODUÇÃO / PREFÁCIO ── */
+.intro-page {
+  padding: 18mm 18mm 14mm;
+  display: flex;
+  flex-direction: column;
+}
+.intro-label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 7pt;
+  font-weight: 700;
+  color: var(--primaria);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 4mm;
+}
+.intro-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 22pt;
+  font-weight: 700;
+  color: #1a1a2e;
+  line-height: 1.2;
+  margin-bottom: 7mm;
+}
+.intro-text {
+  font-family: 'Lato', sans-serif;
+  font-size: 11pt;
+  color: #3a3a4a;
+  line-height: 1.85;
+  text-align: justify;
+}
+
+/* ── PÁGINA DE CONTEÚDO (capítulos, passos, módulos...) ── */
+.content-page {
+  padding: 0;
+}
+.content-header {
+  height: 28mm;
+  background: linear-gradient(90deg, var(--primaria) 0%, color-mix(in srgb, var(--primaria) 70%, #1a1a2e) 100%);
+  display: flex;
+  align-items: flex-end;
+  padding: 0 18mm 5mm;
+  position: relative;
+}
+.content-header-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 48pt;
+  font-weight: 800;
+  color: rgba(255,255,255,0.18);
+  line-height: 1;
+  position: absolute;
+  right: 14mm;
+  bottom: 2mm;
+}
+.content-header-label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 7pt;
+  font-weight: 700;
+  color: rgba(255,255,255,0.65);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 1.5mm;
+}
+.content-header-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 17pt;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.25;
+  max-width: 150mm;
+}
+.content-body {
+  padding: 8mm 18mm 14mm;
+}
+.content-texto {
+  font-family: 'Lato', sans-serif;
+  font-size: 10.5pt;
+  color: #2d2d3e;
+  line-height: 1.9;
+  text-align: justify;
+  margin-bottom: 6mm;
+}
+.content-texto p { margin-bottom: 3.5mm; }
+
+/* Pull quote */
+.pull-quote {
+  margin: 6mm 0;
+  padding: 5mm 7mm;
+  background: color-mix(in srgb, var(--primaria) 8%, #fff);
+  border-left: 3mm solid var(--primaria);
+  border-radius: 0 2mm 2mm 0;
+}
+.pull-quote-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 12pt;
+  font-style: italic;
+  color: var(--primaria);
+  line-height: 1.6;
+}
+
+/* Pontos-chave */
+.pontos-titulo {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 7.5pt;
+  font-weight: 700;
+  color: var(--primaria);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin: 5mm 0 2.5mm;
+}
+.pontos-lista { list-style: none; }
+.pontos-lista li {
+  font-family: 'Lato', sans-serif;
+  font-size: 10pt;
+  color: #2d2d3e;
+  padding: 1.5mm 0 1.5mm 5mm;
+  position: relative;
+  line-height: 1.5;
+}
+.pontos-lista li::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 4mm;
+  width: 2mm; height: 2mm;
+  background: var(--secundaria);
+  border-radius: 50%;
+}
+
+/* Caixa de dica */
+.dica-box {
+  margin: 5mm 0;
+  padding: 4mm 6mm;
+  background: color-mix(in srgb, var(--secundaria) 10%, #fff);
+  border: 0.5mm solid color-mix(in srgb, var(--secundaria) 30%, #fff);
+  border-radius: 2mm;
+  display: flex;
+  gap: 4mm;
+  align-items: flex-start;
+}
+.dica-icon {
+  font-size: 14pt;
+  flex-shrink: 0;
+  line-height: 1.2;
+}
+.dica-text {
+  font-family: 'Lato', sans-serif;
+  font-size: 9.5pt;
+  color: #3a3a4a;
+  line-height: 1.65;
+}
+
+/* Ações / checklists */
+.acoes-lista { list-style: none; margin-top: 3mm; }
+.acoes-lista li {
+  font-family: 'Lato', sans-serif;
+  font-size: 10pt;
+  color: #2d2d3e;
+  padding: 1.5mm 0 1.5mm 6mm;
+  position: relative;
+  line-height: 1.5;
+  border-bottom: 0.2mm solid #f0f0f5;
+}
+.acoes-lista li:last-child { border-bottom: none; }
+.acoes-lista li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--primaria);
+  font-weight: 700;
+  font-size: 9pt;
+}
+
+/* Checklist items */
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 3mm;
+  padding: 2mm 0;
+  border-bottom: 0.2mm solid #f0f0f8;
+}
+.check-box {
+  width: 4mm; height: 4mm;
+  border: 0.5mm solid var(--primaria);
+  border-radius: 0.8mm;
+  flex-shrink: 0;
+  margin-top: 1mm;
+}
+.check-text {
+  font-family: 'Lato', sans-serif;
+  font-size: 10.5pt;
+  color: #2d2d3e;
+  line-height: 1.55;
+}
+
+/* Linhas de exercício */
+.exercise-lines {
+  margin-top: 2mm;
+}
+.exercise-line {
+  border-bottom: 0.4mm solid #d0d0e0;
+  height: 7mm;
+  margin-bottom: 1mm;
+}
+
+/* Oração devocional */
+.oracao-box {
+  margin: 4mm 0;
+  padding: 5mm 7mm;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primaria) 5%, #fff), color-mix(in srgb, var(--secundaria) 5%, #fff));
+  border: 0.5mm solid color-mix(in srgb, var(--primaria) 20%, #fff);
+  border-radius: 2mm;
+}
+.oracao-label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 7pt;
+  font-weight: 700;
+  color: var(--primaria);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 2.5mm;
+}
+.oracao-text {
+  font-family: 'Lato', sans-serif;
+  font-size: 10pt;
+  font-style: italic;
+  color: #3a3a4a;
+  line-height: 1.8;
+}
+
+/* Tag de versículo */
+.versiculo-box {
+  margin: 4mm 0 5mm;
+  padding: 4mm 7mm;
+  background: color-mix(in srgb, var(--primaria) 6%, #fff);
+  border-radius: 2mm;
+  border-left: 3mm solid var(--primaria);
+}
+.versiculo-ref {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 7pt;
+  font-weight: 700;
+  color: var(--primaria);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 1.5mm;
+}
+.versiculo-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 11pt;
+  font-style: italic;
+  color: #1a1a2e;
+  line-height: 1.65;
+}
+
+/* Script VSL */
+.vsl-parte {
+  margin-bottom: 4mm;
+}
+.vsl-header {
+  display: flex;
+  align-items: center;
+  gap: 3mm;
+  margin-bottom: 2.5mm;
+}
+.vsl-badge {
+  background: var(--primaria);
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 7pt;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 1mm 3mm;
+  border-radius: 1mm;
+}
+.vsl-duracao {
+  font-family: 'Lato', sans-serif;
+  font-size: 8pt;
+  color: #888;
+}
+.vsl-script {
+  font-family: 'Lato', sans-serif;
+  font-size: 10.5pt;
+  color: #2d2d3e;
+  line-height: 1.85;
+  text-align: justify;
+  padding: 3mm 4mm;
+  background: #f9f9fc;
+  border-radius: 1.5mm;
+}
+
+/* Dia do desafio / planner */
+.dia-card {
+  margin-bottom: 3.5mm;
+  padding: 3.5mm 5mm;
+  border: 0.5mm solid #e8e8f0;
+  border-radius: 2mm;
+  position: relative;
+  page-break-inside: avoid;
+}
+.dia-num {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 7pt;
+  font-weight: 700;
+  color: var(--primaria);
+  letter-spacing: 1px;
+  margin-bottom: 1mm;
+}
+.dia-titulo {
+  font-family: 'Lato', sans-serif;
+  font-size: 10pt;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 1.5mm;
+}
+.dia-tarefa {
+  font-family: 'Lato', sans-serif;
+  font-size: 9.5pt;
+  color: #3a3a4a;
+  line-height: 1.6;
+}
+.dia-afirmacao {
+  font-family: 'Lato', sans-serif;
+  font-size: 8.5pt;
+  font-style: italic;
+  color: var(--primaria);
+  margin-top: 1.5mm;
+}
+
+/* Ritual (planner) */
+.ritual-card {
+  margin-bottom: 5mm;
+  padding: 4mm 6mm;
+  background: color-mix(in srgb, var(--primaria) 5%, #fff);
+  border-radius: 2mm;
+  border: 0.5mm solid color-mix(in srgb, var(--primaria) 15%, #fff);
+}
+.ritual-tipo {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 8pt;
+  font-weight: 700;
+  color: var(--primaria);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 2.5mm;
+}
+.ritual-steps { list-style: none; }
+.ritual-steps li {
+  font-family: 'Lato', sans-serif;
+  font-size: 10pt;
+  color: #2d2d3e;
+  padding: 1.5mm 0 1.5mm 5mm;
+  position: relative;
+}
+.ritual-steps li::before {
+  content: counter(step);
+  counter-increment: step;
+  position: absolute;
+  left: 0;
+  color: var(--secundaria);
+  font-weight: 700;
+  font-size: 8pt;
+}
+.ritual-steps { counter-reset: step; }
+
+/* Seção do planner */
+.planner-section {
+  margin-bottom: 6mm;
+}
+.planner-section-titulo {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10pt;
+  font-weight: 700;
+  color: #1a1a2e;
+  border-bottom: 0.8mm solid var(--primaria);
+  padding-bottom: 2mm;
+  margin-bottom: 3mm;
+}
+.planner-campo {
+  display: flex;
+  align-items: flex-start;
+  gap: 2mm;
+  margin-bottom: 3mm;
+}
+.planner-campo-label {
+  font-family: 'Lato', sans-serif;
+  font-size: 9pt;
+  color: #5a5a6a;
+  min-width: 35mm;
+  padding-top: 0.5mm;
+}
+.planner-campo-linha {
+  flex: 1;
+  border-bottom: 0.4mm solid #c0c0d0;
+  min-height: 6mm;
+}
+
+/* ── RODAPÉ ── */
+.page-footer {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 10mm;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18mm;
+  border-top: 0.3mm solid #e8e8f4;
+}
+.footer-autor {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 7pt;
+  font-weight: 600;
+  color: #aaa;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.footer-page {
+  font-family: 'Lato', sans-serif;
+  font-size: 7pt;
+  color: #bbb;
+}
+
+/* ── CONTRACAPA ── */
+.contracapa {
+  background: linear-gradient(170deg, #0f0e1f 0%, #1a1a35 100%);
+  min-height: 297mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14mm;
+  position: relative;
+}
+.contracapa-deco {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3mm;
+  background: linear-gradient(90deg, var(--primaria), var(--secundaria));
+}
+.contracapa-titulo {
+  font-family: 'Playfair Display', serif;
+  font-size: 20pt;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 5mm;
+  line-height: 1.3;
+}
+.contracapa-subtitulo {
+  font-family: 'Lato', sans-serif;
+  font-size: 10.5pt;
+  color: rgba(255,255,255,0.65);
+  text-align: center;
+  line-height: 1.7;
+  max-width: 150mm;
+  margin-bottom: 10mm;
+}
+.contracapa-divider {
+  width: 20mm; height: 0.8mm;
+  background: var(--primaria);
+  margin: 0 auto 10mm;
+  border-radius: 1mm;
+}
+.contracapa-autor-nome {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11pt;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 2mm;
+}
+.contracapa-autor-bio {
+  font-family: 'Lato', sans-serif;
+  font-size: 9.5pt;
+  color: rgba(255,255,255,0.55);
+  text-align: center;
+  line-height: 1.7;
+  max-width: 140mm;
+}
+.contracapa-ano {
+  position: absolute;
+  bottom: 8mm;
+  font-family: 'Lato', sans-serif;
+  font-size: 8pt;
+  color: rgba(255,255,255,0.25);
+}
+</style>
+</head>
+<body>
+<div id="doc"></div>
+
+<script>
+/* __CRIADOR_DATA__ */
+
+(function() {
+  const d = window.__D;
+  if (!d) return;
+
+  const doc = document.getElementById('doc');
+  const P = d.cores.primaria;
+  const S = d.cores.secundaria;
+  const BG = d.cores.bg;
+
+  // Injeta variáveis CSS
+  document.documentElement.style.setProperty('--primaria',   P);
+  document.documentElement.style.setProperty('--secundaria', S);
+  document.documentElement.style.setProperty('--bg', BG);
+
+  // Helpers
+  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function paras(t){ return esc(t||'').split(/\n+/).filter(Boolean).map(p=>`<p>${p}</p>`).join(''); }
+
+  let pageNum = 0;
+  function footer(){ pageNum++; return `<div class="page-footer"><span class="footer-autor">${esc(d.autor)}</span><span class="footer-page">${pageNum}</span></div>`; }
+
+  let html = '';
+
+  // ══════════════════════════════════════════
+  // CAPA
+  // ══════════════════════════════════════════
+  html += `
+  <div class="page">
+    <div class="capa">
+      <div class="capa-deco-top"></div>
+      <div class="capa-deco-circle1"></div>
+      <div class="capa-deco-circle2"></div>
+      <div class="capa-deco-line"></div>
+      <div class="capa-badge">${esc(d.label_tipo)}</div>
+      <div class="capa-content">
+        <div class="capa-divider"></div>
+        <div class="capa-titulo">${esc(d.titulo||'')}</div>
+        <div class="capa-subtitulo">${esc(d.subtitulo||d.nicho||'')}</div>
+        <div class="capa-autor">Por ${esc(d.autor)} · ${d.ano}</div>
+      </div>
+    </div>
+  </div>`;
+
+  // ══════════════════════════════════════════
+  // RENDERIZAÇÃO POR TIPO
+  // ══════════════════════════════════════════
+
+  if (d.tipo === 'ebook') {
+    // Introdução
+    if (d.introducao) {
+      html += `<div class="page intro-page">
+        <div class="intro-label">Introdução</div>
+        <div class="intro-titulo">${esc(d.titulo)}</div>
+        <div class="intro-text">${paras(d.introducao)}</div>
+        ${footer()}
+      </div>`;
+    }
+    // Capítulos
+    (d.capitulos||[]).forEach((cap,i) => {
+      html += `<div class="page content-page">
+        <div class="content-header">
+          <div>
+            <div class="content-header-label">Capítulo ${cap.numero||i+1}</div>
+            <div class="content-header-titulo">${esc(cap.titulo||'')}</div>
+          </div>
+          <div class="content-header-num">${cap.numero||i+1}</div>
+        </div>
+        <div class="content-body">
+          <div class="content-texto">${paras(cap.conteudo||'')}</div>
+          ${cap.citacao ? `<div class="pull-quote"><div class="pull-quote-text">"${esc(cap.citacao)}"</div></div>` : ''}
+          ${(cap.pontos_chave||[]).length ? `
+            <div class="pontos-titulo">Pontos-chave</div>
+            <ul class="pontos-lista">${(cap.pontos_chave||[]).map(p=>`<li>${esc(p)}</li>`).join('')}</ul>
+          ` : ''}
+        </div>
+        ${footer()}
+      </div>`;
+    });
+    // Conclusão
+    if (d.conclusao) {
+      html += `<div class="page intro-page">
+        <div class="intro-label">Conclusão</div>
+        <div class="intro-titulo">Para Onde Ir a Partir Daqui</div>
+        <div class="intro-text">${paras(d.conclusao)}</div>
+        ${d.cta ? `<div class="dica-box" style="margin-top:8mm"><div class="dica-icon">🎯</div><div class="dica-text">${esc(d.cta)}</div></div>` : ''}
+        ${footer()}
+      </div>`;
+    }
+
+  } else if (d.tipo === 'workbook') {
+    if (d.introducao) {
+      html += `<div class="page intro-page">
+        <div class="intro-label">Como Usar Este Workbook</div>
+        <div class="intro-titulo">${esc(d.titulo)}</div>
+        <div class="intro-text">${paras(d.introducao)}</div>
+        ${footer()}
+      </div>`;
+    }
+    (d.modulos||[]).forEach((mod,i) => {
+      html += `<div class="page content-page">
+        <div class="content-header">
+          <div>
+            <div class="content-header-label">Módulo ${mod.numero||i+1}</div>
+            <div class="content-header-titulo">${esc(mod.titulo||'')}</div>
+          </div>
+          <div class="content-header-num">${mod.numero||i+1}</div>
+        </div>
+        <div class="content-body">
+          ${mod.objetivo ? `<div class="dica-box"><div class="dica-icon">🎯</div><div class="dica-text"><strong>Objetivo:</strong> ${esc(mod.objetivo)}</div></div>` : ''}
+          ${mod.teoria ? `<div class="content-texto">${paras(mod.teoria)}</div>` : ''}
+          ${(mod.exercicios||[]).map(ex => `
+            <div class="pontos-titulo">${esc(ex.titulo||'Exercício')}</div>
+            <div class="dica-text" style="margin-bottom:2mm;font-size:9.5pt;color:#3a3a4a">${esc(ex.instrucao||'')}</div>
+            <div class="exercise-lines">${Array(ex.linhas||5).fill('<div class="exercise-line"></div>').join('')}</div>
+          `).join('')}
+        </div>
+        ${footer()}
+      </div>`;
+    });
+    if (d.reflexao_final) {
+      html += `<div class="page intro-page">
+        <div class="intro-label">Reflexão Final</div>
+        <div class="intro-titulo">Seu Compromisso</div>
+        <div class="intro-text">${paras(d.reflexao_final)}</div>
+        ${footer()}
+      </div>`;
+    }
+
+  } else if (d.tipo === 'guia') {
+    if (d.introducao) {
+      html += `<div class="page intro-page">
+        <div class="intro-label">Introdução</div>
+        <div class="intro-titulo">${esc(d.titulo)}</div>
+        <div class="intro-text">${paras(d.introducao)}</div>
+        ${footer()}
+      </div>`;
+    }
+    (d.passos||[]).forEach((passo,i) => {
+      html += `<div class="page content-page">
+        <div class="content-header">
+          <div>
+            <div class="content-header-label">Passo ${passo.numero||i+1}</div>
+            <div class="content-header-titulo">${esc(passo.titulo||'')}</div>
+          </div>
+          <div class="content-header-num">${passo.numero||i+1}</div>
+        </div>
+        <div class="content-body">
+          <div class="content-texto">${paras(passo.descricao||'')}</div>
+          ${(passo.acoes||[]).length ? `
+            <div class="pontos-titulo">Ações Práticas</div>
+            <ul class="acoes-lista">${(passo.acoes||[]).map(a=>`<li>${esc(a)}</li>`).join('')}</ul>
+          ` : ''}
+          ${passo.dica ? `<div class="dica-box" style="margin-top:4mm"><div class="dica-icon">💡</div><div class="dica-text">${esc(passo.dica)}</div></div>` : ''}
+        </div>
+        ${footer()}
+      </div>`;
+    });
+    if (d.conclusao) {
+      html += `<div class="page intro-page">
+        <div class="intro-label">Próximos Passos</div>
+        <div class="intro-titulo">Você Está Pronto</div>
+        <div class="intro-text">${paras(d.conclusao)}</div>
+        ${footer()}
+      </div>`;
+    }
+
+  } else if (d.tipo === 'checklist') {
+    if (d.introducao) {
+      html += `<div class="page intro-page">
+        <div class="intro-label">Sobre Este Checklist</div>
+        <div class="intro-titulo">${esc(d.titulo)}</div>
+        <div class="intro-text">${paras(d.introducao)}</div>
+        ${footer()}
+      </div>`;
+    }
+    (d.secoes||[]).forEach(sec => {
+      html += `<div class="page content-page">
+        <div class="content-header">
+          <div>
+            <div class="content-header-label">Checklist</div>
+            <div class="content-header-titulo">${esc(sec.titulo||'')}</div>
+          </div>
+        </div>
+        <div class="content-body">
+          ${sec.descricao ? `<div class="intro-text" style="margin-bottom:4mm;font-size:10pt">${esc(sec.descricao)}</div>` : ''}
+          ${(sec.itens||[]).map(item=>`
+            <div class="check-item">
+              <div class="check-box"></div>
+              <div class="check-text">${esc(item)}</div>
+            </div>
+          `).join('')}
+        </div>
+        ${footer()}
+      </div>`;
+    });
+    if (d.dica_final) {
+      html += `<div class="page intro-page">
+        <div class="intro-label">Dica Final</div>
+        <div class="intro-titulo">Como Tirar o Máximo</div>
+        <div class="intro-text">${paras(d.dica_final)}</div>
+        ${footer()}
+      </div>`;
+    }
+
+  } else if (d.tipo === 'desafio') {
+    if (d.introducao) {
+      html += `<div class="page intro-page">
+        <div class="intro-label">Aceite o Desafio</div>
+        <div class="intro-titulo">${esc(d.titulo)}</div>
+        <div class="intro-text">${paras(d.introducao)}</div>
+        ${d.manifesto ? `<div class="pull-quote" style="margin-top:6mm"><div class="pull-quote-text">${esc(d.manifesto)}</div></div>` : ''}
+        ${footer()}
+      </div>`;
+    }
+    (d.semanas||[]).forEach(sem => {
+      html += `<div class="page content-page">
+        <div class="content-header">
+          <div>
+            <div class="content-header-label">Semana ${sem.numero}</div>
+            <div class="content-header-titulo">${esc(sem.tema||'')}</div>
+          </div>
+          <div class="content-header-num">${sem.numero}</div>
+        </div>
+        <div class="content-body">
+          ${sem.descricao ? `<div class="content-texto" style="margin-bottom:4mm">${paras(sem.descricao)}</div>` : ''}
+          ${(sem.dias||[]).map(dia=>`
+            <div class="dia-card">
+              <div class="dia-num">DIA ${dia.numero}</div>
+              <div class="dia-titulo">${esc(dia.titulo||'')}</div>
+              <div class="dia-tarefa">${esc(dia.tarefa||'')}</div>
+              <div class="dia-afirmacao">✨ ${esc(dia.afirmacao||'')}</div>
+            </div>
+          `).join('')}
+        </div>
+        ${footer()}
+      </div>`;
+    });
+
+  } else if (d.tipo === 'planner') {
+    if (d.introducao) {
+      html += `<div class="page intro-page">
+        <div class="intro-label">Como Usar Este Planner</div>
+        <div class="intro-titulo">${esc(d.titulo)}</div>
+        <div class="intro-text">${paras(d.introducao)}</div>
+        ${d.citacao ? `<div class="pull-quote" style="margin-top:6mm"><div class="pull-quote-text">"${esc(d.citacao)}"</div></div>` : ''}
+        ${footer()}
+      </div>`;
+    }
+    (d.secoes||[]).forEach(sec => {
+      const campos = sec.campos||[];
+      html += `<div class="page intro-page" style="padding-top:14mm">
+        <div class="planner-section">
+          <div class="planner-section-titulo">${esc(sec.titulo||'')}</div>
+          ${sec.descricao ? `<div class="dica-text" style="margin-bottom:4mm;font-size:9.5pt;color:#5a5a6a">${esc(sec.descricao)}</div>` : ''}
+          ${campos.map(c=>`
+            <div class="planner-campo">
+              <div class="planner-campo-label">${esc(c)}</div>
+              <div class="planner-campo-linha"></div>
+            </div>
+          `).join('')}
+          ${Array(4).fill('<div class="planner-campo"><div class="planner-campo-label"></div><div class="planner-campo-linha"></div></div>').join('')}
+        </div>
+        ${footer()}
+      </div>`;
+    });
+    if ((d.rituais||[]).length) {
+      html += `<div class="page intro-page" style="padding-top:14mm">
+        <div class="intro-label">Rituais de Alta Performance</div>
+        <div class="intro-titulo">Rotinas que Transformam</div>
+        ${(d.rituais||[]).map(r=>`
+          <div class="ritual-card">
+            <div class="ritual-tipo">${esc(r.tipo||r.titulo||'')}</div>
+            <ol class="ritual-steps">${(r.passos||[]).map(p=>`<li>${esc(p)}</li>`).join('')}</ol>
+          </div>
+        `).join('')}
+        ${footer()}
+      </div>`;
+    }
+
+  } else if (d.tipo === 'devocional') {
+    if (d.prefacio) {
+      html += `<div class="page intro-page">
+        <div class="intro-label">Prefácio</div>
+        <div class="intro-titulo">${esc(d.titulo)}</div>
+        <div class="intro-text">${paras(d.prefacio)}</div>
+        ${footer()}
+      </div>`;
+    }
+    (d.dias||[]).forEach(dia => {
+      html += `<div class="page content-page">
+        <div class="content-header">
+          <div>
+            <div class="content-header-label">Dia ${dia.numero}</div>
+            <div class="content-header-titulo">${esc(dia.titulo||'')}</div>
+          </div>
+          <div class="content-header-num">${dia.numero}</div>
+        </div>
+        <div class="content-body">
+          ${dia.versiculo ? `
+            <div class="versiculo-box">
+              <div class="versiculo-ref">${esc(dia.versiculo_ref||'')}</div>
+              <div class="versiculo-text">${esc(dia.versiculo)}</div>
+            </div>
+          ` : ''}
+          <div class="content-texto">${paras(dia.reflexao||'')}</div>
+          ${(dia.perguntas||[]).length ? `
+            <div class="pontos-titulo">Para Pensar Hoje</div>
+            <ul class="pontos-lista">${(dia.perguntas||[]).map(p=>`<li>${esc(p)}</li>`).join('')}</ul>
+          ` : ''}
+          ${dia.oracao ? `
+            <div class="oracao-box">
+              <div class="oracao-label">🙏 Oração do Dia</div>
+              <div class="oracao-text">${esc(dia.oracao)}</div>
+            </div>
+          ` : ''}
+        </div>
+        ${footer()}
+      </div>`;
+    });
+    if (d.oracao_final) {
+      html += `<div class="page intro-page">
+        <div class="intro-label">Oração Final</div>
+        <div class="intro-titulo">Encerrando Esta Jornada</div>
+        <div class="oracao-box" style="margin-top:6mm">
+          <div class="oracao-label">🙏 Oração de Encerramento</div>
+          <div class="oracao-text">${esc(d.oracao_final)}</div>
+        </div>
+        ${footer()}
+      </div>`;
+    }
+
+  } else if (d.tipo === 'script_vsl') {
+    html += `<div class="page intro-page">
+      <div class="intro-label">Script de VSL</div>
+      <div class="intro-titulo">${esc(d.titulo)}</div>
+      <div class="intro-text" style="margin-bottom:6mm">Script completo de Video Sales Letter para apresentação do produto.</div>
+      ${footer()}
+    </div>`;
+    const partesPorPagina = 3;
+    const partes = d.partes||[];
+    for (let i = 0; i < partes.length; i += partesPorPagina) {
+      const grupo = partes.slice(i, i + partesPorPagina);
+      html += `<div class="page intro-page" style="padding-top:12mm">
+        ${grupo.map(p=>`
+          <div class="vsl-parte">
+            <div class="vsl-header">
+              <div class="vsl-badge">${esc(p.nome||'')}</div>
+              <div class="vsl-duracao">~${p.duracao_seg||0}s · ${Math.ceil((p.duracao_seg||0)/60)} min</div>
+            </div>
+            <div class="vsl-script">${paras(p.script||'')}</div>
+          </div>
+        `).join('')}
+        ${footer()}
+      </div>`;
+    }
+  }
+
+  // ══════════════════════════════════════════
+  // CONTRACAPA
+  // ══════════════════════════════════════════
+  html += `
+  <div class="page">
+    <div class="contracapa">
+      <div class="contracapa-deco"></div>
+      <div class="contracapa-titulo">${esc(d.titulo||'')}</div>
+      <div class="contracapa-subtitulo">${esc(d.subtitulo||d.nicho||'')}</div>
+      <div class="contracapa-divider"></div>
+      <div class="contracapa-autor-nome">${esc(d.autor)}</div>
+      <div class="contracapa-autor-bio">${esc(d.label_tipo)} · ${d.ano}</div>
+      <div class="contracapa-ano">© ${d.ano} ${esc(d.autor)} · Todos os direitos reservados</div>
+    </div>
+  </div>`;
+
+  doc.innerHTML = html;
+})();
+</script>
+</body>
+</html>
