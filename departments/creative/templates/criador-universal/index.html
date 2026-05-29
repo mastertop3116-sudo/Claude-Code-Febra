@@ -28,71 +28,155 @@ body {
 }
 .page:last-child { page-break-after: auto; }
 
-/* ── PÁGINA DE TRANSIÇÃO (entre capítulos/módulos/passos) ── */
+/* ══════════════════════ TRANSIÇÃO v2 — EDITORIAL ══════════════════════ */
 .page-transition {
   width: 210mm;
   min-height: 297mm;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  background: linear-gradient(145deg,
-    color-mix(in srgb, var(--p, #6366f1) 92%, #000) 0%,
-    color-mix(in srgb, var(--p, #6366f1) 68%, #000) 100%
-  );
+  background:
+    radial-gradient(ellipse 120% 60% at 80% -10%,
+      color-mix(in srgb, var(--p,#6366f1) 55%, transparent) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at -10% 110%,
+      color-mix(in srgb, var(--p,#6366f1) 30%, transparent) 0%, transparent 52%),
+    linear-gradient(155deg,
+      color-mix(in srgb, var(--p,#6366f1) 88%, #000) 0%,
+      color-mix(in srgb, var(--p,#6366f1) 60%, #000) 100%);
   position: relative;
   overflow: hidden;
   page-break-after: always;
   page-break-inside: avoid;
 }
+
+/* Grade de pontos */
 .page-transition::before {
   content: '';
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(circle, rgba(255,255,255,0.55) 0.5px, transparent 0.5px);
-  background-size: 9mm 9mm;
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.6) 0.5px, transparent 0.5px);
+  background-size: 8mm 8mm;
   opacity: 0.07;
 }
+
+/* Número fantasma grande — hero de fundo */
 .pt-num {
   font-family: 'Playfair Display', serif;
-  font-size: 120pt;
-  font-weight: 800;
-  color: rgba(255,255,255,0.06);
+  font-size: 200pt; font-weight: 800;
+  color: rgba(255,255,255,0.07);
   line-height: 1;
   position: absolute;
-  right: 8mm;
-  bottom: -10mm;
-  user-select: none;
+  right: -8mm; bottom: -20mm;
+  user-select: none; pointer-events: none;
+  letter-spacing: -5px;
 }
-.pt-label {
+
+/* Círculo decorativo grande — topo direito */
+.pt-deco-c {
+  position: absolute;
+  width: 110mm; height: 110mm; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.10) 0%, transparent 68%);
+  top: -30mm; right: -25mm;
+  pointer-events: none;
+}
+
+/* Retângulo decorativo bordado */
+.pt-deco-r1 {
+  position: absolute;
+  width: 44mm; height: 44mm; border-radius: 9mm;
+  border: 1.5px solid rgba(255,255,255,0.14);
+  top: 28mm; right: 18mm;
+  transform: rotate(15deg);
+  pointer-events: none;
+}
+.pt-deco-r2 {
+  position: absolute;
+  width: 28mm; height: 28mm; border-radius: 6mm;
+  border: 1px solid rgba(255,255,255,0.09);
+  top: 42mm; right: 32mm;
+  transform: rotate(30deg);
+  pointer-events: none;
+}
+
+/* Cantos ornamentais */
+.pt-corner-tl {
+  position: absolute;
+  top: 14mm; left: 14mm;
+  width: 12mm; height: 12mm;
+  border-top: 1.5px solid rgba(255,255,255,0.28);
+  border-left: 1.5px solid rgba(255,255,255,0.28);
+  pointer-events: none;
+}
+.pt-corner-br {
+  position: absolute;
+  bottom: 14mm; right: 14mm;
+  width: 12mm; height: 12mm;
+  border-bottom: 1.5px solid rgba(255,255,255,0.28);
+  border-right: 1.5px solid rgba(255,255,255,0.28);
+  pointer-events: none;
+}
+
+/* Barra de acento vertical — lado esquerdo */
+.pt-accent-bar {
+  position: absolute;
+  left: 0; top: 0; bottom: 0; width: 3.5mm;
+  background: linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.08) 100%);
+  pointer-events: none;
+}
+
+/* Linha horizontal central */
+.pt-h-line {
+  position: absolute;
+  left: 14mm; right: 14mm;
+  height: 0.4mm;
+  background: linear-gradient(90deg, rgba(255,255,255,0.25), rgba(255,255,255,0.06) 70%, transparent);
+  top: 50%;
+  pointer-events: none;
+}
+
+/* Conteúdo central */
+.pt-content {
+  position: relative; z-index: 2;
+  padding: 0 20mm 0 22mm;
+}
+.pt-badge {
+  display: inline-flex; align-items: center; gap: 3mm;
+  margin-bottom: 8mm;
+}
+.pt-badge-num {
+  width: 10mm; height: 10mm; border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.32);
   font-family: 'Montserrat', sans-serif;
-  font-size: 7.5pt;
-  font-weight: 700;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.5);
-  margin-bottom: 5mm;
-  position: relative;
-  z-index: 2;
+  font-size: 8pt; font-weight: 800;
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  letter-spacing: 0;
+}
+.pt-badge-label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 7pt; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
 }
 .pt-titulo {
   font-family: 'Playfair Display', serif;
-  font-size: 28pt;
-  font-weight: 700;
+  font-size: 34pt; font-weight: 800;
   color: #fff;
-  text-align: center;
-  line-height: 1.2;
-  max-width: 150mm;
-  position: relative;
-  z-index: 2;
+  line-height: 1.15;
+  max-width: 145mm;
+  margin-bottom: 8mm;
 }
-.pt-line {
-  width: 14mm; height: 1mm;
-  background: rgba(255,255,255,0.3);
+.pt-divider {
+  display: flex; align-items: center; gap: 3mm;
+}
+.pt-divider-bar {
+  width: 16mm; height: 1.5mm;
+  background: linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0.15));
   border-radius: 1mm;
-  margin: 6mm auto 0;
-  position: relative;
-  z-index: 2;
+}
+.pt-divider-dot {
+  width: 2mm; height: 2mm; border-radius: 50%;
+  background: rgba(255,255,255,0.3);
 }
 
 /* ── PÁGINA DE ÍNDICE ── */
@@ -1196,13 +1280,31 @@ body {
   };
   const capaIcon = TIPO_SVGS[d.tipo] || `<svg viewBox="0 0 48 48" width="48" height="48"><polygon points="24,8 28,20 40,20 31,27 34,40 24,33 14,40 17,27 8,20 20,20" fill="rgba(255,255,255,0.7)"/></svg>`;
 
-  // Função para gerar página de transição (antes de cada capítulo/módulo/passo)
+  // Página de transição v2 — editorial bold
   function transicao(label, num, titulo) {
+    const n = String(num).padStart(2,'0');
     return `<div class="page-transition">
-      <div class="pt-num">${String(num).padStart(2,'0')}</div>
-      <div class="pt-label">${esc(label)}</div>
-      <div class="pt-titulo">${esc(titulo||'')}</div>
-      <div class="pt-line"></div>
+      <div class="pt-deco-c"></div>
+      <div class="pt-deco-r1"></div>
+      <div class="pt-deco-r2"></div>
+      <div class="pt-corner-tl"></div>
+      <div class="pt-corner-br"></div>
+      <div class="pt-accent-bar"></div>
+      <div class="pt-h-line"></div>
+      <div class="pt-num">${n}</div>
+
+      <div class="pt-content">
+        <div class="pt-badge">
+          <div class="pt-badge-num">${n}</div>
+          <div class="pt-badge-label">${esc(label)}</div>
+        </div>
+        <div class="pt-titulo">${esc(titulo||'')}</div>
+        <div class="pt-divider">
+          <div class="pt-divider-bar"></div>
+          <div class="pt-divider-dot"></div>
+          <div class="pt-divider-dot" style="opacity:0.5"></div>
+        </div>
+      </div>
     </div>`;
   }
 

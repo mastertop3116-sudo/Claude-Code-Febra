@@ -139,7 +139,7 @@ function getPromptSchema(tipo, extensao) {
     {
       "numero": 1,
       "titulo": "título do capítulo — direto, sem rodeios",
-      "conteudo": "texto corrido (${wpp} palavras) — ESTRUTURA: (1) PROBLEMA: dor real do nicho; (2) SOLUÇÃO com passo específico; (3) desenvolva o conteúdo principal. SEM incluir a dica, exemplo e ação aqui — eles aparecem nos campos abaixo.",
+      "conteudo": "texto corrido (${wpp} palavras) — ESTRUTURA: (1) PROBLEMA: dor real do nicho; (2) SOLUÇÃO com passo específico; (3) desenvolva o conteúdo principal. REGRA CULTURAL: se o tema/nicho envolver técnicas milenares, ancestrais, orientais ou históricas — mencione a origem real da técnica (nome nativo, civilização, período) e como ela era praticada originalmente antes de conectar ao contexto moderno. SEM incluir a dica, exemplo e ação aqui — eles aparecem nos campos abaixo.",
       "dica": "dica prática do autor em 1ª pessoa — 1 frase curta e direta, começa com 'Quando eu...' ou 'O que funcionou pra mim foi...' (máx 2 linhas)",
       "exemplo_real": "história concreta: '[Nome brasileiro], [idade] anos, [cidade] — [situação com número real]. Em [prazo], ela/ele [resultado mensurável].' (máx 3 linhas)",
       "acao_pratica": "tarefa que o leitor faz AGORA: '[Verbo imperativo] [número] [objeto concreto do nicho] em [prazo curto]. [Por que isso funciona em 1 frase.]' (máx 2 linhas)",
@@ -196,7 +196,7 @@ OBRIGATÓRIO: gere de ${qtd} módulos, cada um com 2 a 3 exercícios`,
     {
       "numero": 1,
       "titulo": "nome do passo — verbo imperativo + o quê",
-      "descricao": "em 1ª pessoa (250 a 400 palavras) — 'A maioria erra aqui porque [erro].' → 'Eu mesmo errei quando...' → 'O que funciona: [solução com detalhe]'. SEM incluir dica, exemplo e ação aqui — ficam nos campos abaixo.",
+      "descricao": "em 1ª pessoa (300 a 500 palavras). REGRA CULTURAL: se o tema/nicho envolver técnicas milenares, ancestrais, orientais, asiáticas, ayurvédicas, chinesas, japonesas, egípcias, indígenas ou de qualquer civilização/período histórico — OBRIGATÓRIO abrir com a origem real da técnica: nome original no idioma nativo (ex: 'Yoga Nidra', 'Pranayama', '4-7-8 do Pranayama indiano', 'Yoga-nidra dos Upanishads', 'técnica do sono militar do Exército dos EUA') + civilização/período + por que surgiu + como era praticada originalmente. Só então conecte com a aplicação moderna. Para temas sem origem histórica: 'A maioria erra aqui porque [erro].' → 'Eu mesmo errei quando...' → 'O que funciona: [solução com detalhe]'. SEM incluir dica, exemplo e ação aqui — ficam nos campos abaixo.",
       "acoes": ["ação concreta com verbo imperativo + critério de conclusão", "idem", "idem"],
       "contraste": { "label_a": "estado sem aplicar o passo (ex: Sem este passo)", "label_b": "estado com o passo aplicado", "itens_a": ["consequência negativa (3–7 palavras)"], "itens_b": ["benefício concreto (3–7 palavras)"] },
       "equacao": { "a": "elemento 1 (2–5 palavras)", "sub_a": "legenda", "b": "elemento 2 (2–5 palavras)", "sub_b": "legenda", "resultado": "resultado (2–5 palavras)", "sub_r": "legenda" },
