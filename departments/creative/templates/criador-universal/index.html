@@ -154,7 +154,7 @@ body {
   min-width: 8mm; text-align: right; flex-shrink: 0;
 }
 
-/* ══════════════════════ CAPA ══════════════════════ */
+/* ══════════════════════ CAPA v2 — EDITORIAL BOLD ══════════════════════ */
 .capa {
   width: 210mm;
   min-height: 297mm;
@@ -165,143 +165,190 @@ body {
   overflow: hidden;
 }
 
-/* Fundo — gradiente radial que emana do topo */
+/* ── Gradiente: 4 camadas sobrepostas para profundidade ── */
 .capa-bg {
-  position: absolute;
-  inset: 0;
+  position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse 130% 55% at 50% -5%,  color-mix(in srgb, var(--p) 60%, transparent) 0%, transparent 60%),
-    radial-gradient(ellipse 80%  50% at 95% 95%,   color-mix(in srgb, var(--p) 22%, transparent) 0%, transparent 55%),
-    linear-gradient(180deg, var(--bg, #0f0e1f) 0%, color-mix(in srgb, #000 55%, var(--bg)) 100%);
+    radial-gradient(ellipse 145% 68% at 72% -8%,
+      color-mix(in srgb, var(--p) 52%, transparent) 0%, transparent 56%),
+    radial-gradient(ellipse 88% 52% at -10% 108%,
+      color-mix(in srgb, var(--s) 26%, transparent) 0%, transparent 52%),
+    radial-gradient(ellipse 58% 46% at 108% 52%,
+      color-mix(in srgb, var(--p) 16%, transparent) 0%, transparent 58%),
+    radial-gradient(ellipse 70% 40% at 50% 115%,
+      color-mix(in srgb, var(--s) 12%, transparent) 0%, transparent 55%),
+    linear-gradient(158deg, var(--bg, #0f0e1f) 0%, color-mix(in srgb, #000 48%, var(--bg)) 100%);
 }
 
-/* Grade de pontos sutil — textura de fundo */
+/* ── Grade de pontos ── */
 .capa-lines {
-  position: absolute;
-  inset: 0;
-  opacity: 0.10;
-  background-image:
-    radial-gradient(circle, rgba(255,255,255,0.6) 0.6px, transparent 0.6px);
-  background-size: 9mm 9mm;
+  position: absolute; inset: 0;
+  opacity: 0.07;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.7) 0.5px, transparent 0.5px);
+  background-size: 8mm 8mm;
 }
 
-/* ── ZONA 1: TOPO ── badge do tipo de produto */
+/* ── Blob decorativo grande — topo direito ── */
+.capa-deco-c1 {
+  position: absolute;
+  width: 132mm; height: 132mm; border-radius: 50%;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--p) 22%, transparent) 0%, transparent 68%);
+  top: -48mm; right: -38mm;
+  pointer-events: none;
+}
+/* ── Blob decorativo pequeno — baixo esquerdo ── */
+.capa-deco-c2 {
+  position: absolute;
+  width: 78mm; height: 78mm; border-radius: 50%;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--s) 18%, transparent) 0%, transparent 68%);
+  bottom: 15mm; left: -24mm;
+  pointer-events: none;
+}
+/* ── Retângulo decorativo bordado — rotacionado ── */
+.capa-deco-r1 {
+  position: absolute;
+  width: 54mm; height: 54mm; border-radius: 10mm;
+  border: 1.5px solid color-mix(in srgb, var(--p) 32%, transparent);
+  top: 35mm; right: 9mm;
+  transform: rotate(18deg);
+  pointer-events: none;
+}
+.capa-deco-r2 {
+  position: absolute;
+  width: 33mm; height: 33mm; border-radius: 6.5mm;
+  border: 1px solid color-mix(in srgb, var(--s) 22%, transparent);
+  top: 50mm; right: 22mm;
+  transform: rotate(35deg);
+  pointer-events: none;
+}
+/* ── Linha diagonal de acento ── */
+.capa-deco-line {
+  position: absolute;
+  width: 200mm; height: 0.4mm;
+  background: linear-gradient(90deg,
+    transparent,
+    color-mix(in srgb, var(--p) 18%, transparent) 30%,
+    color-mix(in srgb, var(--p) 10%, transparent) 70%,
+    transparent);
+  top: 80mm; left: -20mm;
+  transform: rotate(-8deg);
+  pointer-events: none;
+}
+/* ── Texto fantasma de fundo ── */
+.capa-ghost {
+  position: absolute;
+  bottom: 22mm; right: -6mm;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 88pt; font-weight: 900;
+  color: rgba(255,255,255,0.028);
+  letter-spacing: -2px; text-transform: uppercase;
+  white-space: nowrap; line-height: 1;
+  pointer-events: none; user-select: none;
+}
+
+/* ── TOPO ── */
 .capa-top {
-  position: relative;
-  z-index: 10;
+  position: relative; z-index: 10;
   padding: 13mm 16mm 0;
+  display: flex; align-items: center; justify-content: space-between;
   flex-shrink: 0;
 }
-
 .capa-badge {
-  display: inline-flex;
-  align-items: center;
-  background: rgba(255,255,255,0.09);
-  border: 1px solid rgba(255,255,255,0.18);
-  border-radius: 40px;
-  padding: 2mm 5.5mm;
+  display: inline-flex; align-items: center;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 40px; padding: 2mm 5.5mm;
   font-family: 'Montserrat', sans-serif;
-  font-size: 7pt;
-  font-weight: 700;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
+  font-size: 7pt; font-weight: 700;
+  letter-spacing: 2.5px; text-transform: uppercase;
   color: rgba(255,255,255,0.82);
 }
-
-/* ── ZONA 2: VISUAL — ícone com anéis concêntricos */
-.capa-visual {
-  flex: 1;
-  position: relative;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 108mm;
-  padding: 6mm 16mm;
+.capa-ano {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 8pt; font-weight: 600;
+  color: rgba(255,255,255,0.18); letter-spacing: 2px;
 }
 
-.capa-ring-3 {
-  width: 82mm; height: 82mm;
-  border-radius: 50%;
-  border: 0.35mm solid rgba(255,255,255,0.07);
-  display: flex; align-items: center; justify-content: center;
-}
-.capa-ring-2 {
-  width: 63mm; height: 63mm;
-  border-radius: 50%;
-  border: 0.45mm solid rgba(255,255,255,0.11);
-  display: flex; align-items: center; justify-content: center;
-}
-.capa-ring-1 {
-  width: 46mm; height: 46mm;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--p) 16%, transparent);
-  border: 1mm solid color-mix(in srgb, var(--p) 42%, transparent);
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 0 18mm color-mix(in srgb, var(--p) 28%, transparent);
-}
-.capa-icon-main {
-  font-size: 46pt;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.capa-icon-main svg { display: block; }
-
-/* ── ZONA 3: CONTEÚDO — título, subtítulo, autor */
-.capa-content {
-  position: relative;
-  z-index: 10;
-  padding: 7mm 16mm 14mm;
+/* ── ÍCONE em caixa backdrop ── */
+.capa-icon-zone {
+  position: relative; z-index: 10;
+  padding: 12mm 16mm 8mm;
   flex-shrink: 0;
-  border-top: 0.3mm solid rgba(255,255,255,0.09);
 }
+.capa-icon-box {
+  width: 22mm; height: 22mm;
+  background: color-mix(in srgb, var(--p) 22%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--p) 44%, transparent);
+  border-radius: 5.5mm;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow:
+    0 0 14mm color-mix(in srgb, var(--p) 35%, transparent),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.capa-icon-box svg { width: 30px; height: 30px; }
 
-.capa-line {
-  width: 16mm; height: 1.2mm;
-  background: linear-gradient(90deg, var(--s, #818cf8), transparent);
-  border-radius: 1mm;
+/* ── HERO: nicho + título + barra + subtítulo ── */
+.capa-hero {
+  flex: 1; position: relative; z-index: 10;
+  padding: 0 16mm;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.capa-pretitulo {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 7pt; font-weight: 700;
+  color: var(--p); letter-spacing: 3.5px; text-transform: uppercase;
   margin-bottom: 5mm;
 }
-
 .capa-titulo {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 40pt;
-  font-weight: 800;
-  color: #fff;
-  line-height: 1.1;
-  letter-spacing: -0.5px;
-  margin-bottom: 4mm;
+  font-size: 44pt; font-weight: 800;
+  color: #fff; line-height: 1.08;
+  letter-spacing: -0.5px; margin-bottom: 7mm;
 }
-
+.capa-accent-bar {
+  display: flex; gap: 2mm; align-items: center; margin-bottom: 6mm;
+}
+.capa-accent-fill {
+  height: 2mm; width: 20mm;
+  background: linear-gradient(90deg, var(--p), var(--s));
+  border-radius: 1mm;
+}
+.capa-accent-dot {
+  width: 2mm; height: 2mm; border-radius: 50%;
+  background: color-mix(in srgb, var(--s) 65%, transparent);
+}
 .capa-subtitulo {
   font-family: 'Inter', sans-serif;
-  font-size: 10.5pt;
-  font-weight: 300;
-  color: rgba(255,255,255,0.62);
-  line-height: 1.55;
-  margin-bottom: 8mm;
-  max-width: 160mm;
+  font-size: 10.5pt; font-weight: 300;
+  color: rgba(255,255,255,0.55); line-height: 1.68; max-width: 156mm;
 }
 
-.capa-autor-row {
-  display: flex;
-  align-items: center;
-  gap: 4mm;
+/* ── RODAPÉ: autor ── */
+.capa-footer {
+  position: relative; z-index: 10;
+  padding: 5mm 16mm 12mm; flex-shrink: 0;
+  border-top: 0.5mm solid rgba(255,255,255,0.07);
+  display: flex; align-items: center; gap: 3.5mm;
 }
-.capa-autor-line {
-  width: 6mm; height: 0.5mm;
-  background: var(--s, #818cf8);
-  border-radius: 1mm;
+.capa-footer-bar {
+  width: 7mm; height: 0.6mm; background: var(--s);
+  border-radius: 1mm; flex-shrink: 0;
 }
 .capa-autor {
   font-family: 'Montserrat', sans-serif;
-  font-size: 8.5pt;
-  font-weight: 600;
-  color: rgba(255,255,255,0.58);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
+  font-size: 8.5pt; font-weight: 600;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 1.5px; text-transform: uppercase;
+}
+.capa-footer-sep {
+  width: 1mm; height: 1mm; border-radius: 50%;
+  background: rgba(255,255,255,0.2); flex-shrink: 0;
+}
+.capa-footer-tipo {
+  font-family: 'Inter', sans-serif;
+  font-size: 7.5pt; color: rgba(255,255,255,0.22);
 }
 
 /* ══════════════════════ PÁGINA DE CONTEÚDO ══════════════════════ */
@@ -1186,29 +1233,38 @@ body {
     <div class="capa">
       <div class="capa-bg"></div>
       <div class="capa-lines"></div>
+      <div class="capa-deco-c1"></div>
+      <div class="capa-deco-c2"></div>
+      <div class="capa-deco-r1"></div>
+      <div class="capa-deco-r2"></div>
+      <div class="capa-deco-line"></div>
+      <div class="capa-ghost">${esc(d.label_tipo)}</div>
 
       <div class="capa-top">
         <div class="capa-badge">${esc(d.label_tipo)}</div>
+        <div class="capa-ano">${d.ano}</div>
       </div>
 
-      <div class="capa-visual">
-        <div class="capa-ring-3">
-          <div class="capa-ring-2">
-            <div class="capa-ring-1">
-              <div class="capa-icon-main">${capaIcon}</div>
-            </div>
-          </div>
-        </div>
+      <div class="capa-icon-zone">
+        <div class="capa-icon-box">${capaIcon}</div>
       </div>
 
-      <div class="capa-content">
-        <div class="capa-line"></div>
+      <div class="capa-hero">
+        <div class="capa-pretitulo">${esc(d.nicho||d.tema||'')}</div>
         <div class="capa-titulo">${esc(d.titulo||'')}</div>
-        <div class="capa-subtitulo">${esc(d.subtitulo||d.nicho||'')}</div>
-        <div class="capa-autor-row">
-          <div class="capa-autor-line"></div>
-          <div class="capa-autor">por ${esc(d.autor)} · ${d.ano}</div>
+        <div class="capa-accent-bar">
+          <div class="capa-accent-fill"></div>
+          <div class="capa-accent-dot"></div>
+          <div class="capa-accent-dot" style="opacity:0.5"></div>
         </div>
+        <div class="capa-subtitulo">${esc(d.subtitulo||d.nicho||'')}</div>
+      </div>
+
+      <div class="capa-footer">
+        <div class="capa-footer-bar"></div>
+        <div class="capa-autor">por ${esc(d.autor)}</div>
+        <div class="capa-footer-sep"></div>
+        <div class="capa-footer-tipo">${esc(d.label_tipo)} · ${d.ano}</div>
       </div>
     </div>
   </div>`;
