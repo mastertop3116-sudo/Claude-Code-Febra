@@ -355,6 +355,17 @@ body {
   color: rgba(255,255,255,0.18); letter-spacing: 2px;
 }
 
+/* ── Foto realista (base64 inline) — fundo com blend ── */
+.capa-foto-bg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center top;
+  opacity: 0.28;
+  filter: grayscale(35%) brightness(0.55) saturate(1.3);
+  mix-blend-mode: luminosity;
+  z-index: 0; pointer-events: none;
+}
+
 /* ── Ilustração vetorial (SVG injetado inline) ── */
 .capa-illus {
   position: absolute;
@@ -1362,6 +1373,7 @@ body {
   html += `<div class="page">
     <div class="capa">
       <div class="capa-bg"></div>
+      ${d.imagem_capa ? `<img class="capa-foto-bg" src="${d.imagem_capa}">` : ''}
       <div class="capa-lines"></div>
       <div class="capa-deco-c1"></div>
       <div class="capa-deco-c2"></div>

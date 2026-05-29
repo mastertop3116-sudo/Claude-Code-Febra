@@ -9,6 +9,7 @@ const path          = require('path');
 const fs            = require('fs');
 const OpenAI        = require('openai');
 const aprendizados  = require('../../../utils/aprendizados');
+const { buscarImagemCapa, popularNicho } = require('../../../utils/imageLibrary');
 
 const TEMPLATE_PATH      = path.join(__dirname, '../templates/criador-universal/index.html');
 const TEMPLATE_KIDS_PATH = path.join(__dirname, '../templates/criador-kids/index.html');
@@ -647,6 +648,16 @@ async function renderizarPDF(conteudo, params) {
 
   const ilustracaoSvg = !TIPOS_KIDS.includes(tipo) ? detectarIlustracao(params.nicho, params.tema) : null;
 
+  // Foto realista da biblioteca Supabase (se disponível)
+  let imagemCapa = null;
+  if (!TIPOS_KIDS.includes(tipo) && params.nicho) {
+    imagemCapa = await buscarImagemCapa(params.nicho).catch(() => null);
+    if (!imagemCapa) {
+      // Nicho sem foto ainda — popula em background, sem bloquear a geração
+      popularNicho(params.nicho, params.tema).catch(() => {});
+    }
+  }
+
   const data = {
     ...conteudo,
     tipo,
@@ -655,7 +666,8 @@ async function renderizarPDF(conteudo, params) {
     autor:         conteudo.autor || params.autor || 'Autor',
     nicho:         params.nicho   || '',
     ano:           new Date().getFullYear(),
-    ilustracao:    ilustracaoSvg  || null,
+    imagem_capa:   imagemCapa   || null,   // foto realista (base64) ou null
+    ilustracao:    imagemCapa ? null : (ilustracaoSvg || null), // SVG só quando não tem foto
   };
 
   const html = templateHtml.replace(
