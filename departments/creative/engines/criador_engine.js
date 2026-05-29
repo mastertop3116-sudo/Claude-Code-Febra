@@ -73,8 +73,9 @@ const PALETAS_NICHO = [
 // ── Ilustrações por nicho (SVGs locais) ─────────────────────
 const ILUST_DIR = path.join(__dirname, '../../../public/assets/illus');
 const ILUSTRACOES_NICHO = [
-  { palavras: ['meditação','sono','relaxamento','mindfulness','yoga','chakra','respiração','ansiedade'], arquivo: 'meditacao.svg' },
-  { palavras: ['bem-estar','natureza','jardinagem','equilíbrio','paz','tranquilo'], arquivo: 'bem-estar.svg' },
+  { palavras: ['sono','insônia','dormir','noite','descanso','cama'], arquivo: 'sono.svg' },
+  { palavras: ['meditação','relaxamento','mindfulness','yoga','chakra','respiração','ansiedade','bem-estar','paz'], arquivo: 'meditacao.svg' },
+  { palavras: ['natureza','jardinagem','equilíbrio','tranquilo'], arquivo: 'bem-estar.svg' },
   { palavras: ['produtividade','rotina','manhã','organização','agenda','planner','hábito'], arquivo: 'manha-produtiva.svg' },
   { palavras: ['fitness','academia','exercício','treino','musculação','corrida','emagrecer','dieta','corpo'], arquivo: 'fitness.svg' },
   { palavras: ['finanças','financeiro','orçamento','dívida','economizar','poupança','riqueza'], arquivo: 'financas.svg' },

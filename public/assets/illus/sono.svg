@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 380" fill="none">
+  <path d="M410 55 C432 55 450 73 450 95 C450 117 432 135 410 135 C396 135 384 128 377 117 C388 122 401 122 411 116 C427 107 436 91 433 75 C428 63 420 55 410 55Z" fill="rgba(255,255,255,0.82)"/>
+  <circle cx="370" cy="45" r="4" fill="rgba(255,255,255,0.7)"/>
+  <circle cx="395" cy="28" r="3" fill="rgba(255,255,255,0.6)"/>
+  <circle cx="455" cy="38" r="2.5" fill="rgba(255,255,255,0.6)"/>
+  <text x="330" y="108" font-family="Georgia,serif" font-size="32" font-weight="bold" fill="rgba(255,255,255,0.5)">z</text>
+  <text x="360" y="83" font-family="Georgia,serif" font-size="24" font-weight="bold" fill="rgba(255,255,255,0.38)">z</text>
+  <text x="384" y="63" font-family="Georgia,serif" font-size="17" font-weight="bold" fill="rgba(255,255,255,0.28)">z</text>
+  <rect x="80" y="230" width="360" height="20" rx="5" fill="rgba(255,255,255,0.30)"/>
+  <rect x="60" y="220" width="400" height="90" rx="8" fill="rgba(255,255,255,0.18)"/>
+  <rect x="60" y="290" width="400" height="30" rx="6" fill="rgba(255,255,255,0.25)"/>
+  <rect x="60" y="220" width="60" height="100" rx="8" fill="rgba(255,255,255,0.28)"/>
+  <rect x="400" y="220" width="60" height="100" rx="8" fill="rgba(255,255,255,0.28)"/>
+  <ellipse cx="175" cy="235" rx="38" ry="28" fill="rgba(255,255,255,0.82)"/>
+  <rect x="137" y="235" width="76" height="18" rx="4" fill="rgba(255,255,255,0.75)"/>
+  <rect x="145" y="240" width="160" height="16" rx="8" fill="rgba(255,255,255,0.72)"/>
+  <ellipse cx="225" cy="246" rx="18" ry="12" fill="rgba(255,255,255,0.85)"/>
+  <rect x="207" y="250" width="120" height="14" rx="7" fill="rgba(255,255,255,0.55)"/>
+  <path d="M100 320 L420 320" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+  <ellipse cx="260" cy="335" rx="170" ry="10" fill="rgba(255,255,255,0.12)"/>
+</svg>
