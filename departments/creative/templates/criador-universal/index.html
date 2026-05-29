@@ -859,6 +859,86 @@ body {
   font-size: 7.5pt; color: rgba(255,255,255,0.2);
   text-align: center;
 }
+
+/* ══════════════════════ CALLOUT BOXES ══════════════════════ */
+.cbox {
+  margin: 5mm 0;
+  padding: 4mm 5.5mm;
+  border-radius: 2.5mm;
+  page-break-inside: avoid;
+}
+.cbox-label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 6.5pt; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  margin-bottom: 2mm;
+  display: flex; align-items: center; gap: 2mm;
+}
+.cbox-label::before {
+  content: '';
+  display: inline-block;
+  width: 1.5mm; height: 4mm;
+  border-radius: 1mm;
+  background: currentColor;
+  flex-shrink: 0;
+}
+.cbox-body {
+  font-family: 'Inter', sans-serif;
+  font-size: 9.5pt; line-height: 1.7;
+}
+
+/* Dica — âmbar */
+.cbox-dica {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 0.4mm solid #fcd34d;
+  border-left: 3.5mm solid #f59e0b;
+}
+.cbox-dica .cbox-label { color: #92400e; }
+.cbox-dica .cbox-body  { color: #451a03; }
+
+/* Exemplo real — azul */
+.cbox-exemplo {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 0.4mm solid #93c5fd;
+  border-left: 3.5mm solid #3b82f6;
+}
+.cbox-exemplo .cbox-label { color: #1e40af; }
+.cbox-exemplo .cbox-body  { color: #1e3a5f; }
+
+/* Na prática — verde */
+.cbox-pratica {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 0.4mm solid #86efac;
+  border-left: 3.5mm solid #16a34a;
+}
+.cbox-pratica .cbox-label { color: #15803d; }
+.cbox-pratica .cbox-body  { color: #14532d; font-weight: 600; }
+
+/* Atenção — vermelho */
+.cbox-atencao {
+  background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+  border: 0.4mm solid #fca5a5;
+  border-left: 3.5mm solid #ef4444;
+}
+.cbox-atencao .cbox-label { color: #991b1b; }
+.cbox-atencao .cbox-body  { color: #450a0a; }
+
+/* Sabia? — cor do tema */
+.cbox-sabia {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--p,#6366f1) 5%, #fff),
+    color-mix(in srgb, var(--s,#818cf8) 8%, #fff)
+  );
+  border: 0.4mm solid color-mix(in srgb, var(--p,#6366f1) 22%, #ddd);
+  border-left: 3.5mm solid var(--p,#6366f1);
+}
+.cbox-sabia .cbox-label { color: color-mix(in srgb, var(--p,#6366f1) 80%, #000); }
+.cbox-sabia .cbox-body  {
+  font-family: 'Playfair Display', serif;
+  font-size: 11pt; font-style: italic;
+  color: color-mix(in srgb, var(--p,#6366f1) 85%, #111);
+  line-height: 1.7;
+}
 </style>
 </head>
 <body>
@@ -884,6 +964,13 @@ body {
     return String(t||'').split(/\n+/).filter(Boolean)
       .map(p=>`<p>${esc(p)}</p>`).join('');
   }
+
+  // ── Callout boxes ──
+  function boxDica(t)    { return t?`<div class="cbox cbox-dica"><div class="cbox-label">Dica do Autor</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
+  function boxExemplo(t) { return t?`<div class="cbox cbox-exemplo"><div class="cbox-label">Exemplo Real</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
+  function boxPratica(t) { return t?`<div class="cbox cbox-pratica"><div class="cbox-label">Na Pratica — Faca Agora</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
+  function boxAtencao(t) { return t?`<div class="cbox cbox-atencao"><div class="cbox-label">Atencao</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
+  function boxSabia(t)   { return t?`<div class="cbox cbox-sabia"><div class="cbox-label">Voce Sabia?</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
 
   let pgNum = 0;
   function footer(){
@@ -1010,6 +1097,10 @@ body {
         </div>
         <div class="pg-body">
           <div class="texto">${paras(c.conteudo||'')}</div>
+          ${boxDica(c.dica)}
+          ${boxExemplo(c.exemplo_real)}
+          ${boxAtencao(c.atencao)}
+          ${boxPratica(c.acao_pratica)}
           ${c.citacao?`<div class="quote"><div class="quote-text">"${esc(c.citacao)}"</div></div>`:''}
           ${(c.pontos_chave||[]).length?`
             <div class="kp-label">Pontos-chave</div>
@@ -1058,6 +1149,8 @@ body {
         <div class="pg-body">
           ${m.objetivo?`<div class="tip" style="margin-bottom:4mm"><div class="tip-icon" style="font-size:11pt">◎</div><div class="tip-text"><strong>Ao final deste módulo você vai:</strong> ${esc(m.objetivo)}</div></div>`:''}
           ${m.teoria?`<div class="texto">${paras(m.teoria)}</div>`:''}
+          ${boxDica(m.dica)}
+          ${boxExemplo(m.exemplo_real)}
         </div>
         ${footer()}
       </div>`;
@@ -1122,7 +1215,9 @@ body {
             <div class="kp-label">Ações Práticas</div>
             <ul class="actions">${(p.acoes||[]).map(a=>`<li>${esc(a)}</li>`).join('')}</ul>
           `:''}
-          ${p.dica?`<div class="tip" style="margin-top:4mm"><div class="tip-icon">💡</div><div class="tip-text">${esc(p.dica)}</div></div>`:''}
+          ${boxDica(p.dica)}
+          ${boxExemplo(p.exemplo_real)}
+          ${boxPratica(p.acao_pratica)}
         </div>
         ${footer()}
       </div>`;

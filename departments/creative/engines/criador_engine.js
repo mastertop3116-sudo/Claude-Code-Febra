@@ -10,20 +10,63 @@ const fs            = require('fs');
 const OpenAI        = require('openai');
 const aprendizados  = require('../../../utils/aprendizados');
 
-const TEMPLATE_PATH = path.join(__dirname, '../templates/criador-universal/index.html');
+const TEMPLATE_PATH      = path.join(__dirname, '../templates/criador-universal/index.html');
+const TEMPLATE_KIDS_PATH = path.join(__dirname, '../templates/criador-kids/index.html');
+const TIPOS_KIDS = ['atividade_infantil','plano_de_aula','receita','proposta','roteiro_live'];
 
 // ── Paletas por NICHO (sobrepõe paleta por tipo) ────────────
+// Ordem importa: primeiro match vence. Nichos mais específicos vêm antes.
 const PALETAS_NICHO = [
-  { palavras: ['emagrecimento','dieta','saúde','saudável','treino','fitness','academia','nutrição','peso','corpo'], primaria: '#10b981', secundaria: '#34d399', bg: '#051a10' },
-  { palavras: ['finanças','financeiro','dinheiro','renda','investimento','lucro','mei','empreendedor','negócio','vender','vendas','marketing'], primaria: '#f59e0b', secundaria: '#fcd34d', bg: '#181000' },
-  { palavras: ['beleza','cabelo','maquiagem','pele','estética','unhas','moda','skincare'], primaria: '#ec4899', secundaria: '#f9a8d4', bg: '#180710' },
-  { palavras: ['espiritualidade','fé','bíblia','deus','oração','devocional','cristão','cristã','missão'], primaria: '#d97706', secundaria: '#fbbf24', bg: '#181000' },
-  { palavras: ['fotografia','foto','câmera','imagem','vídeo','edição','design','criativo','arte','instagram'], primaria: '#a855f7', secundaria: '#d8b4fe', bg: '#0f0718' },
-  { palavras: ['educação','professor','escola','bncc','criança','pedagogia','infantil','aula','plano'], primaria: '#3b82f6', secundaria: '#93c5fd', bg: '#070f18' },
-  { palavras: ['jiu','luta','esporte','marcial','treino','atleta','competição'], primaria: '#ef4444', secundaria: '#fca5a5', bg: '#180707' },
-  { palavras: ['confeitaria','bolo','doce','culinária','gastronomia','receita','cozinha','buffet'], primaria: '#f472b6', secundaria: '#fbcfe8', bg: '#180810' },
-  { palavras: ['relacionamento','amor','namoro','casamento','autoestima','ansiedade','mental','psicologia'], primaria: '#8b5cf6', secundaria: '#c4b5fd', bg: '#0d0718' },
-  { palavras: ['pet','cachorro','gato','animal','veterinário','adestramento'], primaria: '#22d3a5', secundaria: '#5eead4', bg: '#051812' },
+  // 1. Emagrecimento / Fitness / Saúde
+  { palavras: ['emagrecimento','emagrecer','dieta','saúde','saudável','fitness','academia','nutrição','peso','corpo','metabolismo','barriga','gordo','magro','lowcarb','detox'], primaria: '#10b981', secundaria: '#34d399', bg: '#051a10' },
+
+  // 2. Marketing Digital / Social Media / Tráfego
+  { palavras: ['marketing digital','tráfego','reels','conteúdo','copywriting','funil','leads','social media','anúncios','stories','engajamento','copy','lançamento','afiliado'], primaria: '#f97316', secundaria: '#fdba74', bg: '#180a00' },
+
+  // 3. Finanças / Renda Extra / Empreendedorismo
+  { palavras: ['finanças','financeiro','dinheiro','renda','investimento','lucro','mei','empreendedor','negócio','vender','vendas','faturar','riqueza','orçamento','dívida','economizar','patrimônio'], primaria: '#f59e0b', secundaria: '#fcd34d', bg: '#181000' },
+
+  // 4. Beleza / Skincare / Estética
+  { palavras: ['beleza','cabelo','maquiagem','pele','estética','unhas','skincare','sobrancelha','cílios','depilação','procedimento','tratamento facial','coloração'], primaria: '#ec4899', secundaria: '#f9a8d4', bg: '#180710' },
+
+  // 5. Moda / Estilo / Imagem Pessoal
+  { palavras: ['moda','estilo','looks','roupas','consultoria de imagem','guarda-roupa','tendência','outfit','cápsula','visagismo','personal stylist'], primaria: '#c084fc', secundaria: '#e9d5ff', bg: '#120718' },
+
+  // 6. Espiritualidade / Fé / Cristão / Devocional
+  { palavras: ['espiritualidade','fé','bíblia','deus','oração','devocional','cristão','cristã','missão','igreja','evangelho','palavra','cura','ungido','profecia'], primaria: '#d97706', secundaria: '#fbbf24', bg: '#181000' },
+
+  // 7. Desenvolvimento Pessoal / Mindset / Autoconhecimento
+  { palavras: ['desenvolvimento pessoal','mindset','autoconhecimento','mentalidade','hábitos','disciplina','propósito','motivação','crescimento','evolução','alta performance','reprogramação'], primaria: '#7c3aed', secundaria: '#c4b5fd', bg: '#0d0718' },
+
+  // 8. Relacionamentos / Amor / Psicologia Emocional
+  { palavras: ['relacionamento','amor','namoro','casamento','família','psicologia','emoções','trauma','comunicação','separação','autoestima','ansiedade','depressão','apego'], primaria: '#db2777', secundaria: '#fbcfe8', bg: '#180710' },
+
+  // 9. Meditação / Mindfulness / Bem-estar
+  { palavras: ['meditação','mindfulness','bem-estar','estresse','respiração','yoga','equilíbrio','consciência','paz interior','gratidão','chakra','frequência','espiritualidade zen'], primaria: '#06b6d4', secundaria: '#a5f3fc', bg: '#031218' },
+
+  // 10. Produtividade / Organização / Planner
+  { palavras: ['produtividade','organização','planner','rotina','agenda','gestão do tempo','foco','metas','planejamento','método','sistemática','bullet journal','kanban'], primaria: '#0ea5e9', secundaria: '#7dd3fc', bg: '#030f18' },
+
+  // 11. Educação Infantil / Pedagogia / Professor
+  { palavras: ['educação','professor','escola','bncc','criança','pedagogia','infantil','aula','plano de aula','alfabetização','ensino fundamental','maternal','creche','aluno','sala de aula'], primaria: '#3b82f6', secundaria: '#93c5fd', bg: '#070f18' },
+
+  // 12. Concurso / Vestibular / ENEM / Estudo
+  { palavras: ['concurso','vestibular','enem','redação','concurseiro','aprovação','reta final','simulado','faculdade','universidade','gabarito','questões','estudo dirigido'], primaria: '#4338ca', secundaria: '#a5b4fc', bg: '#060718' },
+
+  // 13. Culinária / Confeitaria / Receitas / Gastronomia
+  { palavras: ['confeitaria','bolo','doce','culinária','gastronomia','receita','cozinha','buffet','candy','fitfood','salgado','torta','brigadeiro','bolacha','sobremesa'], primaria: '#f43f5e', secundaria: '#fda4af', bg: '#180309' },
+
+  // 14. Artesanato / Crochê / Costura / DIY
+  { palavras: ['artesanato','crochê','costura','bordado','pintura','customização','patchwork','tricô','feltro','ateliê','handmade','diy','renda','macramê'], primaria: '#14b8a6', secundaria: '#99f6e4', bg: '#041512' },
+
+  // 15. Pet / Animais / Adestramento
+  { palavras: ['pet','cachorro','gato','animal','veterinário','adestramento','banho e tosa','raça','filhote','tutor','adoção','comportamento animal'], primaria: '#22d3a5', secundaria: '#5eead4', bg: '#051812' },
+
+  // 16. Esportes / Jiu-Jitsu / Luta / Atletismo
+  { palavras: ['jiu','luta','esporte','marcial','atleta','competição','futebol','corrida','triathlon','crossfit','musculação','fisiculturismo','boxe','treino esportivo'], primaria: '#ef4444', secundaria: '#fca5a5', bg: '#180707' },
+
+  // 17. Fotografia / Vídeo / Design / Arte Digital
+  { palavras: ['fotografia','foto','câmera','vídeo','edição','design','criativo','arte','lightroom','premiere','canva','illustrator','audiovisual'], primaria: '#a855f7', secundaria: '#d8b4fe', bg: '#0f0718' },
 ];
 
 function detectarPaletaNicho(nicho) {
@@ -38,26 +81,47 @@ function detectarPaletaNicho(nicho) {
 
 // ── Paletas padrão por tipo ──────────────────────────────────
 const CORES = {
-  ebook:      { primaria: '#6366f1', secundaria: '#818cf8', bg: '#0f0e1f' },
-  workbook:   { primaria: '#10b981', secundaria: '#34d399', bg: '#071810' },
-  guia:       { primaria: '#f59e0b', secundaria: '#fcd34d', bg: '#180f00' },
-  checklist:  { primaria: '#22d3a5', secundaria: '#5eead4', bg: '#071812' },
-  desafio:    { primaria: '#ef4444', secundaria: '#fca5a5', bg: '#180707' },
-  planner:    { primaria: '#a855f7', secundaria: '#d8b4fe', bg: '#0f0718' },
-  devocional: { primaria: '#d97706', secundaria: '#fbbf24', bg: '#181000' },
-  script_vsl: { primaria: '#3b82f6', secundaria: '#93c5fd', bg: '#070f18' },
+  // ── Template Universal (adultos) ──
+  ebook:             { primaria: '#6366f1', secundaria: '#818cf8', bg: '#0f0e1f' },
+  workbook:          { primaria: '#10b981', secundaria: '#34d399', bg: '#071810' },
+  guia:              { primaria: '#f59e0b', secundaria: '#fcd34d', bg: '#180f00' },
+  checklist:         { primaria: '#22d3a5', secundaria: '#5eead4', bg: '#071812' },
+  desafio:           { primaria: '#ef4444', secundaria: '#fca5a5', bg: '#180707' },
+  planner:           { primaria: '#a855f7', secundaria: '#d8b4fe', bg: '#0f0718' },
+  devocional:        { primaria: '#d97706', secundaria: '#fbbf24', bg: '#181000' },
+  script_vsl:        { primaria: '#3b82f6', secundaria: '#93c5fd', bg: '#070f18' },
+  // ── Template Kids (educacional/infantil) ──
+  atividade_infantil:{ primaria: '#FF6B6B', secundaria: '#FFD93D', bg: '#fff' },
+  plano_de_aula:     { primaria: '#4D96FF', secundaria: '#93c5fd', bg: '#fff' },
+  receita:           { primaria: '#FF9F43', secundaria: '#ffd0a0', bg: '#fff' },
+  proposta:          { primaria: '#6BCB77', secundaria: '#a7f3d0', bg: '#fff' },
+  roteiro_live:      { primaria: '#C77DFF', secundaria: '#e9d5ff', bg: '#fff' },
 };
 
 const LABELS = {
-  ebook:      'E-book',
-  workbook:   'Workbook',
-  guia:       'Guia',
-  checklist:  'Checklist',
-  desafio:    'Desafio',
-  planner:    'Planner',
-  devocional: 'Devocional',
-  script_vsl: 'Script VSL',
+  ebook:             'E-book',
+  workbook:          'Workbook',
+  guia:              'Guia',
+  checklist:         'Checklist',
+  desafio:           'Desafio',
+  planner:           'Planner',
+  devocional:        'Devocional',
+  script_vsl:        'Script VSL',
+  atividade_infantil:'Atividade Infantil',
+  plano_de_aula:     'Plano de Aula',
+  receita:           'Receita',
+  proposta:          'Proposta',
+  roteiro_live:      'Roteiro de Live',
 };
+
+// ── Tom por tipo: autoral (1ª pessoa) ou objetivo (técnico/direto) ──
+// Conselho especialista low ticket BR: plano de aula, receita, proposta, checklist
+// devem ser objetivos e diretos — professor/comprador quer usar, não ouvir história pessoal
+const TOM_TIPO = {
+  autoral:   ['ebook','workbook','guia','desafio','planner','devocional','script_vsl','roteiro_live'],
+  objetivo:  ['checklist','plano_de_aula','receita','proposta','atividade_infantil'],
+};
+function isTipoObjetivo(tipo) { return TOM_TIPO.objetivo.includes(tipo); }
 
 // ── Schemas JSON por tipo ───────────────────────────────────
 function getPromptSchema(tipo, extensao) {
@@ -75,7 +139,11 @@ function getPromptSchema(tipo, extensao) {
     {
       "numero": 1,
       "titulo": "título do capítulo — direto, sem rodeios",
-      "conteudo": "texto completo (${wpp} palavras) — ESTRUTURA OBRIGATÓRIA: (1) PROBLEMA: abra com uma dor real e específica do nicho; (2) HISTÓRIA: 'Eu vi isso acontecer com [Nome], [idade] anos, [contexto] — ela/ele [situação concreta com número]'; (3) SOLUÇÃO: o que realmente funciona, com passo específico; (4) AÇÃO: 'Sua tarefa agora: [verbo imperativo] [número] [coisa concreta] em [prazo]'. PROIBIDO: 'você pode', 'é possível', 'considere', 'pense em', 'busque', 'talvez'.",
+      "conteudo": "texto corrido (${wpp} palavras) — ESTRUTURA: (1) PROBLEMA: dor real do nicho; (2) SOLUÇÃO com passo específico; (3) desenvolva o conteúdo principal. SEM incluir a dica, exemplo e ação aqui — eles aparecem nos campos abaixo.",
+      "dica": "dica prática do autor em 1ª pessoa — 1 frase curta e direta, começa com 'Quando eu...' ou 'O que funcionou pra mim foi...' (máx 2 linhas)",
+      "exemplo_real": "história concreta: '[Nome brasileiro], [idade] anos, [cidade] — [situação com número real]. Em [prazo], ela/ele [resultado mensurável].' (máx 3 linhas)",
+      "acao_pratica": "tarefa que o leitor faz AGORA: '[Verbo imperativo] [número] [objeto concreto do nicho] em [prazo curto]. [Por que isso funciona em 1 frase.]' (máx 2 linhas)",
+      "atencao": "erro comum neste ponto que arruína o resultado — 1 frase direta, começa com 'O erro mais comum aqui é...' (opcional, omita se não há erro relevante)",
       "pontos_chave": ["ponto direto e específico ao nicho — começa com verbo ou número", "idem", "idem"],
       "citacao": "frase de impacto em 1ª pessoa do autor — algo que ele diria (máx 20 palavras)"
     }
@@ -96,7 +164,9 @@ OBRIGATÓRIO: gere de ${qtd} capítulos completos`,
       "numero": 1,
       "titulo": "nome do módulo",
       "objetivo": "o que o leitor será capaz de fazer — começa com verbo de ação forte (ex: Calcular, Eliminar, Criar, Mapear)",
-      "teoria": "em 1ª pessoa (200 a 300 palavras) — comece com 'Quando eu comecei a trabalhar com isso...' ou 'Uma vez, acompanhei [Nome], [perfil] que...'; mostre o problema, a descoberta e a solução com número ou prazo concreto; termine com: 'Então aqui está o que funciona de verdade:'",
+      "teoria": "em 1ª pessoa (180 a 250 palavras) — comece com 'Quando eu comecei a trabalhar com isso...' ou 'Uma vez, acompanhei [Nome], [perfil] que...'; mostre o problema, a descoberta e a solução com número concreto.",
+      "dica": "dica do autor em 1ª pessoa — o detalhe que faz diferença neste módulo (1-2 linhas)",
+      "exemplo_real": "história de alguém que aplicou este módulo: '[Nome], [idade], [cidade] — fez [ação] e obteve [resultado com número] em [prazo]' (máx 3 linhas)",
       "exercicios": [
         {
           "titulo": "nome curto do exercício — verbo + objeto específico do nicho",
@@ -120,9 +190,11 @@ OBRIGATÓRIO: gere de ${qtd} módulos, cada um com 2 a 3 exercícios`,
     {
       "numero": 1,
       "titulo": "nome do passo — verbo imperativo + o quê",
-      "descricao": "em 1ª pessoa (300 a 500 palavras) — ESTRUTURA: 'A maioria das pessoas erra aqui porque [erro específico].' → 'Eu mesmo errei isso quando...' → 'O que realmente funciona é [solução com detalhe]' → 'Na prática, [Nome real ou fictício plausível] fez assim: [situação concreta]' → termine com: 'Sua tarefa neste passo: [ação + número + prazo]'",
-      "acoes": ["ação concreta com verbo imperativo + número ou critério de conclusão", "idem", "idem"],
-      "dica": "dica do autor em 1ª pessoa: 'Quando eu faço isso, presto atenção em [detalhe específico]...' ou 'O erro que eu via todo mundo cometendo era...'"
+      "descricao": "em 1ª pessoa (250 a 400 palavras) — 'A maioria erra aqui porque [erro].' → 'Eu mesmo errei quando...' → 'O que funciona: [solução com detalhe]'. SEM incluir dica, exemplo e ação aqui — ficam nos campos abaixo.",
+      "acoes": ["ação concreta com verbo imperativo + critério de conclusão", "idem", "idem"],
+      "dica": "dica do autor em 1ª pessoa — detalhe que não é óbvio neste passo (1-2 linhas)",
+      "exemplo_real": "pessoa real que executou este passo: '[Nome], [perfil] — fez [ação] em [prazo] e conseguiu [resultado]' (máx 3 linhas)",
+      "acao_pratica": "o que o leitor faz AGORA neste passo: '[Verbo] [número] [coisa] em [prazo]. Critério: [como saber se concluiu].' (máx 2 linhas)"
     }
   ],
   "conclusao": "em 1ª pessoa — o autor diz exatamente o que o leitor deve fazer nas próximas 24h (80 a 120 palavras)"
@@ -233,6 +305,130 @@ OBRIGATÓRIO: gere exatamente 7 dias completos`,
   ]
 }
 OBRIGATÓRIO: preencha TODAS as 8 partes. Script como fala — frases curtas, pausas marcadas. 1ª pessoa em todos os blocos. PROIBIDO: 'você pode', 'é possível', 'considere', 'talvez'`,
+
+    plano_de_aula: `Retorne JSON com exatamente esta estrutura:
+{
+  "titulo": "título do plano de aula (máx 10 palavras)",
+  "componente": "componente curricular (ex: Língua Portuguesa, Matemática)",
+  "ano_escolar": "faixa de ano (ex: 3º ao 5º ano do Ensino Fundamental)",
+  "duracao": "duração estimada (ex: 50 minutos)",
+  "habilidade_bncc": "código e descrição da habilidade BNCC principal",
+  "objetivo": "o que o aluno será capaz de fazer ao final — começa com verbo (máx 2 linhas)",
+  "materiais": ["material necessário com quantidade se aplicável"],
+  "desenvolvimento": [
+    {
+      "fase": "Abertura / Desenvolvimento / Encerramento",
+      "duracao": "tempo estimado (ex: 10 min)",
+      "descricao": "o que o professor faz e o que o aluno faz — objetivo e específico (150 a 250 palavras)",
+      "instrucoes": ["instrução direta para o professor — verbo imperativo + ação específica"]
+    }
+  ],
+  "avaliacao": "como o professor avalia se o objetivo foi alcançado — critério mensurável e específico",
+  "adaptacoes": "adaptações para alunos com necessidades especiais (1-2 sugestões concretas)",
+  "dica_professor": "dica prática de quem já aplicou esta aula — 1 detalhe que faz diferença (1-2 linhas)"
+}
+OBRIGATÓRIO: 3 fases (Abertura, Desenvolvimento, Encerramento), cada uma com 2 a 3 instruções`,
+
+    atividade_infantil: `Retorne JSON com exatamente esta estrutura:
+{
+  "titulo": "título da atividade (máx 8 palavras, lúdico e direto)",
+  "componente": "componente curricular",
+  "ano_escolar": "faixa etária/ano escolar",
+  "duracao": "tempo estimado",
+  "habilidade_bncc": "código BNCC",
+  "objetivo": "o que o aluno aprende com esta atividade",
+  "instrucao_professor": "como o professor apresenta a atividade para os alunos (2-3 frases simples)",
+  "atividades": [
+    {
+      "tipo": "ligar_colunas | verdadeiro_falso | completar | sequencia | caca_palavras | colorir | responder",
+      "titulo": "nome curto da atividade",
+      "enunciado": "instrução para o aluno — linguagem simples, direta, para a faixa etária",
+      "dados": {}
+    }
+  ]
+}
+REGRAS por tipo de atividade:
+- ligar_colunas: dados = { "coluna_a": ["item1","item2",...], "coluna_b": ["correspondente1","correspondente2",...] } — mínimo 4 pares
+- verdadeiro_falso: dados = { "itens": [{"texto":"afirmação","resposta":"V"},{"texto":"afirmação","resposta":"F"},...] } — mínimo 5 itens
+- completar: dados = { "texto": "frase com ___lacuna___ para preencher", "banco_palavras": ["palavra1","palavra2",...] }
+- sequencia: dados = { "itens": ["passo 1","passo 2","passo 3","passo 4"] }
+- caca_palavras: dados = { "palavras": ["PALAVRA1","PALAVRA2","PALAVRA3","PALAVRA4","PALAVRA5"] }
+- colorir: dados = { "instrucoes": ["Pinte o sol de amarelo","Pinte a árvore de verde",...] }
+- responder: dados = { "perguntas": ["Pergunta 1?","Pergunta 2?","Pergunta 3?"], "linhas_resposta": 3 }
+OBRIGATÓRIO: gere de 3 a 5 atividades variando os tipos`,
+
+    receita: `Retorne JSON com exatamente esta estrutura:
+{
+  "titulo": "nome da receita (máx 8 palavras, apetitoso)",
+  "subtitulo": "para quem é e qual o diferencial (ex: fit, vegana, rápida)",
+  "autor": "nome do criador",
+  "descricao": "descrição curta e irresistível da receita (2-3 linhas)",
+  "informacoes": {
+    "tempo_preparo": "ex: 15 min",
+    "tempo_forno": "ex: 35 min (ou null se não usa forno)",
+    "porcoes": "ex: 12 unidades",
+    "dificuldade": "Fácil / Médio / Avançado",
+    "calorias": "estimativa por porção (opcional)"
+  },
+  "ingredientes": [
+    { "grupo": "nome do grupo (ex: Massa, Recheio — ou null para receita simples)", "itens": ["quantidade + unidade + ingrediente"] }
+  ],
+  "modo_preparo": [
+    { "passo": 1, "titulo": "nome curto do passo (ex: Misture a base)", "descricao": "instrução objetiva e clara (2-3 linhas)" }
+  ],
+  "dica_chef": "dica do autor que faz a receita ficar ainda melhor — específica, não óbvia (1-2 linhas)",
+  "variacao": "como adaptar a receita (ex: versão sem glúten, versão mais econômica) — 1 sugestão",
+  "como_servir": "sugestão de apresentação e combinações (1-2 linhas)"
+}
+OBRIGATÓRIO: ingredientes organizados por grupo, mínimo 5 passos no modo de preparo`,
+
+    proposta: `Retorne JSON com exatamente esta estrutura:
+{
+  "titulo": "título da proposta — claro e objetivo (máx 10 palavras)",
+  "subtitulo": "resultado ou transformação entregue (máx 15 palavras)",
+  "autor": "nome do profissional / empresa",
+  "cliente": "nome do cliente ou perfil-alvo",
+  "data_validade": "válido por X dias",
+  "resumo_executivo": "visão geral da proposta em 3-4 linhas — problema, solução, resultado esperado",
+  "problema": "descrição do problema ou necessidade do cliente (100 a 150 palavras) — objetivo, sem jargão",
+  "solucao": "descrição da solução proposta (150 a 200 palavras) — o que será entregue, como, em quanto tempo",
+  "entregas": [
+    { "item": "nome do entregável", "descricao": "o que inclui — 1-2 linhas", "prazo": "quando será entregue" }
+  ],
+  "investimento": {
+    "descricao": "forma de pagamento e condições",
+    "itens": [{ "servico": "descrição do serviço", "valor": "R$ X.XXX,00" }],
+    "total": "R$ X.XXX,00",
+    "condicoes": "condições de pagamento (ex: 50% na assinatura, 50% na entrega)"
+  },
+  "diferenciais": ["diferencial concreto e verificável — não genérico"],
+  "proximos_passos": ["passo 1 — ação específica com prazo", "passo 2", "passo 3"],
+  "validade": "esta proposta é válida por X dias a partir de [data]"
+}
+OBRIGATÓRIO: mínimo 3 entregas, 3 diferenciais, 3 próximos passos`,
+
+    roteiro_live: `Retorne JSON com exatamente esta estrutura:
+{
+  "titulo": "tema da live (máx 10 palavras)",
+  "autor": "nome do apresentador",
+  "duracao_total": "duração estimada (ex: 60 min)",
+  "objetivo": "o que o espectador vai aprender ou conseguir ao final",
+  "checklist_pre": ["verificação técnica antes de começar — específica"],
+  "blocos": [
+    {
+      "nome": "nome do bloco (ex: ABERTURA, CONTEÚDO, OFERTA)",
+      "duracao": "ex: 5 min",
+      "objetivo_bloco": "o que acontece neste bloco",
+      "script": "em 1ª pessoa — o que o apresentador diz, natural e conversacional (150 a 250 palavras). Inclua marcações: [MOSTRAR TELA], [PERGUNTA PARA O CHAT], [PAUSA], [MOSTRAR PRODUTO]",
+      "interacao_chat": "como engajar o chat neste bloco (ex: 'Pergunte: quem aqui já tentou X?')"
+    }
+  ],
+  "cta_principal": "chamada para ação principal da live — direta, com link/ação específica",
+  "respostas_objecoes": [
+    { "objecao": "objeção comum do público", "resposta": "resposta natural em 1ª pessoa (2-3 linhas)" }
+  ]
+}
+OBRIGATÓRIO: mínimo 5 blocos (ABERTURA, CONTEÚDO x2, OFERTA, ENCERRAMENTO), 3 objeções`,
   };
 
   return schemas[tipo] || schemas.ebook;
@@ -251,7 +447,19 @@ async function gerarConteudo(params) {
     educativo:      'didático, claro, com muitos exemplos e analogias acessíveis',
   };
 
-  const sistema = `Você é ${autor}, criador de infoprodutos digitais premium para o mercado brasileiro.
+  const sistema = isTipoObjetivo(tipo)
+    ? `Você é especialista em ${nicho}. Crie um ${LABELS[tipo] || tipo} completo, objetivo e profissional para o mercado brasileiro.
+Tom: ${TONS[tom] || TONS.educativo}
+
+REGRAS (inegociáveis):
+• LINGUAGEM OBJETIVA E DIRETA: sem narrativas pessoais do autor — o leitor quer usar o material, não ler a história de quem criou
+• EXEMPLOS CONCRETOS quando necessário: "[Nome], [perfil], fez [ação] e obteve [resultado com número]" — como referência, não como história pessoal
+• ZERO VAGUEZA: BANIDO "você pode", "é possível", "considere", "pense em", "talvez" — use verbos imperativos e afirmações diretas
+• ESTRUTURA CLARA: títulos, passos numerados, listas objetivas — o leitor precisa usar isso sem adaptar nada
+• AÇÃO CONCRETA: toda seção termina com 1 tarefa com critério de conclusão mensurável
+• ESPECÍFICO AO NICHO: cada item deve fazer sentido somente para quem está neste nicho — zero conteúdo genérico
+Retorne SOMENTE JSON válido. Sem markdown. Sem menção a IA ou ChatGPT.`
+    : `Você é ${autor}, criador de infoprodutos digitais premium para o mercado brasileiro.
 Escreva na SUA voz — primeira pessoa, histórias reais ou plausíveis, descobertas pessoais.
 Tom: ${TONS[tom] || TONS.conversacional}
 
@@ -382,7 +590,8 @@ async function renderizarPDF(conteudo, params) {
   const { tipo, nicho } = params;
   const cores = detectarPaletaNicho(nicho) || CORES[tipo] || CORES.ebook;
 
-  const templateHtml = fs.readFileSync(TEMPLATE_PATH, 'utf8');
+  const templateFile = TIPOS_KIDS.includes(tipo) ? TEMPLATE_KIDS_PATH : TEMPLATE_PATH;
+  const templateHtml = fs.readFileSync(templateFile, 'utf8');
 
   const data = {
     ...conteudo,

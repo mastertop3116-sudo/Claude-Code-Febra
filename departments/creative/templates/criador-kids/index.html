@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+@page { size: A4; margin: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --c1: #FF6B6B; --c2: #FFD93D; --c3: #6BCB77; --c4: #4D96FF; --c5: #C77DFF;
+  --p: #FF6B6B; --s: #FFD93D;
+  --ink: #1a1a2e; --muted: #555566;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: #fff;
+  width: 210mm;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  color: var(--ink);
+}
+
+/* ── PÁGINA ── */
+.page {
+  width: 210mm;
+  min-height: 297mm;
+  position: relative;
+  overflow: hidden;
+  page-break-after: always;
+  page-break-inside: avoid;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+.page:last-child { page-break-after: auto; }
+
+/* ════════════ CAPA ════════════ */
+.capa {
+  width: 210mm;
+  min-height: 297mm;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+}
+
+.capa-confetti {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, var(--p) 2px, transparent 2px),
+    radial-gradient(circle, var(--s) 1.5px, transparent 1.5px),
+    radial-gradient(circle, var(--c3) 2px, transparent 2px),
+    radial-gradient(circle, var(--c4) 1.5px, transparent 1.5px);
+  background-size: 38px 38px, 55px 55px, 44px 44px, 62px 62px;
+  background-position: 0 0, 20px 18px, 10px 30px, 35px 8px;
+  opacity: 0.12;
+}
+
+/* Faixa diagonal de cor no topo */
+.capa-faixa {
+  background: linear-gradient(135deg, var(--p) 0%, var(--s) 100%);
+  padding: 16mm 16mm 20mm;
+  position: relative;
+  clip-path: polygon(0 0, 100% 0, 100% 80%, 0 100%);
+  min-height: 130mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.capa-badge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255,255,255,0.28);
+  border: 2px solid rgba(255,255,255,0.5);
+  border-radius: 40px;
+  padding: 2.5mm 6mm;
+  font-size: 8.5pt;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #fff;
+  margin-bottom: 6mm;
+  width: fit-content;
+}
+
+.capa-icon {
+  font-size: 72pt;
+  line-height: 1;
+  margin-bottom: 5mm;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
+}
+.capa-icon svg { display: block; }
+
+.capa-titulo {
+  font-family: 'Nunito', sans-serif;
+  font-size: 36pt;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.1;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  margin-bottom: 3mm;
+}
+
+.capa-subtitulo {
+  font-size: 12pt;
+  font-weight: 700;
+  color: rgba(255,255,255,0.82);
+  line-height: 1.4;
+}
+
+.capa-body {
+  flex: 1;
+  padding: 14mm 16mm 0;
+  position: relative;
+  z-index: 2;
+}
+
+.capa-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6mm;
+  margin-bottom: 8mm;
+}
+.capa-info-item {
+  background: #f8f9ff;
+  border: 2px solid #e8eaff;
+  border-radius: 12px;
+  padding: 5mm 6mm;
+}
+.capa-info-label {
+  font-size: 7.5pt;
+  font-weight: 800;
+  color: var(--p);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 1.5mm;
+}
+.capa-info-val {
+  font-size: 11pt;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+}
+
+.capa-objetivo-box {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--p) 8%, #fff),
+    color-mix(in srgb, var(--s) 8%, #fff)
+  );
+  border: 2.5px solid color-mix(in srgb, var(--p) 30%, #fff);
+  border-radius: 16px;
+  padding: 6mm 7mm;
+  margin-bottom: 8mm;
+}
+.capa-objetivo-label {
+  font-size: 8pt;
+  font-weight: 800;
+  color: var(--p);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 2mm;
+}
+.capa-objetivo-text {
+  font-size: 11pt;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.55;
+}
+
+.capa-footer {
+  padding: 0 16mm 10mm;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+.capa-autor {
+  font-size: 9.5pt;
+  font-weight: 800;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+.capa-estrelas {
+  display: flex;
+  gap: 1.5mm;
+}
+.estrela {
+  width: 6mm; height: 6mm;
+  background: var(--s);
+  clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+  opacity: 0.4;
+}
+
+/* ════════════ PÁGINAS DE CONTEÚDO ════════════ */
+.pg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4mm 12mm 3mm;
+  background: linear-gradient(90deg, var(--p), var(--s));
+  position: relative;
+}
+.pg-header-titulo {
+  font-size: 7.5pt;
+  font-weight: 800;
+  color: rgba(255,255,255,0.9);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.pg-header-num {
+  font-size: 7.5pt;
+  font-weight: 700;
+  color: rgba(255,255,255,0.7);
+}
+
+.pg-body {
+  flex: 1;
+  padding: 6mm 12mm 18mm;
+  display: flex;
+  flex-direction: column;
+  gap: 5mm;
+}
+
+.pg-footer {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 10mm;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12mm;
+  background: color-mix(in srgb, var(--p) 6%, #fff);
+  border-top: 1.5px dashed color-mix(in srgb, var(--p) 25%, #eee);
+}
+.footer-autor {
+  font-size: 7pt; font-weight: 800;
+  color: color-mix(in srgb, var(--p) 55%, #aaa);
+  letter-spacing: 1px; text-transform: uppercase;
+}
+.footer-pg {
+  font-size: 7.5pt; font-weight: 700;
+  color: color-mix(in srgb, var(--p) 45%, #bbb);
+}
+
+/* ── SEÇÃO DE ATIVIDADE ── */
+.ativ-wrap {
+  border: 2.5px solid var(--cor-ativ, #ddd);
+  border-radius: 14px;
+  overflow: hidden;
+  page-break-inside: avoid;
+}
+.ativ-header {
+  background: var(--cor-ativ, #ddd);
+  padding: 3.5mm 5mm;
+  display: flex;
+  align-items: center;
+  gap: 3.5mm;
+}
+.ativ-num {
+  width: 7mm; height: 7mm;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8.5pt; font-weight: 900; color: #fff;
+  flex-shrink: 0;
+}
+.ativ-titulo {
+  font-size: 11.5pt;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.2;
+  flex: 1;
+}
+.ativ-body {
+  padding: 4mm 5mm 5mm;
+  background: #fff;
+}
+.ativ-instrucao {
+  font-size: 10pt;
+  font-weight: 700;
+  color: var(--cor-ativ, #555);
+  margin-bottom: 3.5mm;
+  line-height: 1.45;
+  display: flex;
+  align-items: flex-start;
+  gap: 2.5mm;
+}
+.ativ-instrucao::before {
+  content: '→';
+  flex-shrink: 0;
+  font-weight: 900;
+}
+
+/* Linhas de resposta */
+.linhas-wrap { display: flex; flex-direction: column; gap: 2.5mm; }
+.linha-resp {
+  border-bottom: 2px dashed color-mix(in srgb, var(--cor-ativ, #aaa) 40%, #ddd);
+  height: 7.5mm;
+}
+
+/* Colunas de ligar */
+.ligar-grid {
+  display: grid;
+  grid-template-columns: 1fr 16mm 1fr;
+  gap: 2mm;
+  align-items: start;
+}
+.ligar-col { display: flex; flex-direction: column; gap: 2.5mm; }
+.ligar-item {
+  padding: 2.5mm 4mm;
+  background: color-mix(in srgb, var(--cor-ativ, #aaa) 10%, #fff);
+  border: 1.5px solid color-mix(in srgb, var(--cor-ativ, #aaa) 30%, #eee);
+  border-radius: 8px;
+  font-size: 10pt;
+  font-weight: 700;
+  color: var(--ink);
+  text-align: center;
+  line-height: 1.3;
+}
+.ligar-linhas { display: flex; flex-direction: column; justify-content: space-around; padding-top: 1mm; }
+.ligar-linha { border-bottom: 2px dashed color-mix(in srgb, var(--cor-ativ, #aaa) 30%, #ddd); height: 8mm; }
+
+/* Verdadeiro/Falso */
+.vf-list { display: flex; flex-direction: column; gap: 2.5mm; }
+.vf-item {
+  display: flex;
+  align-items: center;
+  gap: 3mm;
+  padding: 3mm 4mm;
+  background: #f9f9ff;
+  border: 1.5px solid #e8e8f8;
+  border-radius: 9px;
+}
+.vf-box {
+  min-width: 14mm;
+  display: flex;
+  gap: 2mm;
+}
+.vf-btn {
+  width: 6mm; height: 6mm;
+  border: 2px solid color-mix(in srgb, var(--cor-ativ, #aaa) 40%, #ccc);
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.vf-label { font-size: 7pt; font-weight: 800; color: var(--cor-ativ, #aaa); }
+.vf-text { font-size: 10pt; font-weight: 600; color: var(--ink); line-height: 1.35; flex: 1; }
+
+/* Completar lacunas */
+.completar-text {
+  font-size: 11pt;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 2.2;
+}
+.lacuna {
+  display: inline-block;
+  border-bottom: 2.5px solid var(--cor-ativ, #aaa);
+  min-width: 28mm;
+  height: 5mm;
+  vertical-align: bottom;
+  margin: 0 1mm;
+}
+
+/* Sequência / ordenar */
+.seq-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3mm;
+}
+.seq-item {
+  border: 2px solid color-mix(in srgb, var(--cor-ativ, #aaa) 35%, #ddd);
+  border-radius: 10px;
+  padding: 3mm;
+  text-align: center;
+  background: color-mix(in srgb, var(--cor-ativ, #aaa) 6%, #fff);
+}
+.seq-num {
+  width: 6mm; height: 6mm;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--cor-ativ, #aaa) 40%, #ddd);
+  margin: 0 auto 2mm;
+  font-size: 8pt; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--cor-ativ, #aaa);
+}
+.seq-texto { font-size: 9pt; font-weight: 700; color: var(--ink); line-height: 1.3; }
+
+/* Palavras cruzadas simplificadas */
+.cruzadinha-grid {
+  display: grid;
+  gap: 1mm;
+}
+.cruzadinha-row { display: flex; gap: 1mm; }
+.cruzadinha-cell {
+  width: 7.5mm; height: 7.5mm;
+  border: 1.5px solid #ccc;
+  border-radius: 2px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8pt; font-weight: 800;
+  background: #fff;
+}
+.cruzadinha-cell.black { background: var(--cor-ativ, #ddd); border-color: transparent; }
+.cruzadinha-cell.num {
+  font-size: 6pt;
+  position: relative;
+}
+.cruzadinha-num-overlay {
+  position: absolute;
+  top: 0.5px; left: 1px;
+  font-size: 5pt;
+  font-weight: 900;
+  color: var(--cor-ativ, #aaa);
+}
+
+/* Palavras para caça */
+.caca-wrap { display: flex; gap: 5mm; align-items: flex-start; }
+.caca-grid { display: flex; flex-direction: column; gap: 0.8mm; flex-shrink: 0; }
+.caca-row { display: flex; gap: 0.8mm; }
+.caca-cell {
+  width: 7mm; height: 7mm;
+  border: 1.2px solid #dde;
+  border-radius: 2px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9pt; font-weight: 800;
+  color: var(--ink);
+  background: #fafafe;
+  font-family: 'Nunito', monospace;
+  letter-spacing: 0;
+}
+.caca-palavras {
+  display: flex;
+  flex-direction: column;
+  gap: 2mm;
+  flex: 1;
+}
+.caca-palavra {
+  display: flex;
+  align-items: center;
+  gap: 2.5mm;
+  padding: 2mm 3mm;
+  background: color-mix(in srgb, var(--cor-ativ, #aaa) 10%, #fff);
+  border-radius: 7px;
+  border: 1.5px solid color-mix(in srgb, var(--cor-ativ, #aaa) 25%, #eee);
+}
+.caca-palavra-check {
+  width: 5mm; height: 5mm;
+  border: 2px solid color-mix(in srgb, var(--cor-ativ, #aaa) 45%, #ccc);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.caca-palavra-text { font-size: 10pt; font-weight: 800; color: var(--ink); }
+
+/* Colorir por instrução */
+.colorir-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4mm;
+}
+.colorir-item {
+  border: 2px solid color-mix(in srgb, var(--cor-ativ, #aaa) 35%, #ddd);
+  border-radius: 12px;
+  padding: 4mm;
+  text-align: center;
+  background: #fcfcff;
+}
+.colorir-icon { font-size: 28pt; line-height: 1.2; margin-bottom: 2mm; }
+.colorir-nome { font-size: 9.5pt; font-weight: 800; color: var(--ink); margin-bottom: 2mm; }
+.colorir-cor-badge {
+  display: inline-block;
+  font-size: 8pt; font-weight: 800;
+  padding: 1mm 3mm;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--cor-ativ, #aaa) 18%, #fff);
+  color: var(--cor-ativ, #555);
+  border: 1.5px solid color-mix(in srgb, var(--cor-ativ, #aaa) 35%, #ddd);
+}
+
+/* Gabarito */
+.gabarito-box {
+  background: #f0fff4;
+  border: 2px dashed #6BCB77;
+  border-radius: 14px;
+  padding: 5mm 6mm;
+  margin-top: 4mm;
+}
+.gabarito-label {
+  font-size: 8pt; font-weight: 900;
+  color: #22863a; letter-spacing: 1.5px;
+  text-transform: uppercase; margin-bottom: 2.5mm;
+}
+.gabarito-text {
+  font-size: 10pt; font-weight: 600;
+  color: #1a472a; line-height: 1.6;
+}
+
+/* ════════════ CONTRACAPA ════════════ */
+.contracapa {
+  width: 210mm;
+  min-height: 297mm;
+  background: linear-gradient(145deg, var(--p) 0%, var(--s) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16mm;
+  position: relative;
+  overflow: hidden;
+}
+.contracapa::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.5) 1.5px, transparent 1.5px);
+  background-size: 14mm 14mm;
+  opacity: 0.15;
+}
+.cc-icon { font-size: 64pt; line-height: 1; margin-bottom: 8mm; position: relative; z-index: 2; }
+.cc-icon svg { display: block; }
+.cc-titulo {
+  font-family: 'Nunito', sans-serif;
+  font-size: 24pt; font-weight: 900;
+  color: #fff; text-align: center;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  margin-bottom: 4mm; line-height: 1.2;
+  position: relative; z-index: 2;
+}
+.cc-autor {
+  font-size: 12pt; font-weight: 800;
+  color: rgba(255,255,255,0.78);
+  text-align: center; margin-bottom: 10mm;
+  position: relative; z-index: 2;
+}
+.cc-div {
+  width: 20mm; height: 1.2mm;
+  background: rgba(255,255,255,0.5);
+  border-radius: 2mm;
+  margin: 0 auto 10mm;
+  position: relative; z-index: 2;
+}
+.cc-estrelas {
+  display: flex; gap: 3mm;
+  margin-bottom: 14mm;
+  position: relative; z-index: 2;
+}
+.cc-estrela {
+  width: 10mm; height: 10mm;
+  background: rgba(255,255,255,0.3);
+  clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+}
+.cc-copy {
+  position: absolute;
+  bottom: 8mm; left: 0; right: 0;
+  font-size: 8pt; font-weight: 700;
+  color: rgba(255,255,255,0.35);
+  text-align: center;
+}
+</style>
+</head>
+<body>
+<div id="doc"></div>
+
+<script>
+/* __CRIADOR_DATA__ */
+
+(function(){
+  const d = window.__D;
+  if (!d) return;
+
+  // Paleta de cores vibrantes por sequência de atividade
+  const PALETA_ATIVS = ['#FF6B6B','#4D96FF','#6BCB77','#C77DFF','#FF9F43','#00CEC9','#E84393','#F9A825'];
+  const KIDS_SVGS = {
+    atividade_infantil: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="56" height="56"><circle cx="24" cy="24" r="18" fill="rgba(255,255,255,0.25)" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/><path d="M16 20 Q24 14 32 20" stroke="rgba(255,255,255,0.85)" stroke-width="2.5" stroke-linecap="round" fill="none"/><circle cx="18" cy="22" r="2" fill="rgba(255,255,255,0.9)"/><circle cx="30" cy="22" r="2" fill="rgba(255,255,255,0.9)"/><path d="M18 30 Q24 35 30 30" stroke="rgba(255,255,255,0.85)" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg>`,
+    plano_de_aula: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="56" height="56"><rect x="10" y="6" width="28" height="36" rx="3" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.55)" stroke-width="1.5"/><line x1="16" y1="15" x2="32" y2="15" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round"/><line x1="16" y1="21" x2="32" y2="21" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" stroke-linecap="round"/><line x1="16" y1="27" x2="26" y2="27" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" stroke-linecap="round"/><rect x="16" y="32" width="5" height="5" rx="1" fill="rgba(255,255,255,0.5)"/><polyline points="17,34.5 18.5,36 21,33" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
+    receita: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="56" height="56"><path d="M14 10 Q14 6 18 6 L18 16 Q14 16 14 12Z" fill="rgba(255,255,255,0.6)"/><rect x="16" y="6" width="3" height="10" fill="rgba(255,255,255,0.4)"/><ellipse cx="24" cy="30" rx="14" ry="12" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/><path d="M20 26 Q24 22 28 26" stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-linecap="round" fill="none"/><circle cx="24" cy="32" r="3" fill="rgba(255,255,255,0.6)"/></svg>`,
+    proposta: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="56" height="56"><rect x="8" y="8" width="32" height="32" rx="4" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/><line x1="15" y1="17" x2="33" y2="17" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round"/><line x1="15" y1="23" x2="33" y2="23" stroke="rgba(255,255,255,0.55)" stroke-width="1.5" stroke-linecap="round"/><line x1="15" y1="29" x2="25" y2="29" stroke="rgba(255,255,255,0.55)" stroke-width="1.5" stroke-linecap="round"/><circle cx="34" cy="34" r="8" fill="rgba(255,255,255,0.35)" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/><polyline points="30,34 33,37 38,31" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
+    roteiro_live: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="56" height="56"><rect x="6" y="12" width="36" height="22" rx="4" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/><circle cx="24" cy="23" r="7" fill="rgba(255,255,255,0.3)"/><polygon points="21,20 21,26 29,23" fill="rgba(255,255,255,0.85)"/><line x1="14" y1="38" x2="34" y2="38" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round"/><circle cx="38" cy="14" r="5" fill="#FF6B6B"/><line x1="36" y1="14" x2="40" y2="14" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><line x1="38" y1="12" x2="38" y2="16" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  };
+
+  document.documentElement.style.setProperty('--p', d.cores.primaria);
+  document.documentElement.style.setProperty('--s', d.cores.secundaria);
+
+  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function paras(t){ return String(t||'').split(/\n+/).filter(Boolean).map(p=>`<p style="margin-bottom:2.5mm">${esc(p)}</p>`).join(''); }
+
+  let pgNum = 0;
+  function footer(){
+    pgNum++;
+    return `<div class="pg-footer">
+      <span class="footer-autor">${esc(d.autor)}</span>
+      <span class="footer-pg">${pgNum}</span>
+    </div>`;
+  }
+  function header(label){
+    return `<div class="pg-header">
+      <span class="pg-header-titulo">${esc(d.titulo||'')}</span>
+      <span class="pg-header-num">${esc(label||'')}</span>
+    </div>`;
+  }
+
+  const capaIcon = KIDS_SVGS[d.tipo] || KIDS_SVGS.atividade_infantil;
+  let html = '';
+
+  /* ════════ CAPA ════════ */
+  html += `<div class="page">
+    <div class="capa">
+      <div class="capa-confetti"></div>
+      <div class="capa-faixa">
+        <div class="capa-badge">${esc(d.label_tipo)}</div>
+        <div class="capa-icon">${capaIcon}</div>
+        <div class="capa-titulo">${esc(d.titulo||'')}</div>
+        <div class="capa-subtitulo">${esc(d.subtitulo||d.nicho||'')}</div>
+      </div>
+      <div class="capa-body">
+        <div class="capa-info-grid">
+          ${d.ano_escolar?`<div class="capa-info-item"><div class="capa-info-label">Ano escolar</div><div class="capa-info-val">${esc(d.ano_escolar)}</div></div>`:''}
+          ${d.componente?`<div class="capa-info-item"><div class="capa-info-label">Componente</div><div class="capa-info-val">${esc(d.componente)}</div></div>`:''}
+          ${d.duracao?`<div class="capa-info-item"><div class="capa-info-label">Duração</div><div class="capa-info-val">${esc(d.duracao)}</div></div>`:''}
+          ${d.habilidade_bncc?`<div class="capa-info-item"><div class="capa-info-label">Habilidade BNCC</div><div class="capa-info-val">${esc(d.habilidade_bncc)}</div></div>`:''}
+          ${d.dificuldade?`<div class="capa-info-item"><div class="capa-info-label">Nível</div><div class="capa-info-val">${esc(d.dificuldade)}</div></div>`:''}
+          ${d.porcoes?`<div class="capa-info-item"><div class="capa-info-label">Porções</div><div class="capa-info-val">${esc(d.porcoes)}</div></div>`:''}
+        </div>
+        ${d.objetivo?`<div class="capa-objetivo-box"><div class="capa-objetivo-label">🎯 Objetivo</div><div class="capa-objetivo-text">${esc(d.objetivo)}</div></div>`:''}
+      </div>
+      <div class="capa-footer">
+        <span class="capa-autor">por ${esc(d.autor)} · ${d.ano}</span>
+        <div class="capa-estrelas">${Array(5).fill('<div class="estrela"></div>').join('')}</div>
+      </div>
+    </div>
+  </div>`;
+
+  /* ════════ ATIVIDADE INFANTIL ════════ */
+  if (d.tipo === 'atividade_infantil') {
+    (d.atividades||[]).forEach((ativ, i) => {
+      const cor = PALETA_ATIVS[i % PALETA_ATIVS.length];
+      let conteudoHtml = '';
+
+      if (ativ.tipo === 'ligar_colunas' && ativ.colunaA && ativ.colunaB) {
+        const max = Math.max(ativ.colunaA.length, ativ.colunaB.length);
+        conteudoHtml = `<div class="ligar-grid">
+          <div class="ligar-col">${ativ.colunaA.map(x=>`<div class="ligar-item">${esc(x)}</div>`).join('')}</div>
+          <div class="ligar-linhas">${Array(max).fill('<div class="ligar-linha"></div>').join('')}</div>
+          <div class="ligar-col">${ativ.colunaB.map(x=>`<div class="ligar-item">${esc(x)}</div>`).join('')}</div>
+        </div>`;
+      } else if (ativ.tipo === 'verdadeiro_falso' && ativ.itens) {
+        conteudoHtml = `<div class="vf-list">${ativ.itens.map(it=>`
+          <div class="vf-item">
+            <div class="vf-box">
+              <div><div class="vf-btn"></div><div class="vf-label">V</div></div>
+              <div><div class="vf-btn"></div><div class="vf-label">F</div></div>
+            </div>
+            <div class="vf-text">${esc(it)}</div>
+          </div>
+        `).join('')}</div>`;
+      } else if (ativ.tipo === 'completar' && ativ.texto) {
+        const textoHtml = ativ.texto.replace(/___+/g, '<span class="lacuna"></span>');
+        conteudoHtml = `<div class="completar-text">${textoHtml}</div>`;
+        if (ativ.palavras_banco) {
+          conteudoHtml += `<div style="margin-top:3.5mm;padding:3mm 4mm;background:#f0f7ff;border:1.5px dashed #4D96FF;border-radius:9px;font-size:9.5pt;font-weight:700;color:#1a3c6e">
+            <strong style="color:#4D96FF">Banco de palavras:</strong> ${ativ.palavras_banco.map(p=>esc(p)).join(' · ')}
+          </div>`;
+        }
+      } else if (ativ.tipo === 'sequencia' && ativ.itens) {
+        conteudoHtml = `<div class="seq-grid">${ativ.itens.map((it,si)=>`
+          <div class="seq-item">
+            <div class="seq-num">${si+1}</div>
+            <div class="seq-texto">${esc(it)}</div>
+          </div>
+        `).join('')}</div>`;
+      } else if (ativ.tipo === 'caca_palavras' && ativ.grade && ativ.palavras) {
+        const gradeRows = ativ.grade.map(row=>
+          `<div class="caca-row">${row.map(c=>`<div class="caca-cell">${esc(c)}</div>`).join('')}</div>`
+        ).join('');
+        conteudoHtml = `<div class="caca-wrap">
+          <div class="caca-grid">${gradeRows}</div>
+          <div class="caca-palavras">
+            <div style="font-size:8.5pt;font-weight:900;color:${cor};text-transform:uppercase;letter-spacing:1.5px;margin-bottom:2mm">Encontre as palavras:</div>
+            ${ativ.palavras.map(p=>`<div class="caca-palavra"><div class="caca-palavra-check"></div><div class="caca-palavra-text">${esc(p)}</div></div>`).join('')}
+          </div>
+        </div>`;
+      } else if (ativ.tipo === 'colorir' && ativ.itens) {
+        conteudoHtml = `<div class="colorir-grid">${ativ.itens.map(it=>`
+          <div class="colorir-item">
+            <div class="colorir-icon">${esc(it.emoji||'🎨')}</div>
+            <div class="colorir-nome">${esc(it.nome||'')}</div>
+            <div class="colorir-cor-badge">🖍 ${esc(it.cor||'')}</div>
+          </div>
+        `).join('')}</div>`;
+      } else {
+        // responder / genérico
+        const nLinhas = ativ.linhas || 4;
+        conteudoHtml = `<div class="linhas-wrap">${Array(nLinhas).fill('<div class="linha-resp"></div>').join('')}</div>`;
+      }
+
+      // Cada atividade numa nova página se i > 1
+      if (i > 0 && i % 2 === 0) {
+        html += `<div class="page">
+          ${header('Atividades')}
+          <div class="pg-body">`;
+      } else if (i === 0) {
+        html += `<div class="page">
+          ${header('Atividades')}
+          <div class="pg-body">`;
+      }
+
+      html += `<div class="ativ-wrap" style="--cor-ativ:${cor}">
+        <div class="ativ-header">
+          <div class="ativ-num">${i+1}</div>
+          <div class="ativ-titulo">${esc(ativ.titulo||'')}</div>
+        </div>
+        <div class="ativ-body">
+          <div class="ativ-instrucao">${esc(ativ.instrucao||'')}</div>
+          ${conteudoHtml}
+        </div>
+      </div>`;
+
+      if (i % 2 === 1 || i === (d.atividades||[]).length - 1) {
+        html += `</div>${footer()}</div>`;
+      }
+    });
+
+    if (d.gabarito) {
+      html += `<div class="page">
+        ${header('Gabarito')}
+        <div class="pg-body">
+          <div class="gabarito-box">
+            <div class="gabarito-label">✅ Gabarito do Professor</div>
+            <div class="gabarito-text">${paras(d.gabarito)}</div>
+          </div>
+        </div>
+        ${footer()}
+      </div>`;
+    }
+
+  /* ════════ PLANO DE AULA ════════ */
+  } else if (d.tipo === 'plano_de_aula') {
+    // Página 1: estrutura geral
+    html += `<div class="page">
+      ${header('Plano de Aula')}
+      <div class="pg-body">
+        ${d.objetivo_geral?`<div class="ativ-wrap" style="--cor-ativ:${PALETA_ATIVS[0]}"><div class="ativ-header"><div class="ativ-titulo">🎯 Objetivo Geral</div></div><div class="ativ-body"><div style="font-size:10.5pt;font-weight:600;color:var(--ink);line-height:1.55">${esc(d.objetivo_geral)}</div></div></div>`:''}
+        ${(d.objetivos_especificos||[]).length?`<div class="ativ-wrap" style="--cor-ativ:${PALETA_ATIVS[1]}"><div class="ativ-header"><div class="ativ-titulo">📌 Objetivos Específicos</div></div><div class="ativ-body">${(d.objetivos_especificos||[]).map((o,i)=>`<div style="display:flex;gap:3mm;padding:2mm 0;border-bottom:1px solid #f0f0f8;font-size:10pt;font-weight:600;color:var(--ink)"><span style="color:${PALETA_ATIVS[1]};font-weight:900">${i+1}.</span>${esc(o)}</div>`).join('')}</div></div>`:''}
+        ${(d.materiais||[]).length?`<div class="ativ-wrap" style="--cor-ativ:${PALETA_ATIVS[2]}"><div class="ativ-header"><div class="ativ-titulo">📦 Materiais Necessários</div></div><div class="ativ-body"><div style="display:grid;grid-template-columns:1fr 1fr;gap:2mm">${(d.materiais||[]).map(m=>`<div style="display:flex;align-items:center;gap:2mm;padding:2mm 3mm;background:#f8fff9;border:1.5px solid #c3f0ca;border-radius:8px;font-size:9.5pt;font-weight:700"><span>✓</span>${esc(m)}</div>`).join('')}</div></div></div>`:''}
+      </div>
+      ${footer()}
+    </div>`;
+
+    // Página 2: desenvolvimento
+    if (d.desenvolvimento) {
+      const dev = d.desenvolvimento;
+      const etapas = [
+        {label:'🌅 Início', cor: PALETA_ATIVS[3], texto: dev.inicio},
+        {label:'⚡ Desenvolvimento', cor: PALETA_ATIVS[4], texto: dev.meio},
+        {label:'🏁 Fechamento', cor: PALETA_ATIVS[5], texto: dev.fim},
+      ].filter(e=>e.texto);
+
+      html += `<div class="page">
+        ${header('Desenvolvimento')}
+        <div class="pg-body">
+          ${etapas.map(e=>`<div class="ativ-wrap" style="--cor-ativ:${e.cor}"><div class="ativ-header"><div class="ativ-titulo">${esc(e.label)}</div></div><div class="ativ-body"><div style="font-size:10pt;font-weight:600;color:var(--ink);line-height:1.65">${paras(e.texto)}</div></div></div>`).join('')}
+          ${d.avaliacao?`<div class="ativ-wrap" style="--cor-ativ:${PALETA_ATIVS[6]}"><div class="ativ-header"><div class="ativ-titulo">📊 Avaliação</div></div><div class="ativ-body"><div style="font-size:10pt;font-weight:600;color:var(--ink);line-height:1.6">${paras(d.avaliacao)}</div></div></div>`:''}
+          ${d.para_casa?`<div class="ativ-wrap" style="--cor-ativ:${PALETA_ATIVS[7]}"><div class="ativ-header"><div class="ativ-titulo">🏠 Para Casa</div></div><div class="ativ-body"><div style="font-size:10pt;font-weight:600;color:var(--ink);line-height:1.6">${paras(d.para_casa)}</div></div></div>`:''}
+        </div>
+        ${footer()}
+      </div>`;
+    }
+
+  /* ════════ RECEITA ════════ */
+  } else if (d.tipo === 'receita') {
+    html += `<div class="page">
+      ${header('Receita')}
+      <div class="pg-body">
+        <div class="ativ-wrap" style="--cor-ativ:${PALETA_ATIVS[0]}">
+          <div class="ativ-header"><div class="ativ-titulo">🧂 Ingredientes</div></div>
+          <div class="ativ-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:2mm">
+              ${(d.ingredientes||[]).map(ing=>`<div style="display:flex;align-items:center;gap:2.5mm;padding:2mm 3mm;background:#fff8f0;border:1.5px solid #ffd0a0;border-radius:8px;font-size:10pt;font-weight:600"><span style="color:${PALETA_ATIVS[0]}">◆</span>${esc(ing)}</div>`).join('')}
+            </div>
+          </div>
+        </div>
+        ${(d.passos||[]).map((p,i)=>`<div class="ativ-wrap" style="--cor-ativ:${PALETA_ATIVS[(i+1)%PALETA_ATIVS.length]}">
+          <div class="ativ-header"><div class="ativ-num">${i+1}</div><div class="ativ-titulo">${esc(p.titulo||`Passo ${i+1}`)}</div></div>
+          <div class="ativ-body"><div style="font-size:10.5pt;font-weight:600;color:var(--ink);line-height:1.6">${esc(p.descricao||'')}</div></div>
+        </div>`).join('')}
+        ${d.dica?`<div style="padding:4mm 5mm;background:#fffbea;border:2px dashed #FFD93D;border-radius:12px;font-size:10pt;font-weight:700;color:#7a5c00"><strong style="color:#c8960c">💡 Dica da Receita:</strong> ${esc(d.dica)}</div>`:''}
+      </div>
+      ${footer()}
+    </div>`;
+
+  /* ════════ PROPOSTA COMERCIAL ════════ */
+  } else if (d.tipo === 'proposta') {
+    (d.secoes||[]).forEach((sec, i) => {
+      if (i % 3 === 0) {
+        if (i > 0) html += `</div>${footer()}</div>`;
+        html += `<div class="page">${header('Proposta')}<div class="pg-body">`;
+      }
+      html += `<div class="ativ-wrap" style="--cor-ativ:${PALETA_ATIVS[i%PALETA_ATIVS.length]}">
+        <div class="ativ-header"><div class="ativ-titulo">${esc(sec.titulo||'')}</div></div>
+        <div class="ativ-body"><div style="font-size:10.5pt;font-weight:600;color:var(--ink);line-height:1.65">${paras(sec.conteudo||'')}</div></div>
+      </div>`;
+      if (i === (d.secoes||[]).length - 1) html += `</div>${footer()}</div>`;
+    });
+
+  /* ════════ ROTEIRO LIVE ════════ */
+  } else if (d.tipo === 'roteiro_live') {
+    const blocos = d.blocos||[];
+    blocos.forEach((b, i) => {
+      if (i % 2 === 0) {
+        if (i > 0) html += `</div>${footer()}</div>`;
+        html += `<div class="page">${header('Roteiro')}<div class="pg-body">`;
+      }
+      const cor = PALETA_ATIVS[i % PALETA_ATIVS.length];
+      html += `<div class="ativ-wrap" style="--cor-ativ:${cor}">
+        <div class="ativ-header">
+          <div class="ativ-num" style="background:rgba(0,0,0,0.15)">${i+1}</div>
+          <div class="ativ-titulo">${esc(b.nome||'')} <span style="font-size:8pt;opacity:.7;font-weight:700">~${b.duracao||'?'}</span></div>
+        </div>
+        <div class="ativ-body">
+          <div style="font-size:10.5pt;line-height:1.75;color:var(--ink);font-weight:600">${paras(b.script||'')}</div>
+          ${b.dica?`<div style="margin-top:3mm;padding:2.5mm 4mm;background:#f0f7ff;border-left:3px solid ${cor};border-radius:0 8px 8px 0;font-size:9.5pt;font-weight:700;color:${cor}">💬 ${esc(b.dica)}</div>`:''}
+        </div>
+      </div>`;
+      if (i === blocos.length - 1) html += `</div>${footer()}</div>`;
+    });
+  }
+
+  /* ════════ CONTRACAPA ════════ */
+  html += `<div class="page">
+    <div class="contracapa">
+      <div class="cc-icon">${capaIcon}</div>
+      <div class="cc-titulo">${esc(d.titulo||'')}</div>
+      <div class="cc-autor">por ${esc(d.autor)}</div>
+      <div class="cc-div"></div>
+      <div class="cc-estrelas">${Array(5).fill('<div class="cc-estrela"></div>').join('')}</div>
+      <div class="cc-copy">© ${d.ano} ${esc(d.autor)} · Todos os direitos reservados</div>
+    </div>
+  </div>`;
+
+  document.getElementById('doc').innerHTML = html;
+})();
+</script>
+</body>
+</html>
