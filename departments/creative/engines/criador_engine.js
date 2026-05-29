@@ -69,6 +69,48 @@ const PALETAS_NICHO = [
   { palavras: ['fotografia','foto','câmera','vídeo','edição','design','criativo','arte','lightroom','premiere','canva','illustrator','audiovisual'], primaria: '#a855f7', secundaria: '#d8b4fe', bg: '#0f0718' },
 ];
 
+// ── Ilustrações por nicho (SVGs locais) ─────────────────────
+const ILUST_DIR = path.join(__dirname, '../../../public/assets/illus');
+const ILUSTRACOES_NICHO = [
+  { palavras: ['meditação','sono','relaxamento','mindfulness','yoga','chakra','respiração','ansiedade'], arquivo: 'meditacao.svg' },
+  { palavras: ['bem-estar','natureza','jardinagem','equilíbrio','paz','tranquilo'], arquivo: 'bem-estar.svg' },
+  { palavras: ['produtividade','rotina','manhã','organização','agenda','planner','hábito'], arquivo: 'manha-produtiva.svg' },
+  { palavras: ['fitness','academia','exercício','treino','musculação','corrida','emagrecer','dieta','corpo'], arquivo: 'fitness.svg' },
+  { palavras: ['finanças','financeiro','orçamento','dívida','economizar','poupança','riqueza'], arquivo: 'financas.svg' },
+  { palavras: ['crescimento','resultado','performance','métricas','análise','dados','renda extra'], arquivo: 'crescimento.svg' },
+  { palavras: ['dinheiro','renda','lucro','faturar','vendas','mei','empreendedor'], arquivo: 'renda.svg' },
+  { palavras: ['marketing digital','instagram','reels','stories','conteúdo','copywriting','funil','leads','afiliado'], arquivo: 'marketing.svg' },
+  { palavras: ['apresentação','comunicação','palestra','oratória','liderança','público'], arquivo: 'apresentacao.svg' },
+  { palavras: ['negócio','empreendimento','startup','plano','estratégia','empresa'], arquivo: 'negocios.svg' },
+  { palavras: ['propósito','caminho','direção','descoberta','desenvolvimento pessoal','mindset','hábitos'], arquivo: 'proposito.svg' },
+  { palavras: ['sonho','desejo','conquista','objetivo','meta','realização','meta'], arquivo: 'sonho.svg' },
+  { palavras: ['educação','professor','escola','bncc','criança','pedagogia','estudo','aprender','enem','concurso'], arquivo: 'educacao.svg' },
+  { palavras: ['relacionamento','amor','namoro','casamento','família','casal','comunicação'], arquivo: 'relacionamento.svg' },
+  { palavras: ['equipe','parceria','trabalho','colaboração','grupo'], arquivo: 'equipe.svg' },
+  { palavras: ['design','arte','fotografia','câmera','criativo','canva','edição','audiovisual'], arquivo: 'criativo.svg' },
+  { palavras: ['podcast','áudio','música','conteúdo digital','gravação','live'], arquivo: 'conteudo.svg' },
+  { palavras: ['pet','cachorro','gato','animal','veterinário','adestramento'], arquivo: 'pet.svg' },
+  { palavras: ['checklist','verificação','lista','protocolo','processo','passo a passo'], arquivo: 'checklist.svg' },
+  { palavras: ['viagem','aventura','lifestyle','moda','estilo','looks'], arquivo: 'lifestyle.svg' },
+  { palavras: ['tecnologia','digital','ia','inteligência artificial','programação','software'], arquivo: 'tecnologia.svg' },
+  { palavras: ['contrato','documento','proposta','acordo','assinatura','jurídico'], arquivo: 'documentos.svg' },
+];
+
+function detectarIlustracao(nicho, tema) {
+  const txt = ((nicho||'') + ' ' + (tema||'')).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  for (const il of ILUSTRACOES_NICHO) {
+    if (il.palavras.some(w => txt.includes(w.normalize('NFD').replace(/[̀-ͯ]/g,'')))) {
+      const filePath = path.join(ILUST_DIR, il.arquivo);
+      if (fs.existsSync(filePath)) return fs.readFileSync(filePath, 'utf8');
+    }
+  }
+  // fallback: pegar aleatório baseado no hash do nicho
+  const files = fs.existsSync(ILUST_DIR) ? fs.readdirSync(ILUST_DIR).filter(f=>f.endsWith('.svg')) : [];
+  if (!files.length) return null;
+  const idx = txt.split('').reduce((a,c)=>a+c.charCodeAt(0),0) % files.length;
+  return fs.readFileSync(path.join(ILUST_DIR, files[idx]), 'utf8');
+}
+
 function detectarPaletaNicho(nicho) {
   const n = (nicho || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
   for (const p of PALETAS_NICHO) {
@@ -603,14 +645,17 @@ async function renderizarPDF(conteudo, params) {
   const templateFile = TIPOS_KIDS.includes(tipo) ? TEMPLATE_KIDS_PATH : TEMPLATE_PATH;
   const templateHtml = fs.readFileSync(templateFile, 'utf8');
 
+  const ilustracaoSvg = !TIPOS_KIDS.includes(tipo) ? detectarIlustracao(params.nicho, params.tema) : null;
+
   const data = {
     ...conteudo,
     tipo,
     cores,
-    label_tipo:  LABELS[tipo] || tipo,
-    autor:       conteudo.autor || params.autor || 'Autor',
-    nicho:       params.nicho   || '',
-    ano:         new Date().getFullYear(),
+    label_tipo:    LABELS[tipo] || tipo,
+    autor:         conteudo.autor || params.autor || 'Autor',
+    nicho:         params.nicho   || '',
+    ano:           new Date().getFullYear(),
+    ilustracao:    ilustracaoSvg  || null,
   };
 
   const html = templateHtml.replace(
