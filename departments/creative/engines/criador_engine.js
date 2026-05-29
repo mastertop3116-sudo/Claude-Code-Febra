@@ -145,13 +145,17 @@ function getPromptSchema(tipo, extensao) {
       "acao_pratica": "tarefa que o leitor faz AGORA: '[Verbo imperativo] [número] [objeto concreto do nicho] em [prazo curto]. [Por que isso funciona em 1 frase.]' (máx 2 linhas)",
       "atencao": "erro comum neste ponto que arruína o resultado — 1 frase direta, começa com 'O erro mais comum aqui é...' (opcional, omita se não há erro relevante)",
       "pontos_chave": ["ponto direto e específico ao nicho — começa com verbo ou número", "idem", "idem"],
-      "citacao": "frase de impacto em 1ª pessoa do autor — algo que ele diria (máx 20 palavras)"
+      "citacao": "frase de impacto em 1ª pessoa do autor — algo que ele diria (máx 20 palavras)",
+      "contraste": { "label_a": "label do lado negativo (ex: Sem Método, O Problema, Antes)", "label_b": "label do lado positivo (ex: Com Método, A Solução, Depois)", "itens_a": ["item negativo específico ao nicho (3–8 palavras)"], "itens_b": ["item positivo correspondente (3–8 palavras)"] },
+      "equacao": { "a": "fator 1 (2–5 palavras)", "sub_a": "legenda opcional do fator 1", "b": "fator 2 (2–5 palavras)", "sub_b": "legenda opcional", "resultado": "resultado final (2–5 palavras)", "sub_r": "legenda do resultado" },
+      "steps_visuais": ["passo 1 em 4–8 palavras", "passo 2", "passo 3"]
     }
   ],
   "conclusao": "conclusão em 1ª pessoa — o que o autor quer que o leitor faça HOJE, com 1 ação concreta e numerada (100 a 150 palavras)",
   "cta": "chamada para ação direta e específica — diz exatamente o que fazer agora (máx 50 palavras)"
 }
-OBRIGATÓRIO: gere de ${qtd} capítulos completos`,
+OBRIGATÓRIO: gere de ${qtd} capítulos completos
+REGRA DOS BLOCOS VISUAIS: use contraste, equacao e steps_visuais com parcimônia — no máximo 1 de cada por capítulo, apenas quando o conteúdo do capítulo tem uma comparação clara (contraste), uma fórmula de 3 elementos (equacao) ou uma sequência de passos (steps_visuais). Se não se encaixar naturalmente, omita o campo.`,
 
     workbook: `Retorne JSON com exatamente esta estrutura:
 {
@@ -167,6 +171,8 @@ OBRIGATÓRIO: gere de ${qtd} capítulos completos`,
       "teoria": "em 1ª pessoa (180 a 250 palavras) — comece com 'Quando eu comecei a trabalhar com isso...' ou 'Uma vez, acompanhei [Nome], [perfil] que...'; mostre o problema, a descoberta e a solução com número concreto.",
       "dica": "dica do autor em 1ª pessoa — o detalhe que faz diferença neste módulo (1-2 linhas)",
       "exemplo_real": "história de alguém que aplicou este módulo: '[Nome], [idade], [cidade] — fez [ação] e obteve [resultado com número] em [prazo]' (máx 3 linhas)",
+      "contraste": { "label_a": "estado antes (ex: Sem Sistema, O Problema)", "label_b": "estado depois (ex: Com Sistema, A Solução)", "itens_a": ["item negativo (3–7 palavras)"], "itens_b": ["item positivo (3–7 palavras)"] },
+      "steps_visuais": ["passo do módulo em 4–8 palavras", "passo 2", "passo 3"],
       "exercicios": [
         {
           "titulo": "nome curto do exercício — verbo + objeto específico do nicho",
@@ -192,6 +198,9 @@ OBRIGATÓRIO: gere de ${qtd} módulos, cada um com 2 a 3 exercícios`,
       "titulo": "nome do passo — verbo imperativo + o quê",
       "descricao": "em 1ª pessoa (250 a 400 palavras) — 'A maioria erra aqui porque [erro].' → 'Eu mesmo errei quando...' → 'O que funciona: [solução com detalhe]'. SEM incluir dica, exemplo e ação aqui — ficam nos campos abaixo.",
       "acoes": ["ação concreta com verbo imperativo + critério de conclusão", "idem", "idem"],
+      "contraste": { "label_a": "estado sem aplicar o passo (ex: Sem este passo)", "label_b": "estado com o passo aplicado", "itens_a": ["consequência negativa (3–7 palavras)"], "itens_b": ["benefício concreto (3–7 palavras)"] },
+      "equacao": { "a": "elemento 1 (2–5 palavras)", "sub_a": "legenda", "b": "elemento 2 (2–5 palavras)", "sub_b": "legenda", "resultado": "resultado (2–5 palavras)", "sub_r": "legenda" },
+      "steps_visuais": ["sub-passo em 4–8 palavras", "sub-passo 2", "sub-passo 3"],
       "dica": "dica do autor em 1ª pessoa — detalhe que não é óbvio neste passo (1-2 linhas)",
       "exemplo_real": "pessoa real que executou este passo: '[Nome], [perfil] — fez [ação] em [prazo] e conseguiu [resultado]' (máx 3 linhas)",
       "acao_pratica": "o que o leitor faz AGORA neste passo: '[Verbo] [número] [coisa] em [prazo]. Critério: [como saber se concluiu].' (máx 2 linhas)"
@@ -199,7 +208,8 @@ OBRIGATÓRIO: gere de ${qtd} módulos, cada um com 2 a 3 exercícios`,
   ],
   "conclusao": "em 1ª pessoa — o autor diz exatamente o que o leitor deve fazer nas próximas 24h (80 a 120 palavras)"
 }
-OBRIGATÓRIO: gere de ${qtd} passos detalhados`,
+OBRIGATÓRIO: gere de ${qtd} passos detalhados
+REGRA DOS BLOCOS VISUAIS: use contraste, equacao e steps_visuais com parcimônia — no máximo 1 de cada por passo, apenas quando o conteúdo pede naturalmente. Se não se encaixar, omita o campo.`,
 
     checklist: `Retorne JSON com exatamente esta estrutura:
 {
