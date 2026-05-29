@@ -4,7 +4,7 @@
 // Image Library — Supabase Storage + Unsplash auto-populate
 //
 // Fluxo:
-//   1. buscarImagemCapa(nicho) → verifica Supabase Storage
+//   1. buscarImagemCapa(nicho) → Supabase Storage (SDK)
 //   2. Se não tem → retorna null + dispara popularNicho() em bg
 //   3. popularNicho() → Unsplash API → salva no Supabase
 //   4. Próxima geração do mesmo nicho → já tem foto
@@ -14,10 +14,10 @@ const https   = require('https');
 const http    = require('http');
 const { URL } = require('url');
 
-const SUPABASE_URL      = process.env.SUPABASE_URL;
-const SUPABASE_KEY      = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const UNSPLASH_KEY      = process.env.UNSPLASH_ACCESS_KEY; // opcional
-const BUCKET            = 'criador-images';
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const UNSPLASH_KEY = process.env.UNSPLASH_ACCESS_KEY;
+const BUCKET       = 'criador-images';
 
 // ── Normaliza nicho para slug de pasta ──────────────────────
 function slugify(texto) {
@@ -83,145 +83,111 @@ const KEYWORDS_EN = {
   'vendas':        'sales business success handshake',
 };
 
-function keywords(nicho, tema) {
-  const slug = slugify(nicho);
+function keywordsEn(nicho, tema) {
+  const slug     = slugify(nicho);
   const temaSlug = slugify(tema || '');
-
-  // Tenta match exato
   for (const [pt, en] of Object.entries(KEYWORDS_EN)) {
     if (slug.includes(pt) || temaSlug.includes(pt)) return en;
   }
-
-  // Fallback: usa o próprio texto (Unsplash entende inglês melhor)
-  const raw = [nicho, tema].filter(Boolean).join(' ');
-  return encodeURIComponent(raw);
+  return [nicho, tema].filter(Boolean).join(' ');
 }
 
-// ── HTTP helper genérico ─────────────────────────────────────
+// ── Supabase client lazy ─────────────────────────────────────
+let _supa = null;
+function getSupa() {
+  if (_supa) return _supa;
+  if (!SUPABASE_URL || !SUPABASE_KEY) return null;
+  const { createClient } = require('@supabase/supabase-js');
+  _supa = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: { persistSession: false },
+  });
+  return _supa;
+}
+
+// ── HTTP helper (para Unsplash e download de imagens) ────────
 function httpGet(urlStr, headers = {}) {
   return new Promise((resolve, reject) => {
     const parsed = new URL(urlStr);
-    const lib = parsed.protocol === 'https:' ? https : http;
-    const opts = {
+    const lib    = parsed.protocol === 'https:' ? https : http;
+    const opts   = {
       hostname: parsed.hostname,
       path:     parsed.pathname + parsed.search,
       headers:  { 'User-Agent': 'MAX-Criador/1.0', ...headers },
     };
     lib.get(opts, res => {
-      // Seguir redirect
-      if (res.statusCode === 301 || res.statusCode === 302 || res.statusCode === 307) {
+      if ([301, 302, 307, 308].includes(res.statusCode)) {
         return httpGet(res.headers.location, headers).then(resolve).catch(reject);
       }
       const chunks = [];
       res.on('data', c => chunks.push(c));
-      res.on('end',  () => resolve({ status: res.statusCode, body: Buffer.concat(chunks), headers: res.headers }));
+      res.on('end',  () => resolve({
+        status:  res.statusCode,
+        body:    Buffer.concat(chunks),
+        headers: res.headers,
+      }));
     }).on('error', reject);
   });
 }
 
-// ── Supabase Storage helpers ─────────────────────────────────
-async function listarFotos(nichoSlug) {
-  const url = `${SUPABASE_URL}/storage/v1/object/list/${BUCKET}`;
-  const body = JSON.stringify({ prefix: `nichos/${nichoSlug}/`, limit: 20 });
-  return new Promise((resolve) => {
-    const parsed = new URL(url);
-    const opts = {
-      hostname: parsed.hostname,
-      path:     parsed.pathname,
-      method:   'POST',
-      headers: {
-        'Content-Type':  'application/json',
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'apikey':        SUPABASE_KEY,
-        'Content-Length': Buffer.byteLength(body),
-      },
-    };
-    const req = https.request(opts, res => {
-      let d = '';
-      res.on('data', c => d += c);
-      res.on('end', () => {
-        try { resolve(JSON.parse(d)); } catch { resolve([]); }
-      });
-    });
-    req.on('error', () => resolve([]));
-    req.write(body);
-    req.end();
-  });
-}
-
-async function uploadFoto(nichoSlug, filename, buffer, mimeType) {
-  const path = `nichos/${nichoSlug}/${filename}`;
-  const url  = `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`;
-  return new Promise((resolve) => {
-    const parsed = new URL(url);
-    const opts = {
-      hostname: parsed.hostname,
-      path:     parsed.pathname,
-      method:   'POST',
-      headers: {
-        'Content-Type':  mimeType || 'image/jpeg',
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'apikey':        SUPABASE_KEY,
-        'Content-Length': buffer.length,
-        'x-upsert':      'false',
-      },
-    };
-    const req = https.request(opts, res => {
-      let d = ''; res.on('data', c => d += c);
-      res.on('end', () => resolve(res.statusCode < 300));
-    });
-    req.on('error', () => resolve(false));
-    req.write(buffer);
-    req.end();
-  });
-}
-
-function getPublicUrl(nichoSlug, filename) {
-  return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/nichos/${nichoSlug}/${filename}`;
-}
-
-// ── Buscar foto no Supabase ──────────────────────────────────
+// ── Buscar foto no Supabase Storage (SDK) ───────────────────
 async function buscarImagemCapa(nicho) {
-  if (!SUPABASE_URL || !SUPABASE_KEY) return null;
   try {
-    const slug  = slugify(nicho);
-    const files = await listarFotos(slug);
-    if (!Array.isArray(files) || files.length === 0) return null;
+    const supa = getSupa();
+    if (!supa) return null;
 
-    // Escolhe aleatoriamente entre as disponíveis
-    const fotos  = files.filter(f => f.name && f.name !== '.emptyFolderPlaceholder');
+    const slug = slugify(nicho);
+    const { data: files, error } = await supa.storage
+      .from(BUCKET)
+      .list(`nichos/${slug}`, { limit: 20, sortBy: { column: 'name', order: 'asc' } });
+
+    if (error || !files || files.length === 0) return null;
+
+    const fotos = files.filter(f => f.name && !f.name.startsWith('.'));
     if (!fotos.length) return null;
-    const escolha = fotos[Math.floor(Math.random() * fotos.length)];
-    const url = getPublicUrl(slug, escolha.name);
 
-    // Converte para base64 (embedding inline no HTML → Puppeteer não precisa de rede)
-    const { status, body, headers: h } = await httpGet(url);
-    if (status !== 200) return null;
+    // Escolhe aleatoriamente
+    const escolha = fotos[Math.floor(Math.random() * fotos.length)];
+    const { data: urlData } = supa.storage
+      .from(BUCKET)
+      .getPublicUrl(`nichos/${slug}/${escolha.name}`);
+
+    const publicUrl = urlData?.publicUrl;
+    if (!publicUrl) return null;
+
+    // Converte para base64 inline (Puppeteer não precisa de rede)
+    const { status, body, headers: h } = await httpGet(publicUrl);
+    if (status !== 200 || !body.length) return null;
+
     const mime = h['content-type'] || 'image/jpeg';
     return `data:${mime};base64,${body.toString('base64')}`;
+
   } catch (e) {
     console.error('[imageLibrary] buscarImagemCapa:', e.message);
     return null;
   }
 }
 
-// ── Popular nicho via Unsplash (fire and forget) ─────────────
+// ── Popular nicho via Unsplash (background) ─────────────────
 async function popularNicho(nicho, tema) {
-  if (!UNSPLASH_KEY) {
-    // Sem chave: silencia, tenta de novo quando a chave for adicionada
-    return;
-  }
+  if (!UNSPLASH_KEY) return;
   try {
+    const supa = getSupa();
+    if (!supa) return;
+
     const slug = slugify(nicho);
-    const kw   = keywords(nicho, tema);
 
-    // Checar se já tem fotos (evitar duplicar)
-    const existentes = await listarFotos(slug);
-    const fotos = Array.isArray(existentes) ? existentes.filter(f => f.name && f.name !== '.emptyFolderPlaceholder') : [];
-    if (fotos.length >= 3) return; // já tem suficiente
+    // Verificar quantas fotos já tem
+    const { data: existentes } = await supa.storage
+      .from(BUCKET)
+      .list(`nichos/${slug}`, { limit: 20 });
 
-    const qtd = 5 - fotos.length;
+    const qtdAtual = (existentes || []).filter(f => f.name && !f.name.startsWith('.')).length;
+    if (qtdAtual >= 3) return; // já tem suficiente
+
+    const qtd = Math.min(5 - qtdAtual, 5);
+    const kw  = keywordsEn(nicho, tema);
     const apiUrl = `https://api.unsplash.com/photos/random?query=${encodeURIComponent(kw)}&count=${qtd}&orientation=portrait`;
+
     const { status, body } = await httpGet(apiUrl, {
       'Authorization': `Client-ID ${UNSPLASH_KEY}`,
       'Accept-Version': 'v1',
@@ -236,16 +202,28 @@ async function popularNicho(nicho, tema) {
       try {
         const imgUrl = foto.urls?.regular || foto.urls?.small;
         if (!imgUrl) continue;
+
         const { status: s, body: imgBuffer, headers: h } = await httpGet(imgUrl);
-        if (s !== 200) continue;
+        if (s !== 200 || !imgBuffer.length) continue;
+
         const mime = h['content-type'] || 'image/jpeg';
         const ext  = mime.includes('png') ? 'png' : 'jpg';
         const nome = `${Date.now()}-${salvos}.${ext}`;
-        const ok   = await uploadFoto(slug, nome, imgBuffer, mime);
-        if (ok) salvos++;
+
+        const { error } = await supa.storage
+          .from(BUCKET)
+          .upload(`nichos/${slug}/${nome}`, imgBuffer, {
+            contentType: mime,
+            upsert: false,
+          });
+
+        if (!error) salvos++;
       } catch (_) {}
     }
-    if (salvos > 0) console.log(`[imageLibrary] ${salvos} fotos salvas para nicho: ${nicho}`);
+
+    if (salvos > 0) {
+      console.log(`[imageLibrary] ${salvos} foto(s) salva(s) para nicho: ${nicho}`);
+    }
   } catch (e) {
     console.error('[imageLibrary] popularNicho:', e.message);
   }

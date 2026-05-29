@@ -178,7 +178,7 @@ function getPromptSchema(tipo, extensao) {
   "titulo": "título poderoso e específico (máx 12 palavras, sem ponto final)",
   "subtitulo": "subtítulo que reforça o benefício principal (máx 20 palavras)",
   "autor": "nome do autor",
-  "introducao": "introdução em 1ª pessoa — comece com 'Quando eu...' ou 'Eu lembro de...' — conte por que o autor criou este material, inclua 1 situação concreta com número ou resultado (150 a 200 palavras)",
+  "introducao": "em 1ª pessoa — ESTRUTURA OBRIGATÓRIA: (1) abra com cena específica vivida pelo autor ('Quando eu tinha X anos e...', ou 'Num domingo às 23h, eu...'); (2) descreva o momento de virada com detalhe sensorial; (3) apresente o problema central do nicho com número; (4) explique o que este e-book entrega e por que é diferente; (5) cite 1 caso real com nome brasileiro, resultado com número e prazo. (220 a 300 palavras — NUNCA menos que 200)",
   "capitulos": [
     {
       "numero": 1,
@@ -206,7 +206,7 @@ REGRA DOS BLOCOS VISUAIS: use contraste, equacao e steps_visuais com parcimônia
   "titulo": "título do workbook (máx 12 palavras)",
   "subtitulo": "resultado concreto e mensurável que o leitor terá ao completar",
   "autor": "nome do autor",
-  "introducao": "em 1ª pessoa — conte como o autor descobriu que precisava criar este workbook, inclua 1 resultado real ou estimado ('Quem aplica esse método em 30 dias costuma...') (100 a 150 palavras)",
+  "introducao": "em 1ª pessoa — ESTRUTURA OBRIGATÓRIA: (1) abra com a situação frustrante que o autor viveu antes de criar o método; (2) descreva a descoberta que mudou tudo com detalhe específico; (3) explique como este workbook estrutura o método passo a passo; (4) cite 1 resultado estimado ou real de quem completou ('Quem termina todos os exercícios costuma...') com número. (180 a 250 palavras — NUNCA menos que 160)",
   "modulos": [
     {
       "numero": 1,
@@ -235,7 +235,7 @@ OBRIGATÓRIO: gere de ${qtd} módulos, cada um com 2 a 3 exercícios`,
   "titulo": "título do guia passo a passo (máx 12 palavras)",
   "subtitulo": "promessa central — resultado esperado em [prazo]",
   "autor": "nome do autor",
-  "introducao": "em 1ª pessoa — por que o autor criou este guia, 1 caso concreto de quem aplicou ('Um aluno meu, [Nome], fez isso em [tempo] e conseguiu [resultado com número]') (120 a 180 palavras)",
+  "introducao": "em 1ª pessoa — ESTRUTURA OBRIGATÓRIA: (1) abra com 1 situação concreta vivida pelo autor ou vista por ele, com detalhe específico ('Quando eu tinha [problema], ou Na noite em que atendi [Nome]...'); (2) apresente o problema central do nicho com dado ou número; (3) explique por que este guia existe e o que ele entrega; (4) cite 1 caso real de quem aplicou com nome brasileiro, idade, cidade e resultado mensurável. (200 a 280 palavras — NUNCA menos que 180)",
   "passos": [
     {
       "numero": 1,

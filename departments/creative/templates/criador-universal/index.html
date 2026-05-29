@@ -1031,29 +1031,22 @@ body {
 
 /* ══════════════════════ CALLOUT BOXES ══════════════════════ */
 .cbox {
-  margin: 5mm 0;
-  padding: 4mm 5.5mm;
-  border-radius: 2.5mm;
+  margin: 5.5mm 0;
+  padding: 4.5mm 6mm;
+  border-radius: 3mm;
   page-break-inside: avoid;
 }
 .cbox-label {
   font-family: 'Montserrat', sans-serif;
-  font-size: 6.5pt; font-weight: 700;
-  letter-spacing: 1.5px; text-transform: uppercase;
-  margin-bottom: 2mm;
-  display: flex; align-items: center; gap: 2mm;
+  font-size: 6.5pt; font-weight: 800;
+  letter-spacing: 1.8px; text-transform: uppercase;
+  margin-bottom: 2.5mm;
+  display: flex; align-items: center; gap: 2.5mm;
 }
-.cbox-label::before {
-  content: '';
-  display: inline-block;
-  width: 1.5mm; height: 4mm;
-  border-radius: 1mm;
-  background: currentColor;
-  flex-shrink: 0;
-}
+.cbox-label svg { flex-shrink: 0; opacity: 0.85; }
 .cbox-body {
   font-family: 'Inter', sans-serif;
-  font-size: 9.5pt; line-height: 1.7;
+  font-size: 9.5pt; line-height: 1.75;
 }
 
 /* Dica — âmbar */
@@ -1246,11 +1239,18 @@ body {
   }
 
   // ── Callout boxes ──
-  function boxDica(t)    { return t?`<div class="cbox cbox-dica"><div class="cbox-label">Dica do Autor</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
-  function boxExemplo(t) { return t?`<div class="cbox cbox-exemplo"><div class="cbox-label">Exemplo Real</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
-  function boxPratica(t) { return t?`<div class="cbox cbox-pratica"><div class="cbox-label">Na Pratica — Faca Agora</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
-  function boxAtencao(t) { return t?`<div class="cbox cbox-atencao"><div class="cbox-label">Atencao</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
-  function boxSabia(t)   { return t?`<div class="cbox cbox-sabia"><div class="cbox-label">Voce Sabia?</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
+  // Ícones SVG inline para os callout boxes
+  const ICON_DICA    = `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 1 7 7c0 3-1.8 5.6-4.5 6.7V17H9.5v-1.3C6.8 14.6 5 12 5 9a7 7 0 0 1 7-7zm0 18v2h-1v-2h2zm-1-3h2v-1.5l1.2-.5A5 5 0 0 0 17 9a5 5 0 1 0-10 0 5 5 0 0 0 2.8 4.5l1.2.5V17z"/></svg>`;
+  const ICON_EXEMPLO = `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>`;
+  const ICON_PRATICA = `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2.05v2.02c3.95.49 7 3.85 7 7.93 0 3.21-1.82 6.01-4.5 7.56L13 17v5h5l-1.22-1.22C19.91 19.07 22 15.76 22 12c0-5.18-3.95-9.45-9-9.95zM11 2.05C5.95 2.55 2 6.82 2 12c0 3.76 2.09 7.07 5.22 8.78L6 22h5v-5l-2.5 2.5C6.82 18.01 5 15.21 5 12c0-4.08 3.05-7.44 7-7.93V2.05z"/></svg>`;
+  const ICON_ATENCAO = `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`;
+  const ICON_SABIA   = `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`;
+
+  function boxDica(t)    { return t?`<div class="cbox cbox-dica"><div class="cbox-label">${ICON_DICA} Dica do Autor</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
+  function boxExemplo(t) { return t?`<div class="cbox cbox-exemplo"><div class="cbox-label">${ICON_EXEMPLO} Exemplo Real</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
+  function boxPratica(t) { return t?`<div class="cbox cbox-pratica"><div class="cbox-label">${ICON_PRATICA} Na Pratica — Faca Agora</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
+  function boxAtencao(t) { return t?`<div class="cbox cbox-atencao"><div class="cbox-label">${ICON_ATENCAO} Atencao</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
+  function boxSabia(t)   { return t?`<div class="cbox cbox-sabia"><div class="cbox-label">${ICON_SABIA} Voce Sabia?</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
 
   function boxContraste(obj) {
     if (!obj || !(obj.itens_a||[]).length) return '';
@@ -1817,6 +1817,18 @@ body {
   }
 
   /* ═══════════════ CONTRACAPA ═══════════════ */
+  const FRASES_FECHAMENTO = {
+    ebook:       'Cada página que você leu foi um passo. Agora é hora de agir.',
+    workbook:    'O exercício mais importante é o próximo que você vai fazer.',
+    guia:        'Siga o passo a passo. A consistência vence o talento.',
+    checklist:   'Marque cada item. Um check de cada vez muda tudo.',
+    desafio:     'Você aceitou o desafio. Agora vá até o fim.',
+    planner:     'Quem planeja o dia, possui o dia.',
+    devocional:  'Cada dia com Deus é um novo começo.',
+    script_vsl:  'Palavras certas. Momento certo. Transformação garantida.',
+  };
+  const fraseFechamento = FRASES_FECHAMENTO[d.tipo] || 'O conhecimento só transforma quando colocado em prática.';
+
   html += `<div class="page">
     <div class="contracapa">
       <div class="contracapa-top-bar"></div>
@@ -1824,8 +1836,7 @@ body {
       <div class="contracapa-circle" style="left:-20mm;top:-20mm;right:auto;bottom:auto;width:70mm;height:70mm"></div>
 
       <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;width:100%">
-        <!-- Ícone SVG na contracapa -->
-        <div style="opacity:0.22;margin-bottom:8mm">${capaIcon}</div>
+        <div style="opacity:0.20;margin-bottom:8mm">${capaIcon}</div>
 
         <div class="contracapa-titulo">${esc(d.titulo||'')}</div>
         <div class="contracapa-sub">${esc(d.subtitulo||d.nicho||'')}</div>
@@ -1833,11 +1844,18 @@ body {
         <div class="contracapa-autor">${esc(d.autor)}</div>
         <div class="contracapa-tipo">${esc(d.label_tipo)} · ${d.ano}</div>
 
-        <!-- Frase de fechamento -->
-        <div style="margin-top:14mm;padding:5mm 10mm;border:0.5mm solid rgba(255,255,255,0.14);border-radius:3mm;max-width:140mm;text-align:center">
-          <div style="font-family:'Playfair Display',serif;font-size:10.5pt;font-style:italic;color:rgba(255,255,255,0.45);line-height:1.7">
-            "O conhecimento só transforma quando colocado em prática."
+        <div style="margin-top:14mm;padding:6mm 12mm;border:0.5mm solid rgba(255,255,255,0.14);border-radius:3mm;max-width:145mm;text-align:center;background:rgba(255,255,255,0.03)">
+          <div style="font-family:'Playfair Display',serif;font-size:11pt;font-style:italic;color:rgba(255,255,255,0.5);line-height:1.72">
+            "${esc(fraseFechamento)}"
           </div>
+        </div>
+
+        <div style="margin-top:10mm;display:flex;align-items:center;gap:3mm">
+          <div style="width:4mm;height:0.5mm;background:var(--s);border-radius:1mm;opacity:0.5"></div>
+          <div style="font-family:'Montserrat',sans-serif;font-size:7pt;color:rgba(255,255,255,0.22);letter-spacing:1.5px;text-transform:uppercase">
+            ${esc(d.nicho||d.label_tipo||'')}
+          </div>
+          <div style="width:4mm;height:0.5mm;background:var(--s);border-radius:1mm;opacity:0.5"></div>
         </div>
       </div>
 
