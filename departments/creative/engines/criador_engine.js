@@ -549,6 +549,7 @@ RETORNE SOMENTE O JSON COMPLETO E VÁLIDO.`;
     ],
     response_format: { type: 'json_object' },
     temperature: 0.8,
+    max_tokens: 14000,
   });
 
   const raw = response.choices[0].message.content;
