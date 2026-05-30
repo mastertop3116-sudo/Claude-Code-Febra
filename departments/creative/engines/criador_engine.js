@@ -887,7 +887,7 @@ async function executar(params, onProgress = () => {}) {
     }
 
     onProgress(68, 'Renderizando PDF profissional...');
-    const { pdfBuffer, thumbnailBuffer } = await renderizarPDF(conteudo, { tipo, nicho, autor });
+    const { pdfBuffer, thumbnailBuffer } = await renderizarPDF(conteudo, { tipo, nicho, autor, perspectiva });
 
     onProgress(92, 'Salvando resultado...');
     const titulo = conteudo.titulo || tema || nicho || tipo;
