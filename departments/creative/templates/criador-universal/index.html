@@ -1868,8 +1868,8 @@ body {
     for (var si = 0; si < secoes.length; si++) {
       var sec = secoes[si];
       var args = sec.argumentos || [];
-      for (var ai = 0; ai < args.length; ai += 4) {
-        var grupo = args.slice(ai, ai + 4);
+      for (var ai = 0; ai < args.length; ai += 5) {
+        var grupo = args.slice(ai, ai + 5);
         var isFirst = (ai === 0);
         var argsHtml = '';
         for (var gi = 0; gi < grupo.length; gi++) { argsHtml += renderArg(grupo[gi]); }

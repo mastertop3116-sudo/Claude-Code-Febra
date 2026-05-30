@@ -749,6 +749,7 @@ async function renderizarPDF(conteudo, params) {
     autor:         conteudo.autor || params.autor || 'Autor',
     nicho:         params.nicho   || '',
     ano:           new Date().getFullYear(),
+    perspectiva:   params.perspectiva || null,
     imagem_capa:   imagemCapa   || null,   // foto realista (base64) ou null
     ilustracao:    imagemCapa ? null : (ilustracaoSvg || null), // SVG só quando não tem foto
   };
