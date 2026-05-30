@@ -848,13 +848,14 @@ async function registrarErro(entregaId, rota, erro, contexto) {
 // ── Motor principal ─────────────────────────────────────────
 async function executar(params, onProgress = () => {}) {
   const {
-    tipo      = 'ebook',
-    nicho     = '',
-    publico   = '',
-    tema      = '',
-    tom       = 'conversacional',
-    extensao  = 'medio',
-    autor     = 'Autor',
+    tipo        = 'ebook',
+    nicho       = '',
+    publico     = '',
+    tema        = '',
+    tom         = 'conversacional',
+    extensao    = 'medio',
+    autor       = 'Autor',
+    perspectiva = 'critico_direita',
   } = params;
 
   const { createClient } = require('@supabase/supabase-js');
@@ -875,7 +876,7 @@ async function executar(params, onProgress = () => {}) {
     onProgress(8,  'Preparando estrutura do produto...');
 
     onProgress(20, `Gerando ${LABELS[tipo] || tipo} com IA — aguarde (30–90s)...`);
-    let conteudo = await gerarConteudo({ tipo, nicho, publico, tema, tom, extensao, autor });
+    let conteudo = await gerarConteudo({ tipo, nicho, publico, tema, tom, extensao, autor, perspectiva });
 
     // Valida conteúdo — retry automático se insuficiente
     try {

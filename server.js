@@ -2751,26 +2751,30 @@ app.get('/api/criador/progresso/:jobId', (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no'); // desativa buffer do Nginx/Render
   res.flushHeaders();
 
-  const send = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
+  const send = (data) => { res.write(`data: ${JSON.stringify(data)}\n\n`); if (res.flush) res.flush(); };
+
+  // Heartbeat a cada 20s para manter conexão viva pelo proxy do Render
+  const heartbeat = setInterval(() => { res.write(': ping\n\n'); if (res.flush) res.flush(); }, 20000);
 
   const tick = setInterval(() => {
     const j = criadorJobs.get(req.params.jobId);
-    if (!j) { send({ error: 'Job não encontrado' }); clearInterval(tick); res.end(); return; }
+    if (!j) { send({ error: 'Job não encontrado' }); clearInterval(tick); clearInterval(heartbeat); res.end(); return; }
 
     send({ progress: j.progress, message: j.message, status: j.status });
 
     if (j.status === 'done') {
       send({ done: true, titulo: j.titulo });
-      clearInterval(tick); res.end();
+      clearInterval(tick); clearInterval(heartbeat); res.end();
     } else if (j.status === 'error') {
       send({ error: j.message });
-      clearInterval(tick); criadorJobs.delete(req.params.jobId); res.end();
+      clearInterval(tick); clearInterval(heartbeat); criadorJobs.delete(req.params.jobId); res.end();
     }
   }, 700);
 
-  req.on('close', () => clearInterval(tick));
+  req.on('close', () => { clearInterval(tick); clearInterval(heartbeat); });
 });
 
 // GET /api/criador/resultado/:jobId → payload com PDF base64

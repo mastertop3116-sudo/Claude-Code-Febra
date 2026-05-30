@@ -907,6 +907,7 @@ async function iniciar() {
   goTo(3);
   setProg(0, 'Iniciando…');
   setStep('');
+  startFakeTick();
 
   const params = {
     tipo,
@@ -931,21 +932,52 @@ async function iniciar() {
   } catch(e) { mostrarErro(e.message); }
 }
 
-function ouvirProgresso(id) {
+function ouvirProgresso(id, tentativa = 0) {
   const es = new EventSource('/api/criador/progresso/'+id);
   es.onmessage = evt => {
-    const d = JSON.parse(evt.data);
-    if (d.progress !== undefined) {
-      setProg(d.progress, d.message || '');
-      if (d.progress >= 20 && d.progress < 68) setStep('ia');
-      else if (d.progress >= 68 && d.progress < 92) setStep('pdf');
-      else if (d.progress >= 92) setStep('save');
-    }
-    if (d.done)  { es.close(); fetchResultado(id); }
-    if (d.error) { es.close(); mostrarErro(d.error); }
+    try {
+      const d = JSON.parse(evt.data);
+      if (d.progress !== undefined) {
+        stopFakeTick();
+        setProg(d.progress, d.message || '');
+        if (d.progress >= 20 && d.progress < 68) setStep('ia');
+        else if (d.progress >= 68 && d.progress < 92) setStep('pdf');
+        else if (d.progress >= 92) setStep('save');
+      }
+      if (d.done)  { stopFakeTick(); es.close(); fetchResultado(id); }
+      if (d.error) { stopFakeTick(); es.close(); mostrarErro(d.error); }
+    } catch(_) {}
   };
-  es.onerror = () => { es.close(); mostrarErro('Conexão perdida.'); };
+  es.onerror = () => {
+    es.close();
+    if (tentativa < 8) {
+      // Reconecta automaticamente com delay crescente
+      setTimeout(() => ouvirProgresso(id, tentativa + 1), 2000 + tentativa * 1000);
+    } else {
+      stopFakeTick();
+      mostrarErro('Conexão perdida após várias tentativas. Tente novamente.');
+    }
+  };
 }
+
+// Progresso simulado — avança lentamente até 63% enquanto aguarda o servidor
+let _fakeTicker = null, _fakePct = 0;
+function startFakeTick() {
+  _fakePct = 0;
+  clearInterval(_fakeTicker);
+  const msgs = ['Iniciando…','Pesquisando o nicho…','Criando conteúdo especializado…','Estruturando argumentos…','Revisando dados…','Quase lá…'];
+  _fakeTicker = setInterval(() => {
+    if (_fakePct >= 63) return;
+    const step = _fakePct < 15 ? 3 : _fakePct < 40 ? 1.8 : 0.7;
+    _fakePct = Math.min(_fakePct + step * (0.6 + Math.random()), 63);
+    const msg = msgs[Math.min(Math.floor(_fakePct / 11), msgs.length-1)];
+    document.getElementById('prog-fill').style.width = _fakePct + '%';
+    document.getElementById('prog-pct').textContent  = Math.floor(_fakePct) + '%';
+    document.getElementById('prog-msg').textContent  = msg;
+    if (_fakePct >= 15) setStep('ia');
+  }, 900);
+}
+function stopFakeTick() { clearInterval(_fakeTicker); _fakeTicker = null; }
 
 async function fetchResultado(id) {
   setProg(100, 'Produto pronto!');
