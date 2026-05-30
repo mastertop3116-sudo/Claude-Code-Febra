@@ -15,7 +15,7 @@ const http    = require('http');
 const { URL } = require('url');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 const UNSPLASH_KEY = process.env.UNSPLASH_ACCESS_KEY;
 const BUCKET       = 'criador-images';
 
