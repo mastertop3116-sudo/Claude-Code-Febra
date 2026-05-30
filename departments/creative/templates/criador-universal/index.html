@@ -1864,25 +1864,36 @@ body {
         + '</div>'
         + '</div>';
     }
-    // Páginas de argumentos — 4 argumentos por página
+    // Fluxo contínuo — coleta todos os argumentos e pagina globalmente (sem sobras por seção)
+    var allItems = [];
     for (var si = 0; si < secoes.length; si++) {
       var sec = secoes[si];
-      var args = sec.argumentos || [];
-      for (var ai = 0; ai < args.length; ai += 5) {
-        var grupo = args.slice(ai, ai + 5);
-        var isFirst = (ai === 0);
-        var argsHtml = '';
-        for (var gi = 0; gi < grupo.length; gi++) { argsHtml += renderArg(grupo[gi]); }
-        var temaLabel = isFirst
-          ? '<div style="margin-bottom:4mm;padding:2mm 4mm;display:inline-block;background:var(--p);border-radius:1.5mm"><span style="font-family:Montserrat,sans-serif;font-size:8pt;font-weight:800;color:#fff;letter-spacing:1.5px">' + esc((sec.tema||'').toUpperCase()) + '</span></div>'
-          : '';
-        html += '<div class="page" style="padding:10mm 12mm">'
-          + pgHeader(esc(sec.tema || ''))
-          + temaLabel
-          + argsHtml
-          + footer()
-          + '</div>';
+      var secArgs = sec.argumentos || [];
+      for (var ai = 0; ai < secArgs.length; ai++) {
+        allItems.push({ tema: sec.tema || '', arg: secArgs[ai], firstInSec: ai === 0 });
       }
+    }
+    var PER_PAGE = 5;
+    for (var pi = 0; pi < allItems.length; pi += PER_PAGE) {
+      var pageItems = allItems.slice(pi, pi + PER_PAGE);
+      var pageArgsHtml = '';
+      var lastTema = '';
+      for (var ii = 0; ii < pageItems.length; ii++) {
+        var item = pageItems[ii];
+        // Cabeçalho de seção quando muda o tema
+        if (item.firstInSec || item.tema !== lastTema) {
+          pageArgsHtml += '<div style="margin-bottom:3mm;margin-top:' + (ii > 0 ? '5mm' : '0') + ';padding:2mm 4mm;display:inline-block;background:var(--p);border-radius:1.5mm"><span style="font-family:Montserrat,sans-serif;font-size:8pt;font-weight:800;color:#fff;letter-spacing:1.5px">' + esc((item.tema).toUpperCase()) + '</span></div>';
+          lastTema = item.tema;
+        }
+        pageArgsHtml += renderArg(item.arg);
+      }
+      // Cabeçalho do header: tema dominante na página
+      var dominantTema = pageItems[0].tema;
+      html += '<div class="page" style="padding:10mm 12mm">'
+        + pgHeader(esc(dominantTema))
+        + pageArgsHtml
+        + footer()
+        + '</div>';
     }
     // Página "Como Usar no Debate"
     if (d.como_usar_no_debate) {
