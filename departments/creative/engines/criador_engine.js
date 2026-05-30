@@ -861,16 +861,13 @@ async function executar(params, onProgress = () => {}) {
   const { createClient } = require('@supabase/supabase-js');
   const supa = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
-  // Registra a entrega no Supabase
+  // Registra a entrega no Supabase (fire-and-forget — nunca bloqueia a geração)
   let entregaId = null;
-  try {
-    const { data } = await supa
-      .from('entregas')
-      .insert({ tipo, nicho, publico, tema, tom, extensao, autor, parametros: params, status: 'gerando' })
-      .select('id')
-      .single();
-    entregaId = data?.id || null;
-  } catch (_) {}
+  supa.from('entregas')
+    .insert({ tipo, nicho, publico, tema, tom, extensao, autor, parametros: params, status: 'gerando' })
+    .select('id').single()
+    .then(({ data }) => { entregaId = data?.id || null; })
+    .catch(() => {});
 
   try {
     onProgress(8,  'Preparando estrutura do produto...');
