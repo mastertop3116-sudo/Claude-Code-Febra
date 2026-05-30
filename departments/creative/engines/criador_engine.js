@@ -170,6 +170,7 @@ const CORES = {
   receita:           { primaria: '#FF9F43', secundaria: '#ffd0a0', bg: '#fff' },
   proposta:          { primaria: '#6BCB77', secundaria: '#a7f3d0', bg: '#fff' },
   roteiro_live:      { primaria: '#C77DFF', secundaria: '#e9d5ff', bg: '#fff' },
+  debate_politico:   { primaria: '#1d4ed8', secundaria: '#93c5fd', bg: '#020b1a' },
 };
 
 const LABELS = {
@@ -186,6 +187,7 @@ const LABELS = {
   receita:           'Receita',
   proposta:          'Proposta',
   roteiro_live:      'Roteiro de Live',
+  debate_politico:   'Debate Político',
 };
 
 // ── Tom por tipo: autoral (1ª pessoa) ou objetivo (técnico/direto) ──
@@ -198,7 +200,7 @@ const TOM_TIPO = {
 function isTipoObjetivo(tipo) { return TOM_TIPO.objetivo.includes(tipo); }
 
 // ── Schemas JSON por tipo ───────────────────────────────────
-function getPromptSchema(tipo, extensao) {
+function getPromptSchema(tipo, extensao, params = {}) {
   const qtd = extensao === 'longo' ? '10 a 12' : extensao === 'medio' ? '7 a 9' : '5 a 6';
   const wpp  = extensao === 'longo' ? '800 a 1000' : extensao === 'medio' ? '600 a 800' : '400 a 550';
 
@@ -515,7 +517,46 @@ OBRIGATÓRIO: mínimo 3 entregas, 3 diferenciais, 3 próximos passos`,
 OBRIGATÓRIO: mínimo 5 blocos (ABERTURA, CONTEÚDO x2, OFERTA, ENCERRAMENTO), 3 objeções`,
   };
 
-  return schemas[tipo] || schemas.ebook;
+    debate_politico: (perspectiva) => {
+      const qtdSecoes = extensao === 'longo' ? 7 : extensao === 'medio' ? 5 : 4;
+      const qtdArgs   = extensao === 'longo' ? 7 : extensao === 'medio' ? 6 : 5;
+      const labels = {
+        critico_esquerda: 'argumentos baseados em dados que criticam políticas e governos de esquerda no Brasil (PT, Lula, Dilma — use fatos documentados, dados do IBGE/TCU/TSE/Banco Central)',
+        critico_direita:  'argumentos baseados em dados que criticam políticas e governos de direita no Brasil (Bolsonaro, governo 2019-2022 — use fatos documentados, dados do IBGE/TCU/TSE/Banco Central)',
+        balanceado:       'argumentos dos dois lados (esquerda e direita) com dados verificáveis — o leitor recebe munição para qualquer debate',
+      };
+      return `Retorne JSON com exatamente esta estrutura:
+{
+  "titulo": "título chamativo com número (ex: '47 Argumentos com Dados que Encerram Qualquer Debate')",
+  "subtitulo": "subtítulo posicionador (ex: 'Fatos verificáveis que a mídia não coloca em pauta')",
+  "introducao": "por que dados vencem opiniões em debates políticos — 150 a 200 palavras, direto, sem lado político",
+  "secoes": [
+    {
+      "tema": "Economia",
+      "icone": "💰",
+      "argumentos": [
+        {
+          "numero": 1,
+          "afirmacao": "Afirmação direta baseada em dado real (1-2 frases impactantes)",
+          "dado": "Estatística específica com ano — ex: 'Inflação acumulada: 26,3% entre jan/2020 e dez/2022 (IPCA/IBGE)'",
+          "fonte": "Instituição + ano (IBGE 2023, TSE 2022, Banco Central, TCU, PNAD...)",
+          "como_usar": "Como apresentar esse argumento num debate sem parecer panfletário (1 frase)"
+        }
+      ]
+    }
+  ],
+  "como_usar_no_debate": "guia rápido: 3 táticas para usar dados em discussões sem perder a calma (200 palavras)",
+  "aviso_legal": "frase curta: 'Verifique as fontes antes de usar. Dados políticos mudam — consulte sempre a fonte original.'"
+}
+PERSPECTIVA: ${labels[perspectiva] || labels.critico_direita}
+OBRIGATÓRIO: exatamente ${qtdSecoes} seções temáticas (Economia, Segurança Pública, Educação, Saúde, Corrupção/Transparência, Meio Ambiente, Direitos e Democracia — adapte conforme relevância), cada seção com exatamente ${qtdArgs} argumentos.
+USE SOMENTE dados de fontes verificáveis e públicas. NUNCA invente estatísticas. Se não tiver dado concreto, use dados relacionados verificáveis.`;
+    },
+  };
+
+  return typeof schemas[tipo] === 'function'
+    ? schemas[tipo](params.perspectiva)
+    : (schemas[tipo] || schemas.ebook);
 }
 
 // ── Geração de conteúdo via GPT-4o ─────────────────────────
@@ -556,9 +597,11 @@ REGRAS DE OURO (inegociáveis):
 • AÇÃO AO FINAL: toda seção longa termina com 1 tarefa concreta: "[Verbo imperativo] [número] [coisa] [prazo]"
 Retorne SOMENTE JSON válido. Sem markdown. Sem menção a IA ou ChatGPT.`;
 
-  const schema = getPromptSchema(tipo, extensao);
+  const schema = getPromptSchema(tipo, extensao, params);
 
-  const prompt = `Crie um ${LABELS[tipo] || tipo} completo e premium sobre:
+  const prompt = tipo === 'debate_politico'
+    ? `Crie um Arsenal de Argumentos Políticos completo para o nicho: ${nicho}.\nPúblico-alvo: ${publico || 'debatedores políticos brasileiros'}.\n${tema ? `Foco especial em: ${tema}.\n` : ''}Perspectiva: ${params.perspectiva || 'critico_direita'}.\n\n${schema}`
+    : `Crie um ${LABELS[tipo] || tipo} completo e premium sobre:
 
 Nicho: ${nicho}
 Público-alvo: ${publico}
@@ -642,6 +685,15 @@ function validarConteudo(conteudo, tipo, extensao) {
       conteudo.partes.forEach((p, i) => {
         if (!p.script || p.script.length < 50)
           throw new Error(`Parte ${i+1} do VSL sem script ou muito curta`);
+      });
+    },
+    debate_politico: () => {
+      const minSecoes = extensao === 'longo' ? 5 : extensao === 'medio' ? 4 : 3;
+      if (!Array.isArray(conteudo.secoes) || conteudo.secoes.length < minSecoes)
+        throw new Error(`Debate com apenas ${conteudo.secoes?.length || 0} seções — mínimo ${minSecoes}`);
+      conteudo.secoes.forEach((s, i) => {
+        if (!Array.isArray(s.argumentos) || s.argumentos.length < 3)
+          throw new Error(`Seção ${i+1} do debate com menos de 3 argumentos`);
       });
     },
   };

@@ -1816,6 +1816,74 @@ body {
     }
   }
 
+  // ── DEBATE POLÍTICO ──
+  } else if (d.tipo === 'debate_politico') {
+    const secoes = d.secoes || [];
+    const totalArgs = secoes.reduce((s,sec)=>s+(sec.argumentos||[]).length, 0);
+    const perspLab = { critico_esquerda:'Crítico à Esquerda', critico_direita:'Crítico à Direita', balanceado:'Balanceado' };
+    const perspLabel = perspLab[d.perspectiva] || 'Arsenal Completo';
+    // Página introdução
+    html += `<div class="page intro-page">
+      ${pgHeader('Debate Político')}
+      <div class="intro-label">Arsenal de Argumentos com Dados</div>
+      <div class="intro-titulo">${esc(d.titulo)}</div>
+      <div class="intro-sub">${esc(d.subtitulo||'')}</div>
+      <div style="margin:4mm 0 5mm;display:inline-block;padding:2mm 5mm;border-radius:2mm;background:rgba(29,78,216,0.2);border:0.5mm solid rgba(29,78,216,0.5)">
+        <span style="font-family:'Montserrat',sans-serif;font-size:8pt;font-weight:700;color:var(--p);letter-spacing:1px">${esc(perspLabel)}</span>
+      </div>
+      <div style="margin-top:4mm;font-family:'Inter',sans-serif;font-size:9.5pt;color:rgba(20,20,36,0.75);line-height:1.75">${paras(d.introducao||'')}</div>
+      <div style="margin-top:6mm;padding:3mm 5mm;background:rgba(29,78,216,0.06);border-left:1mm solid var(--p);border-radius:0 2mm 2mm 0">
+        <div style="font-family:'Montserrat',sans-serif;font-size:8pt;font-weight:700;color:var(--p)">${totalArgs} ARGUMENTOS ORGANIZADOS EM ${secoes.length} TEMAS</div>
+        <div style="font-family:'Inter',sans-serif;font-size:8pt;color:rgba(20,20,36,0.6);margin-top:1mm">${secoes.map(s=>s.tema||'').join(' · ')}</div>
+      </div>
+      ${footer()}
+    </div>`;
+    // Páginas de argumentos — 4 argumentos por página
+    for (const sec of secoes) {
+      const args = sec.argumentos || [];
+      for (let i = 0; i < args.length; i += 4) {
+        const grupo = args.slice(i, i+4);
+        const isFirst = i === 0;
+        html += `<div class="page" style="padding:10mm 12mm">
+          ${pgHeader(esc(sec.icone||'🗳️') + ' ' + esc(sec.tema||''))}
+          ${isFirst ? `<div style="margin-bottom:4mm;padding:2mm 4mm;display:inline-block;background:var(--p);border-radius:1.5mm"><span style="font-family:'Montserrat',sans-serif;font-size:8pt;font-weight:800;color:#fff;letter-spacing:1.5px">${esc(sec.tema||'').toUpperCase()}</span></div>` : ''}
+          ${grupo.map(arg=>`
+            <div style="margin-bottom:3.5mm;border:0.5mm solid rgba(29,78,216,0.2);border-radius:2.5mm;overflow:hidden">
+              <div style="background:rgba(29,78,216,0.08);padding:2.5mm 4mm;display:flex;align-items:flex-start;gap:3mm">
+                <div style="width:5mm;height:5mm;border-radius:50%;background:var(--p);color:#fff;font-family:'Montserrat',sans-serif;font-size:6.5pt;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:0.5mm">${arg.numero||'•'}</div>
+                <div style="font-family:'Montserrat',sans-serif;font-size:9pt;font-weight:700;color:#141424;line-height:1.4">${esc(arg.afirmacao||'')}</div>
+              </div>
+              <div style="padding:2mm 4mm 2.5mm;display:grid;grid-template-columns:1fr 1fr;gap:2mm">
+                <div style="padding:2mm 3mm;background:rgba(29,78,216,0.04);border-radius:1.5mm">
+                  <div style="font-family:'Montserrat',sans-serif;font-size:6.5pt;font-weight:700;color:var(--p);letter-spacing:.8px;margin-bottom:1mm">📊 DADO</div>
+                  <div style="font-family:'Inter',sans-serif;font-size:8pt;color:#1e1e2e;line-height:1.45">${esc(arg.dado||'')}</div>
+                </div>
+                <div style="padding:2mm 3mm;background:rgba(0,0,0,0.03);border-radius:1.5mm">
+                  <div style="font-family:'Montserrat',sans-serif;font-size:6.5pt;font-weight:700;color:#64748b;letter-spacing:.8px;margin-bottom:1mm">💡 COMO USAR</div>
+                  <div style="font-family:'Inter',sans-serif;font-size:8pt;color:#1e1e2e;line-height:1.45">${esc(arg.como_usar||'')}</div>
+                </div>
+              </div>
+              <div style="padding:1mm 4mm 2mm;border-top:0.3mm solid rgba(29,78,216,0.1)">
+                <span style="font-family:'Inter',sans-serif;font-size:7pt;color:#94a3b8">🔗 Fonte: ${esc(arg.fonte||'')}</span>
+              </div>
+            </div>
+          `).join('')}
+          ${footer()}
+        </div>`;
+      }
+    }
+    // Página "Como Usar no Debate"
+    if (d.como_usar_no_debate) {
+      html += `<div class="page intro-page">
+        ${pgHeader('Debate Político')}
+        <div class="intro-label">Guia Tático</div>
+        <div class="intro-titulo" style="font-size:20pt">Como Usar Esses Argumentos Sem Perder a Calma</div>
+        <div style="margin-top:5mm;font-family:'Inter',sans-serif;font-size:9.5pt;color:rgba(20,20,36,0.78);line-height:1.78">${paras(d.como_usar_no_debate)}</div>
+        ${d.aviso_legal ? `<div style="margin-top:6mm;padding:3mm 5mm;border:0.5mm solid rgba(239,68,68,0.3);border-radius:2mm;background:rgba(239,68,68,0.05)"><span style="font-family:'Inter',sans-serif;font-size:8pt;color:#dc2626">⚠️ ${esc(d.aviso_legal)}</span></div>` : ''}
+        ${footer()}
+      </div>`;
+    }
+
   /* ═══════════════ CONTRACAPA ═══════════════ */
   const FRASES_FECHAMENTO = {
     ebook:       'Cada página que você leu foi um passo. Agora é hora de agir.',
@@ -1825,7 +1893,8 @@ body {
     desafio:     'Você aceitou o desafio. Agora vá até o fim.',
     planner:     'Quem planeja o dia, possui o dia.',
     devocional:  'Cada dia com Deus é um novo começo.',
-    script_vsl:  'Palavras certas. Momento certo. Transformação garantida.',
+    script_vsl:      'Palavras certas. Momento certo. Transformação garantida.',
+    debate_politico: 'Dados não têm partido. Quem conhece os fatos, vence o debate.',
   };
   const fraseFechamento = FRASES_FECHAMENTO[d.tipo] || 'O conhecimento só transforma quando colocado em prática.';
 
