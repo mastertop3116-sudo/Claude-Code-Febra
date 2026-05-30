@@ -515,7 +515,6 @@ OBRIGATÓRIO: mínimo 3 entregas, 3 diferenciais, 3 próximos passos`,
   ]
 }
 OBRIGATÓRIO: mínimo 5 blocos (ABERTURA, CONTEÚDO x2, OFERTA, ENCERRAMENTO), 3 objeções`,
-  };
 
     debate_politico: (perspectiva) => {
       const qtdSecoes = extensao === 'longo' ? 7 : extensao === 'medio' ? 5 : 4;
