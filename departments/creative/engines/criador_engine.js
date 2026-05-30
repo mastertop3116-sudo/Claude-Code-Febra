@@ -89,6 +89,15 @@ const PALETAS_NICHO = [
 
   // 23. Imóveis / Corretagem / Mercado imobiliário
   { palavras: ['imóveis','imoveis','corretor','corretagem','imobiliária','imobiliaria','apartamento','venda de imóveis','lançamento imobiliário'], primaria: '#0f766e', secundaria: '#5eead4', bg: '#030f0d' },
+
+  // 24. Política / Marketing Eleitoral / Gestão Pública — AZUL AUTORIDADE + OURO
+  { palavras: ['política','politica','político','politico','eleição','eleicao','candidato','vereador','prefeito','deputado','senador','mandato','campanha eleitoral','marketing político','marketing politico','gestão pública','gestao publica','servidor público','servidor publico','administração pública','poder executivo','poder legislativo'], primaria: '#1d4ed8', secundaria: '#93c5fd', bg: '#020b1a' },
+
+  // 25. Jurídico / Direito / OAB / Advocacia
+  { palavras: ['direito','jurídico','juridico','advocacia','advogado','oab','contrato','lei','legislação','legislacao','processo','juridico','trabalhista','penal','civil','tributário'], primaria: '#475569', secundaria: '#cbd5e1', bg: '#0a0c10' },
+
+  // 26. Música / Canto / Produção Musical / DJ
+  { palavras: ['música','musica','canto','cantor','cantora','violão','guitarra','piano','produção musical','dj','beat','melodia','vocal','instrumento'], primaria: '#7e22ce', secundaria: '#e9d5ff', bg: '#0d0518' },
 ];
 
 // ── Ilustrações por nicho (SVGs locais) ─────────────────────
