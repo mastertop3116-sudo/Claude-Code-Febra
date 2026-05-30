@@ -821,6 +821,8 @@ async function renderizarPDF(conteudo, params) {
 // ── Salva erro no Supabase com solução automática ───────────
 async function registrarErro(entregaId, rota, erro, contexto) {
   try {
+    // Supabase desativado temporariamente no engine para evitar EFATAL
+    return;
     const { createClient } = require('@supabase/supabase-js');
     const supa = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
@@ -858,16 +860,7 @@ async function executar(params, onProgress = () => {}) {
     perspectiva = 'critico_direita',
   } = params;
 
-  const { createClient } = require('@supabase/supabase-js');
-  const supa = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-
-  // Registra a entrega no Supabase (fire-and-forget — nunca bloqueia a geração)
-  let entregaId = null;
-  supa.from('entregas')
-    .insert({ tipo, nicho, publico, tema, tom, extensao, autor, parametros: params, status: 'gerando' })
-    .select('id').single()
-    .then(({ data }) => { entregaId = data?.id || null; })
-    .catch(() => {});
+  // Analytics de entrega removido do engine — evita EFATAL Supabase que derruba o processo
 
   try {
     onProgress(8,  'Preparando estrutura do produto...');
@@ -898,23 +891,13 @@ async function executar(params, onProgress = () => {}) {
 
     onProgress(92, 'Salvando resultado...');
     const titulo = conteudo.titulo || tema || nicho || tipo;
-    const pdfFilename = `${entregaId || Date.now()}-${tipo}.pdf`;
+    const pdfFilename = `${Date.now()}-${tipo}.pdf`;
 
     // Upload PDF e thumbnail para Storage
     const pdfUrl = await uploadPDF(pdfBuffer, pdfFilename);
     let thumbUrl = null;
     if (thumbnailBuffer) {
       thumbUrl = await uploadPDF(thumbnailBuffer, pdfFilename.replace('.pdf', '-thumb.jpg'));
-    }
-
-    if (entregaId) {
-      await supa.from('entregas').update({
-        status: 'pronto',
-        titulo,
-        conteudo,
-        pdf_url:   pdfUrl,
-        thumb_url: thumbUrl,
-      }).eq('id', entregaId);
     }
 
     onProgress(100, 'Pronto!');
