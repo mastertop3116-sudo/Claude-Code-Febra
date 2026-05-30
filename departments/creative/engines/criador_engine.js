@@ -886,6 +886,20 @@ async function executar(params, onProgress = () => {}) {
       validarConteudo(conteudo, tipo, extensao); // lança se ainda inválido após retry
     }
 
+    // Corrige número de argumentos no título do debate_politico
+    if (tipo === 'debate_politico' && Array.isArray(conteudo.secoes)) {
+      const totalReal = conteudo.secoes.reduce((s, sec) => s + (sec.argumentos?.length || 0), 0);
+      if (totalReal > 0 && conteudo.titulo) {
+        conteudo.titulo = conteudo.titulo.replace(/^\d+/, totalReal);
+      }
+      if (conteudo.introducao) {
+        conteudo.introducao = conteudo.introducao.replace(
+          /\b\d+\s+(argumentos|ARGUMENTOS)\b/g,
+          `${totalReal} argumentos`
+        );
+      }
+    }
+
     onProgress(68, 'Renderizando PDF profissional...');
     const { pdfBuffer, thumbnailBuffer } = await renderizarPDF(conteudo, { tipo, nicho, autor, perspectiva });
 
