@@ -133,16 +133,29 @@ function httpGet(urlStr, headers = {}) {
 async function buscarImagemCapa(nicho) {
   try {
     const supa = getSupa();
-    if (!supa) return null;
+    if (!supa) {
+      console.log('[imageLibrary] getSupa() null — SUPABASE_URL:', !!process.env.SUPABASE_URL, 'KEY:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
+      return null;
+    }
 
     const slug = slugify(nicho);
+    console.log(`[imageLibrary] buscando nicho="${nicho}" slug="${slug}"`);
+
     const { data: files, error } = await supa.storage
       .from(BUCKET)
       .list(`nichos/${slug}`, { limit: 20, sortBy: { column: 'name', order: 'asc' } });
 
-    if (error || !files || files.length === 0) return null;
+    if (error) {
+      console.log(`[imageLibrary] erro ao listar: ${error.message}`);
+      return null;
+    }
+    if (!files || files.length === 0) {
+      console.log(`[imageLibrary] pasta vazia ou inexistente: nichos/${slug}`);
+      return null;
+    }
 
     const fotos = files.filter(f => f.name && !f.name.startsWith('.'));
+    console.log(`[imageLibrary] ${fotos.length} foto(s) encontrada(s) para ${slug}`);
     if (!fotos.length) return null;
 
     // Escolhe aleatoriamente
@@ -152,13 +165,20 @@ async function buscarImagemCapa(nicho) {
       .getPublicUrl(`nichos/${slug}/${escolha.name}`);
 
     const publicUrl = urlData?.publicUrl;
-    if (!publicUrl) return null;
+    if (!publicUrl) {
+      console.log('[imageLibrary] publicUrl nulo');
+      return null;
+    }
 
     // Converte para base64 inline (Puppeteer não precisa de rede)
     const { status, body, headers: h } = await httpGet(publicUrl);
-    if (status !== 200 || !body.length) return null;
+    if (status !== 200 || !body.length) {
+      console.log(`[imageLibrary] download falhou: status=${status} size=${body?.length}`);
+      return null;
+    }
 
     const mime = h['content-type'] || 'image/jpeg';
+    console.log(`[imageLibrary] foto carregada: ${escolha.name} (${body.length} bytes)`);
     return `data:${mime};base64,${body.toString('base64')}`;
 
   } catch (e) {
