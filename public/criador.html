@@ -938,8 +938,11 @@ function ouvirProgresso(id, tentativa = 0) {
     try {
       const d = JSON.parse(evt.data);
       if (d.progress !== undefined) {
-        stopFakeTick();
-        setProg(d.progress, d.message || '');
+        // Só usa progresso do servidor quando for real (>15%) ou quando fake não está rodando
+        if (d.progress > 15 || !_fakeTicker) {
+          stopFakeTick();
+          setProg(d.progress, d.message || '');
+        }
         if (d.progress >= 20 && d.progress < 68) setStep('ia');
         else if (d.progress >= 68 && d.progress < 92) setStep('pdf');
         else if (d.progress >= 92) setStep('save');
