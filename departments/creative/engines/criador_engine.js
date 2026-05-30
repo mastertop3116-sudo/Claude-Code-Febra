@@ -42,8 +42,11 @@ const PALETAS_NICHO = [
   // 8. Relacionamentos / Amor / Psicologia Emocional
   { palavras: ['relacionamento','amor','namoro','casamento','família','psicologia','emoções','trauma','comunicação','separação','autoestima','ansiedade','depressão','apego'], primaria: '#db2777', secundaria: '#fbcfe8', bg: '#180710' },
 
-  // 9. Meditação / Mindfulness / Bem-estar
-  { palavras: ['meditação','mindfulness','bem-estar','estresse','respiração','yoga','equilíbrio','consciência','paz interior','gratidão','chakra','frequência','espiritualidade zen'], primaria: '#06b6d4', secundaria: '#a5f3fc', bg: '#031218' },
+  // 9a. Sono / Dormir / Insônia / Descanso — LUA, NOITE, ÍNDIGO
+  { palavras: ['sono','dormir','insônia','insonia','descanso','noite','acordar','cama','qualidade do sono','higiene do sono','apneia'], primaria: '#818cf8', secundaria: '#c7d2fe', bg: '#06071a' },
+
+  // 9b. Meditação / Mindfulness / Bem-estar — SPA, ZEN, TEAL PROFUNDO
+  { palavras: ['meditação','mindfulness','bem-estar','estresse','respiração','yoga','equilíbrio','consciência','paz interior','gratidão','chakra','frequência','espiritualidade zen'], primaria: '#0d9488', secundaria: '#5eead4', bg: '#031412' },
 
   // 10. Produtividade / Organização / Planner
   { palavras: ['produtividade','organização','planner','rotina','agenda','gestão do tempo','foco','metas','planejamento','método','sistemática','bullet journal','kanban'], primaria: '#0ea5e9', secundaria: '#7dd3fc', bg: '#030f18' },
@@ -57,17 +60,35 @@ const PALETAS_NICHO = [
   // 13. Culinária / Confeitaria / Receitas / Gastronomia
   { palavras: ['confeitaria','bolo','doce','culinária','gastronomia','receita','cozinha','buffet','candy','fitfood','salgado','torta','brigadeiro','bolacha','sobremesa'], primaria: '#f43f5e', secundaria: '#fda4af', bg: '#180309' },
 
-  // 14. Artesanato / Crochê / Costura / DIY
-  { palavras: ['artesanato','crochê','costura','bordado','pintura','customização','patchwork','tricô','feltro','ateliê','handmade','diy','renda','macramê'], primaria: '#14b8a6', secundaria: '#99f6e4', bg: '#041512' },
+  // 14. Artesanato / Crochê / Costura / DIY — TERRACOTA, QUENTE, ARTESANAL
+  { palavras: ['artesanato','crochê','costura','bordado','pintura','customização','patchwork','tricô','feltro','ateliê','handmade','diy','renda','macramê'], primaria: '#c2410c', secundaria: '#fdba74', bg: '#150503' },
 
-  // 15. Pet / Animais / Adestramento
-  { palavras: ['pet','cachorro','gato','animal','veterinário','adestramento','banho e tosa','raça','filhote','tutor','adoção','comportamento animal'], primaria: '#22d3a5', secundaria: '#5eead4', bg: '#051812' },
+  // 15. Pet / Animais / Adestramento — ÂMBAR CALOROSO, AMIGÁVEL
+  { palavras: ['pet','cachorro','gato','animal','veterinário','adestramento','banho e tosa','raça','filhote','tutor','adoção','comportamento animal'], primaria: '#ca8a04', secundaria: '#fde68a', bg: '#130f00' },
 
   // 16. Esportes / Jiu-Jitsu / Luta / Atletismo
   { palavras: ['jiu','luta','esporte','marcial','atleta','competição','futebol','corrida','triathlon','crossfit','musculação','fisiculturismo','boxe','treino esportivo'], primaria: '#ef4444', secundaria: '#fca5a5', bg: '#180707' },
 
   // 17. Fotografia / Vídeo / Design / Arte Digital
   { palavras: ['fotografia','foto','câmera','vídeo','edição','design','criativo','arte','lightroom','premiere','canva','illustrator','audiovisual'], primaria: '#a855f7', secundaria: '#d8b4fe', bg: '#0f0718' },
+
+  // 18. Coaching / Mentoria / Alta Performance
+  { palavras: ['coaching','coach','mentoria','mentor','alta performance','liderança','gestão','lider'], primaria: '#7c3aed', secundaria: '#c4b5fd', bg: '#0d0718' },
+
+  // 19. Maternidade / Gravidez / Bebê / Família com filhos
+  { palavras: ['maternidade','gravidez','bebê','bebe','gestante','amamentação','parto','infantil gestação','mãe e filho','primeira infância'], primaria: '#f472b6', secundaria: '#fbcfe8', bg: '#190710' },
+
+  // 20. Saúde Mental / Psicologia / Terapia / Ansiedade
+  { palavras: ['saúde mental','terapia','terapeuta','psicologia','psicólogo','burnout','equilíbrio emocional','mente sã','bem-estar mental'], primaria: '#8b5cf6', secundaria: '#c4b5fd', bg: '#0c0718' },
+
+  // 21. Idiomas / Inglês / Espanhol / Fluência
+  { palavras: ['inglês','ingles','espanhol','francês','idioma','fluência','fluencia','bilingue','bilíngue','speaking','conversação'], primaria: '#0284c7', secundaria: '#7dd3fc', bg: '#03101a' },
+
+  // 22. Cripto / Blockchain / Web3 / Investimento digital
+  { palavras: ['cripto','crypto','bitcoin','blockchain','web3','nft','defi','token','criptomoeda'], primaria: '#f97316', secundaria: '#fdba74', bg: '#150800' },
+
+  // 23. Imóveis / Corretagem / Mercado imobiliário
+  { palavras: ['imóveis','imoveis','corretor','corretagem','imobiliária','imobiliaria','apartamento','venda de imóveis','lançamento imobiliário'], primaria: '#0f766e', secundaria: '#5eead4', bg: '#030f0d' },
 ];
 
 // ── Ilustrações por nicho (SVGs locais) ─────────────────────
