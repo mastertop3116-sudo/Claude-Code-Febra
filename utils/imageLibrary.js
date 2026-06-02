@@ -73,7 +73,15 @@ const KEYWORDS_EN = {
   'pet':           'dog cat pet happy',
   'cachorro':      'dog puppy cute happy',
   'gato':          'cat kitten cute',
-  'jiu':           'martial arts fight training',
+  'jiu':           'brazilian jiu jitsu martial arts gi',
+  'jitsu':         'brazilian jiu jitsu martial arts gi',
+  'bjj':           'brazilian jiu jitsu grappling',
+  'tatame':        'jiu jitsu martial arts mat training',
+  'luta':          'martial arts fighting training',
+  'judo':          'judo martial arts throw',
+  'karate':        'karate martial arts kick',
+  'capoeira':      'capoeira brazilian martial art',
+  'marcial':       'martial arts training dojo',
   'esporte':       'sport athletic training competition',
   'fotografia':    'photography camera creative studio',
   'design':        'design creative graphic art',
@@ -83,13 +91,23 @@ const KEYWORDS_EN = {
   'vendas':        'sales business success handshake',
 };
 
+const NICHO_KIDS = /(infantil|crian|kids|pequenos|filho|maternal|creche)/;
 function keywordsEn(nicho, tema) {
   const slug     = slugify(nicho);
   const temaSlug = slugify(tema || '');
+  // Escolhe o termo que aparece MAIS CEDO no nicho (o ASSUNTO vem primeiro:
+  // "jiu-jitsu infantil para professores" → assunto é jiu-jitsu, não professor).
+  let best = null, bestPos = Infinity;
   for (const [pt, en] of Object.entries(KEYWORDS_EN)) {
-    if (slug.includes(pt) || temaSlug.includes(pt)) return en;
+    const pn = slug.indexOf(pt);
+    const pt2 = temaSlug.indexOf(pt);
+    const pos = pn >= 0 ? pn : (pt2 >= 0 ? 1000 + pt2 : -1);
+    if (pos >= 0 && pos < bestPos) { bestPos = pos; best = en; }
   }
-  return [nicho, tema].filter(Boolean).join(' ');
+  let kw = best || [nicho, tema].filter(Boolean).join(' ');
+  // Nicho infantil → foca em crianças (evita foto de adulto fora de contexto).
+  if (NICHO_KIDS.test(slug + ' ' + temaSlug) && !/kids|children/.test(kw)) kw += ' kids children';
+  return kw;
 }
 
 // ── Supabase client lazy ─────────────────────────────────────
@@ -132,6 +150,16 @@ function httpGet(urlStr, headers = {}) {
 // ── Buscar foto no Supabase Storage (SDK) ───────────────────
 async function buscarImagemCapa(nicho) {
   try {
+    // 1º) CATÁLOGO local — reusa uma imagem que A GENTE já criou (nunca desperdiçar).
+    try {
+      const { buscarLocal } = require('./catalogoImagens');
+      const local = buscarLocal(nicho, { transparente: false });
+      if (local) {
+        console.log(`[imageLibrary] usando imagem do CATÁLOGO local: ${local.item.arquivo} (nicho ${local.item.nicho})`);
+        return local.dataUri;
+      }
+    } catch (e) { /* catálogo é opcional — segue pro Supabase */ }
+
     const supa = getSupa();
     if (!supa) {
       console.log('[imageLibrary] getSupa() null — SUPABASE_URL:', !!process.env.SUPABASE_URL, 'KEY:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);

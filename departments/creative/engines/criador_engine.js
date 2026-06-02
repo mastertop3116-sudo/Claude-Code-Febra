@@ -13,7 +13,7 @@ const { buscarImagemCapa, popularNicho } = require('../../../utils/imageLibrary'
 
 const TEMPLATE_PATH      = path.join(__dirname, '../templates/criador-universal/index.html');
 const TEMPLATE_KIDS_PATH = path.join(__dirname, '../templates/criador-kids/index.html');
-const TIPOS_KIDS = ['atividade_infantil','plano_de_aula','receita','proposta','roteiro_live'];
+const TIPOS_KIDS = ['atividade_infantil','plano_de_aula','receita','proposta','roteiro_live','ficha_dinamica'];
 
 // ── Paletas por NICHO (sobrepõe paleta por tipo) ────────────
 // Ordem importa: primeiro match vence. Nichos mais específicos vêm antes.
@@ -50,6 +50,10 @@ const PALETAS_NICHO = [
 
   // 10. Produtividade / Organização / Planner
   { palavras: ['produtividade','organização','planner','rotina','agenda','gestão do tempo','foco','metas','planejamento','método','sistemática','bullet journal','kanban'], primaria: '#0ea5e9', secundaria: '#7dd3fc', bg: '#030f18' },
+
+  // 10.5 Artes marciais / Luta (jiu-jitsu, judô, karatê) — cor dominante AZUL (tatame/faixa).
+  // Vem ANTES da educação pra "jiu-jitsu infantil" pegar a cor da LUTA, não a de escola.
+  { palavras: ['jiu-jitsu','jiu jitsu','jiujitsu','jiu','jitsu','bjj','judô','judo','karatê','karate','taekwondo','luta','lutas','tatame','faixa','marcial','grappling','wrestling','muay thai'], primaria: '#2563eb', secundaria: '#60a5fa', bg: '#0a1224' },
 
   // 11. Educação Infantil / Pedagogia / Professor
   { palavras: ['educação','professor','escola','bncc','criança','pedagogia','infantil','aula','plano de aula','alfabetização','ensino fundamental','maternal','creche','aluno','sala de aula'], primaria: '#3b82f6', secundaria: '#93c5fd', bg: '#070f18' },
@@ -170,8 +174,34 @@ const CORES = {
   receita:           { primaria: '#FF9F43', secundaria: '#ffd0a0', bg: '#fff' },
   proposta:          { primaria: '#6BCB77', secundaria: '#a7f3d0', bg: '#fff' },
   roteiro_live:      { primaria: '#C77DFF', secundaria: '#e9d5ff', bg: '#fff' },
+  ficha_dinamica:    { primaria: '#16a34a', secundaria: '#86efac', bg: '#fff' },
   debate_politico:   { primaria: '#1d4ed8', secundaria: '#93c5fd', bg: '#020b1a' },
 };
+
+// ── Cores por FAIXA (graduação) — pinta a página inteira na cor da faixa ──
+// Cada entrada: primaria (cor forte p/ títulos/destaques), secundaria (clara p/ degradês), rotulo (nome exibido).
+const PALETAS_FAIXA = {
+  branca:   { primaria: '#64748b', secundaria: '#cbd5e1', bg: '#fff', rotulo: 'Faixa Branca'  },
+  cinza:    { primaria: '#6b7280', secundaria: '#d1d5db', bg: '#fff', rotulo: 'Faixa Cinza'   },
+  amarela:  { primaria: '#ca8a04', secundaria: '#fde047', bg: '#fff', rotulo: 'Faixa Amarela' },
+  laranja:  { primaria: '#ea580c', secundaria: '#fdba74', bg: '#fff', rotulo: 'Faixa Laranja' },
+  verde:    { primaria: '#16a34a', secundaria: '#86efac', bg: '#fff', rotulo: 'Faixa Verde'   },
+  azul:     { primaria: '#2563eb', secundaria: '#93c5fd', bg: '#fff', rotulo: 'Faixa Azul'    },
+  roxa:     { primaria: '#7c3aed', secundaria: '#c4b5fd', bg: '#fff', rotulo: 'Faixa Roxa'    },
+  marrom:   { primaria: '#92400e', secundaria: '#d6b48c', bg: '#fff', rotulo: 'Faixa Marrom'  },
+  preta:    { primaria: '#1f2937', secundaria: '#9ca3af', bg: '#fff', rotulo: 'Faixa Preta'   },
+  vermelha: { primaria: '#dc2626', secundaria: '#fca5a5', bg: '#fff', rotulo: 'Faixa Vermelha'},
+};
+// Aceita 'azul', 'Faixa Azul', 'faixa-azul', 'blue' etc.
+function paletaFaixa(faixa) {
+  if (!faixa) return null;
+  const f = String(faixa).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const map = { white:'branca', grey:'cinza', gray:'cinza', yellow:'amarela', orange:'laranja',
+                green:'verde', blue:'azul', purple:'roxa', brown:'marrom', black:'preta', red:'vermelha' };
+  for (const chave of Object.keys(PALETAS_FAIXA)) if (f.includes(chave)) return { ...PALETAS_FAIXA[chave], chave };
+  for (const en of Object.keys(map)) if (f.includes(en)) return { ...PALETAS_FAIXA[map[en]], chave: map[en] };
+  return null;
+}
 
 const LABELS = {
   ebook:             'E-book',
@@ -187,6 +217,7 @@ const LABELS = {
   receita:           'Receita',
   proposta:          'Proposta',
   roteiro_live:      'Roteiro de Live',
+  ficha_dinamica:    'Ficha de Dinâmica',
   debate_politico:   'Debate Político',
 };
 
@@ -195,7 +226,7 @@ const LABELS = {
 // devem ser objetivos e diretos — professor/comprador quer usar, não ouvir história pessoal
 const TOM_TIPO = {
   autoral:   ['ebook','workbook','guia','desafio','planner','devocional','script_vsl','roteiro_live'],
-  objetivo:  ['checklist','plano_de_aula','receita','proposta','atividade_infantil'],
+  objetivo:  ['checklist','plano_de_aula','receita','proposta','atividade_infantil','ficha_dinamica'],
 };
 function isTipoObjetivo(tipo) { return TOM_TIPO.objetivo.includes(tipo); }
 
@@ -443,6 +474,26 @@ REGRAS por tipo de atividade:
 - responder: dados = { "perguntas": ["Pergunta 1?","Pergunta 2?","Pergunta 3?"], "linhas_resposta": 3 }
 OBRIGATÓRIO: gere de 3 a 5 atividades variando os tipos`,
 
+    ficha_dinamica: `Retorne JSON com exatamente esta estrutura — uma FICHA DE DINÂMICA prática e lúdica, pronta pro professor aplicar na aula (estilo ficha de atividade esportiva infantil):
+{
+  "titulo": "nome da dinâmica (curto, lúdico e marcante — ex: 'Ginga dos Animais', 'Guerra dos Cones', 'Pega-Pega da Base')",
+  "subtitulo": "uma linha curta de contexto do nicho + 'Kids • Aula prática e lúdica' (ex: 'Jiu-Jitsu Kids - Aula prática e lúdica')",
+  "faixa_etaria": "faixa etária recomendada (ex: '4 a 8 anos', '6 a 12 anos')",
+  "duracao": "duração estimada (ex: '30 a 45 min')",
+  "objetivo": "o que a dinâmica desenvolve na criança — 1 a 2 frases, começa com verbo no infinitivo (ex: 'Trabalhar coordenação, base e atenção de forma divertida')",
+  "materiais": ["material com quantidade (ou 'Espaço livre no tatame' / 'Nenhum' se não precisar)"],
+  "passo_a_passo": [
+    { "titulo": "nome curto do passo (3 a 5 palavras)", "descricao": "instrução CURTA e direta do que fazer — no MÁXIMO 2 frases / 30 palavras. É uma ficha de aplicar na hora, não um texto. Específico do nicho, zero vaguidão." }
+  ],
+  "variacoes": [
+    { "contexto": "ex: 'Para os menores', 'Turmas grandes', 'Para desafiar'", "descricao": "como adaptar — 1 frase curta" }
+  ],
+  "dica_professor": "dica de quem JÁ APLICOU — o detalhe que faz diferença, em 1ª pessoa ('O que funciona pra mim é...'). 1 a 2 linhas curtas.",
+  "o_que_observar": ["sinal/comportamento concreto que mostra se está funcionando — frase curta de até 8 palavras"]
+}
+ESTILO FICHA (CRÍTICO): é uma ficha de UMA PÁGINA pra professor aplicar na hora — TUDO curto, escaneável, direto. NADA de parágrafo longo. Pense em bullet, não em texto.
+OBRIGATÓRIO: 4 a 5 passos no passo_a_passo (cada descrição com no máx 2 frases); exatamente 3 variações (menores / turmas grandes / desafio); 3 a 4 itens em materiais e em o_que_observar. Tudo ESPECÍFICO do nicho.`,
+
     receita: `Retorne JSON com exatamente esta estrutura:
 {
   "titulo": "nome da receita (máx 8 palavras, apetitoso)",
@@ -562,8 +613,6 @@ USE SOMENTE dados de fontes verificáveis e públicas. NUNCA invente estatístic
 async function gerarConteudo(params) {
   const { tipo, nicho, publico, tema, tom, extensao, autor } = params;
 
-  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
   const TONS = {
     profissional:   'formal, com autoridade e linguagem de especialista',
     conversacional: 'direto, próximo, como um amigo especialista falando ao leitor',
@@ -571,30 +620,39 @@ async function gerarConteudo(params) {
     educativo:      'didático, claro, com muitos exemplos e analogias acessíveis',
   };
 
+  // Regras universais de VALOR: o que faz um entregável de referência converter —
+  // profundidade técnica real, contexto cultural do nicho, zero fabricação, zero enchimento.
+  const REGRAS_VALOR = `O QUE ENTREGAR (pra valer o dinheiro):
+• PROFUNDIDADE REAL DE ESPECIALISTA: ensine o COMO exato. Técnicas/métodos NOMEADOS, mecânica precisa, passo a passo, parâmetros e números concretos do nicho. O leitor tem que aprender algo específico que ele NÃO sabia — nunca conselho óbvio ("seja consistente", "use jogos", "tenha paciência").
+• ERRO COMUM em cada parte importante: o erro exato que a maioria comete, POR QUE acontece, e o certo a fazer no lugar.
+• CONTEXTO CULTURAL DO NICHO: use a linguagem, os termos técnicos, as referências e os exemplos REAIS desse universo (${nicho}). Quem é do meio tem que reconhecer "isso é de quem entende de verdade".
+• AÇÃO CONCRETA ao fim de cada seção: um passo prático (verbo imperativo + o quê + como saber que deu certo).
+
+NUNCA FAÇA (mata a credibilidade e entrega que é robô/IA):
+• NÃO invente estatística nem pesquisa ("estudos mostram que 73%...", "uma pesquisa recente revelou..."). Sem fonte real, não cite número de pesquisa.
+• NUNCA invente aluno/cliente/pessoa com NOME PRÓPRIO + idade + resultado ("o Rafael, 9 anos, de Curitiba, virou campeão"). ZERO exceções — nem UM personagem nomeado inventado no material inteiro. As SUAS histórias em 1ª pessoa (o que VOCÊ viveu ou viu de verdade, sem nome+idade+cidade), sim. Quando precisar exemplificar um aluno, use genérico e plausível: "tinha um aluno meu que...", "uma criança da turma...", sem nome próprio nem número de resultado fabricado.
+• NÃO encha com história de origem genérica ("surgiu no Japão feudal", "os antigos mestres...") nem frase de efeito vazia. Cada linha entrega.
+• NÃO use "você pode", "considere", "é possível", "talvez" como frase principal — seja direto.
+
+Retorne SOMENTE JSON válido. Sem markdown. Sem mencionar IA, ChatGPT ou Claude.`;
+
+  // Voz HUMANA em 1ª pessoa — cria identificação com o leitor, não parece texto de IA.
+  const VOZ_HUMANA = `COMO ESCREVER (pra soar HUMANO e criar IDENTIFICAÇÃO — isto é tão importante quanto o conteúdo):
+• VOZ EM 1ª PESSOA, de verdade: abra trechos com coisas como "Quando eu comecei...", "Eu aprendi isso errando feio...", "Demorei pra entender que...", "Confesso que no início eu...". O leitor tem que SENTIR que uma pessoa que JÁ VIVEU isso está falando com ele — nunca um manual frio.
+• IDENTIFICAÇÃO COM A DOR: mostre que você entende quem lê ("você já passou por aquela aula em que nada funcionava?"). Fale a língua dele.
+• NATURAL, nunca formuláico: varie as aberturas (uma cena, uma pergunta cortante, uma frase curta de impacto, uma confissão). Nada de padrão repetido seção após seção.`;
+
   const sistema = isTipoObjetivo(tipo)
-    ? `Você é especialista em ${nicho}. Crie um ${LABELS[tipo] || tipo} completo, objetivo e profissional para o mercado brasileiro.
+    ? `Você é ${autor}, um(a) ESPECIALISTA DE VERDADE em ${nicho} — nível mestre, anos de prática real. Crie um ${LABELS[tipo] || tipo} premium, direto e prático para o mercado brasileiro, no nível de quem domina o assunto e está passando o ouro. Escreva como GENTE, não como IA.
 Tom: ${TONS[tom] || TONS.educativo}
 
-REGRAS (inegociáveis):
-• LINGUAGEM OBJETIVA E DIRETA: sem narrativas pessoais do autor — o leitor quer usar o material, não ler a história de quem criou
-• EXEMPLOS CONCRETOS quando necessário: "[Nome], [perfil], fez [ação] e obteve [resultado com número]" — como referência, não como história pessoal
-• ZERO VAGUEZA: BANIDO "você pode", "é possível", "considere", "pense em", "talvez" — use verbos imperativos e afirmações diretas
-• ESTRUTURA CLARA: títulos, passos numerados, listas objetivas — o leitor precisa usar isso sem adaptar nada
-• AÇÃO CONCRETA: toda seção termina com 1 tarefa com critério de conclusão mensurável
-• ESPECÍFICO AO NICHO: cada item deve fazer sentido somente para quem está neste nicho — zero conteúdo genérico
-Retorne SOMENTE JSON válido. Sem markdown. Sem menção a IA ou ChatGPT.`
-    : `Você é ${autor}, criador de infoprodutos digitais premium para o mercado brasileiro.
-Escreva na SUA voz — primeira pessoa, histórias reais ou plausíveis, descobertas pessoais.
+${REGRAS_VALOR}`
+    : `Você é ${autor}, um(a) ESPECIALISTA DE VERDADE em ${nicho} com anos de prática real, escrevendo um ${LABELS[tipo] || tipo} premium que vai ser VENDIDO. Escreva como GENTE — um mestre do assunto conversando com o leitor — de um jeito que cria identificação e NÃO pareça texto de robô/IA.
 Tom: ${TONS[tom] || TONS.conversacional}
 
-REGRAS DE OURO (inegociáveis):
-• PRIMEIRA PESSOA: "Quando eu comecei...", "Eu aprendi isso do jeito difícil...", "Uma vez, acompanhei a [Nome] que...", "Comigo, a virada aconteceu quando..."
-• PERSONAGENS REAIS: exemplos com nome brasileiro, idade, cidade, número concreto. "A Juliana, 28 anos, de BH, saiu de R$ 4.200 de dívida para zero em 6 meses."
-• ZERO VAGUEZA: BANIDO como frase principal: "você pode", "é possível", "considere", "pense em", "busque", "talvez" — troque por ações diretas e afirmações concretas
-• VARIAÇÃO NARRATIVA: cada seção/capítulo deve ter abertura diferente — às vezes inicia com história, às vezes com dado impactante, às vezes com pergunta cortante — nunca padrão idêntico
-• ANCORAGEM COM NÚMEROS: prazos, percentuais, valores estimados, quantidades — o leitor precisa sentir o chão sob os pés
-• AÇÃO AO FINAL: toda seção longa termina com 1 tarefa concreta: "[Verbo imperativo] [número] [coisa] [prazo]"
-Retorne SOMENTE JSON válido. Sem markdown. Sem menção a IA ou ChatGPT.`;
+${VOZ_HUMANA}
+
+${REGRAS_VALOR}`;
 
   const schema = getPromptSchema(tipo, extensao, params);
 
@@ -613,18 +671,48 @@ ${schema}
 
 RETORNE SOMENTE O JSON COMPLETO E VÁLIDO.`;
 
-  const response = await client.chat.completions.create({
-    model: 'gpt-4o',
-    messages: [
-      { role: 'system', content: sistema },
-      { role: 'user',   content: prompt  },
-    ],
-    response_format: { type: 'json_object' },
-    temperature: 0.8,
-    max_tokens: 14000,
-  });
-
-  const raw = response.choices[0].message.content;
+  // PRINCIPAL: Claude (melhor pra conteúdo). Se falhar (ex: sem crédito Anthropic),
+  // cai automaticamente no GPT-4o — assim o produto NUNCA para. Mesmo prompt nos dois.
+  let raw;
+  // Modelo escolhido na tela: 'gpt' (custo menor) | 'opus' (custo REAL, melhor) | padrão (sonnet).
+  const _escolha = (params && params.modelo) || '';
+  const _usarGpt = _escolha === 'gpt';
+  try {
+    if (_usarGpt) throw new Error('modelo GPT escolhido na tela');
+    const Anthropic = require('@anthropic-ai/sdk');
+    const anthropic = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const MODELO_CLAUDE = _escolha === 'opus' ? 'claude-opus-4-8' : (process.env.CRIADOR_MODELO || 'claude-sonnet-4-6');
+    const response = await anthropic.messages.create({
+      model: MODELO_CLAUDE,
+      max_tokens: 16000,
+      temperature: 0.7,
+      system: sistema,
+      messages: [
+        { role: 'user', content: prompt + '\n\nIMPORTANTE: responda APENAS com o JSON, começando em { e terminando em }. Nada de texto antes ou depois.' },
+      ],
+    });
+    raw = (response.content || []).map(b => b.text || '').join('');
+    console.log(`[criador] conteúdo gerado pelo Claude (${MODELO_CLAUDE})`);
+  } catch (claudeErr) {
+    console.warn(`[criador] Claude indisponível (${String(claudeErr.message).slice(0, 90)}) → usando GPT-4o`);
+    const OpenAI = require('openai');
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const response = await client.chat.completions.create({
+      model: 'gpt-4o',
+      messages: [
+        { role: 'system', content: sistema },
+        { role: 'user',   content: prompt  },
+      ],
+      response_format: { type: 'json_object' },
+      temperature: 0.8,
+      max_tokens: 14000,
+    });
+    raw = response.choices[0].message.content;
+  }
+  raw = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
+  // extrai só o bloco JSON (do primeiro { ao último }) — robusto contra preâmbulo
+  const _i = raw.indexOf('{'), _j = raw.lastIndexOf('}');
+  if (_i > 0 && _j > _i) raw = raw.slice(_i, _j + 1);
 
   try {
     return JSON.parse(raw);
@@ -724,7 +812,9 @@ const uploadPDF = uploadArquivo;
 // ── Renderização PDF via Puppeteer ──────────────────────────
 async function renderizarPDF(conteudo, params) {
   const { tipo, nicho } = params;
-  const cores = detectarPaletaNicho(nicho) || CORES[tipo] || CORES.ebook;
+  // FAIXA tem prioridade: se vier uma faixa (param ou conteúdo), a página inteira usa a cor dela.
+  const _faixa = paletaFaixa(params.faixa || conteudo.faixa);
+  const cores = _faixa || detectarPaletaNicho(nicho) || CORES[tipo] || CORES.ebook;
 
   const templateFile = TIPOS_KIDS.includes(tipo) ? TEMPLATE_KIDS_PATH : TEMPLATE_PATH;
   const templateHtml = fs.readFileSync(templateFile, 'utf8');
@@ -741,28 +831,67 @@ async function renderizarPDF(conteudo, params) {
     }
   }
 
+  // Ficha de dinâmica: usa o mascote 3D salvo da FAIXA (recortado, sem gastar geração).
+  let ilustracaoFicha = conteudo.ilustracao || null;
+  let mascoteFile = null;   // caminho do PNG original (2048) p/ trocar no PDF em alta resolução
+  if (tipo === 'ficha_dinamica' && !ilustracaoFicha) {
+    const _p = require('path');
+    const chave = _faixa && _faixa.chave;
+    // 1) mascote salvo da faixa: preferir versão recortada (-transp), senão a com fundo branco
+    const candidatos = [];
+    if (chave) candidatos.push(`jj-${chave}-transp.png`, `jj-${chave}.png`);
+    candidatos.push('jj-azul-transp.png', 'jj-azul.png'); // fallback genérico
+    for (const nome of candidatos) {
+      const fp = _p.join(__dirname, '../../../assets/mascotes', nome);
+      try { if (fs.existsSync(fp)) { ilustracaoFicha = 'data:image/png;base64,' + fs.readFileSync(fp).toString('base64'); mascoteFile = fp; break; } } catch (e) {}
+    }
+    // 2) fallback final: gera com gpt-image-2 só se não houver nenhum mascote salvo
+    if (!ilustracaoFicha) {
+      try {
+        const { openaiImage } = require('../../../integrations/openai');
+        const promptImg = `A cute 3D rendered cartoon character, Pixar style, of a happy little kid practicing ${nicho}, wearing a white jiu-jitsu gi. Glossy 3D render, full body, centered, plain solid white background, no text.`;
+        const buf = await openaiImage(promptImg, '1024x1024', 'high');
+        ilustracaoFicha = 'data:image/png;base64,' + buf.toString('base64');
+      } catch (e) { console.warn('[criador] ilustração da ficha falhou (segue sem):', e.message); }
+    }
+  }
+
   const data = {
     ...conteudo,
     tipo,
     cores,
+    faixa_rotulo:  _faixa ? _faixa.rotulo : null,   // ex: 'Faixa Azul' — pinta o selo do topo
+    pagina:        params.pagina != null ? params.pagina : null,   // nº da página no pack (senão usa o interno)
     label_tipo:    LABELS[tipo] || tipo,
     autor:         conteudo.autor || params.autor || 'Autor',
     nicho:         params.nicho   || '',
     ano:           new Date().getFullYear(),
     perspectiva:   params.perspectiva || null,
     imagem_capa:   imagemCapa   || null,   // foto realista (base64) ou null
-    ilustracao:    imagemCapa ? null : (ilustracaoSvg || null), // SVG só quando não tem foto
+    ilustracao:    tipo === 'ficha_dinamica'
+                     ? (ilustracaoFicha || null)
+                     : (imagemCapa ? null : (ilustracaoSvg || null)),
   };
 
-  const html = templateHtml.replace(
-    '/* __CRIADOR_DATA__ */',
-    `window.__D = ${JSON.stringify(data)};`
-  );
+  // Fonte Gagalin (títulos/rótulos da ficha) embutida em base64 — setContent não resolve arquivos locais.
+  let fontStyle = '';
+  try {
+    const fontPath = require('path').join(__dirname, '../../../assets/fonts/Gagalin-Regular.otf');
+    const fontB64 = fs.readFileSync(fontPath).toString('base64');
+    fontStyle = `<style>@font-face{font-family:'Gagalin';src:url(data:font/otf;base64,${fontB64}) format('opentype');font-weight:normal;font-style:normal;font-display:block;}</style>`;
+  } catch (e) { console.warn('[criador] fonte Gagalin não embutida (segue sem):', e.message); }
+
+  const html = templateHtml
+    .replace('/* __CRIADOR_DATA__ */', `window.__D = ${JSON.stringify(data)};`)
+    .replace('</head>', fontStyle + '</head>');
 
   const isProd = !!(process.env.NODE_ENV === 'production' || process.env.RENDER);
 
   let browser;
-  const ARGS = ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--font-render-hinting=none'];
+  // Densidade de renderização: 3x faz o Chromium guardar as imagens em ALTA resolução no PDF
+  // (sem isso ele encolhe as imagens, ex: mascote 2048 virava 576px no PDF).
+  const DSF = Number(process.env.PDF_DSF || 1);
+  const ARGS = ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--font-render-hinting=none', `--force-device-scale-factor=${DSF}`];
 
   if (isProd) {
     const chromium      = require('@sparticuz/chromium');
@@ -779,6 +908,7 @@ async function renderizarPDF(conteudo, params) {
 
   try {
     const page = await browser.newPage();
+    await page.setViewport({ width: 794, height: 1123, deviceScaleFactor: DSF });
     await page.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 });
     await new Promise(r => setTimeout(r, 1500));
 
@@ -798,6 +928,7 @@ async function renderizarPDF(conteudo, params) {
     await page.close();
 
     // Injeta metadados internos no PDF (Author, Title, Subject)
+    let outBuffer = rawBuffer;
     try {
       const { PDFDocument } = require('pdf-lib');
       const pdfDoc = await PDFDocument.load(rawBuffer);
@@ -806,13 +937,29 @@ async function renderizarPDF(conteudo, params) {
       pdfDoc.setTitle(titulo);
       pdfDoc.setAuthor(autor);
       pdfDoc.setSubject(params?.nicho || '');
-      pdfDoc.setCreator('MAX Criador — Powered by GPT-4o');
+      pdfDoc.setCreator('MAX Criador');
       pdfDoc.setProducer('MAX Criador');
-      const pdfBytes = await pdfDoc.save();
-      return { pdfBuffer: Buffer.from(pdfBytes), thumbnailBuffer };
-    } catch (_) {
-      return { pdfBuffer: rawBuffer, thumbnailBuffer };
+      outBuffer = Buffer.from(await pdfDoc.save());
+    } catch (_) {}
+
+    // Ficha: troca o mascote encolhido pelo navegador pela imagem 2048 ORIGINAL (mesmo lugar).
+    if (mascoteFile) {
+      try {
+        const cp = require('child_process'), os = require('os'), _p = require('path');
+        const tmpIn  = _p.join(os.tmpdir(), `ficha_${Date.now()}_${Math.random().toString(36).slice(2)}.pdf`);
+        const tmpOut = tmpIn.replace('.pdf', '_hd.pdf');
+        const script = _p.join(__dirname, '../../../replace-mascote.py');
+        fs.writeFileSync(tmpIn, outBuffer);
+        let ok = false;
+        for (const py of [process.env.PYTHON_BIN, 'python', 'python3'].filter(Boolean)) {
+          try { cp.execFileSync(py, [script, tmpIn, mascoteFile, tmpOut], { stdio: 'ignore', timeout: 30000 }); ok = true; break; } catch (e) {}
+        }
+        if (ok && fs.existsSync(tmpOut)) outBuffer = fs.readFileSync(tmpOut);
+        try { fs.unlinkSync(tmpIn); } catch (_) {}
+        try { fs.unlinkSync(tmpOut); } catch (_) {}
+      } catch (e) { console.warn('[criador] mascote HD falhou (segue normal):', e.message); }
     }
+    return { pdfBuffer: outBuffer, thumbnailBuffer };
   } finally {
     await browser.close();
   }
@@ -945,15 +1092,16 @@ async function executar(params, onProgress = () => {}) {
 
   } catch (erro) {
     console.error('[criador_engine]', erro.message);
-    await registrarErro(entregaId, '/api/criador', erro, params);
+    const _entregaId = (params && params.entregaId) || null;
+    await registrarErro(_entregaId, '/api/criador', erro, params);
 
-    if (entregaId) {
+    if (_entregaId) {
       try {
-        await supa.from('entregas').update({ status: 'erro' }).eq('id', entregaId);
+        await supa.from('entregas').update({ status: 'erro' }).eq('id', _entregaId);
       } catch (_) {}
     }
     throw erro;
   }
 }
 
-module.exports = { executar, CORES, LABELS };
+module.exports = { executar, renderizarPDF, gerarConteudo, CORES, LABELS };

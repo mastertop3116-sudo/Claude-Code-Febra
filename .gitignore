@@ -23,3 +23,7 @@ conselho_consulta.js
 
 # Claude Code local
 .claude/
+
+# Usuários/senhas (criado a partir das variáveis de ambiente em produção) — NUNCA commitar
+data/usuarios.json
+.playwright-mcp/

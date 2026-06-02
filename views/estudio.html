@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Estúdio · MAX Criador</title>
+<style>
+  :root{--bg:#0b0f17;--card:#141b26;--card2:#0f1622;--line:#222c3a;--txt:#e8eef6;--mut:#8a97aa;--ac:#f97316;--ac2:#fb923c;--gr:#22c55e;--gr2:#16351f}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,Arial,sans-serif;min-height:100vh}
+  .top{display:flex;align-items:center;justify-content:space-between;padding:16px 26px;border-bottom:1px solid var(--line);
+    position:sticky;top:0;background:rgba(11,15,23,.92);backdrop-filter:blur(8px);z-index:10}
+  .brand{font-weight:800;letter-spacing:1px}.brand b{color:var(--ac)}
+  .user{display:flex;align-items:center;gap:12px;font-size:13px}
+  .chip{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-weight:600}
+  .chip .papel{color:var(--ac);font-size:11px;font-weight:800;text-transform:uppercase;margin-left:6px}
+  .sair{color:var(--mut);text-decoration:none;font-weight:600}.sair:hover{color:var(--txt)}
+  .wrap{max-width:1080px;margin:0 auto;padding:26px 22px 70px}
+  h1{font-size:25px;margin-bottom:4px}.lead{color:var(--mut);font-size:14px;margin-bottom:22px}
+  /* seletor de modelo */
+  .modelo{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:24px}
+  .modelo .row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .modelo b.t{font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut)}
+  .seg{display:flex;background:#0d141e;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .seg button{background:transparent;color:var(--mut);border:0;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer}
+  .seg button.on{background:var(--ac);color:#1a1206}
+  .aviso{margin-top:12px;font-size:13px;color:#ffcf99;background:#2a1d10;border:1px solid #5c3c1b;border-radius:9px;padding:9px 12px;display:none}
+  .aviso.show{display:block}
+  /* cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px}
+  .c{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+  .c h3{font-size:17px;display:flex;align-items:center;gap:9px}
+  .tag{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;padding:3px 8px;border-radius:6px}
+  .tag.free{background:var(--gr2);color:#5cf08c}.tag.ia{background:#221a33;color:#c79bf0}
+  .c p{color:var(--mut);font-size:13px;line-height:1.5}
+  .c label{font-size:12px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px}
+  .c select,.c input,.c textarea{width:100%;background:#0d141e;border:1px solid var(--line);border-radius:9px;color:var(--txt);padding:10px 11px;font-size:14px;outline:none;font-family:inherit}
+  .c select:focus,.c input:focus,.c textarea:focus{border-color:var(--ac)}
+  .field{display:flex;gap:10px}.field>div{flex:1}
+  .btn{background:linear-gradient(100deg,var(--ac),var(--ac2));color:#1a1206;border:0;border-radius:10px;padding:12px;font-size:14.5px;font-weight:800;cursor:pointer;margin-top:4px}
+  .btn.sec{background:transparent;border:1px solid var(--line);color:var(--txt)}
+  .btn:disabled{opacity:.6;cursor:default}
+  .status{font-size:13px;color:var(--mut);min-height:18px}
+  .status.ok{color:var(--gr)}.status.err{color:#ff9aa2}
+  .spin{display:inline-block;width:13px;height:13px;border:2px solid var(--mut);border-top-color:var(--ac);border-radius:50%;animation:s .8s linear infinite;vertical-align:-2px;margin-right:7px}
+  @keyframes s{to{transform:rotate(360deg)}}
+  .hide{display:none}
+  small.dim{color:var(--mut);font-size:11.5px}
+</style>
+</head>
+<body>
+  <div class="top">
+    <div class="brand"><b>MAX</b> Criador</div>
+    <div class="user"><span class="chip" id="userchip">…</span><a class="sair" href="#" id="sair">Sair</a></div>
+  </div>
+  <div class="wrap">
+    <h1>Estúdio</h1>
+    <p class="lead">Crie seus materiais aqui. As atividades são <b>grátis</b> (sem IA). Os textos com IA usam o modelo que você escolher abaixo.</p>
+
+    <!-- SELETOR DE MODELO -->
+    <div class="modelo">
+      <div class="row">
+        <b class="t">Modelo de IA</b>
+        <div class="seg" id="seg">
+          <button data-m="gpt" class="on">GPT · barato</button>
+          <button data-m="opus">Opus · premium</button>
+        </div>
+        <small class="dim">Usado só quando a IA escreve textos (ebook, ficha…). As atividades abaixo não gastam nada.</small>
+      </div>
+      <div class="aviso" id="aviso">⚠️ <b>Opus tem custo REAL</b> — cada geração sai do seu crédito da Anthropic. Use quando quiser o melhor acabamento; pra testar, fique no GPT.<div id="opus-limite" style="margin-top:7px;font-weight:700"></div></div>
+    </div>
+
+    <div class="grid">
+      <!-- ATIVIDADES -->
+      <div class="c">
+        <h3>🧩 Pack de Atividades <span class="tag free">grátis · sem IA</span></h3>
+        <p>+100 atividades printáveis (caça-palavras, labirinto, ligue, código, desembaralhe) com gabarito. Qualquer tema.</p>
+        <div>
+          <label>Tema (nicho)</label>
+          <select id="atv-nicho"></select>
+        </div>
+        <div id="novo-wrap" class="hide">
+          <label>Nome do tema</label>
+          <input id="novo-nome" placeholder="ex: Animais, Folclore, Inglês Kids">
+          <label style="margin-top:10px">Palavras (uma por linha — PALAVRA: dica)</label>
+          <textarea id="novo-termos" rows="5" placeholder="LEÃO: rei da selva&#10;ZEBRA: tem listras&#10;GIRAFA: pescoço comprido"></textarea>
+          <small class="dim">Mínimo 8 palavras. A dica ajuda nas atividades.</small>
+        </div>
+        <div class="field">
+          <div><label>Quantidade</label><input id="atv-qtd" type="number" value="100" min="10" max="300"></div>
+        </div>
+        <button class="btn" id="atv-btn">Gerar PDF</button>
+        <div class="status" id="atv-status"></div>
+      </div>
+
+      <!-- MATEMÁTICA -->
+      <div class="c">
+        <h3>➗ Pack de Matemática <span class="tag free">grátis · sem IA</span></h3>
+        <p>+100 atividades de conta de verdade: somar, subtrair, tabuada, ligar conta ao resultado, sequência, maior/menor. Com gabarito conferido.</p>
+        <div class="field">
+          <div><label>Quantidade</label><input id="mat-qtd" type="number" value="100" min="10" max="300"></div>
+        </div>
+        <button class="btn" id="mat-btn">Gerar PDF</button>
+        <div class="status" id="mat-status"></div>
+      </div>
+
+      <!-- CRIADOR IA -->
+      <div class="c">
+        <h3>✨ Criador com IA <span class="tag ia">usa modelo</span></h3>
+        <p>Ebook, workbook, guia, checklist, ficha de dinâmica, script de VSL… textos escritos pela IA, com o modelo escolhido acima.</p>
+        <small class="dim" id="ia-modelo">Modelo atual: GPT</small>
+        <button class="btn sec" id="ia-btn">Abrir Criador com IA</button>
+      </div>
+
+      <!-- CATÁLOGO -->
+      <div class="c">
+        <h3>🖼️ Catálogo de Imagens <span class="tag free">reuso</span></h3>
+        <p>Todas as imagens que a gente criou (mascotes, natação…). O Criador reusa automaticamente quando o tema bate — nada se desperdiça.</p>
+        <button class="btn sec" id="cat-btn">Abrir Catálogo</button>
+      </div>
+
+      <!-- USUÁRIOS (admin) -->
+      <div class="c hide" id="card-users">
+        <h3>👥 Usuários <span class="tag ia">admin</span></h3>
+        <p>Gerencie quem acessa. As permissões finas a gente ajusta quando você quiser.</p>
+        <button class="btn sec" id="users-btn">Ver usuários</button>
+        <div class="status" id="users-status"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  let MODELO = localStorage.getItem('max_modelo') || 'gpt';
+  let OPUS = null;
+  const seg=document.getElementById('seg'), aviso=document.getElementById('aviso');
+  function aplicaModelo(){
+    seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.m===MODELO));
+    aviso.classList.toggle('show', MODELO==='opus');
+    const ol=document.getElementById('opus-limite');
+    if(ol) ol.textContent=(MODELO==='opus'&&OPUS&&!OPUS.ilimitado)
+      ? `🔒 Limite: você pode usar o Opus ${OPUS.limite} vezes (é por causa do custo). Restam ${OPUS.restantes}.` : '';
+    const restoTxt=(MODELO==='opus'&&OPUS&&!OPUS.ilimitado)?` · restam ${OPUS.restantes}`:'';
+    document.getElementById('ia-modelo').textContent='Modelo atual: '+(MODELO==='opus'?'Opus (custo real)':'GPT')+restoTxt;
+    localStorage.setItem('max_modelo',MODELO);
+  }
+  seg.addEventListener('click',e=>{ if(e.target.dataset.m){ MODELO=e.target.dataset.m; aplicaModelo(); }});
+  aplicaModelo();
+
+  // usuário logado
+  fetch('/api/me').then(r=>r.json()).then(u=>{
+    if(!u||!u.nome){ location.href='/login'; return; }
+    document.getElementById('userchip').innerHTML=u.nome+'<span class="papel">'+u.papel+'</span>';
+    if(u.papel==='admin') document.getElementById('card-users').classList.remove('hide');
+    OPUS=u.opus||null; aplicaModelo();
+  });
+  document.getElementById('sair').onclick=async e=>{e.preventDefault();await fetch('/api/logout',{method:'POST'});location.href='/login';};
+
+  // nichos disponíveis
+  fetch('/api/estudio/nichos').then(r=>r.json()).then(d=>{
+    const sel=document.getElementById('atv-nicho');
+    (d.nichos||[]).forEach(n=>{const o=document.createElement('option');o.value=n.id;o.textContent=n.nome;sel.appendChild(o);});
+    const o=document.createElement('option');o.value='__novo__';o.textContent='➕ Criar tema novo…';sel.appendChild(o);
+    sel.onchange=()=>document.getElementById('novo-wrap').classList.toggle('hide',sel.value!=='__novo__');
+  });
+
+  function baixar(base64,nome){
+    const a=document.createElement('a');a.href='data:application/pdf;base64,'+base64;a.download=nome;a.click();
+  }
+  async function gerar(url,body,statusEl,btn){
+    statusEl.className='status'; statusEl.innerHTML='<span class="spin"></span>Gerando… isso leva ~1 minuto, pode aguardar.';
+    btn.disabled=true;
+    try{
+      const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      const d=await r.json();
+      if(r.ok&&d.ok){ statusEl.className='status ok'; statusEl.textContent='✅ Pronto! ('+d.paginas+' páginas) Baixando…'; baixar(d.pdf,d.filename); }
+      else { statusEl.className='status err'; statusEl.textContent='❌ '+(d.error||'Falhou.'); }
+    }catch(_){ statusEl.className='status err'; statusEl.textContent='❌ Erro de conexão.'; }
+    btn.disabled=false;
+  }
+
+  document.getElementById('atv-btn').onclick=()=>{
+    const nicho=document.getElementById('atv-nicho').value;
+    const qtd=+document.getElementById('atv-qtd').value||100;
+    const body={nicho,qtd};
+    if(nicho==='__novo__'){
+      body.novoNicho={nome:document.getElementById('novo-nome').value.trim(),termos:document.getElementById('novo-termos').value.trim()};
+      if(!body.novoNicho.nome||body.novoNicho.termos.split('\n').filter(x=>x.trim()).length<8){
+        const s=document.getElementById('atv-status');s.className='status err';s.textContent='❌ Dê um nome e pelo menos 8 palavras.';return;
+      }
+    }
+    gerar('/api/estudio/atividades',body,document.getElementById('atv-status'),document.getElementById('atv-btn'));
+  };
+  document.getElementById('mat-btn').onclick=()=>{
+    gerar('/api/estudio/matematica',{qtd:+document.getElementById('mat-qtd').value||100},document.getElementById('mat-status'),document.getElementById('mat-btn'));
+  };
+  document.getElementById('ia-btn').onclick=async()=>{
+    // Opus tem custo real → gasta 1 crédito e barra o usuário comum depois do limite.
+    if(MODELO==='opus' && OPUS && !OPUS.ilimitado){
+      const r=await fetch('/api/estudio/opus/consumir',{method:'POST'});
+      const d=await r.json();
+      if(!r.ok){ alert('⛔ '+(d.mensagem||'Limite do Opus atingido.')); MODELO='gpt'; aplicaModelo(); return; }
+      OPUS.restantes=d.restantes; OPUS.usado=d.usado; aplicaModelo();
+    }
+    location.href='/criar?modelo='+MODELO;
+  };
+  document.getElementById('cat-btn').onclick=()=>{ window.open('/estudio/catalogo','_blank'); };
+  const ub=document.getElementById('users-btn');
+  if(ub) ub.onclick=async()=>{
+    const s=document.getElementById('users-status');s.textContent='…';
+    const r=await fetch('/api/usuarios');const d=await r.json();
+    if(d.usuarios) s.innerHTML=d.usuarios.map(u=>'• '+u.nome+' ('+u.login+') — '+u.papel).join('<br>');
+    else s.textContent=d.error||'erro';
+  };
+</script>
+</body>
+</html>

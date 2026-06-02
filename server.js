@@ -50,6 +50,115 @@ app.use("/webhook", ggCheckout);
 // Gerador de Entregáveis (web + API com progresso SSE)
 // ──────────────────────────────────────────
 const path = require("path");
+
+// ════════════════════════════════════════════════════════════
+// [MAX] LOGIN + ESTÚDIO — porta de entrada nova, com usuários
+// ════════════════════════════════════════════════════════════
+const auth = require("./auth");
+const fsx = require("fs");
+const { execFile } = require("child_process");
+try { require("./utils/catalogoImagens").catalogar(); } catch (_) {} // garante a galeria do catálogo (mesmo vazia no servidor)
+
+// Porteiro: páginas protegidas exigem login (ANTES do static, pra valer até pro .html)
+const PAGINAS_PROTEGIDAS = new Set(["/estudio", "/criar", "/criar.html", "/criador.html"]);
+app.use((req, res, next) => {
+  if (PAGINAS_PROTEGIDAS.has(req.path) && !auth.usuarioDaReq(req)) {
+    return res.redirect("/login?next=" + encodeURIComponent(req.originalUrl));
+  }
+  next();
+});
+
+// Login (público)
+app.get("/login", (req, res) => { res.setHeader("Cache-Control", "no-store"); res.sendFile(path.join(__dirname, "views", "login.html")); });
+app.post("/api/login", (req, res) => {
+  const { login, senha } = req.body || {};
+  const u = auth.acharPorLogin(login);
+  if (!u || !auth.conferirSenha(senha, u.salt, u.hash)) return res.status(401).json({ error: "Usuário ou senha incorretos." });
+  auth.setCookieSessao(res, auth.criarToken(u.id));
+  res.json({ ok: true, usuario: auth.publico(u) });
+});
+app.post("/api/logout", (req, res) => { auth.limparCookie(res); res.json({ ok: true }); });
+app.get("/api/me", (req, res) => { const u = auth.usuarioDaReq(req); res.json(u ? auth.publico(u) : {}); });
+app.get("/api/usuarios", auth.exigirAdmin, (req, res) => { res.json({ usuarios: auth.usuarios().map(auth.publico) }); });
+
+// Estúdio (protegido pelo porteiro acima)
+app.get("/estudio", (req, res) => { res.setHeader("Cache-Control", "no-store"); res.sendFile(path.join(__dirname, "views", "estudio.html")); });
+app.get("/estudio/catalogo", auth.exigirLogin, (req, res) => { res.sendFile(path.join(__dirname, "assets", "catalogo", "index.html")); });
+
+// Lista os temas (nichos) de atividades disponíveis
+app.get("/api/estudio/nichos", auth.exigirLogin, (req, res) => {
+  try {
+    const dir = path.join(__dirname, "nichos-atividades");
+    const nichos = fsx.readdirSync(dir).filter(f => f.endsWith(".json")).map(f => {
+      const id = f.replace(/\.json$/, "");
+      try {
+        const cfg = JSON.parse(fsx.readFileSync(path.join(dir, f), "utf8"));
+        if (!Array.isArray(cfg.termos) || cfg.termos.length < 8) return null; // só temas de palavra (matemática tem gerador próprio)
+        return { id, nome: cfg.titulo_pack || id };
+      } catch (_) { return null; }
+    }).filter(Boolean);
+    res.json({ nichos });
+  } catch (_) { res.json({ nichos: [] }); }
+});
+
+// Roda um gerador (CLI) e devolve o PDF pronto em base64
+function rodarGerador(script, args, pdfPath, res) {
+  res.setTimeout(5 * 60 * 1000);
+  execFile("node", [script, ...args], { cwd: __dirname, maxBuffer: 1024 * 1024 * 20 }, (err, _out, stderr) => {
+    if (err) { console.error("[estudio]", script, (stderr || err.message)); return res.status(500).json({ error: "Falha ao gerar. " + String(stderr || err.message).slice(0, 160) }); }
+    try {
+      const buf = fsx.readFileSync(pdfPath);
+      require("pdf-lib").PDFDocument.load(buf)
+        .then(doc => res.json({ ok: true, pdf: buf.toString("base64"), filename: path.basename(pdfPath), paginas: doc.getPageCount() }))
+        .catch(() => res.json({ ok: true, pdf: buf.toString("base64"), filename: path.basename(pdfPath), paginas: 0 }));
+    } catch (_) { res.status(500).json({ error: "Gerou mas não achei o PDF." }); }
+  });
+}
+
+// Gerar PACK DE ATIVIDADES (qualquer tema; cria tema novo na hora se vier novoNicho)
+app.post("/api/estudio/atividades", auth.exigirLogin, (req, res) => {
+  let { nicho, qtd, novoNicho } = req.body || {};
+  qtd = Math.max(10, Math.min(300, parseInt(qtd) || 100));
+  const dir = path.join(__dirname, "nichos-atividades");
+  if (nicho === "__novo__") {
+    if (!novoNicho || !novoNicho.nome) return res.status(400).json({ error: "Falta o nome do tema." });
+    const slug = String(novoNicho.nome).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const termos = String(novoNicho.termos || "").split("\n").map(l => l.trim()).filter(Boolean).map(l => {
+      const i = l.indexOf(":");
+      const p = (i > -1 ? l.slice(0, i) : l).trim().toUpperCase().replace(/[^A-ZÇÃÕÁÉÍÓÚÂÊÔÀ ]/g, "").trim();
+      const d = i > -1 ? l.slice(i + 1).trim() : "";
+      return { p, d };
+    }).filter(t => t.p.length >= 2);
+    if (termos.length < 8) return res.status(400).json({ error: "Precisa de pelo menos 8 palavras." });
+    const cfg = { titulo_pack: novoNicho.nome, subtitulo_pack: "Atividades prontas para imprimir.", autor: "Avança Leitor", cor: "#7c3aed", cor2: "#a78bfa", labirinto_inicio: "INÍCIO", labirinto_fim: "FIM", termos };
+    fsx.writeFileSync(path.join(dir, slug + ".json"), JSON.stringify(cfg, null, 2));
+    nicho = slug;
+  }
+  if (!nicho || !fsx.existsSync(path.join(dir, nicho + ".json"))) return res.status(400).json({ error: "Tema inválido." });
+  const pdf = path.join(__dirname, "oferta-" + nicho, `pack-${nicho}-${qtd}-atividades.pdf`);
+  rodarGerador("gerar-atividades.js", [nicho, String(qtd)], pdf, res);
+});
+
+// Quanto resta de Opus pro usuário (admin = ilimitado)
+app.get("/api/estudio/opus", auth.exigirLogin, (req, res) => { res.json(auth.opusInfo(req.usuario)); });
+
+// Gasta 1 crédito de Opus (barra o usuário comum depois do limite, por causa do CUSTO)
+app.post("/api/estudio/opus/consumir", auth.exigirLogin, (req, res) => {
+  const r = auth.consumirOpus(req.usuario.id);
+  if (r.ok) return res.json(r);
+  return res.status(403).json({
+    ...r,
+    mensagem: `Você já usou suas ${r.limite} criações no Opus. O Opus é limitado pra você porque cada geração tem CUSTO REAL (gasta dinheiro de verdade da conta). Use o GPT, que é grátis e ilimitado — ou peça pro Rodrigo liberar mais.`,
+  });
+});
+
+// Gerar PACK DE MATEMÁTICA
+app.post("/api/estudio/matematica", auth.exigirLogin, (req, res) => {
+  const qtd = Math.max(10, Math.min(300, parseInt(req.body && req.body.qtd) || 100));
+  const pdf = path.join(__dirname, "oferta-matematica", `pack-matematica-${qtd}-atividades.pdf`);
+  rodarGerador("gerar-matematica.js", [String(qtd)], pdf, res);
+});
+
 app.use(express.static(path.join(__dirname, "public"), { maxAge: "1h" }));
 app.use("/fonts", express.static(path.join(__dirname, "assets/fonts"), { maxAge: "7d" }));
 
