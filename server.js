@@ -2672,6 +2672,20 @@ app.get('/instagram-test/:periodo', async (req, res) => {
   }
 });
 
+// ── INSTAGRAM RESPONDER COMENTÁRIOS ──────────────────────────────────────────
+app.get('/instagram-responder-comentarios', async (req, res) => {
+  if (req.query.secret !== process.env.INSTAGRAM_APP_SECRET) {
+    return res.status(401).json({ erro: 'Não autorizado' });
+  }
+  try {
+    const { responder } = require('./departments/creative/templates/aulas-desplugadas-ei/instagram-pipeline/responder-comentarios');
+    const resultado = await responder();
+    res.json({ status: 'ok', ...resultado });
+  } catch (e) {
+    res.status(500).json({ erro: e.message, stack: e.stack?.split('\n').slice(0,5) });
+  }
+});
+
 // ── HEALTH CHECK ─────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => res.json({ status: 'ok', ts: Date.now() }));
 

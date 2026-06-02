@@ -9,11 +9,12 @@ function iniciar() {
   if (iniciado) return;
   iniciado = true;
 
-  let config, executar;
+  let config, executar, responderComentarios;
   try {
     config  = require('./templates/aulas-desplugadas-ei/instagram-pipeline/config');
     const pipeline = require('./templates/aulas-desplugadas-ei/instagram-pipeline/pipeline');
     executar = pipeline.executar;
+    responderComentarios = require('./templates/aulas-desplugadas-ei/instagram-pipeline/responder-comentarios').responder;
   } catch (e) {
     console.warn('[instagram-scheduler] Dependência não encontrada — scheduler desabilitado:', e.message);
     return;
@@ -41,6 +42,21 @@ function iniciar() {
 
   agendar(horarioManha, 'manha');
   agendar(horarioNoite, 'noite');
+
+  // Robô de comentários — responde automaticamente a cada 30 minutos.
+  // DESLIGADO por padrão. Liga com a variável IG_COMENTARIOS_AUTO=true (ou trocando o default aqui).
+  const comentariosAuto = process.env.IG_COMENTARIOS_AUTO === 'true';
+  if (responderComentarios && comentariosAuto) {
+    cron.schedule('*/30 * * * *', () => {
+      console.log('[instagram-scheduler] Rodando robô de comentários...');
+      responderComentarios().catch(err => {
+        console.error('[instagram-scheduler] ERRO (comentários):', err.message);
+      });
+    }, { timezone: 'America/Sao_Paulo' });
+    console.log('[instagram-scheduler] Robô de comentários agendado → a cada 30 min');
+  } else {
+    console.log('[instagram-scheduler] Robô de comentários PRONTO mas desligado (IG_COMENTARIOS_AUTO != true).');
+  }
 
   if (config.posting.dryRun) {
     console.log('[instagram-scheduler] MODO DRY RUN — gera imagens mas não posta.');

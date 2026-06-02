@@ -47,9 +47,10 @@ async function gerarPost(entrada, bgBase64 = null) {
   if (!templateFn) throw new Error(`Template desconhecido: "${tipo}" / "${estilo}"`);
 
   // Salva fundo 3D em arquivo temporário (base64 vem pronto do pipeline em paralelo)
+  // O fundo 3D só entra no estilo Dark — Premium (preto liso) e Color (card branco) têm visual próprio.
   let bgFilePath = null;
   let bgTempFile = null;
-  if (bgBase64) {
+  if (bgBase64 && estilo === 'dark') {
     try {
       bgTempFile = path.join(os.tmpdir(), `bg-${Date.now()}.png`);
       fs.writeFileSync(bgTempFile, Buffer.from(bgBase64, 'base64'));
