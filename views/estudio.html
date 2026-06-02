@@ -5,212 +5,563 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Estúdio · MAX Criador</title>
 <style>
-  :root{--bg:#0b0f17;--card:#141b26;--card2:#0f1622;--line:#222c3a;--txt:#e8eef6;--mut:#8a97aa;--ac:#f97316;--ac2:#fb923c;--gr:#22c55e;--gr2:#16351f}
+  :root{
+    --bg:#070b12;--bg2:#0c121d;--glass:rgba(22,30,45,.55);--glass2:rgba(16,22,34,.6);
+    --line:rgba(120,140,180,.16);--line2:rgba(140,160,200,.30);
+    --txt:#eef3fb;--mut:#9aa8bf;--mut2:#6b7b96;
+    --ac:#f97316;--ac2:#fb923c;--gr:#22c55e;--pp:#a78bfa;
+    --r:18px;--shadow:0 24px 60px rgba(0,0,0,.45)
+  }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,Arial,sans-serif;min-height:100vh}
-  .top{display:flex;align-items:center;justify-content:space-between;padding:16px 26px;border-bottom:1px solid var(--line);
-    position:sticky;top:0;background:rgba(11,15,23,.92);backdrop-filter:blur(8px);z-index:10}
-  .brand{font-weight:800;letter-spacing:1px}.brand b{color:var(--ac)}
-  .user{display:flex;align-items:center;gap:12px;font-size:13px}
-  .chip{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-weight:600}
-  .chip .papel{color:var(--ac);font-size:11px;font-weight:800;text-transform:uppercase;margin-left:6px}
-  .sair{color:var(--mut);text-decoration:none;font-weight:600}.sair:hover{color:var(--txt)}
-  .wrap{max-width:1080px;margin:0 auto;padding:26px 22px 70px}
-  h1{font-size:25px;margin-bottom:4px}.lead{color:var(--mut);font-size:14px;margin-bottom:22px}
-  /* seletor de modelo */
-  .modelo{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:24px}
-  .modelo .row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .modelo b.t{font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut)}
-  .seg{display:flex;background:#0d141e;border:1px solid var(--line);border-radius:10px;overflow:hidden}
-  .seg button{background:transparent;color:var(--mut);border:0;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer}
-  .seg button.on{background:var(--ac);color:#1a1206}
-  .aviso{margin-top:12px;font-size:13px;color:#ffcf99;background:#2a1d10;border:1px solid #5c3c1b;border-radius:9px;padding:9px 12px;display:none}
-  .aviso.show{display:block}
-  /* cards */
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px}
-  .c{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
-  .c h3{font-size:17px;display:flex;align-items:center;gap:9px}
-  .tag{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;padding:3px 8px;border-radius:6px}
-  .tag.free{background:var(--gr2);color:#5cf08c}.tag.ia{background:#221a33;color:#c79bf0}
-  .c p{color:var(--mut);font-size:13px;line-height:1.5}
-  .c label{font-size:12px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px}
-  .c select,.c input,.c textarea{width:100%;background:#0d141e;border:1px solid var(--line);border-radius:9px;color:var(--txt);padding:10px 11px;font-size:14px;outline:none;font-family:inherit}
-  .c select:focus,.c input:focus,.c textarea:focus{border-color:var(--ac)}
-  .field{display:flex;gap:10px}.field>div{flex:1}
-  .btn{background:linear-gradient(100deg,var(--ac),var(--ac2));color:#1a1206;border:0;border-radius:10px;padding:12px;font-size:14.5px;font-weight:800;cursor:pointer;margin-top:4px}
-  .btn.sec{background:transparent;border:1px solid var(--line);color:var(--txt)}
-  .btn:disabled{opacity:.6;cursor:default}
-  .status{font-size:13px;color:var(--mut);min-height:18px}
-  .status.ok{color:var(--gr)}.status.err{color:#ff9aa2}
-  .spin{display:inline-block;width:13px;height:13px;border:2px solid var(--mut);border-top-color:var(--ac);border-radius:50%;animation:s .8s linear infinite;vertical-align:-2px;margin-right:7px}
-  @keyframes s{to{transform:rotate(360deg)}}
-  .hide{display:none}
-  small.dim{color:var(--mut);font-size:11.5px}
+  html{font-size:16px}
+  body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+    line-height:1.5;min-height:100vh;overflow-x:hidden}
+  body.noanim *{animation:none!important;transition:none!important}
+  /* fundo interativo */
+  #bg{position:fixed;inset:0;z-index:0;display:block}
+  .orbs{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+  .orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5;will-change:transform}
+  .orb.a{width:520px;height:520px;background:radial-gradient(circle,var(--ac),transparent 70%);top:-160px;right:-120px;animation:float1 18s ease-in-out infinite}
+  .orb.b{width:460px;height:460px;background:radial-gradient(circle,#6366f1,transparent 70%);bottom:-160px;left:-120px;animation:float2 22s ease-in-out infinite}
+  .orb.c{width:360px;height:360px;background:radial-gradient(circle,#22c55e,transparent 70%);top:40%;left:55%;opacity:.28;animation:float3 26s ease-in-out infinite}
+  @keyframes float1{50%{transform:translate(-50px,60px) scale(1.1)}}
+  @keyframes float2{50%{transform:translate(60px,-50px) scale(1.08)}}
+  @keyframes float3{50%{transform:translate(-40px,-40px) scale(1.12)}}
+  .app{position:relative;z-index:2}
+  /* SPLASH */
+  #splash{position:fixed;inset:0;z-index:100;background:radial-gradient(900px 600px at 50% 35%,#10192c,#05080e 70%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;transition:opacity .7s,visibility .7s}
+  #splash.gone{opacity:0;visibility:hidden}
+  .splash-logo{width:96px;height:96px;border-radius:26px;background:linear-gradient(135deg,var(--ac),var(--ac2));
+    display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:900;color:#1a1206;
+    box-shadow:0 0 60px #f9731680;animation:pulse 1.8s ease-in-out infinite}
+  @keyframes pulse{50%{transform:scale(1.06);box-shadow:0 0 90px #f97316aa}}
+  .splash-ring{width:54px;height:54px;border:3px solid rgba(255,255,255,.12);border-top-color:var(--ac);border-radius:50%;animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  #splash .txt{font-size:1.25rem;font-weight:800;letter-spacing:.3px}
+  #splash .sub{color:var(--mut);font-size:.95rem;margin-top:-12px}
+  /* TOPBAR */
+  .top{display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:16px clamp(18px,4vw,52px);position:sticky;top:0;z-index:30;
+    background:linear-gradient(180deg,rgba(7,11,18,.9),rgba(7,11,18,.4));backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .brand{font-size:1.2rem;font-weight:800;letter-spacing:.4px;display:flex;align-items:center;gap:11px}
+  .brand .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--ac),var(--ac2));
+    display:flex;align-items:center;justify-content:center;color:#1a1206;font-weight:900;font-size:1.1rem;box-shadow:0 6px 20px #f9731640}
+  .brand b{color:var(--ac)}
+  .top-actions{display:flex;align-items:center;gap:9px}
+  .ic-btn{width:42px;height:42px;border-radius:12px;background:var(--glass);border:1px solid var(--line);color:var(--txt);
+    font-size:1.15rem;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);transition:.15s}
+  .ic-btn:hover{border-color:var(--line2);transform:translateY(-1px)}
+  .btn-top{background:var(--glass);border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:9px 15px;
+    font-size:.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;backdrop-filter:blur(8px)}
+  .btn-top:hover{border-color:var(--line2)}
+  .btn-top .papel{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--ac);background:#f9731622;padding:2px 7px;border-radius:6px}
+  /* LAYOUT */
+  .wrap{width:100%;max-width:1680px;margin:0 auto;padding:clamp(26px,3vw,44px) clamp(18px,4vw,52px) 90px}
+  /* HERO */
+  .hero{display:flex;gap:24px;flex-wrap:wrap;align-items:stretch;margin-bottom:34px}
+  .hero .greet{flex:1 1 380px}
+  .hero h1{font-size:clamp(2rem,3.4vw,3.1rem);letter-spacing:-1px;line-height:1.05}
+  .hero h1 .nome{background:linear-gradient(100deg,var(--ac),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero .date{color:var(--mut);font-size:1rem;margin-top:10px;text-transform:capitalize}
+  .tipbox{flex:1 1 420px;min-height:150px;background:var(--glass);border:1px solid var(--line);border-radius:var(--r);
+    padding:24px 26px;backdrop-filter:blur(14px);position:relative;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;justify-content:center}
+  .tipbox::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:linear-gradient(var(--ac),var(--ac2))}
+  .tipbox .k{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:var(--ac);display:flex;align-items:center;gap:8px}
+  .tipbox .tip{font-size:1.18rem;font-weight:600;margin-top:12px;transition:opacity .5s,transform .5s;line-height:1.45}
+  .tipbox .tip.out{opacity:0;transform:translateY(8px)}
+  .tipbox .dots{position:absolute;bottom:16px;right:18px;display:flex;gap:5px}
+  .tipbox .dot{width:6px;height:6px;border-radius:50%;background:var(--line2);transition:.3s}
+  .tipbox .dot.on{background:var(--ac);width:18px;border-radius:3px}
+  /* MODELO */
+  .modelo{margin-bottom:30px;background:var(--glass2);border:1px solid var(--line);border-radius:var(--r);padding:18px clamp(16px,2vw,24px);backdrop-filter:blur(12px)}
+  .modelo .row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .modelo .t{font-size:.74rem;text-transform:uppercase;letter-spacing:1px;color:var(--mut2);font-weight:800}
+  .seg{display:flex;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
+  .seg button{background:transparent;color:var(--mut);border:0;padding:10px 20px;font-size:.95rem;font-weight:800;cursor:pointer;border-radius:9px;transition:.15s}
+  .seg button.on{background:linear-gradient(100deg,var(--ac),var(--ac2));color:#1a1206}
+  .modelo .hint{color:var(--mut2);font-size:.84rem}
+  .aviso{margin-top:14px;font-size:.93rem;color:#ffd6a8;background:linear-gradient(180deg,#2c1d0f,#231708);border:1px solid #5c3c1b;border-radius:11px;padding:12px 15px;display:none}
+  .aviso.show{display:block}.aviso #opus-limite{margin-top:8px;font-weight:800;color:#ffb866}
+  /* GRID + CARDS */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(390px,1fr));gap:22px}
+  @media(min-width:1500px){.grid{grid-template-columns:repeat(auto-fill,minmax(410px,1fr))}}
+  .c{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:24px;display:flex;flex-direction:column;gap:14px;
+    backdrop-filter:blur(14px);transition:.2s;position:relative;overflow:hidden}
+  .c:hover{border-color:var(--line2);transform:translateY(-3px);box-shadow:var(--shadow)}
+  .c h3{font-size:1.16rem;display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+  .c h3 .ic{font-size:1.45rem}
+  .tag{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;padding:4px 9px;border-radius:7px}
+  .tag.free{background:#15351f;color:#5cf08c}.tag.ia{background:#2a2140;color:#c4a9ff}
+  .c p{color:var(--mut);font-size:.94rem}
+  .c label{font-size:.72rem;font-weight:800;color:var(--mut2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px}
+  .c select,.c input,.c textarea,.modal input,.modal select,.modal textarea,.drawer input,.drawer select{
+    width:100%;background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:12px 13px;font-size:1rem;outline:none;font-family:inherit}
+  .c select:focus,.c input:focus,.c textarea:focus,.modal input:focus,.modal select:focus{border-color:var(--ac)}
+  .field{display:flex;gap:12px}.field>div{flex:1}
+  .btn{background:linear-gradient(100deg,var(--ac),var(--ac2));color:#1a1206;border:0;border-radius:11px;padding:13px;font-size:1rem;font-weight:800;cursor:pointer;transition:.15s}
+  .btn:hover{filter:brightness(1.07)}
+  .btn.sec{background:rgba(255,255,255,.04);border:1px solid var(--line2);color:var(--txt)}
+  .btn.sec:hover{background:rgba(255,255,255,.08)}
+  .btn.sm{padding:9px 13px;font-size:.88rem;border-radius:9px}
+  .btn.danger{background:#3a1418;border:1px solid #6e2730;color:#ff9aa2}
+  .btn:disabled{opacity:.55;cursor:default}
+  .status{font-size:.88rem;color:var(--mut);min-height:18px}.status.ok{color:var(--gr)}.status.err{color:#ff9aa2}
+  .spin{display:inline-block;width:14px;height:14px;border:2px solid var(--mut);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:7px}
+  .hide{display:none!important}.grow{flex:1}small.dim{color:var(--mut2);font-size:.8rem}
+  /* MODAL + DRAWER */
+  .overlay{position:fixed;inset:0;background:rgba(3,6,11,.7);backdrop-filter:blur(5px);z-index:60;display:none;align-items:flex-start;justify-content:center;padding:46px 18px;overflow:auto}
+  .overlay.show{display:flex}
+  .modal{width:100%;max-width:620px;background:linear-gradient(180deg,#141c2b,#0c121d);border:1px solid var(--line2);border-radius:20px;padding:26px;box-shadow:var(--shadow);animation:pop .25s}
+  @keyframes pop{from{transform:scale(.96) translateY(10px);opacity:0}}
+  .modal h2,.drawer h2{font-size:1.3rem;margin-bottom:4px;display:flex;align-items:center;gap:10px}
+  .modal .x,.drawer .x{background:transparent;border:0;color:var(--mut);font-size:1.6rem;cursor:pointer;line-height:1}
+  .modal .sub,.drawer .sub{color:var(--mut);font-size:.9rem;margin-bottom:16px}
+  .modal .grp{margin-bottom:13px}
+  .uitem{display:flex;align-items:center;gap:11px;padding:13px 14px;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:rgba(0,0,0,.22);flex-wrap:wrap}
+  .uitem .nome{font-weight:800}.uitem .lg{color:var(--mut2);font-size:.85rem}
+  .uitem .pp{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;padding:3px 8px;border-radius:6px;background:#1a2336;color:var(--mut)}
+  .uitem .pp.admin{background:#3a2415;color:#ffb168}
+  .divisor{height:1px;background:var(--line);margin:18px 0}
+  .reset-row{display:flex;gap:8px;width:100%;margin-top:4px}
+  /* DRAWER (configurações) */
+  .drawer{position:fixed;top:0;right:0;height:100%;width:380px;max-width:90vw;z-index:70;background:linear-gradient(180deg,#0e1524,#080d16);
+    border-left:1px solid var(--line2);box-shadow:-20px 0 60px rgba(0,0,0,.5);transform:translateX(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);padding:24px 24px 40px;overflow:auto}
+  .drawer.show{transform:translateX(0)}
+  .drawer .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .set-block{margin:22px 0}
+  .set-block .lbl{font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--mut2);margin-bottom:10px}
+  .opts{display:flex;gap:8px;flex-wrap:wrap}
+  .opt{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;padding:9px 14px;font-size:.92rem;font-weight:700;cursor:pointer;transition:.15s}
+  .opt.on{border-color:var(--ac);background:#f9731618;color:#fff}
+  .swatch{width:34px;height:34px;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:.15s}
+  .swatch.on{border-color:#fff;transform:scale(1.08)}
+  .toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0}
+  .sw{width:48px;height:28px;border-radius:999px;background:#2a3548;position:relative;cursor:pointer;transition:.2s;flex:0 0 auto}
+  .sw.on{background:var(--ac)}
+  .sw::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
+  .sw.on::after{left:23px}
+  .ver{color:var(--mut2);font-size:.78rem;text-align:center;margin-top:30px}
 </style>
 </head>
 <body>
-  <div class="top">
-    <div class="brand"><b>MAX</b> Criador</div>
-    <div class="user"><span class="chip" id="userchip">…</span><a class="sair" href="#" id="sair">Sair</a></div>
+  <canvas id="bg"></canvas>
+  <div class="orbs"><div class="orb a"></div><div class="orb b"></div><div class="orb c"></div></div>
+
+  <!-- SPLASH -->
+  <div id="splash">
+    <div class="splash-logo">M</div>
+    <div class="splash-ring"></div>
+    <div class="txt" id="splash-txt">MAX Criador</div>
+    <div class="sub" id="splash-sub">preparando seu estúdio…</div>
   </div>
-  <div class="wrap">
-    <h1>Estúdio</h1>
-    <p class="lead">Crie seus materiais aqui. As atividades são <b>grátis</b> (sem IA). Os textos com IA usam o modelo que você escolher abaixo.</p>
 
-    <!-- SELETOR DE MODELO -->
-    <div class="modelo">
-      <div class="row">
-        <b class="t">Modelo de IA</b>
-        <div class="seg" id="seg">
-          <button data-m="gpt" class="on">GPT · barato</button>
-          <button data-m="opus">Opus · premium</button>
-        </div>
-        <small class="dim">Usado só quando a IA escreve textos (ebook, ficha…). As atividades abaixo não gastam nada.</small>
-      </div>
-      <div class="aviso" id="aviso">⚠️ <b>Opus tem custo REAL</b> — cada geração sai do seu crédito da Anthropic. Use quando quiser o melhor acabamento; pra testar, fique no GPT.<div id="opus-limite" style="margin-top:7px;font-weight:700"></div></div>
-    </div>
-
-    <div class="grid">
-      <!-- ATIVIDADES -->
-      <div class="c">
-        <h3>🧩 Pack de Atividades <span class="tag free">grátis · sem IA</span></h3>
-        <p>+100 atividades printáveis (caça-palavras, labirinto, ligue, código, desembaralhe) com gabarito. Qualquer tema.</p>
-        <div>
-          <label>Tema (nicho)</label>
-          <select id="atv-nicho"></select>
-        </div>
-        <div id="novo-wrap" class="hide">
-          <label>Nome do tema</label>
-          <input id="novo-nome" placeholder="ex: Animais, Folclore, Inglês Kids">
-          <label style="margin-top:10px">Palavras (uma por linha — PALAVRA: dica)</label>
-          <textarea id="novo-termos" rows="5" placeholder="LEÃO: rei da selva&#10;ZEBRA: tem listras&#10;GIRAFA: pescoço comprido"></textarea>
-          <small class="dim">Mínimo 8 palavras. A dica ajuda nas atividades.</small>
-        </div>
-        <div class="field">
-          <div><label>Quantidade</label><input id="atv-qtd" type="number" value="100" min="10" max="300"></div>
-        </div>
-        <button class="btn" id="atv-btn">Gerar PDF</button>
-        <div class="status" id="atv-status"></div>
-      </div>
-
-      <!-- MATEMÁTICA -->
-      <div class="c">
-        <h3>➗ Pack de Matemática <span class="tag free">grátis · sem IA</span></h3>
-        <p>+100 atividades de conta de verdade: somar, subtrair, tabuada, ligar conta ao resultado, sequência, maior/menor. Com gabarito conferido.</p>
-        <div class="field">
-          <div><label>Quantidade</label><input id="mat-qtd" type="number" value="100" min="10" max="300"></div>
-        </div>
-        <button class="btn" id="mat-btn">Gerar PDF</button>
-        <div class="status" id="mat-status"></div>
-      </div>
-
-      <!-- CRIADOR IA -->
-      <div class="c">
-        <h3>✨ Criador com IA <span class="tag ia">usa modelo</span></h3>
-        <p>Ebook, workbook, guia, checklist, ficha de dinâmica, script de VSL… textos escritos pela IA, com o modelo escolhido acima.</p>
-        <small class="dim" id="ia-modelo">Modelo atual: GPT</small>
-        <button class="btn sec" id="ia-btn">Abrir Criador com IA</button>
-      </div>
-
-      <!-- CATÁLOGO -->
-      <div class="c">
-        <h3>🖼️ Catálogo de Imagens <span class="tag free">reuso</span></h3>
-        <p>Todas as imagens que a gente criou (mascotes, natação…). O Criador reusa automaticamente quando o tema bate — nada se desperdiça.</p>
-        <button class="btn sec" id="cat-btn">Abrir Catálogo</button>
-      </div>
-
-      <!-- USUÁRIOS (admin) -->
-      <div class="c hide" id="card-users">
-        <h3>👥 Usuários <span class="tag ia">admin</span></h3>
-        <p>Gerencie quem acessa. As permissões finas a gente ajusta quando você quiser.</p>
-        <button class="btn sec" id="users-btn">Ver usuários</button>
-        <div class="status" id="users-status"></div>
+  <div class="app">
+    <div class="top">
+      <div class="brand"><span class="logo">M</span><span><b>MAX</b> Criador</span></div>
+      <div class="top-actions">
+        <button class="ic-btn" id="btn-set" title="Configurações">⚙️</button>
+        <button class="btn-top" id="btn-conta"><span id="userchip-nome">…</span><span class="papel" id="userchip-papel"></span></button>
+        <button class="ic-btn hide" id="btn-users" title="Usuários">👥</button>
+        <button class="ic-btn" id="sair" title="Sair">⎋</button>
       </div>
     </div>
+
+    <div class="wrap">
+      <!-- HERO -->
+      <div class="hero">
+        <div class="greet">
+          <h1><span id="greet-word">Olá</span>, <span class="nome" id="greet-name">…</span> 👋</h1>
+          <div class="date" id="greet-date"></div>
+        </div>
+        <div class="tipbox">
+          <div class="k">💡 <span data-i18n="tip_title">Dica de infoproduto</span></div>
+          <div class="tip" id="tip">…</div>
+          <div class="dots" id="tip-dots"></div>
+        </div>
+      </div>
+
+      <!-- MODELO -->
+      <div class="modelo">
+        <div class="row">
+          <span class="t" data-i18n="model_label">Modelo de IA</span>
+          <div class="seg" id="seg"><button data-m="gpt" class="on" data-i18n="model_gpt">GPT · barato</button><button data-m="opus" data-i18n="model_opus">Opus · premium</button></div>
+          <span class="hint" data-i18n="model_hint">Usado só quando a IA escreve textos. As atividades abaixo não gastam nada.</span>
+        </div>
+        <div class="aviso" id="aviso"><span data-i18n="opus_warn">⚠️ Opus tem custo REAL — cada geração sai do seu crédito. Pra testar, fique no GPT.</span><div id="opus-limite"></div></div>
+      </div>
+
+      <!-- GRID -->
+      <div class="grid">
+        <div class="c">
+          <h3><span class="ic">🧩</span> <span data-i18n="atv_title">Pack de Atividades</span> <span class="tag free" data-i18n="free">grátis · sem IA</span></h3>
+          <p data-i18n="atv_desc">+100 atividades printáveis (caça-palavras, labirinto, ligue, código, desembaralhe) com gabarito. Qualquer tema.</p>
+          <div><label data-i18n="theme">Tema (nicho)</label><select id="atv-nicho"></select></div>
+          <div id="novo-wrap" class="hide">
+            <label data-i18n="new_theme_name">Nome do tema</label>
+            <input id="novo-nome" data-i18n-ph="new_theme_ph" placeholder="ex: Animais, Folclore, Inglês Kids">
+            <label style="margin-top:12px" data-i18n="words">Palavras (uma por linha — PALAVRA: dica)</label>
+            <textarea id="novo-termos" rows="5" placeholder="LEÃO: rei da selva&#10;ZEBRA: tem listras&#10;GIRAFA: pescoço comprido"></textarea>
+            <small class="dim" data-i18n="words_hint">Mínimo 8 palavras. A dica ajuda nas atividades.</small>
+          </div>
+          <div class="field"><div><label data-i18n="qty">Quantidade</label><input id="atv-qtd" type="number" value="100" min="10" max="300"></div></div>
+          <div class="grow"></div>
+          <button class="btn" id="atv-btn" data-i18n="gen_pdf">Gerar PDF</button>
+          <div class="status" id="atv-status"></div>
+        </div>
+        <div class="c">
+          <h3><span class="ic">➗</span> <span data-i18n="mat_title">Pack de Matemática</span> <span class="tag free" data-i18n="free">grátis · sem IA</span></h3>
+          <p data-i18n="mat_desc">+100 atividades de conta de verdade: somar, subtrair, tabuada, ligar conta ao resultado, sequência, maior/menor. Com gabarito conferido.</p>
+          <div class="field"><div><label data-i18n="qty">Quantidade</label><input id="mat-qtd" type="number" value="100" min="10" max="300"></div></div>
+          <div class="grow"></div>
+          <button class="btn" id="mat-btn" data-i18n="gen_pdf">Gerar PDF</button>
+          <div class="status" id="mat-status"></div>
+        </div>
+        <div class="c">
+          <h3><span class="ic">✨</span> <span data-i18n="ia_title">Criador com IA</span> <span class="tag ia" data-i18n="uses_model">usa modelo</span></h3>
+          <p data-i18n="ia_desc">Ebook, workbook, guia, checklist, ficha de dinâmica, script de VSL… textos escritos pela IA, com o modelo escolhido acima.</p>
+          <small class="dim" id="ia-modelo">Modelo atual: GPT</small>
+          <div class="grow"></div>
+          <button class="btn sec" id="ia-btn" data-i18n="open_ia">Abrir Criador com IA</button>
+        </div>
+        <div class="c">
+          <h3><span class="ic">🖼️</span> <span data-i18n="cat_title">Catálogo de Imagens</span> <span class="tag free" data-i18n="reuse">reuso</span></h3>
+          <p data-i18n="cat_desc">Todas as imagens que a gente criou (mascotes, natação…). O Criador reusa automaticamente quando o tema bate — nada se desperdiça.</p>
+          <div class="grow"></div>
+          <button class="btn sec" id="cat-btn" data-i18n="open_cat">Abrir Catálogo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CONTA -->
+  <div class="overlay" id="ov-conta"><div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:start"><h2>👤 <span data-i18n="my_account">Minha Conta</span></h2><button class="x" data-close>×</button></div>
+    <p class="sub" id="conta-info">…</p>
+    <div class="divisor"></div>
+    <h2 style="font-size:1.1rem" data-i18n="change_pwd">Trocar minha senha</h2>
+    <div class="sub" data-i18n="pwd_hint">Escolha uma senha sua (mínimo 4 caracteres).</div>
+    <div class="grp"><label class="dim" data-i18n="cur_pwd">Senha atual</label><input id="s-atual" type="password"></div>
+    <div class="grp"><label class="dim" data-i18n="new_pwd">Nova senha</label><input id="s-nova" type="password"></div>
+    <div class="grp"><label class="dim" data-i18n="rep_pwd">Repetir nova senha</label><input id="s-rep" type="password"></div>
+    <button class="btn" id="s-btn" data-i18n="save_pwd">Salvar nova senha</button>
+    <div class="status" id="s-status" style="margin-top:10px"></div>
+  </div></div>
+
+  <!-- MODAL USUÁRIOS -->
+  <div class="overlay" id="ov-users"><div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:start"><h2>👥 <span data-i18n="users">Usuários</span></h2><button class="x" data-close>×</button></div>
+    <p class="sub" data-i18n="users_sub">Quem pode acessar. Troque a senha de alguém ou adicione gente nova.</p>
+    <div id="users-list"></div>
+    <div class="divisor"></div>
+    <h2 style="font-size:1.1rem" data-i18n="add_user">Adicionar usuário</h2>
+    <div class="field" style="margin:10px 0">
+      <div><label class="dim" data-i18n="name">Nome</label><input id="nu-nome"></div>
+      <div><label class="dim" data-i18n="login">Usuário (login)</label><input id="nu-login"></div>
+    </div>
+    <div class="field" style="margin-bottom:10px">
+      <div><label class="dim" data-i18n="password">Senha</label><input id="nu-senha" type="text"></div>
+      <div><label class="dim" data-i18n="type">Tipo</label><select id="nu-papel"><option value="usuario" data-i18n="role_user">Usuário (Opus limitado)</option><option value="admin" data-i18n="role_admin">Admin (ilimitado)</option></select></div>
+    </div>
+    <button class="btn" id="nu-btn" data-i18n="create_user">Criar usuário</button>
+    <div class="status" id="nu-status" style="margin-top:10px"></div>
+  </div></div>
+
+  <!-- DRAWER CONFIGURAÇÕES -->
+  <div class="drawer" id="drawer">
+    <div class="head"><h2>⚙️ <span data-i18n="settings">Configurações</span></h2><button class="x" id="set-close">×</button></div>
+    <p class="sub" data-i18n="settings_sub">Deixe do seu jeito. Tudo salva automático.</p>
+    <div class="set-block">
+      <div class="lbl" data-i18n="language">Idioma</div>
+      <div class="opts" id="lang-opts">
+        <div class="opt" data-lang="pt">🇧🇷 Português</div>
+        <div class="opt" data-lang="en">🇺🇸 English</div>
+        <div class="opt" data-lang="es">🇪🇸 Español</div>
+      </div>
+    </div>
+    <div class="set-block">
+      <div class="lbl" data-i18n="accent">Cor de destaque</div>
+      <div class="opts" id="accent-opts">
+        <div class="swatch" data-ac="#f97316,#fb923c" style="background:linear-gradient(135deg,#f97316,#fb923c)"></div>
+        <div class="swatch" data-ac="#3b82f6,#60a5fa" style="background:linear-gradient(135deg,#3b82f6,#60a5fa)"></div>
+        <div class="swatch" data-ac="#a855f7,#c084fc" style="background:linear-gradient(135deg,#a855f7,#c084fc)"></div>
+        <div class="swatch" data-ac="#22c55e,#4ade80" style="background:linear-gradient(135deg,#22c55e,#4ade80)"></div>
+        <div class="swatch" data-ac="#ec4899,#f472b6" style="background:linear-gradient(135deg,#ec4899,#f472b6)"></div>
+        <div class="swatch" data-ac="#14b8a6,#2dd4bf" style="background:linear-gradient(135deg,#14b8a6,#2dd4bf)"></div>
+      </div>
+    </div>
+    <div class="set-block">
+      <div class="lbl" data-i18n="effects">Efeitos</div>
+      <div class="toggle"><span data-i18n="interactive_bg">Fundo interativo (mouse)</span><div class="sw on" id="sw-bg"></div></div>
+      <div class="toggle"><span data-i18n="animations">Animações</span><div class="sw on" id="sw-anim"></div></div>
+    </div>
+    <div class="ver">MAX Criador · v2.0 Premium</div>
   </div>
 
 <script>
-  let MODELO = localStorage.getItem('max_modelo') || 'gpt';
-  let OPUS = null;
-  const seg=document.getElementById('seg'), aviso=document.getElementById('aviso');
+  const $=s=>document.getElementById(s);
+  // ───────── i18n ─────────
+  const I18N={
+    pt:{tip_title:'Dica de infoproduto',model_label:'Modelo de IA',model_gpt:'GPT · barato',model_opus:'Opus · premium',
+      model_hint:'Usado só quando a IA escreve textos. As atividades abaixo não gastam nada.',
+      opus_warn:'⚠️ Opus tem custo REAL — cada geração sai do seu crédito. Pra testar, fique no GPT.',
+      free:'grátis · sem IA',atv_title:'Pack de Atividades',atv_desc:'+100 atividades printáveis (caça-palavras, labirinto, ligue, código, desembaralhe) com gabarito. Qualquer tema.',
+      theme:'Tema (nicho)',new_theme_name:'Nome do tema',new_theme_ph:'ex: Animais, Folclore, Inglês Kids',words:'Palavras (uma por linha — PALAVRA: dica)',words_hint:'Mínimo 8 palavras. A dica ajuda nas atividades.',
+      qty:'Quantidade',gen_pdf:'Gerar PDF',mat_title:'Pack de Matemática',mat_desc:'+100 atividades de conta de verdade: somar, subtrair, tabuada, ligar conta ao resultado, sequência, maior/menor. Com gabarito conferido.',
+      ia_title:'Criador com IA',uses_model:'usa modelo',ia_desc:'Ebook, workbook, guia, checklist, ficha de dinâmica, script de VSL… textos escritos pela IA, com o modelo escolhido acima.',open_ia:'Abrir Criador com IA',
+      cat_title:'Catálogo de Imagens',reuse:'reuso',cat_desc:'Todas as imagens que a gente criou. O Criador reusa automaticamente quando o tema bate — nada se desperdiça.',open_cat:'Abrir Catálogo',
+      my_account:'Minha Conta',change_pwd:'Trocar minha senha',pwd_hint:'Escolha uma senha sua (mínimo 4 caracteres).',cur_pwd:'Senha atual',new_pwd:'Nova senha',rep_pwd:'Repetir nova senha',save_pwd:'Salvar nova senha',
+      users:'Usuários',users_sub:'Quem pode acessar. Troque a senha de alguém ou adicione gente nova.',add_user:'Adicionar usuário',name:'Nome',login:'Usuário (login)',password:'Senha',type:'Tipo',role_user:'Usuário (Opus limitado)',role_admin:'Admin (ilimitado)',create_user:'Criar usuário',
+      settings:'Configurações',settings_sub:'Deixe do seu jeito. Tudo salva automático.',language:'Idioma',accent:'Cor de destaque',effects:'Efeitos',interactive_bg:'Fundo interativo (mouse)',animations:'Animações',
+      g_morning:'Bom dia',g_afternoon:'Boa tarde',g_evening:'Boa noite',splash_sub:'preparando seu estúdio…',
+      tips:['Oferta vence método: uma oferta irresistível vende até um produto mediano. Capriche na promessa.',
+        'Preço-isca (R$9,90) derruba a barreira da 1ª compra. O lucro vem nos order bumps.',
+        'Quantidade no nome vende: "+100 atividades" converte mais que "atividades variadas".',
+        'Teste 1 oferta nova por semana. A escala vem de testar muito, não de acertar de primeira.',
+        'A headline é 80% do criativo. Se o gancho não para o dedo, o resto não importa.',
+        'Prova social fecha venda: print de cliente feliz vale mais que mil promessas.',
+        'Pra low ticket, nicho de DOR > nicho de paixão. Quem sofre, compra rápido.',
+        'Order bump bom é um "sim óbvio": complementa o principal por uma fração do preço.',
+        'A recompra mora no e-mail. Capture o contato no checkout, sempre.',
+        'Foque no ÂNGULO, não no produto. O mesmo PDF vende de 5 jeitos diferentes.',
+        'Velocidade > perfeição. Lance hoje e melhore com os dados de amanhã.',
+        'Garantia de 7 dias remove o medo e aumenta a conversão mais do que assusta.',
+        'Quem fala com todo mundo não vende pra ninguém. Escolha 1 avatar e fale só com ele.',
+        'O criativo vencedor não some: escale o campeão e varie só o gancho.']},
+    en:{tip_title:'Infoproduct tip',model_label:'AI Model',model_gpt:'GPT · cheap',model_opus:'Opus · premium',
+      model_hint:'Used only when AI writes text. The activities below cost nothing.',
+      opus_warn:'⚠️ Opus has a REAL cost — each run uses your credit. To test, stick with GPT.',
+      free:'free · no AI',atv_title:'Activity Pack',atv_desc:'+100 printable activities (word search, maze, match, code, unscramble) with answer key. Any theme.',
+      theme:'Theme',new_theme_name:'Theme name',new_theme_ph:'e.g. Animals, Folklore, Kids English',words:'Words (one per line — WORD: hint)',words_hint:'At least 8 words. The hint helps the activities.',
+      qty:'Quantity',gen_pdf:'Generate PDF',mat_title:'Math Pack',mat_desc:'+100 real math activities: add, subtract, times tables, match the result, sequences, greater/less. With checked answer key.',
+      ia_title:'AI Creator',uses_model:'uses model',ia_desc:'Ebook, workbook, guide, checklist, dynamics sheet, VSL script… text written by AI with the model chosen above.',open_ia:'Open AI Creator',
+      cat_title:'Image Catalog',reuse:'reuse',cat_desc:'Every image we made. The Creator reuses them automatically when the theme matches — nothing wasted.',open_cat:'Open Catalog',
+      my_account:'My Account',change_pwd:'Change my password',pwd_hint:'Choose your password (min 4 characters).',cur_pwd:'Current password',new_pwd:'New password',rep_pwd:'Repeat new password',save_pwd:'Save new password',
+      users:'Users',users_sub:'Who can access. Change someone’s password or add new people.',add_user:'Add user',name:'Name',login:'Username (login)',password:'Password',type:'Type',role_user:'User (Opus limited)',role_admin:'Admin (unlimited)',create_user:'Create user',
+      settings:'Settings',settings_sub:'Make it yours. Everything saves automatically.',language:'Language',accent:'Accent color',effects:'Effects',interactive_bg:'Interactive background (mouse)',animations:'Animations',
+      g_morning:'Good morning',g_afternoon:'Good afternoon',g_evening:'Good evening',splash_sub:'preparing your studio…',
+      tips:['Offer beats method: an irresistible offer sells even an average product. Nail the promise.',
+        'A tripwire price ($7) removes the first-purchase barrier. Profit comes from order bumps.',
+        'Quantity in the name sells: "+100 activities" converts better than "varied activities".',
+        'Test 1 new offer a week. Scale comes from testing a lot, not nailing it first try.',
+        'The headline is 80% of the creative. If the hook doesn’t stop the scroll, nothing else matters.',
+        'Social proof closes the sale: a happy customer screenshot beats a thousand promises.',
+        'For low ticket, a PAIN niche beats a passion niche. People in pain buy fast.',
+        'A good order bump is an "obvious yes": complements the main product for a fraction of the price.',
+        'Repeat sales live in email. Always capture the contact at checkout.',
+        'Focus on the ANGLE, not the product. The same PDF sells 5 different ways.',
+        'Speed > perfection. Launch today and improve with tomorrow’s data.',
+        'A 7-day guarantee removes fear and boosts conversion more than it scares.',
+        'Talking to everyone sells to no one. Pick 1 avatar and speak only to them.',
+        'The winning creative doesn’t disappear: scale the champion and vary only the hook.']},
+    es:{tip_title:'Consejo de infoproducto',model_label:'Modelo de IA',model_gpt:'GPT · barato',model_opus:'Opus · premium',
+      model_hint:'Se usa solo cuando la IA escribe textos. Las actividades de abajo no gastan nada.',
+      opus_warn:'⚠️ Opus tiene costo REAL — cada generación sale de tu crédito. Para probar, quédate en GPT.',
+      free:'gratis · sin IA',atv_title:'Pack de Actividades',atv_desc:'+100 actividades imprimibles (sopa de letras, laberinto, unir, código, descifrar) con solucionario. Cualquier tema.',
+      theme:'Tema',new_theme_name:'Nombre del tema',new_theme_ph:'ej: Animales, Folclore, Inglés Kids',words:'Palabras (una por línea — PALABRA: pista)',words_hint:'Mínimo 8 palabras. La pista ayuda en las actividades.',
+      qty:'Cantidad',gen_pdf:'Generar PDF',mat_title:'Pack de Matemáticas',mat_desc:'+100 actividades de cuentas de verdad: sumar, restar, tablas, unir con el resultado, secuencias, mayor/menor. Con solucionario revisado.',
+      ia_title:'Creador con IA',uses_model:'usa modelo',ia_desc:'Ebook, workbook, guía, checklist, ficha de dinámica, guion de VSL… textos escritos por la IA con el modelo elegido arriba.',open_ia:'Abrir Creador con IA',
+      cat_title:'Catálogo de Imágenes',reuse:'reúso',cat_desc:'Todas las imágenes que creamos. El Creador las reutiliza automáticamente cuando el tema coincide — nada se desperdicia.',open_cat:'Abrir Catálogo',
+      my_account:'Mi Cuenta',change_pwd:'Cambiar mi contraseña',pwd_hint:'Elige tu contraseña (mín. 4 caracteres).',cur_pwd:'Contraseña actual',new_pwd:'Nueva contraseña',rep_pwd:'Repetir nueva contraseña',save_pwd:'Guardar contraseña',
+      users:'Usuarios',users_sub:'Quién puede acceder. Cambia la contraseña de alguien o agrega gente.',add_user:'Agregar usuario',name:'Nombre',login:'Usuario (login)',password:'Contraseña',type:'Tipo',role_user:'Usuario (Opus limitado)',role_admin:'Admin (ilimitado)',create_user:'Crear usuario',
+      settings:'Configuración',settings_sub:'Hazlo a tu manera. Todo se guarda solo.',language:'Idioma',accent:'Color de acento',effects:'Efectos',interactive_bg:'Fondo interactivo (ratón)',animations:'Animaciones',
+      g_morning:'Buenos días',g_afternoon:'Buenas tardes',g_evening:'Buenas noches',splash_sub:'preparando tu estudio…',
+      tips:['La oferta vence al método: una oferta irresistible vende hasta un producto mediocre. Cuida la promesa.',
+        'Un precio gancho (€7) quita la barrera de la 1ª compra. La ganancia viene en los order bumps.',
+        'La cantidad en el nombre vende: "+100 actividades" convierte más que "actividades variadas".',
+        'Prueba 1 oferta nueva por semana. La escala viene de probar mucho, no de acertar a la primera.',
+        'El titular es el 80% del creativo. Si el gancho no detiene el dedo, lo demás no importa.',
+        'La prueba social cierra la venta: una captura de un cliente feliz vale más que mil promesas.',
+        'Para low ticket, un nicho de DOLOR gana al de pasión. Quien sufre, compra rápido.',
+        'Un buen order bump es un "sí obvio": complementa el principal por una fracción del precio.',
+        'La recompra vive en el email. Captura el contacto en el checkout, siempre.',
+        'Enfócate en el ÁNGULO, no en el producto. El mismo PDF se vende de 5 formas distintas.',
+        'Velocidad > perfección. Lanza hoy y mejora con los datos de mañana.',
+        'Una garantía de 7 días quita el miedo y sube la conversión más de lo que asusta.',
+        'Hablarle a todos no le vende a nadie. Elige 1 avatar y háblale solo a él.',
+        'El creativo ganador no desaparece: escala al campeón y varía solo el gancho.']}
+  };
+  let LANG=localStorage.getItem('max_lang')||'pt';
+  const t=k=>(I18N[LANG]&&I18N[LANG][k]!=null?I18N[LANG][k]:(I18N.pt[k]!=null?I18N.pt[k]:k));
+  function applyI18n(){
+    document.querySelectorAll('[data-i18n]').forEach(e=>e.textContent=t(e.getAttribute('data-i18n')));
+    document.querySelectorAll('[data-i18n-ph]').forEach(e=>e.placeholder=t(e.getAttribute('data-i18n-ph')));
+    document.documentElement.lang=LANG==='pt'?'pt-BR':LANG;
+    atualizaGreet(); resetTips();
+  }
+
+  // ───────── CONFIG (persistente) ─────────
+  const CFG=JSON.parse(localStorage.getItem('max_cfg')||'{}');
+  CFG.ac=CFG.ac||'#f97316,#fb923c'; CFG.bg=CFG.bg!==false; CFG.anim=CFG.anim!==false;
+  function salvaCfg(){localStorage.setItem('max_cfg',JSON.stringify(CFG));}
+  function aplicaCfg(){
+    const [a1,a2]=CFG.ac.split(',');document.documentElement.style.setProperty('--ac',a1);document.documentElement.style.setProperty('--ac2',a2);
+    document.body.classList.toggle('noanim',!CFG.anim);
+    document.querySelectorAll('#accent-opts .swatch').forEach(s=>s.classList.toggle('on',s.dataset.ac===CFG.ac));
+    $('sw-bg').classList.toggle('on',CFG.bg); $('sw-anim').classList.toggle('on',CFG.anim);
+    bgOn=CFG.bg && CFG.anim; if(bgOn&&!rafRunning)loopBg();
+  }
+
+  // ───────── GREETING + DATA ─────────
+  function atualizaGreet(){
+    const h=new Date().getHours();
+    $('greet-word').textContent = h<12?t('g_morning'):h<18?t('g_afternoon'):t('g_evening');
+    const loc=LANG==='pt'?'pt-BR':LANG==='es'?'es-ES':'en-US';
+    $('greet-date').textContent=new Date().toLocaleDateString(loc,{weekday:'long',day:'numeric',month:'long'});
+    $('splash-sub').textContent=t('splash_sub');
+  }
+
+  // ───────── TIPS (troca a cada 20s) ─────────
+  let tipi=0,tipTimer=null;
+  function montaDots(){const d=$('tip-dots');const n=Math.min(t('tips').length,8);d.innerHTML='';for(let i=0;i<n;i++){const s=document.createElement('span');s.className='dot';d.appendChild(s);}}
+  function showTip(){
+    const tips=t('tips'),el=$('tip');
+    el.classList.add('out');
+    setTimeout(()=>{ el.textContent=tips[tipi%tips.length]; el.classList.remove('out');
+      const dots=$('tip-dots').children,n=dots.length; for(let i=0;i<n;i++)dots[i].classList.toggle('on',i===(tipi%n));
+      tipi++; },300);
+  }
+  function resetTips(){montaDots();tipi=0;showTip();clearInterval(tipTimer);tipTimer=setInterval(showTip,20000);}
+
+  // ───────── FUNDO INTERATIVO (partículas) ─────────
+  const cv=$('bg'),ctx=cv.getContext('2d');let W,H,parts=[],mouse={x:-9999,y:-9999},bgOn=true,rafRunning=false;
+  function resize(){W=cv.width=innerWidth;H=cv.height=innerHeight;initParts();}
+  function initParts(){const n=Math.min(95,Math.floor(W*H/17000));parts=[];for(let i=0;i<n;i++)parts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35});}
+  function loopBg(){
+    rafRunning=true;
+    if(!bgOn||document.hidden){ctx.clearRect(0,0,W,H);rafRunning=false;return;}
+    ctx.clearRect(0,0,W,H);
+    const ac=getComputedStyle(document.documentElement).getPropertyValue('--ac').trim()||'#f97316';
+    for(const p of parts){
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>W)p.vx*=-1; if(p.y<0||p.y>H)p.vy*=-1;
+      const dx=p.x-mouse.x,dy=p.y-mouse.y,d=Math.hypot(dx,dy);
+      if(d<120){const f=(120-d)/120*2;p.x+=dx/d*f;p.y+=dy/d*f;}
+      ctx.beginPath();ctx.arc(p.x,p.y,1.7,0,6.28);ctx.fillStyle='rgba(150,170,200,.5)';ctx.fill();
+    }
+    for(let i=0;i<parts.length;i++)for(let j=i+1;j<parts.length;j++){
+      const a=parts[i],b=parts[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+      if(d<130){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle=`rgba(120,140,180,${.13*(1-d/130)})`;ctx.lineWidth=1;ctx.stroke();}
+    }
+    // linha até o mouse
+    for(const p of parts){const d=Math.hypot(p.x-mouse.x,p.y-mouse.y);if(d<150){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(mouse.x,mouse.y);ctx.strokeStyle=ac.replace(')',',.18)').replace('rgb','rgba');ctx.lineWidth=1;ctx.stroke();}}
+    requestAnimationFrame(loopBg);
+  }
+  addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;
+    document.querySelectorAll('.orb').forEach((o,i)=>{const f=(i+1)*6;o.style.marginLeft=((e.clientX/W-.5)*f)+'px';o.style.marginTop=((e.clientY/H-.5)*f)+'px';});});
+  addEventListener('mouseleave',()=>{mouse.x=mouse.y=-9999;});
+  addEventListener('resize',resize);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&bgOn&&!rafRunning)loopBg();});
+  resize();
+
+  // ───────── DRAWER / SWATCHES / TOGGLES ─────────
+  $('btn-set').onclick=()=>$('drawer').classList.add('show');
+  $('set-close').onclick=()=>$('drawer').classList.remove('show');
+  $('lang-opts').querySelectorAll('.opt').forEach(o=>o.onclick=()=>{LANG=o.dataset.lang;localStorage.setItem('max_lang',LANG);marcaLang();applyI18n();});
+  function marcaLang(){$('lang-opts').querySelectorAll('.opt').forEach(o=>o.classList.toggle('on',o.dataset.lang===LANG));}
+  $('accent-opts').querySelectorAll('.swatch').forEach(s=>s.onclick=()=>{CFG.ac=s.dataset.ac;salvaCfg();aplicaCfg();});
+  $('sw-bg').onclick=()=>{CFG.bg=!CFG.bg;salvaCfg();aplicaCfg();};
+  $('sw-anim').onclick=()=>{CFG.anim=!CFG.anim;salvaCfg();aplicaCfg();};
+
+  // ───────── MODELO ─────────
+  let MODELO=localStorage.getItem('max_modelo')||'gpt',OPUS=null,EU=null;
+  const seg=$('seg'),aviso=$('aviso');
   function aplicaModelo(){
-    seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.m===MODELO));
-    aviso.classList.toggle('show', MODELO==='opus');
-    const ol=document.getElementById('opus-limite');
-    if(ol) ol.textContent=(MODELO==='opus'&&OPUS&&!OPUS.ilimitado)
-      ? `🔒 Limite: você pode usar o Opus ${OPUS.limite} vezes (é por causa do custo). Restam ${OPUS.restantes}.` : '';
-    const restoTxt=(MODELO==='opus'&&OPUS&&!OPUS.ilimitado)?` · restam ${OPUS.restantes}`:'';
-    document.getElementById('ia-modelo').textContent='Modelo atual: '+(MODELO==='opus'?'Opus (custo real)':'GPT')+restoTxt;
+    seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.m===MODELO));
+    aviso.classList.toggle('show',MODELO==='opus');
+    const ol=$('opus-limite');
+    if(ol)ol.textContent=(MODELO==='opus'&&OPUS&&!OPUS.ilimitado)?`🔒 ${OPUS.limite}x Opus (custo) · ${OPUS.restantes} ${LANG==='en'?'left':LANG==='es'?'restantes':'restantes'}`:'';
+    const resto=(MODELO==='opus'&&OPUS&&!OPUS.ilimitado)?` · ${OPUS.restantes}`:'';
+    $('ia-modelo').textContent='Modelo: '+(MODELO==='opus'?'Opus':'GPT')+resto;
     localStorage.setItem('max_modelo',MODELO);
   }
-  seg.addEventListener('click',e=>{ if(e.target.dataset.m){ MODELO=e.target.dataset.m; aplicaModelo(); }});
-  aplicaModelo();
+  seg.addEventListener('click',e=>{if(e.target.dataset.m){MODELO=e.target.dataset.m;aplicaModelo();}});
 
-  // usuário logado
+  // ───────── ME ─────────
+  let dadosProntos=false;
   fetch('/api/me').then(r=>r.json()).then(u=>{
-    if(!u||!u.nome){ location.href='/login'; return; }
-    document.getElementById('userchip').innerHTML=u.nome+'<span class="papel">'+u.papel+'</span>';
-    if(u.papel==='admin') document.getElementById('card-users').classList.remove('hide');
-    OPUS=u.opus||null; aplicaModelo();
-  });
-  document.getElementById('sair').onclick=async e=>{e.preventDefault();await fetch('/api/logout',{method:'POST'});location.href='/login';};
+    if(!u||!u.nome){location.href='/login';return;}
+    EU=u;OPUS=u.opus||null;
+    $('greet-name').textContent=u.nome.split(' ')[0];
+    $('splash-txt').textContent='Olá, '+u.nome.split(' ')[0];
+    $('userchip-nome').textContent=u.nome.split(' ')[0];$('userchip-papel').textContent=u.papel;
+    if(u.papel==='admin')$('btn-users').classList.remove('hide');
+    $('conta-info').innerHTML='<b>'+u.nome+'</b> ('+u.login+') — '+(u.papel==='admin'?'admin':'usuário')+'.';
+    aplicaModelo();dadosProntos=true;
+  }).catch(()=>location.href='/login');
+  $('sair').onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.href='/login';};
 
-  // nichos disponíveis
+  // ───────── NICHOS ─────────
   fetch('/api/estudio/nichos').then(r=>r.json()).then(d=>{
-    const sel=document.getElementById('atv-nicho');
+    const sel=$('atv-nicho');
     (d.nichos||[]).forEach(n=>{const o=document.createElement('option');o.value=n.id;o.textContent=n.nome;sel.appendChild(o);});
-    const o=document.createElement('option');o.value='__novo__';o.textContent='➕ Criar tema novo…';sel.appendChild(o);
-    sel.onchange=()=>document.getElementById('novo-wrap').classList.toggle('hide',sel.value!=='__novo__');
+    const o=document.createElement('option');o.value='__novo__';o.textContent='➕ '+(LANG==='en'?'New theme…':LANG==='es'?'Tema nuevo…':'Criar tema novo…');sel.appendChild(o);
+    sel.onchange=()=>$('novo-wrap').classList.toggle('hide',sel.value!=='__novo__');
   });
 
-  function baixar(base64,nome){
-    const a=document.createElement('a');a.href='data:application/pdf;base64,'+base64;a.download=nome;a.click();
-  }
-  async function gerar(url,body,statusEl,btn){
-    statusEl.className='status'; statusEl.innerHTML='<span class="spin"></span>Gerando… isso leva ~1 minuto, pode aguardar.';
-    btn.disabled=true;
-    try{
-      const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-      const d=await r.json();
-      if(r.ok&&d.ok){ statusEl.className='status ok'; statusEl.textContent='✅ Pronto! ('+d.paginas+' páginas) Baixando…'; baixar(d.pdf,d.filename); }
-      else { statusEl.className='status err'; statusEl.textContent='❌ '+(d.error||'Falhou.'); }
-    }catch(_){ statusEl.className='status err'; statusEl.textContent='❌ Erro de conexão.'; }
+  // ───────── GERAR ─────────
+  function baixar(b64,nome){const a=document.createElement('a');a.href='data:application/pdf;base64,'+b64;a.download=nome;a.click();}
+  async function gerar(url,body,st,btn){
+    st.className='status';st.innerHTML='<span class="spin"></span>'+(LANG==='en'?'Generating… ~1 min, please wait.':LANG==='es'?'Generando… ~1 min, espera.':'Gerando… ~1 minuto, pode aguardar.');btn.disabled=true;
+    try{const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();
+      if(r.ok&&d.ok){st.className='status ok';st.textContent='✅ '+(LANG==='en'?'Done!':LANG==='es'?'¡Listo!':'Pronto!')+' ('+d.paginas+' '+(LANG==='en'?'pages':LANG==='es'?'páginas':'páginas')+')';baixar(d.pdf,d.filename);}
+      else{st.className='status err';st.textContent='❌ '+(d.error||'erro');}
+    }catch(_){st.className='status err';st.textContent='❌ '+(LANG==='en'?'Connection error.':'Erro de conexão.');}
     btn.disabled=false;
   }
+  $('atv-btn').onclick=()=>{const nicho=$('atv-nicho').value,qtd=+$('atv-qtd').value||100,body={nicho,qtd};
+    if(nicho==='__novo__'){body.novoNicho={nome:$('novo-nome').value.trim(),termos:$('novo-termos').value.trim()};
+      if(!body.novoNicho.nome||body.novoNicho.termos.split('\n').filter(x=>x.trim()).length<8){const s=$('atv-status');s.className='status err';s.textContent='❌ '+(LANG==='en'?'Give a name and at least 8 words.':LANG==='es'?'Pon un nombre y al menos 8 palabras.':'Dê um nome e pelo menos 8 palavras.');return;}}
+    gerar('/api/estudio/atividades',body,$('atv-status'),$('atv-btn'));};
+  $('mat-btn').onclick=()=>gerar('/api/estudio/matematica',{qtd:+$('mat-qtd').value||100},$('mat-status'),$('mat-btn'));
+  $('ia-btn').onclick=async()=>{
+    if(MODELO==='opus'&&OPUS&&!OPUS.ilimitado){const r=await fetch('/api/estudio/opus/consumir',{method:'POST'});const d=await r.json();
+      if(!r.ok){alert('⛔ '+(d.mensagem||'Limite do Opus.'));MODELO='gpt';aplicaModelo();return;}OPUS.restantes=d.restantes;aplicaModelo();}
+    location.href='/criar?modelo='+MODELO;};
+  $('cat-btn').onclick=()=>window.open('/estudio/catalogo','_blank');
 
-  document.getElementById('atv-btn').onclick=()=>{
-    const nicho=document.getElementById('atv-nicho').value;
-    const qtd=+document.getElementById('atv-qtd').value||100;
-    const body={nicho,qtd};
-    if(nicho==='__novo__'){
-      body.novoNicho={nome:document.getElementById('novo-nome').value.trim(),termos:document.getElementById('novo-termos').value.trim()};
-      if(!body.novoNicho.nome||body.novoNicho.termos.split('\n').filter(x=>x.trim()).length<8){
-        const s=document.getElementById('atv-status');s.className='status err';s.textContent='❌ Dê um nome e pelo menos 8 palavras.';return;
-      }
-    }
-    gerar('/api/estudio/atividades',body,document.getElementById('atv-status'),document.getElementById('atv-btn'));
-  };
-  document.getElementById('mat-btn').onclick=()=>{
-    gerar('/api/estudio/matematica',{qtd:+document.getElementById('mat-qtd').value||100},document.getElementById('mat-status'),document.getElementById('mat-btn'));
-  };
-  document.getElementById('ia-btn').onclick=async()=>{
-    // Opus tem custo real → gasta 1 crédito e barra o usuário comum depois do limite.
-    if(MODELO==='opus' && OPUS && !OPUS.ilimitado){
-      const r=await fetch('/api/estudio/opus/consumir',{method:'POST'});
-      const d=await r.json();
-      if(!r.ok){ alert('⛔ '+(d.mensagem||'Limite do Opus atingido.')); MODELO='gpt'; aplicaModelo(); return; }
-      OPUS.restantes=d.restantes; OPUS.usado=d.usado; aplicaModelo();
-    }
-    location.href='/criar?modelo='+MODELO;
-  };
-  document.getElementById('cat-btn').onclick=()=>{ window.open('/estudio/catalogo','_blank'); };
-  const ub=document.getElementById('users-btn');
-  if(ub) ub.onclick=async()=>{
-    const s=document.getElementById('users-status');s.textContent='…';
-    const r=await fetch('/api/usuarios');const d=await r.json();
-    if(d.usuarios) s.innerHTML=d.usuarios.map(u=>'• '+u.nome+' ('+u.login+') — '+u.papel).join('<br>');
-    else s.textContent=d.error||'erro';
-  };
+  // ───────── MODAIS ─────────
+  document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('.overlay').classList.remove('show'));
+  document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show');}));
+  $('btn-conta').onclick=()=>$('ov-conta').classList.add('show');
+  $('s-btn').onclick=async()=>{const atual=$('s-atual').value,nova=$('s-nova').value,rep=$('s-rep').value,st=$('s-status');
+    if(nova.length<4){st.className='status err';st.textContent='Mín. 4 caracteres.';return;}
+    if(nova!==rep){st.className='status err';st.textContent='As senhas novas não batem.';return;}
+    st.className='status';st.textContent='…';
+    const r=await fetch('/api/conta/senha',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({atual,nova})});const d=await r.json();
+    if(r.ok&&d.ok){st.className='status ok';st.textContent='✅ Senha trocada!';$('s-atual').value=$('s-nova').value=$('s-rep').value='';}
+    else{st.className='status err';st.textContent='❌ '+(d.error||'erro');}};
+  $('btn-users').onclick=()=>{$('ov-users').classList.add('show');carregarUsers();};
+  async function carregarUsers(){const box=$('users-list');box.innerHTML='…';
+    const d=await(await fetch('/api/usuarios')).json();if(!d.usuarios){box.innerHTML='<div class="status err">'+(d.error||'erro')+'</div>';return;}
+    box.innerHTML='';d.usuarios.forEach(u=>{const div=document.createElement('div');div.className='uitem';const ehEu=EU&&u.id===EU.id;
+      div.innerHTML=`<div class="grow"><span class="nome">${u.nome}</span> <span class="lg">(${u.login})</span></div>
+        <span class="pp ${u.papel==='admin'?'admin':''}">${u.papel}</span>
+        <button class="btn sec sm" data-reset="${u.id}">${t('cur_pwd')?'🔑':''} senha</button>
+        ${ehEu?'':`<button class="btn danger sm" data-del="${u.id}">✕</button>`}
+        <div class="reset-row hide" id="rr-${u.id}"><input type="text" placeholder="nova senha" id="rs-${u.id}"><button class="btn sm" data-savereset="${u.id}">OK</button></div>`;
+      box.appendChild(div);});
+    box.querySelectorAll('[data-reset]').forEach(b=>b.onclick=()=>$('rr-'+b.dataset.reset).classList.toggle('hide'));
+    box.querySelectorAll('[data-savereset]').forEach(b=>b.onclick=async()=>{const id=b.dataset.savereset,nova=$('rs-'+id).value;
+      if(nova.length<4){alert('Mín. 4 caracteres.');return;}
+      const r=await fetch('/api/usuarios/'+id+'/senha',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nova})});const d=await r.json();
+      alert(r.ok&&d.ok?'✅ Trocada!':'❌ '+(d.error||'erro'));if(r.ok)carregarUsers();});
+    box.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{if(!confirm('Remover?'))return;
+      const r=await fetch('/api/usuarios/'+b.dataset.del,{method:'DELETE'});const d=await r.json();if(r.ok&&d.ok)carregarUsers();else alert('❌ '+(d.error||'erro'));});}
+  $('nu-btn').onclick=async()=>{const body={nome:$('nu-nome').value.trim(),login:$('nu-login').value.trim(),senha:$('nu-senha').value,papel:$('nu-papel').value};
+    const st=$('nu-status');st.className='status';st.textContent='…';
+    const r=await fetch('/api/usuarios',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();
+    if(r.ok&&d.ok){st.className='status ok';st.textContent='✅ Criado!';$('nu-nome').value=$('nu-login').value=$('nu-senha').value='';carregarUsers();}
+    else{st.className='status err';st.textContent='❌ '+(d.error||'erro');}};
+
+  // ───────── BOOT ─────────
+  marcaLang();applyI18n();aplicaCfg();
+  // splash some quando os dados chegarem (mínimo 1.6s pro efeito premium)
+  const t0=Date.now();
+  (function esperaSplash(){
+    if(dadosProntos&&Date.now()-t0>1600){$('splash').classList.add('gone');}
+    else setTimeout(esperaSplash,120);
+  })();
 </script>
 </body>
 </html>

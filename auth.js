@@ -125,6 +125,34 @@ function consumirOpus(userId) {
   return { ok: true, limite: lim, usado: u.opusUsado, restantes: lim - u.opusUsado };
 }
 
+// ── gerenciar senhas/usuários (pelo próprio site) ───────────
+function trocarSenha(userId, novaSenha) {
+  if (!novaSenha || String(novaSenha).length < 4) return { ok: false, error: 'A senha precisa de pelo menos 4 caracteres.' };
+  const lista = usuarios();
+  const u = lista.find(x => x.id === userId);
+  if (!u) return { ok: false, error: 'Usuário não encontrado.' };
+  const { salt, hash } = hashSenha(novaSenha);
+  u.salt = salt; u.hash = hash;
+  salvarUsuarios(lista);
+  return { ok: true };
+}
+function criarUsuarioPersistido(nome, login, senha, papel) {
+  if (!nome || !login || !senha) return { ok: false, error: 'Preencha nome, usuário e senha.' };
+  if (String(senha).length < 4) return { ok: false, error: 'A senha precisa de pelo menos 4 caracteres.' };
+  const lista = usuarios();
+  const lg = String(login).toLowerCase().trim();
+  if (lista.some(u => u.login === lg)) return { ok: false, error: 'Já existe um usuário com esse login.' };
+  const u = novoUsuario(nome, lg, senha, papel === 'admin' ? 'admin' : 'usuario');
+  lista.push(u); salvarUsuarios(lista);
+  return { ok: true, usuario: publico(u) };
+}
+function removerUsuario(userId) {
+  const lista = usuarios();
+  if (!lista.find(x => x.id === userId)) return { ok: false, error: 'Usuário não encontrado.' };
+  salvarUsuarios(lista.filter(x => x.id !== userId));
+  return { ok: true };
+}
+
 // ── usuário "público" (sem segredos) ────────────────────────
 function publico(u) {
   return u && { id: u.id, nome: u.nome, login: u.login, papel: u.papel, permissoes: u.permissoes, opus: opusInfo(u) };
@@ -155,4 +183,5 @@ module.exports = {
   setCookieSessao, limparCookie, exigirLogin, exigirAdmin, usuarioDaReq,
   publico, novoUsuario, salvarUsuarios, hashSenha,
   limiteOpus, opusInfo, consumirOpus,
+  trocarSenha, criarUsuarioPersistido, removerUsuario,
 };

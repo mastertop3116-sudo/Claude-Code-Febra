@@ -81,6 +81,32 @@ app.post("/api/logout", (req, res) => { auth.limparCookie(res); res.json({ ok: t
 app.get("/api/me", (req, res) => { const u = auth.usuarioDaReq(req); res.json(u ? auth.publico(u) : {}); });
 app.get("/api/usuarios", auth.exigirAdmin, (req, res) => { res.json({ usuarios: auth.usuarios().map(auth.publico) }); });
 
+// Trocar a PRÓPRIA senha (qualquer usuário logado)
+app.post("/api/conta/senha", auth.exigirLogin, (req, res) => {
+  const { atual, nova } = req.body || {};
+  const u = auth.acharPorLogin(req.usuario.login);
+  if (!u || !auth.conferirSenha(atual, u.salt, u.hash)) return res.status(400).json({ error: "Senha atual incorreta." });
+  const r = auth.trocarSenha(u.id, nova);
+  res.status(r.ok ? 200 : 400).json(r);
+});
+// Admin: criar usuário
+app.post("/api/usuarios", auth.exigirAdmin, (req, res) => {
+  const { nome, login, senha, papel } = req.body || {};
+  const r = auth.criarUsuarioPersistido(nome, login, senha, papel);
+  res.status(r.ok ? 200 : 400).json(r);
+});
+// Admin: redefinir a senha de um usuário
+app.post("/api/usuarios/:id/senha", auth.exigirAdmin, (req, res) => {
+  const r = auth.trocarSenha(req.params.id, (req.body || {}).nova);
+  res.status(r.ok ? 200 : 400).json(r);
+});
+// Admin: remover usuário (não pode remover a si mesmo)
+app.delete("/api/usuarios/:id", auth.exigirAdmin, (req, res) => {
+  if (req.params.id === req.usuario.id) return res.status(400).json({ error: "Você não pode remover a si mesmo." });
+  const r = auth.removerUsuario(req.params.id);
+  res.status(r.ok ? 200 : 400).json(r);
+});
+
 // Estúdio (protegido pelo porteiro acima)
 app.get("/estudio", (req, res) => { res.setHeader("Cache-Control", "no-store"); res.sendFile(path.join(__dirname, "views", "estudio.html")); });
 app.get("/estudio/catalogo", auth.exigirLogin, (req, res) => { res.sendFile(path.join(__dirname, "assets", "catalogo", "index.html")); });
