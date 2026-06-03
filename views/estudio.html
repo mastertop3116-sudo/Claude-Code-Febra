@@ -153,6 +153,10 @@
   .spin{display:inline-block;width:14px;height:14px;border:2px solid var(--line-2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:7px}
   @keyframes spin{to{transform:rotate(360deg)}}
   .hide{display:none!important}.dim{color:var(--faint);font-size:.8rem}
+  .pw-warn{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:18px 0 -10px;
+    padding:13px 18px;border-radius:16px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-size:.92rem;font-weight:500}
+  [data-theme="dark"] .pw-warn{background:#3a2114;border-color:#7c4a22;color:#fdba74}
+  .pw-warn .btn{background:#ea580c;color:#fff;padding:9px 16px;font-size:.86rem}
 
   footer{max-width:var(--maxw);margin:80px auto 0;padding:30px clamp(20px,5vw,64px) 50px;border-top:1px solid var(--line);
     color:var(--faint);font-size:.82rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
@@ -215,6 +219,11 @@
   </div>
 
   <main class="wrap">
+    <!-- aviso de senha padrão (segurança) -->
+    <div id="pw-warn" class="pw-warn hide">
+      <span>⚠️ <span data-i18n="pw_warn">Você está com a senha padrão. Troque agora pra proteger sua conta.</span></span>
+      <button class="btn sm" id="pw-warn-btn" data-i18n="pw_warn_btn">Trocar senha</button>
+    </div>
     <!-- HERO -->
     <section class="hero">
       <div class="eyebrow r" id="eyebrow">…</div>
@@ -228,15 +237,15 @@
       </div>
     </section>
 
-    <!-- MODELO (oculto enquanto o Criador com IA está desligado) -->
-    <section style="display:none">
+    <!-- MODELO (motor da IA — usado pelo E-book) -->
+    <section>
       <div class="sec-head r" data-reveal>
-        <h2 data-i18n="model_h">Como a IA vai escrever</h2>
+        <h2 data-i18n="model_h">Como a IA vai escrever o e-book</h2>
         <div class="seg" id="seg"><div class="thumb"></div><button data-m="gpt" class="on" data-i18n="model_gpt">GPT</button><button data-m="opus" data-i18n="model_opus">Opus</button></div>
       </div>
       <div class="opus-note r" id="opus-note" data-reveal>
         <span class="pill" data-i18n="opus_tag">custo real</span>
-        <span><span data-i18n="opus_warn">O Opus tem custo real — cada criação usa seu crédito. Para testar, fique no GPT.</span> <b id="opus-lim"></b></span>
+        <span><span data-i18n="opus_warn">O Opus tem custo real — cada criação usa seu crédito. Para testar, fique no GPT (grátis).</span> <b id="opus-lim"></b></span>
       </div>
     </section>
 
@@ -272,13 +281,23 @@
           <div class="status" id="mat-status"></div>
         </div>
 
-        <div class="card r blocked" data-reveal style="transition-delay:.12s">
-          <div class="ico neutral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3l1.9 4.7L18.5 9l-4.6 1.3L12 15l-1.9-4.7L5.5 9l4.6-1.3L12 3zM18 14l.9 2.2L21 17l-2.1.8L18 20l-.9-2.2L15 17l2.1-.8L18 14z"/></svg></div>
-          <h3 data-i18n="ia_title">Criador com IA</h3><span class="badge lock" data-i18n="unavailable">indisponível hoje</span>
-          <p data-i18n="ia_desc">Ebook, workbook, guia, checklist, ficha, script de VSL — escritos pela IA com o modelo escolhido acima.</p>
-          <small class="dim" data-i18n="ia_off">Desativado por enquanto (usa serviços pagos).</small>
+        <div class="card r" data-reveal style="transition-delay:.12s">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v15H5.5A1.5 1.5 0 0 0 4 20.5V5.5zM20 5.5A1.5 1.5 0 0 0 18.5 4H13v15h5.5a1.5 1.5 0 0 1 1.5 1.5V5.5z"/></svg></div>
+          <h3 data-i18n="ebook_title">E-book com IA</h3><span class="badge" id="ia-modelo">GPT</span>
+          <p data-i18n="ebook_desc">A IA escreve um e-book completo e ilustrado sobre o tema — capa, capítulos, exemplos e ação. Já nasce com imagem.</p>
+          <div><label class="field-label" data-i18n="ebook_about">Sobre o que é o e-book?</label>
+            <textarea id="eb-tema" rows="2" data-i18n-ph="ebook_about_ph" placeholder="ex: Como começar no jiu-jitsu depois dos 30"></textarea></div>
+          <div><label class="field-label" data-i18n="ebook_public">Pra quem é? (opcional)</label>
+            <input class="inp" id="eb-publico" data-i18n-ph="ebook_public_ph" placeholder="ex: adultos iniciantes"></div>
+          <div style="display:flex;gap:10px">
+            <div style="flex:1"><label class="field-label" data-i18n="ebook_tone">Tom</label>
+              <select id="eb-tom"><option value="conversacional" data-i18n="tom_conv">Próximo</option><option value="profissional" data-i18n="tom_prof">Profissional</option><option value="inspirador" data-i18n="tom_insp">Inspirador</option><option value="educativo" data-i18n="tom_edu">Didático</option></select></div>
+            <div style="flex:1"><label class="field-label" data-i18n="ebook_len">Tamanho</label>
+              <select id="eb-ext"><option value="curto" data-i18n="len_curto">Curto</option><option value="medio" selected data-i18n="len_medio">Médio</option><option value="longo" data-i18n="len_longo">Longo</option></select></div>
+          </div>
           <div class="grow"></div>
-          <button class="btn ghost" id="ia-btn" data-i18n="unavailable" disabled>indisponível hoje</button>
+          <button class="btn accent" id="eb-btn" data-i18n="create_ebook">Criar E-book</button>
+          <div class="status" id="eb-status"></div>
         </div>
 
         <div class="card r" data-reveal style="transition-delay:.18s">
@@ -349,12 +368,13 @@
   const $=s=>document.getElementById(s);
   // ───── i18n ─────
   const I18N={
-    pt:{tip_title:'Dica de infoproduto',model_h:'Como a IA vai escrever',model_gpt:'GPT',model_opus:'Opus',opus_tag:'custo real',
+    pt:{tip_title:'Dica de infoproduto',model_h:'Como a IA vai escrever o e-book',model_gpt:'GPT',model_opus:'Opus',opus_tag:'custo real',
       opus_warn:'O Opus tem custo real — cada criação usa seu crédito. Para testar, fique no GPT.',
       create_h:'O que você quer criar hoje',free:'grátis',atv_title:'Pack de Atividades',atv_desc:'+100 atividades printáveis com gabarito — caça-palavras, labirinto, ligue, código, desembaralhe. Qualquer tema.',
       theme:'Tema',new_theme_name:'Nome do tema',new_theme_ph:'ex: Animais, Folclore, Inglês Kids',words:'Palavras (uma por linha — PALAVRA: dica)',words_hint:'Mínimo 8 palavras.',qty:'Quantidade',gen_pdf:'Gerar PDF',
       mat_title:'Pack de Matemática',mat_desc:'+100 contas de verdade com gabarito conferido: somar, subtrair, tabuada, ligar resultado, sequência, maior/menor.',
       ia_title:'Criador com IA',uses_model:'usa modelo',ia_desc:'Ebook, workbook, guia, checklist, ficha, script de VSL — escritos pela IA com o modelo escolhido acima.',open_ia:'Abrir Criador com IA',unavailable:'indisponível hoje',ia_off:'Desativado por enquanto (usa serviços pagos).',
+      ebook_title:'E-book com IA',ebook_desc:'A IA escreve um e-book completo e ilustrado sobre o tema — capa, capítulos, exemplos e ação. Já nasce com imagem.',ebook_about:'Sobre o que é o e-book?',ebook_about_ph:'ex: Como começar no jiu-jitsu depois dos 30',ebook_public:'Pra quem é? (opcional)',ebook_public_ph:'ex: adultos iniciantes',ebook_tone:'Tom',ebook_len:'Tamanho',tom_conv:'Próximo',tom_prof:'Profissional',tom_insp:'Inspirador',tom_edu:'Didático',len_curto:'Curto',len_medio:'Médio',len_longo:'Longo',create_ebook:'Criar E-book',pw_warn:'Você está com a senha padrão. Troque agora pra proteger sua conta.',pw_warn_btn:'Trocar senha',
       cat_title:'Catálogo de Imagens',reuse:'reuso',cat_desc:'Todas as imagens que a gente criou. O Criador reusa sozinho quando o tema bate — nada se perde.',open_cat:'Abrir Catálogo',
       foot:'Feito pra criar rápido e vender mais.',my_account:'Minha Conta',change_pwd:'Trocar minha senha',cur_pwd:'Senha atual',new_pwd:'Nova senha',rep_pwd:'Repetir nova senha',save_pwd:'Salvar nova senha',
       users:'Usuários',users_sub:'Quem pode acessar. Troque a senha de alguém ou adicione gente nova.',add_user:'Adicionar usuário',name:'Nome',login:'Usuário',password:'Senha',role_user:'Usuário',role_admin:'Admin',create_user:'Criar usuário',
@@ -374,12 +394,13 @@
         'A garantia de 7 dias remove o medo e aumenta a conversão mais do que assusta.',
         'Quem fala com todo mundo não vende pra ninguém. Escolha um avatar e fale só com ele.',
         'O criativo campeão não se troca: escale o vencedor e varie só o gancho.']},
-    en:{tip_title:'Infoproduct tip',model_h:'How AI will write',model_gpt:'GPT',model_opus:'Opus',opus_tag:'real cost',
+    en:{tip_title:'Infoproduct tip',model_h:'How AI will write the e-book',model_gpt:'GPT',model_opus:'Opus',opus_tag:'real cost',
       opus_warn:'Opus has a real cost — each creation uses your credit. To test, stay on GPT.',
       create_h:'What do you want to create today',free:'free',atv_title:'Activity Pack',atv_desc:'+100 printable activities with answer key — word search, maze, match, code, unscramble. Any theme.',
       theme:'Theme',new_theme_name:'Theme name',new_theme_ph:'e.g. Animals, Folklore, Kids English',words:'Words (one per line — WORD: hint)',words_hint:'At least 8 words.',qty:'Quantity',gen_pdf:'Generate PDF',
       mat_title:'Math Pack',mat_desc:'+100 real math problems with checked answer key: add, subtract, times tables, match result, sequences, greater/less.',
       ia_title:'AI Creator',uses_model:'uses model',ia_desc:'Ebook, workbook, guide, checklist, sheet, VSL script — written by AI with the model chosen above.',open_ia:'Open AI Creator',unavailable:'unavailable today',ia_off:'Off for now (uses paid services).',
+      ebook_title:'AI E-book',ebook_desc:'The AI writes a full, illustrated e-book on your topic — cover, chapters, examples and action. Born with an image.',ebook_about:'What is the e-book about?',ebook_about_ph:'e.g. How to start jiu-jitsu after 30',ebook_public:'Who is it for? (optional)',ebook_public_ph:'e.g. adult beginners',ebook_tone:'Tone',ebook_len:'Length',tom_conv:'Friendly',tom_prof:'Professional',tom_insp:'Inspiring',tom_edu:'Educational',len_curto:'Short',len_medio:'Medium',len_longo:'Long',create_ebook:'Create E-book',pw_warn:'You are using the default password. Change it now to protect your account.',pw_warn_btn:'Change password',
       cat_title:'Image Catalog',reuse:'reuse',cat_desc:'Every image we made. The Creator reuses them when the theme matches — nothing wasted.',open_cat:'Open Catalog',
       foot:'Built to create fast and sell more.',my_account:'My Account',change_pwd:'Change my password',cur_pwd:'Current password',new_pwd:'New password',rep_pwd:'Repeat new password',save_pwd:'Save new password',
       users:'Users',users_sub:'Who can access. Change someone’s password or add new people.',add_user:'Add user',name:'Name',login:'Username',password:'Password',role_user:'User',role_admin:'Admin',create_user:'Create user',
@@ -399,12 +420,13 @@
         'A 7-day guarantee removes fear and lifts conversion more than it scares.',
         'Talking to everyone sells to no one. Pick one avatar and speak only to them.',
         'The winning creative isn’t swapped: scale the champion and vary only the hook.']},
-    es:{tip_title:'Consejo de infoproducto',model_h:'Cómo escribirá la IA',model_gpt:'GPT',model_opus:'Opus',opus_tag:'costo real',
+    es:{tip_title:'Consejo de infoproducto',model_h:'Cómo escribirá la IA el e-book',model_gpt:'GPT',model_opus:'Opus',opus_tag:'costo real',
       opus_warn:'Opus tiene costo real — cada creación usa tu crédito. Para probar, quédate en GPT.',
       create_h:'Qué quieres crear hoy',free:'gratis',atv_title:'Pack de Actividades',atv_desc:'+100 actividades imprimibles con solucionario — sopa de letras, laberinto, unir, código, descifrar. Cualquier tema.',
       theme:'Tema',new_theme_name:'Nombre del tema',new_theme_ph:'ej: Animales, Folclore, Inglés Kids',words:'Palabras (una por línea — PALABRA: pista)',words_hint:'Mínimo 8 palabras.',qty:'Cantidad',gen_pdf:'Generar PDF',
       mat_title:'Pack de Matemáticas',mat_desc:'+100 cuentas de verdad con solucionario: sumar, restar, tablas, unir resultado, secuencias, mayor/menor.',
       ia_title:'Creador con IA',uses_model:'usa modelo',ia_desc:'Ebook, workbook, guía, checklist, ficha, guion de VSL — escritos por la IA con el modelo elegido arriba.',open_ia:'Abrir Creador con IA',unavailable:'no disponible hoy',ia_off:'Desactivado por ahora (usa servicios de pago).',
+      ebook_title:'E-book con IA',ebook_desc:'La IA escribe un e-book completo e ilustrado sobre el tema — portada, capítulos, ejemplos y acción. Nace con imagen.',ebook_about:'¿De qué trata el e-book?',ebook_about_ph:'ej: Cómo empezar jiu-jitsu después de los 30',ebook_public:'¿Para quién es? (opcional)',ebook_public_ph:'ej: adultos principiantes',ebook_tone:'Tono',ebook_len:'Tamaño',tom_conv:'Cercano',tom_prof:'Profesional',tom_insp:'Inspirador',tom_edu:'Didáctico',len_curto:'Corto',len_medio:'Medio',len_longo:'Largo',create_ebook:'Crear E-book',pw_warn:'Estás usando la contraseña por defecto. Cámbiala ahora para proteger tu cuenta.',pw_warn_btn:'Cambiar contraseña',
       cat_title:'Catálogo de Imágenes',reuse:'reúso',cat_desc:'Todas las imágenes que creamos. El Creador las reutiliza cuando el tema coincide — nada se pierde.',open_cat:'Abrir Catálogo',
       foot:'Hecho para crear rápido y vender más.',my_account:'Mi Cuenta',change_pwd:'Cambiar mi contraseña',cur_pwd:'Contraseña actual',new_pwd:'Nueva contraseña',rep_pwd:'Repetir nueva contraseña',save_pwd:'Guardar contraseña',
       users:'Usuarios',users_sub:'Quién puede acceder. Cambia la contraseña de alguien o agrega gente.',add_user:'Agregar usuario',name:'Nombre',login:'Usuario',password:'Contraseña',role_user:'Usuario',role_admin:'Admin',create_user:'Crear usuario',
@@ -478,6 +500,7 @@
     $('nome').textContent=fn;$('sp-hi').textContent='Olá, '+fn;
     $('u-nome').textContent=fn;$('u-papel').textContent=u.papel;
     if(u.papel==='admin')$('btn-users').classList.remove('hide');
+    if(u.senhaPadrao)$('pw-warn').classList.remove('hide');
     $('conta-info').innerHTML='<b>'+u.nome+'</b> ('+u.login+') — '+(u.papel==='admin'?'admin':'usuário')+'.';
     applyModel();pronto=true;
   }).catch(()=>location.href='/login');
@@ -489,24 +512,34 @@
     sel.onchange=()=>$('novo-wrap').classList.toggle('hide',sel.value!=='__novo__');});
   // ───── gerar ─────
   function baixar(b,n){const a=document.createElement('a');a.href='data:application/pdf;base64,'+b;a.download=n;a.click();}
-  async function gerar(url,body,st,btn){st.className='status';st.innerHTML='<span class="spin"></span>'+(LANG==='en'?'Generating… ~1 min':LANG==='es'?'Generando… ~1 min':'Gerando… ~1 min, pode aguardar.');btn.disabled=true;
-    try{const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();
-      if(r.ok&&d.ok){st.className='status ok';st.textContent='✓ '+(LANG==='en'?'Done':LANG==='es'?'Listo':'Pronto')+' · '+d.paginas+(LANG==='en'?' pages':LANG==='es'?' págs':' págs');baixar(d.pdf,d.filename);}
-      else{st.className='status err';st.textContent='× '+(d.error||'erro');}}catch(_){st.className='status err';st.textContent='× '+(LANG==='en'?'Connection error':'Erro de conexão');}
+  async function refreshOpus(){try{const o=await(await fetch('/api/estudio/opus')).json();if(o&&typeof o.usado!=='undefined'){OPUS=o;applyModel();}}catch(_){}}
+  // mostra o cronômetro enquanto gera (tranquiliza o usuário de que não travou)
+  async function gerar(url,body,st,btn,waitMsg){
+    const t0=Date.now();st.className='status';btn.disabled=true;
+    const base=waitMsg||(LANG==='en'?'Generating…':LANG==='es'?'Generando…':'Gerando…');
+    const tick=()=>{st.innerHTML='<span class="spin"></span>'+base+' '+Math.floor((Date.now()-t0)/1000)+'s';};
+    tick();const iv=setInterval(tick,1000);
+    try{const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();clearInterval(iv);
+      if(r.ok&&d.ok){st.className='status ok';st.textContent='✓ '+(LANG==='en'?'Done':LANG==='es'?'Listo':'Pronto')+' · '+d.paginas+(LANG==='en'?' pages':LANG==='es'?' págs':' págs');baixar(d.pdf,d.filename);refreshOpus();}
+      else{st.className='status err';st.textContent='× '+(d.error||'erro');}}
+    catch(_){clearInterval(iv);st.className='status err';st.textContent='× '+(LANG==='en'?'Connection error':'Erro de conexão');}
     btn.disabled=false;}
   $('atv-btn').onclick=()=>{const nicho=$('atv-nicho').value,qtd=+$('atv-qtd').value||100,body={nicho,qtd};
     if(nicho==='__novo__'){body.novoNicho={nome:$('novo-nome').value.trim(),termos:$('novo-termos').value.trim()};
       if(!body.novoNicho.nome||body.novoNicho.termos.split('\n').filter(x=>x.trim()).length<8){const s=$('atv-status');s.className='status err';s.textContent='× '+(LANG==='en'?'Name + at least 8 words.':LANG==='es'?'Nombre + 8 palabras.':'Dê um nome e 8+ palavras.');return;}}
     gerar('/api/estudio/atividades',body,$('atv-status'),$('atv-btn'));};
   $('mat-btn').onclick=()=>gerar('/api/estudio/matematica',{qtd:+$('mat-qtd').value||100},$('mat-status'),$('mat-btn'));
-  $('ia-btn').onclick=async()=>{if(MODELO==='opus'&&OPUS&&!OPUS.ilimitado){const r=await fetch('/api/estudio/opus/consumir',{method:'POST'});const d=await r.json();
-      if(!r.ok){alert('⛔ '+(d.mensagem||'Limite do Opus.'));MODELO='gpt';applyModel();return;}OPUS.restantes=d.restantes;applyModel();}
-    location.href='/criar?modelo='+MODELO;};
+  $('eb-btn').onclick=()=>{const tema=$('eb-tema').value.trim(),st=$('eb-status');
+    if(tema.length<3){st.className='status err';st.textContent='× '+(LANG==='en'?'Say what the e-book is about.':LANG==='es'?'Di de qué trata el ebook.':'Diga sobre o que é o e-book.');return;}
+    if(MODELO==='opus'&&OPUS&&!OPUS.ilimitado&&OPUS.restantes<=0){st.className='status err';st.textContent='× '+(LANG==='en'?'No Opus credits — use GPT.':LANG==='es'?'Sin créditos Opus — usa GPT.':'Sem créditos de Opus — use o GPT (grátis).');return;}
+    const body={tema,publico:$('eb-publico').value.trim(),tom:$('eb-tom').value,extensao:$('eb-ext').value,modelo:MODELO};
+    gerar('/api/estudio/ebook',body,st,$('eb-btn'),(LANG==='en'?'Writing your e-book…':LANG==='es'?'Escribiendo tu ebook…':'Escrevendo seu e-book…'));};
   $('cat-btn').onclick=()=>window.open('/estudio/catalogo','_blank');
   // ───── modais / sheet ─────
   document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('.ov').classList.remove('show'));
   document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show');}));
   $('btn-conta').onclick=()=>$('ov-conta').classList.add('show');
+  $('pw-warn-btn').onclick=()=>$('ov-conta').classList.add('show');
   $('btn-set').onclick=()=>$('sheet').classList.add('show');
   $('set-close').onclick=()=>$('sheet').classList.remove('show');
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.ov.show').forEach(o=>o.classList.remove('show'));$('sheet').classList.remove('show');}});
@@ -524,11 +557,15 @@
   $('btn-users').onclick=()=>{$('ov-users').classList.add('show');loadUsers();};
   async function loadUsers(){const box=$('users-list');box.innerHTML='…';const d=await(await fetch('/api/usuarios')).json();if(!d.usuarios){box.innerHTML='<div class="status err">'+(d.error||'erro')+'</div>';return;}
     box.innerHTML='';d.usuarios.forEach(u=>{const div=document.createElement('div');div.className='uitem';const eu=EU&&u.id===EU.id;
-      div.innerHTML=`<div class="grow"><span class="nm">${u.nome}</span> <span class="lg">(${u.login})</span></div><span class="pp ${u.papel==='admin'?'admin':''}">${u.papel}</span>
-        <button class="btn ghost sm" data-reset="${u.id}">senha</button>${eu?'':`<button class="btn danger sm" data-del="${u.id}">remover</button>`}
+      const op=u.opus||{};const cred=op.ilimitado?'∞ Opus':((op.restantes!=null?op.restantes:'?')+'/'+op.limite+' créditos Opus');
+      div.innerHTML=`<div class="grow"><span class="nm">${u.nome}</span> <span class="lg">(${u.login})</span><div class="lg" style="margin-top:2px">${cred}${u.senhaPadrao?' · <span style="color:#c0392b">senha padrão</span>':''}</div></div><span class="pp ${u.papel==='admin'?'admin':''}">${u.papel}</span>
+        <button class="btn ghost sm" data-reset="${u.id}">senha</button>${op.ilimitado?'':`<button class="btn ghost sm" data-cred="${u.id}">+créditos</button>`}${eu?'':`<button class="btn danger sm" data-del="${u.id}">remover</button>`}
         <div class="reset-row hide" id="rr-${u.id}"><input class="inp" type="text" placeholder="nova senha" id="rs-${u.id}"><button class="btn sm" data-savereset="${u.id}">OK</button></div>`;
       box.appendChild(div);});
     box.querySelectorAll('[data-reset]').forEach(b=>b.onclick=()=>$('rr-'+b.dataset.reset).classList.toggle('hide'));
+    box.querySelectorAll('[data-cred]').forEach(b=>b.onclick=async()=>{const qtd=prompt('Quantos créditos de Opus adicionar?\n(cada crédito = 1 criação no Opus, que tem custo real)','10');if(!qtd)return;
+      const r=await fetch('/api/usuarios/'+b.dataset.cred+'/creditos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({qtd:parseInt(qtd)})});const d=await r.json();
+      alert(r.ok&&d.ok?('✓ '+(d.ilimitado?'Ilimitado':'Agora tem '+d.restantes+' créditos')):'× '+(d.error||'erro'));if(r.ok)loadUsers();});
     box.querySelectorAll('[data-savereset]').forEach(b=>b.onclick=async()=>{const id=b.dataset.savereset,nova=$('rs-'+id).value;if(nova.length<4){alert('Mín. 4 caracteres.');return;}
       const r=await fetch('/api/usuarios/'+id+'/senha',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nova})});const d=await r.json();alert(r.ok&&d.ok?'✓ Trocada!':'× '+(d.error||'erro'));if(r.ok)loadUsers();});
     box.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{if(!confirm('Remover?'))return;const r=await fetch('/api/usuarios/'+b.dataset.del,{method:'DELETE'});const d=await r.json();if(r.ok&&d.ok)loadUsers();else alert('× '+(d.error||'erro'));});}

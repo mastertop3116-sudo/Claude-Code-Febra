@@ -57,6 +57,29 @@ function escanear() {
       itens.push({ arquivo:file, pasta, rel:`assets/${pasta}/${file}`, abs, bytes, ...meta(pasta, file) });
     }
   }
+  // AUTO-CATÁLOGO: imagens que o Criador baixou de banco grátis / criou com IA, por tema.
+  // É isto que faz o catálogo do site "se alimentar sozinho".
+  const autoRoot = path.join(ASSETS, 'catalogo-auto');
+  if (fs.existsSync(autoRoot)) {
+    for (const slug of fs.readdirSync(autoRoot).sort()) {
+      const dir = path.join(autoRoot, slug);
+      let st; try { st = fs.statSync(dir); } catch (_) { continue; }
+      if (!st.isDirectory()) continue;
+      let origem = 'banco'; try { origem = (fs.readFileSync(path.join(dir, '.origem'), 'utf8').trim() || 'banco'); } catch (_) {}
+      const ehIA = origem === 'ia';
+      for (const file of fs.readdirSync(dir).sort()) {
+        if (!/\.(png|jpe?g|webp)$/i.test(file)) continue;
+        const abs = path.join(dir, file);
+        let bytes = 0; try { bytes = fs.statSync(abs).size; } catch (_) {}
+        itens.push({
+          arquivo:file, pasta:`catalogo-auto/${slug}`, rel:`assets/catalogo-auto/${slug}/${file}`, abs, bytes,
+          nicho:slug, variante: ehIA ? 'Criada pela nossa IA' : 'Foto de banco grátis',
+          tipo: ehIA ? 'imagem IA' : 'foto', transparente:false, fonte:origem,
+          chaves:[norm(slug)], tags:[slug, ehIA ? 'ia' : 'banco-gratis'],
+        });
+      }
+    }
+  }
   return itens;
 }
 
@@ -97,7 +120,7 @@ function galeriaHTML(itens, m) {
   const nichos = Object.keys(m.por_nicho).sort();
   const card = it => `
     <figure class="card ${it.transparente?'is-transp':''}" data-nicho="${it.nicho}" data-transp="${it.transparente}">
-      <div class="thumb"><img loading="lazy" src="../${it.pasta}/${it.arquivo}" alt="${it.variante}"></div>
+      <div class="thumb"><img loading="lazy" src="/catalogo-assets/${it.pasta}/${encodeURIComponent(it.arquivo)}" alt="${it.variante}"></div>
       <figcaption>
         <strong>${it.variante}</strong>
         <span class="nicho">${it.nicho}</span>
@@ -136,7 +159,11 @@ function galeriaHTML(itens, m) {
   <p class="sub">${m.total} imagens que a gente criou · atualizado em ${m.gerado_em}. Clique nos filtros pra ver por nicho. Reusadas automaticamente pelo Criador quando o nicho bate.</p>
   <div class="chips">${chips}</div>
 </header>
-<main class="grid">${itens.map(card).join('')}</main>
+${itens.length === 0 ? `<div style="max-width:620px;margin:60px auto;text-align:center;color:var(--mut);line-height:1.6">
+  <div style="font-size:42px;margin-bottom:14px">🖼️</div>
+  <h2 style="color:var(--txt);font-size:19px;margin-bottom:8px">O catálogo ainda está vazio</h2>
+  <p>Toda vez que você criar um material com IA sobre um tema novo, o sistema busca uma imagem grátis (ou cria com a nossa IA) e <b>guarda aqui automaticamente</b>. Crie seu primeiro e-book e volte aqui — as imagens daquele tema vão aparecer.</p>
+</div>` : `<main class="grid">${itens.map(card).join('')}</main>`}
 <footer>Gerado por <b>gerar-catalogo.js</b> · as imagens ficam em <code>assets/mascotes</code> e <code>assets/natacao</code></footer>
 <script>
   const chips=document.querySelectorAll('.chip'), cards=document.querySelectorAll('.card');

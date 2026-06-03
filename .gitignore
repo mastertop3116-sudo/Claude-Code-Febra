@@ -26,4 +26,8 @@ conselho_consulta.js
 
 # Usuários/senhas (criado a partir das variáveis de ambiente em produção) — NUNCA commitar
 data/usuarios.json
+data/.session_secret
 .playwright-mcp/
+
+# Cache de imagens baixadas/criadas por tema (alimenta o catálogo em runtime) — não commitar
+assets/catalogo-auto/

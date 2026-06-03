@@ -569,13 +569,13 @@ body {
 
 .texto {
   font-family: 'Inter', sans-serif;
-  font-size: 10pt;
+  font-size: 10.5pt;
   color: #1e1e2e;
-  line-height: 1.92;
+  line-height: 1.72;
   text-align: justify;
-  margin-bottom: 5mm;
+  margin-bottom: 4mm;
 }
-.texto p { margin-bottom: 3.5mm; }
+.texto p { margin-bottom: 3mm; }
 
 /* ── PULL QUOTE ── */
 .quote {
@@ -1430,8 +1430,9 @@ body {
       </div>`;
     }
     (d.capitulos||[]).forEach((c,i)=>{
-      // Página de transição antes de cada capítulo
-      html += transicao('Capítulo', c.numero||i+1, c.titulo);
+      // 1 capítulo = 1 página CHEIA. Curamos os blocos visuais (máx ~1 destaque grande)
+      // pra encher a página sem estourar e deixar páginas quase em branco.
+      const visual = boxEquacao(c.equacao) || boxContraste(c.contraste) || boxSteps(c.steps_visuais);
       html += `<div class="page">
         ${pgHeader('Capítulo '+(c.numero||i+1))}
         <div class="sec-header">
@@ -1441,14 +1442,10 @@ body {
         </div>
         <div class="pg-body">
           <div class="texto">${paras(c.conteudo||'')}</div>
-          ${boxContraste(c.contraste)}
-          ${boxEquacao(c.equacao)}
-          ${boxSteps(c.steps_visuais)}
-          ${boxDica(c.dica)}
+          ${visual}
           ${boxExemplo(c.exemplo_real)}
-          ${boxAtencao(c.atencao)}
           ${boxPratica(c.acao_pratica)}
-          ${c.citacao?`<div class="quote"><div class="quote-text">"${esc(c.citacao)}"</div></div>`:''}
+          ${boxDica(c.dica)}
           ${(c.pontos_chave||[]).length?`
             <div class="kp-label">Pontos-chave</div>
             <ul class="kp-list">${(c.pontos_chave||[]).map(p=>`<li>${esc(p)}</li>`).join('')}</ul>

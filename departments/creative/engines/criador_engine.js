@@ -9,7 +9,7 @@ const path          = require('path');
 const fs            = require('fs');
 const OpenAI        = require('openai');
 const aprendizados  = require('../../../utils/aprendizados');
-const { buscarImagemCapa, popularNicho } = require('../../../utils/imageLibrary');
+const { buscarImagemCapa, popularNicho, garantirImagemCapa, gerarImagemIA } = require('../../../utils/imageLibrary');
 
 const TEMPLATE_PATH      = path.join(__dirname, '../templates/criador-universal/index.html');
 const TEMPLATE_KIDS_PATH = path.join(__dirname, '../templates/criador-kids/index.html');
@@ -821,13 +821,15 @@ async function renderizarPDF(conteudo, params) {
 
   const ilustracaoSvg = !TIPOS_KIDS.includes(tipo) ? detectarIlustracao(params.nicho, params.tema) : null;
 
-  // Foto realista da biblioteca Supabase (se disponível)
+  // Imagem de capa: o tema "nasce com imagem". Usa o que já temos (catálogo nosso,
+  // cache local, Supabase) ou baixa 1 de banco GRÁTIS na hora (com timeout, custo zero)
+  // e guarda pra próxima vez. Se nada vier, o template cai na ilustração SVG.
   let imagemCapa = null;
   if (!TIPOS_KIDS.includes(tipo) && params.nicho) {
-    imagemCapa = await buscarImagemCapa(params.nicho).catch(() => null);
-    if (!imagemCapa) {
-      // Nicho sem foto ainda — popula em background, sem bloquear a geração
-      popularNicho(params.nicho, params.tema).catch(() => {});
+    imagemCapa = await garantirImagemCapa(params.nicho, params.tema).catch(() => null);
+    // (opcional, COM CUSTO) só gera com a nossa IA se foi pedido de propósito
+    if (!imagemCapa && params.imagemIA) {
+      imagemCapa = await gerarImagemIA(params.nicho, params.tema).catch(() => null);
     }
   }
 

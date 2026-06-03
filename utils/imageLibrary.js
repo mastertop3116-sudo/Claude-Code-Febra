@@ -12,12 +12,19 @@
 
 const https   = require('https');
 const http    = require('http');
+const fs      = require('fs');
+const path    = require('path');
 const { URL } = require('url');
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 const UNSPLASH_KEY = process.env.UNSPLASH_ACCESS_KEY;
+const PEXELS_KEY   = process.env.PEXELS_API_KEY;   // 2ª fonte grátis (opcional)
 const BUCKET       = 'criador-images';
+
+// Cache LOCAL de imagens baixadas/criadas, por tema — alimenta o Catálogo do site
+// e faz o próximo documento do mesmo tema "já nascer com imagem".
+const AUTO_DIR = path.join(__dirname, '..', 'assets', 'catalogo-auto');
 
 // ── Normaliza nicho para slug de pasta ──────────────────────
 function slugify(texto) {
@@ -123,7 +130,8 @@ function getSupa() {
 }
 
 // ── HTTP helper (para Unsplash e download de imagens) ────────
-function httpGet(urlStr, headers = {}) {
+// timeoutMs: corta a conexão se demorar — assim a geração NUNCA trava esperando imagem.
+function httpGet(urlStr, headers = {}, timeoutMs = 9000) {
   return new Promise((resolve, reject) => {
     const parsed = new URL(urlStr);
     const lib    = parsed.protocol === 'https:' ? https : http;
@@ -132,9 +140,9 @@ function httpGet(urlStr, headers = {}) {
       path:     parsed.pathname + parsed.search,
       headers:  { 'User-Agent': 'MAX-Criador/1.0', ...headers },
     };
-    lib.get(opts, res => {
+    const req = lib.get(opts, res => {
       if ([301, 302, 307, 308].includes(res.statusCode)) {
-        return httpGet(res.headers.location, headers).then(resolve).catch(reject);
+        return httpGet(res.headers.location, headers, timeoutMs).then(resolve).catch(reject);
       }
       const chunks = [];
       res.on('data', c => chunks.push(c));
@@ -143,7 +151,9 @@ function httpGet(urlStr, headers = {}) {
         body:    Buffer.concat(chunks),
         headers: res.headers,
       }));
-    }).on('error', reject);
+    });
+    req.on('error', reject);
+    req.setTimeout(timeoutMs, () => { req.destroy(new Error('timeout')); });
   });
 }
 
@@ -277,4 +287,120 @@ async function popularNicho(nicho, tema) {
   }
 }
 
-module.exports = { buscarImagemCapa, popularNicho, slugify };
+// ── Cache LOCAL (assets/catalogo-auto/<slug>/) ──────────────
+function salvarLocal(slug, buffer, ext, origem) {
+  try {
+    const dir = path.join(AUTO_DIR, slug);
+    fs.mkdirSync(dir, { recursive: true });
+    const nome = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}.${ext || 'jpg'}`;
+    fs.writeFileSync(path.join(dir, nome), buffer);
+    // marca a origem (banco grátis x IA) num arquivinho ao lado, pro catálogo mostrar
+    try { fs.writeFileSync(path.join(dir, '.origem'), origem || 'banco'); } catch (_) {}
+    return path.join(dir, nome);
+  } catch (_) { return null; }
+}
+function buscarLocalAuto(slug) {
+  try {
+    const dir = path.join(AUTO_DIR, slug);
+    if (!fs.existsSync(dir)) return null;
+    const fotos = fs.readdirSync(dir).filter(f => /\.(jpe?g|png|webp)$/i.test(f));
+    if (!fotos.length) return null;
+    const esc = fotos[Math.floor(Math.random() * fotos.length)];
+    const buf = fs.readFileSync(path.join(dir, esc));
+    const ext = path.extname(esc).slice(1).toLowerCase();
+    const mime = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg';
+    return `data:${mime};base64,${buf.toString('base64')}`;
+  } catch (_) { return null; }
+}
+
+// ── Uma foto de banco GRÁTIS (sem custo): Unsplash → Pexels ──
+async function fetchBancoGratis(nicho, tema) {
+  const kw = keywordsEn(nicho, tema);
+  // 1) Unsplash (se tiver chave)
+  if (UNSPLASH_KEY) {
+    try {
+      const apiUrl = `https://api.unsplash.com/photos/random?query=${encodeURIComponent(kw)}&orientation=portrait`;
+      const { status, body } = await httpGet(apiUrl, { 'Authorization': `Client-ID ${UNSPLASH_KEY}`, 'Accept-Version': 'v1' }, 8000);
+      if (status === 200) {
+        const j = JSON.parse(body.toString());
+        const url = j?.urls?.regular || j?.urls?.small;
+        if (url) { const img = await httpGet(url, {}, 9000); if (img.status === 200 && img.body.length) return { buffer: img.body, mime: img.headers['content-type'] || 'image/jpeg', origem: 'unsplash' }; }
+      }
+    } catch (_) {}
+  }
+  // 2) Pexels (se tiver chave) — 2ª fonte grátis
+  if (PEXELS_KEY) {
+    try {
+      const apiUrl = `https://api.pexels.com/v1/search?query=${encodeURIComponent(kw)}&orientation=portrait&per_page=10`;
+      const { status, body } = await httpGet(apiUrl, { 'Authorization': PEXELS_KEY }, 8000);
+      if (status === 200) {
+        const j = JSON.parse(body.toString());
+        const arr = (j && j.photos) || [];
+        if (arr.length) {
+          const p = arr[Math.floor(Math.random() * arr.length)];
+          const url = p?.src?.large || p?.src?.medium || p?.src?.original;
+          if (url) { const img = await httpGet(url, {}, 9000); if (img.status === 200 && img.body.length) return { buffer: img.body, mime: 'image/jpeg', origem: 'pexels' }; }
+        }
+      }
+    } catch (_) {}
+  }
+  return null;
+}
+
+// ── GARANTE uma imagem de capa pro tema, "nascendo com imagem" ──
+// Ordem: catálogo nosso (mascotes/natação) → cache local → Supabase →
+//        baixa 1 de banco grátis AGORA (com timeout) e guarda pra próxima vez.
+// Se tudo falhar, devolve null e o template usa a ilustração SVG. NUNCA trava.
+async function garantirImagemCapa(nicho, tema) {
+  // 1) o que já temos (rápido, sem rede)
+  const jaTem = await buscarImagemCapa(nicho).catch(() => null);
+  if (jaTem) return jaTem;
+  const slug = slugify(nicho);
+  const local = buscarLocalAuto(slug);
+  if (local) return local;
+
+  // 2) não temos nada → baixa 1 de banco grátis AGORA (custo zero)
+  try {
+    const foto = await fetchBancoGratis(nicho, tema);
+    if (foto && foto.buffer && foto.buffer.length) {
+      const ext = (foto.mime || '').includes('png') ? 'png' : 'jpg';
+      salvarLocal(slug, foto.buffer, ext, foto.origem);          // alimenta o catálogo + reuso local
+      try { await salvarNoSupabase(slug, foto.buffer, foto.mime); } catch (_) {} // persiste entre publicações
+      // em background, busca mais algumas pra encher o tema
+      popularNicho(nicho, tema).catch(() => {});
+      return `data:${foto.mime || 'image/jpeg'};base64,${foto.buffer.toString('base64')}`;
+    }
+  } catch (_) {}
+  // 3) ainda assim tenta encher em background pra próxima geração já ter
+  popularNicho(nicho, tema).catch(() => {});
+  return null;
+}
+
+// salva um buffer no Supabase Storage (persistência entre deploys)
+async function salvarNoSupabase(slug, buffer, mime) {
+  const supa = getSupa();
+  if (!supa) return;
+  const ext = (mime || '').includes('png') ? 'png' : 'jpg';
+  const nome = `${Date.now()}-${Math.random().toString(36).slice(2, 5)}.${ext}`;
+  try { await supa.storage.from(BUCKET).upload(`nichos/${slug}/${nome}`, buffer, { contentType: mime || 'image/jpeg', upsert: false }); } catch (_) {}
+}
+
+// ── (OPCIONAL, TEM CUSTO) Cria a imagem com a nossa IA no estilo 3D cartoon ──
+// Só roda quando explicitamente pedido (gasta dinheiro). Guarda no catálogo pra reusar.
+async function gerarImagemIA(nicho, tema) {
+  try {
+    const { openaiImage } = require('../integrations/openai');
+    const assunto = [tema, nicho].filter(Boolean).join(', ');
+    const prompt = `A cute 3D rendered cartoon illustration, Pixar/Disney style, glossy soft lighting, about "${assunto}". Friendly, colorful, centered composition, plain soft solid background, no text, no words, high quality render.`;
+    const buf = await openaiImage(prompt, '1024x1024', 'high');
+    if (buf && buf.length) {
+      const slug = slugify(nicho);
+      salvarLocal(slug, buf, 'png', 'ia');
+      try { await salvarNoSupabase(slug, buf, 'image/png'); } catch (_) {}
+      return 'data:image/png;base64,' + buf.toString('base64');
+    }
+  } catch (e) { console.warn('[imageLibrary] gerarImagemIA falhou:', e.message); }
+  return null;
+}
+
+module.exports = { buscarImagemCapa, popularNicho, slugify, garantirImagemCapa, gerarImagemIA, buscarLocalAuto, AUTO_DIR };

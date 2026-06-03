@@ -73,12 +73,38 @@ app.use((req, res, next) => {
   next();
 });
 
+// Favicon (M do NEXUS) — evita 404 no console e dá identidade na aba
+app.get("/favicon.ico", (req, res) => {
+  res.type("image/svg+xml").set("Cache-Control", "public, max-age=86400")
+    .send('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"><rect width="30" height="30" rx="6" fill="#fbfaf7"/><path d="M3 24V9L12 18L15 5L18 18L27 9V24" fill="none" stroke="#e8590c" stroke-width="2.6" stroke-linejoin="miter" stroke-linecap="square"/></svg>');
+});
+
 // Login (público)
 app.get("/login", (req, res) => { res.setHeader("Cache-Control", "no-store"); res.sendFile(path.join(__dirname, "views", "login.html")); });
+// trava anti-força-bruta no login: por IP, no máx. LOGIN_MAX tentativas por janela
+const _loginTent = new Map();
+const LOGIN_MAX = 8, LOGIN_JANELA = 15 * 60 * 1000;
+function loginBloqueado(ip) {
+  const e = _loginTent.get(ip);
+  if (!e) return false;
+  if (Date.now() - e.t0 > LOGIN_JANELA) { _loginTent.delete(ip); return false; }
+  return e.n >= LOGIN_MAX;
+}
+function falhaLogin(ip) {
+  const e = _loginTent.get(ip);
+  if (!e || Date.now() - e.t0 > LOGIN_JANELA) _loginTent.set(ip, { n: 1, t0: Date.now() });
+  else e.n++;
+}
 app.post("/api/login", (req, res) => {
+  const ip = String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "?").split(",")[0].trim();
+  if (loginBloqueado(ip)) return res.status(429).json({ error: "Muitas tentativas. Espere uns minutos e tente de novo." });
   const { login, senha } = req.body || {};
   const u = auth.acharPorLogin(login);
-  if (!u || !auth.conferirSenha(senha, u.salt, u.hash)) return res.status(401).json({ error: "Usuário ou senha incorretos." });
+  if (!u || !auth.conferirSenha(senha, u.salt, u.hash)) {
+    falhaLogin(ip);
+    return res.status(401).json({ error: "Usuário ou senha incorretos." });
+  }
+  _loginTent.delete(ip);
   auth.setCookieSessao(res, auth.criarToken(u.id));
   res.json({ ok: true, usuario: auth.publico(u) });
 });
@@ -105,6 +131,11 @@ app.post("/api/usuarios/:id/senha", auth.exigirAdmin, (req, res) => {
   const r = auth.trocarSenha(req.params.id, (req.body || {}).nova);
   res.status(r.ok ? 200 : 400).json(r);
 });
+// Admin: dar N créditos de Opus (cada crédito = 1 criação no Opus, que tem custo real)
+app.post("/api/usuarios/:id/creditos", auth.exigirAdmin, (req, res) => {
+  const r = auth.darCreditos(req.params.id, (req.body || {}).qtd);
+  res.status(r.ok ? 200 : 400).json(r);
+});
 // Admin: remover usuário (não pode remover a si mesmo)
 app.delete("/api/usuarios/:id", auth.exigirAdmin, (req, res) => {
   if (req.params.id === req.usuario.id) return res.status(400).json({ error: "Você não pode remover a si mesmo." });
@@ -114,7 +145,14 @@ app.delete("/api/usuarios/:id", auth.exigirAdmin, (req, res) => {
 
 // Estúdio (protegido pelo porteiro acima)
 app.get("/estudio", (req, res) => { res.setHeader("Cache-Control", "no-store"); res.sendFile(path.join(__dirname, "views", "estudio.html")); });
-app.get("/estudio/catalogo", auth.exigirLogin, (req, res) => { res.sendFile(path.join(__dirname, "assets", "catalogo", "index.html")); });
+// Catálogo: regenera na hora (pra mostrar as imagens que o Criador foi guardando) e serve.
+app.get("/estudio/catalogo", auth.exigirLogin, (req, res) => {
+  try { require("./utils/catalogoImagens").catalogar(); } catch (_) {}
+  res.setHeader("Cache-Control", "no-store");
+  res.sendFile(path.join(__dirname, "assets", "catalogo", "index.html"));
+});
+// Serve as imagens do catálogo (mascotes, natação e as baixadas/criadas por tema)
+app.use("/catalogo-assets", express.static(path.join(__dirname, "assets"), { maxAge: "1h", index: false }));
 
 // Lista os temas (nichos) de atividades disponíveis
 app.get("/api/estudio/nichos", auth.exigirLogin, (req, res) => {
@@ -192,6 +230,44 @@ app.post("/api/estudio/matematica", auth.exigirLogin, (req, res) => {
   const qtd = Math.max(10, Math.min(300, parseInt(req.body && req.body.qtd) || 100));
   const pdf = path.join(__dirname, "oferta-matematica", `pack-matematica-${qtd}-atividades.pdf`);
   rodarGerador("gerar-matematica.js", [String(qtd)], pdf, res);
+});
+
+// Criar E-BOOK com IA (só texto — NÃO usa ElevenLabs). Modelo: GPT (barato) ou Opus (custo real, limitado).
+app.post("/api/estudio/ebook", auth.exigirLogin, async (req, res) => {
+  const b = req.body || {};
+  const tema = String(b.tema || "").trim().slice(0, 200);   // teto de tamanho (anti-abuso)
+  const publico = String(b.publico || "").trim().slice(0, 200);
+  const TONS = ["conversacional", "profissional", "inspirador", "educativo"];
+  const tom = TONS.includes(b.tom) ? b.tom : "conversacional";
+  const EXT = ["curto", "medio", "longo"];
+  const extensao = EXT.includes(b.extensao) ? b.extensao : "medio";
+  const modelo = b.modelo === "opus" ? "opus" : "gpt";
+  if (tema.length < 3) return res.status(400).json({ error: "Diga sobre o que é o e-book." });
+  // Opus tem custo real → gasta 1 crédito do usuário (admin é ilimitado), com teto diário de segurança
+  if (modelo === "opus") {
+    const c = auth.consumirOpus(req.usuario.id);
+    if (!c.ok) {
+      const msg = c.limiteDiario
+        ? `Limite de segurança de ${c.diario} criações no Opus por dia atingido. Tente amanhã ou use o GPT (grátis).`
+        : c.esgotado ? `Você já usou seus ${c.limite} créditos do Opus (cada um tem custo real). Use o GPT, que é grátis — ou peça mais créditos ao Rodrigo.`
+        : "Não foi possível usar o Opus.";
+      return res.status(403).json({ error: msg });
+    }
+  }
+  res.setTimeout(6 * 60 * 1000);
+  try {
+    const autor = (req.usuario && req.usuario.nome) || "Autor";
+    const eng = require("./departments/creative/engines/criador_engine");
+    const conteudo = await eng.gerarConteudo({ tipo: "ebook", nicho: tema, tema, publico, tom, extensao, autor, modelo });
+    const { pdfBuffer } = await eng.renderizarPDF(conteudo, { tipo: "ebook", nicho: tema, tema, autor });
+    const buf = Buffer.from(pdfBuffer);
+    let paginas = 0; try { paginas = (await require("pdf-lib").PDFDocument.load(buf)).getPageCount(); } catch (_) {}
+    const slug = tema.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "novo";
+    res.json({ ok: true, pdf: buf.toString("base64"), filename: `ebook-${slug}.pdf`, paginas, titulo: conteudo.titulo || tema });
+  } catch (e) {
+    console.error("[estudio/ebook]", e.message);
+    res.status(500).json({ error: "Não consegui gerar o e-book. " + String(e.message).slice(0, 160) });
+  }
 });
 
 app.use(express.static(path.join(__dirname, "public"), { maxAge: "1h" }));

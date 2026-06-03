@@ -16,9 +16,31 @@ const path = require('path');
 
 const DATA_DIR = path.join(__dirname, 'data');
 const USERS_FILE = path.join(DATA_DIR, 'usuarios.json');
-const SECRET = process.env.SESSION_SECRET || 'max-criador-segredo-troque-em-producao-2026';
 const COOKIE = 'max_sessao';
 const VALIDADE_DIAS = 30;
+// Quantas criações no Opus por dia, no MÁXIMO, por usuário — trava de SEGURANÇA de custo
+// (vale até pro admin: protege a conta de um gasto disparado por engano/abuso).
+const MAX_OPUS_DIA = parseInt(process.env.MAX_OPUS_DIA) || 40;
+
+// ── SEGREDO da sessão ───────────────────────────────────────
+// Se não vier por env (SESSION_SECRET), NÃO usar um segredo fixo conhecido
+// (isso deixaria qualquer um forjar um cookie de admin). Geramos um aleatório
+// e guardamos em data/.session_secret, reusado entre reinícios.
+const SECRET = (function () {
+  if (process.env.SESSION_SECRET && process.env.SESSION_SECRET.length >= 16) return process.env.SESSION_SECRET;
+  try {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    const f = path.join(DATA_DIR, '.session_secret');
+    if (fs.existsSync(f)) { const s = fs.readFileSync(f, 'utf8').trim(); if (s.length >= 16) return s; }
+    const novo = crypto.randomBytes(32).toString('hex');
+    fs.writeFileSync(f, novo);
+    console.warn('[auth] SESSION_SECRET não definido — gerei um aleatório (data/.session_secret). Defina SESSION_SECRET no servidor para manter a sessão entre publicações.');
+    return novo;
+  } catch (_) {
+    return 'max-' + crypto.randomBytes(16).toString('hex'); // último recurso (só em memória)
+  }
+})();
+function hojeStr() { return new Date().toISOString().slice(0, 10); }
 
 // ── hash de senha (scrypt) ──────────────────────────────────
 function hashSenha(senha, salt = crypto.randomBytes(16).toString('hex')) {
@@ -40,11 +62,12 @@ function salvarUsuarios(lista) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
   fs.writeFileSync(USERS_FILE, JSON.stringify(lista, null, 2));
 }
-function novoUsuario(nome, login, senha, papel) {
+function novoUsuario(nome, login, senha, papel, senhaPadrao = false) {
   const { salt, hash } = hashSenha(senha);
   return {
     id: crypto.randomBytes(6).toString('hex'),
     nome, login: login.toLowerCase().trim(), papel, salt, hash,
+    senhaPadrao: !!senhaPadrao,   // true = ainda está com a senha padrão (mostra aviso pra trocar)
     // permissões — estrutura pronta; Rodrigo detalha depois.
     permissoes: papel === 'admin'
       ? { criar: true, atividades: true, matematica: true, usarOpus: true, gerenciarUsuarios: true, verCustos: true }
@@ -53,9 +76,10 @@ function novoUsuario(nome, login, senha, papel) {
   };
 }
 function semeie() {
+  // senhaPadrao = true quando NÃO veio senha por env (sinaliza pro usuário trocar).
   const lista = [
-    novoUsuario('Rodrigo', 'rodrigo', process.env.RODRIGO_SENHA || 'rodrigo123', 'admin'),
-    novoUsuario('Bruno',   'bruno',   process.env.BRUNO_SENHA   || 'bruno123',   'usuario'),
+    novoUsuario('Rodrigo', 'rodrigo', process.env.RODRIGO_SENHA || 'rodrigo123', 'admin',   !process.env.RODRIGO_SENHA),
+    novoUsuario('Bruno',   'bruno',   process.env.BRUNO_SENHA   || 'bruno123',   'usuario', !process.env.BRUNO_SENHA),
   ];
   salvarUsuarios(lista);
   return lista;
@@ -109,20 +133,46 @@ function limiteOpus(u) {
 }
 function opusInfo(u) {
   const lim = limiteOpus(u), usado = (u && u.opusUsado) || 0;
-  return { ilimitado: lim < 0, limite: lim, usado, restantes: lim < 0 ? null : Math.max(0, lim - usado) };
+  const oh = (u && u.opusHoje && u.opusHoje.data === hojeStr()) ? u.opusHoje.n : 0;
+  return {
+    ilimitado: lim < 0, limite: lim, usado,
+    restantes: lim < 0 ? null : Math.max(0, lim - usado),
+    diario: MAX_OPUS_DIA, usadoHoje: oh, restantesHoje: Math.max(0, MAX_OPUS_DIA - oh),
+  };
 }
-// "gasta" 1 crédito de Opus do usuário (server-side, não dá pra burlar)
+// "gasta" 1 crédito de Opus do usuário (server-side, não dá pra burlar).
+// Duas travas: (1) créditos do usuário; (2) teto DIÁRIO de segurança (vale até pro admin).
 function consumirOpus(userId) {
   const lista = usuarios();
   const u = lista.find(x => x.id === userId);
   if (!u) return { ok: false, error: 'usuário não encontrado' };
+  // trava diária de custo — protege a conta de um gasto disparado
+  const hoje = hojeStr();
+  const oh = (u.opusHoje && u.opusHoje.data === hoje) ? u.opusHoje : { data: hoje, n: 0 };
+  if (oh.n >= MAX_OPUS_DIA) return { ok: false, limiteDiario: true, diario: MAX_OPUS_DIA };
   const lim = limiteOpus(u);
-  if (lim < 0) return { ok: true, ilimitado: true };
-  const usado = u.opusUsado || 0;
-  if (usado >= lim) return { ok: false, esgotado: true, limite: lim, usado };
-  u.opusUsado = usado + 1;
+  if (lim >= 0) {
+    const usado = u.opusUsado || 0;
+    if (usado >= lim) return { ok: false, esgotado: true, limite: lim, usado };
+    u.opusUsado = usado + 1;
+  }
+  oh.n += 1; u.opusHoje = oh;
   salvarUsuarios(lista);
-  return { ok: true, limite: lim, usado: u.opusUsado, restantes: lim - u.opusUsado };
+  const base = lim < 0 ? { ilimitado: true } : { limite: lim, usado: u.opusUsado, restantes: lim - u.opusUsado };
+  return { ok: true, ...base, usadoHoje: oh.n, diario: MAX_OPUS_DIA };
+}
+// admin dá N créditos de Opus a um usuário (aumenta o limite dele)
+function darCreditos(userId, qtd) {
+  const n = parseInt(qtd);
+  if (!n || n < 1) return { ok: false, error: 'Quantidade inválida.' };
+  const lista = usuarios();
+  const u = lista.find(x => x.id === userId);
+  if (!u) return { ok: false, error: 'Usuário não encontrado.' };
+  const base = (typeof u.limiteOpus === 'number') ? u.limiteOpus : (u.papel === 'admin' ? -1 : 3);
+  if (base < 0) return { ok: true, ilimitado: true };   // admin já é ilimitado
+  u.limiteOpus = base + n;
+  salvarUsuarios(lista);
+  return { ok: true, limite: u.limiteOpus, restantes: u.limiteOpus - (u.opusUsado || 0) };
 }
 
 // ── gerenciar senhas/usuários (pelo próprio site) ───────────
@@ -133,6 +183,7 @@ function trocarSenha(userId, novaSenha) {
   if (!u) return { ok: false, error: 'Usuário não encontrado.' };
   const { salt, hash } = hashSenha(novaSenha);
   u.salt = salt; u.hash = hash;
+  u.senhaPadrao = false;   // trocou a senha → some o aviso
   salvarUsuarios(lista);
   return { ok: true };
 }
@@ -155,7 +206,7 @@ function removerUsuario(userId) {
 
 // ── usuário "público" (sem segredos) ────────────────────────
 function publico(u) {
-  return u && { id: u.id, nome: u.nome, login: u.login, papel: u.papel, permissoes: u.permissoes, opus: opusInfo(u) };
+  return u && { id: u.id, nome: u.nome, login: u.login, papel: u.papel, permissoes: u.permissoes, opus: opusInfo(u), senhaPadrao: !!u.senhaPadrao };
 }
 
 // ── middlewares ─────────────────────────────────────────────
@@ -182,6 +233,6 @@ module.exports = {
   usuarios, acharPorLogin, conferirSenha, criarToken, lerToken,
   setCookieSessao, limparCookie, exigirLogin, exigirAdmin, usuarioDaReq,
   publico, novoUsuario, salvarUsuarios, hashSenha,
-  limiteOpus, opusInfo, consumirOpus,
+  limiteOpus, opusInfo, consumirOpus, darCreditos, MAX_OPUS_DIA,
   trocarSenha, criarUsuarioPersistido, removerUsuario,
 };
