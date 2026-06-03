@@ -344,6 +344,26 @@ async function fetchBancoGratis(nicho, tema) {
       }
     } catch (_) {}
   }
+  // 3) Openverse (imagens Creative Commons, SEM CHAVE NENHUMA) — funciona em qualquer
+  // servidor, mesmo sem Unsplash/Pexels configurados. É o que garante foto no ar.
+  try {
+    const apiUrl = `https://api.openverse.org/v1/images/?q=${encodeURIComponent(kw)}&page_size=8&mature=false`;
+    const { status, body } = await httpGet(apiUrl, { 'Accept': 'application/json' }, 8000);
+    if (status === 200) {
+      const arr = (JSON.parse(body.toString()).results || []);
+      for (const cand of arr.slice(0, 4)) {   // tenta algumas (URL às vezes está fora do ar)
+        const url = cand && cand.url;
+        if (!url) continue;
+        try {
+          const img = await httpGet(url, {}, 9000);
+          const mime = (img.headers['content-type'] || 'image/jpeg').split(';')[0];
+          if (img.status === 200 && img.body.length > 3000 && /image\/(jpe?g|png|webp)/.test(mime)) {
+            return { buffer: img.body, mime, origem: 'openverse' };
+          }
+        } catch (_) {}
+      }
+    }
+  } catch (_) {}
   return null;
 }
 
