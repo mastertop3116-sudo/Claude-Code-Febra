@@ -41,12 +41,21 @@
   body.noanim .r{opacity:1;transform:none}
 
   /* ── SPLASH ── */
-  #splash{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
-    transition:opacity .8s var(--ease),transform .9s var(--ease)}
-  #splash.gone{opacity:0;transform:scale(1.12);pointer-events:none}
-  .sp-logo{width:min(60vh,74vw);height:auto;opacity:0;animation:fadein .55s var(--ease) forwards, breathe 2.6s ease-in-out .55s infinite}
+  #splash{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;
+    transition:opacity .7s var(--ease)}
+  #splash.gone{opacity:0;pointer-events:none}
+  .sp-logo{width:min(46vh,66vw);height:min(46vh,66vw);transform:scale(.32);opacity:0;perspective:2800px;
+    transition:transform .9s var(--ease),opacity .6s var(--ease)}
+  .sp-logo.in{transform:scale(1);opacity:1}
+  #splash.gone .sp-logo{transform:scale(.24);opacity:0;transition:transform .6s var(--ease),opacity .5s var(--ease)}
+  .sp-logo .mrot{position:relative;width:100%;height:100%;transform-style:preserve-3d;animation:spin3d 3.4s linear infinite}
+  .sp-logo .mrot svg{position:absolute;inset:0;width:100%;height:100%}
+  .sp-bar{width:190px;height:3px;border-radius:99px;background:var(--line);overflow:hidden;opacity:0;animation:fadein .5s .25s forwards}
+  .sp-bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-2));animation:fillbar 1.55s var(--ease) .3s forwards}
+  #splash.gone .sp-bar{opacity:0;transition:opacity .3s}
   @keyframes fadein{to{opacity:1}}
-  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+  @keyframes fillbar{to{width:100%}}
+  @keyframes spin3d{from{transform:rotateX(-12deg) rotateY(0deg)}to{transform:rotateX(-12deg) rotateY(360deg)}}
   .sp-mark{font-size:.82rem;font-weight:600;letter-spacing:.42em;text-transform:uppercase;color:var(--ink-2);padding-left:.42em;
     opacity:0;animation:spIn .9s var(--ease) .15s forwards}
   .sp-line{width:0;height:1px;background:var(--ink);animation:spLine 1.3s var(--ease) .5s forwards}
@@ -185,7 +194,8 @@
 <body>
   <!-- SPLASH -->
   <div id="splash">
-    <svg class="sp-logo" viewBox="0 0 30 30" fill="none"><defs><linearGradient id="mgSplash" x1="15" y1="2" x2="15" y2="28" gradientUnits="userSpaceOnUse"><stop class="ms0" offset="0"/><stop class="ms1" offset=".55"/><stop class="ms2" offset="1"/></linearGradient></defs><path d="M3 24V9L12 18L15 5L18 18L27 9V24" stroke="url(#mgSplash)" stroke-width="2.6" stroke-linejoin="miter" stroke-linecap="square"/></svg>
+    <div class="sp-logo" id="splogo"><div class="mrot" id="sp3d"></div></div>
+    <div class="sp-bar"><i></i></div>
     <div class="sp-hi serif" id="sp-hi">Olá</div>
   </div>
 
@@ -531,11 +541,27 @@
       hero.style.transform=`translateY(${y*0.16}px)`;hero.style.opacity=o;tl.style.opacity=o;}
   },{passive:true});
 
+  // ───── LOGO 3D (extrusão em camadas que gira) ─────
+  function buildM3D(host,n,step){
+    if(!host)return;n=n||16;step=step||3;const path='M3 24V9L12 18L15 5L18 18L27 9V24',NS='http://www.w3.org/2000/svg';
+    const lerp=(a,b,t)=>{a=parseInt(a,16);b=parseInt(b,16);const f=s=>[s>>16&255,s>>8&255,s&255],A=f(a),B=f(b);
+      return '#'+[0,1,2].map(i=>Math.round(A[i]+(B[i]-A[i])*t).toString(16).padStart(2,'0')).join('');};
+    for(let i=0;i<n;i++){const z=(i-(n-1)/2)*step,t=i/(n-1);
+      const svg=document.createElementNS(NS,'svg');svg.setAttribute('viewBox','0 0 30 30');svg.setAttribute('fill','none');
+      svg.style.transform='translateZ('+z+'px)';
+      const p=document.createElementNS(NS,'path');p.setAttribute('d',path);p.setAttribute('stroke',lerp('22222a','f1f1f6',t));
+      p.setAttribute('stroke-width','2.6');p.setAttribute('stroke-linejoin','bevel');p.setAttribute('stroke-linecap','butt');
+      svg.appendChild(p);host.appendChild(svg);}
+  }
+  buildM3D($('sp3d'),13,2.5);
+
   // ───── BOOT ─────
   markLang();applyI18n();applyCfg();
+  // M começa pequeno e cresce enquanto carrega
+  requestAnimationFrame(()=>requestAnimationFrame(()=>$('splogo').classList.add('in')));
   const t0=Date.now();
   (function boot(){
-    if(pronto&&Date.now()-t0>1500){
+    if(pronto&&Date.now()-t0>2000){
       $('splash').classList.add('gone');
       // entrada orquestrada do hero
       ['eyebrow','hero-h1','tipline'].forEach((id,i)=>setTimeout(()=>$(id).classList.add('in'),120+i*120));
