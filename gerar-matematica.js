@@ -4,8 +4,16 @@
 //   node gerar-matematica.js 100
 const fs = require('fs');
 const path = require('path');
-const puppeteer = require('puppeteer');
 const { PDFDocument } = require('pdf-lib');
+// Abre o Chrome certo: na nuvem (Render) usa @sparticuz/chromium; no PC usa o puppeteer normal.
+async function launchBrowser(){
+  const ARGS=['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage','--disable-gpu','--font-render-hinting=none'];
+  if(process.env.NODE_ENV==='production'||process.env.RENDER){
+    const chromium=require('@sparticuz/chromium');const pc=require('puppeteer-core');
+    return pc.launch({args:[...chromium.args,...ARGS],executablePath:await chromium.executablePath(),headless:chromium.headless});
+  }
+  return require('puppeteer').launch({headless:'new',args:ARGS});
+}
 
 const QTD = parseInt(process.argv[2] || '100', 10);
 const CFG = JSON.parse(fs.readFileSync(path.join(__dirname, 'nichos-atividades', 'matematica.json'), 'utf8'));
@@ -175,7 +183,7 @@ function gabPage(inner) {
     pages.push(gabPage(rows));
   }
 
-  const browser = await puppeteer.launch({ headless:'new', args:['--no-sandbox','--disable-setuid-sandbox'] });
+  const browser = await launchBrowser();
   const LOTE = 40, buffers = [];
   for (let s=0; s<pages.length; s+=LOTE) {
     const chunk = pages.slice(s, s+LOTE);

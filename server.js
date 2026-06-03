@@ -129,9 +129,13 @@ app.get("/api/estudio/nichos", auth.exigirLogin, (req, res) => {
 
 // Roda um gerador (CLI) e devolve o PDF pronto em base64
 function rodarGerador(script, args, pdfPath, res) {
-  res.setTimeout(5 * 60 * 1000);
-  execFile("node", [script, ...args], { cwd: __dirname, maxBuffer: 1024 * 1024 * 20 }, (err, _out, stderr) => {
-    if (err) { console.error("[estudio]", script, (stderr || err.message)); return res.status(500).json({ error: "Falha ao gerar. " + String(stderr || err.message).slice(0, 160) }); }
+  res.setTimeout(6 * 60 * 1000);
+  execFile("node", [script, ...args], { cwd: __dirname, maxBuffer: 1024 * 1024 * 20, timeout: 5 * 60 * 1000, killSignal: "SIGKILL" }, (err, _out, stderr) => {
+    if (err) {
+      const msg = err.killed ? "Demorou demais e foi cancelado. Tente uma quantidade menor." : String(stderr || err.message).slice(0, 200);
+      console.error("[estudio]", script, args.join(" "), "→", (stderr || err.message));
+      return res.status(500).json({ error: "Falha ao gerar. " + msg });
+    }
     try {
       const buf = fsx.readFileSync(pdfPath);
       require("pdf-lib").PDFDocument.load(buf)

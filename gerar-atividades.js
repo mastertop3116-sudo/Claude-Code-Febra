@@ -6,8 +6,16 @@
 //   node gerar-atividades.js natacao 120
 const fs = require('fs');
 const path = require('path');
-const puppeteer = require('puppeteer');
 const { PDFDocument } = require('pdf-lib');
+// Abre o Chrome certo: na nuvem (Render) usa @sparticuz/chromium; no PC usa o puppeteer normal.
+async function launchBrowser(){
+  const ARGS=['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage','--disable-gpu','--font-render-hinting=none'];
+  if(process.env.NODE_ENV==='production'||process.env.RENDER){
+    const chromium=require('@sparticuz/chromium');const pc=require('puppeteer-core');
+    return pc.launch({args:[...chromium.args,...ARGS],executablePath:await chromium.executablePath(),headless:chromium.headless});
+  }
+  return require('puppeteer').launch({headless:'new',args:ARGS});
+}
 
 const NICHO = process.argv[2] || 'jiu-jitsu';
 const QTD = parseInt(process.argv[3] || '100', 10);
@@ -262,7 +270,7 @@ function gabVisPages(list, perPage, titulo) {
   pages.push(...gabVisPages(gMaze, 9, 'Labirintos (caminho certo)'));
 
   // renderiza em blocos (Puppeteer aguenta, mas dividimos pra não estourar memória) e junta com pdf-lib
-  const browser = await puppeteer.launch({ headless:'new', args:['--no-sandbox','--disable-setuid-sandbox'] });
+  const browser = await launchBrowser();
   const LOTE = 40, buffers = [];
   for (let s=0; s<pages.length; s+=LOTE) {
     const chunk = pages.slice(s, s+LOTE);
