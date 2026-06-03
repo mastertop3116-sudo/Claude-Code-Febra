@@ -676,7 +676,9 @@ RETORNE SOMENTE O JSON COMPLETO E VÁLIDO.`;
   let raw;
   // Modelo escolhido na tela: 'gpt' (custo menor) | 'opus' (custo REAL, melhor) | padrão (sonnet).
   const _escolha = (params && params.modelo) || '';
-  const _usarGpt = _escolha === 'gpt';
+  // Pediram GPT mas o servidor não tem chave da OpenAI? Cai no Claude (Sonnet, barato)
+  // em vez de quebrar — assim o e-book NUNCA falha por falta de chave no servidor.
+  const _usarGpt = _escolha === 'gpt' && !!process.env.OPENAI_API_KEY;
   try {
     if (_usarGpt) throw new Error('modelo GPT escolhido na tela');
     const Anthropic = require('@anthropic-ai/sdk');
