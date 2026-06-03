@@ -26,7 +26,7 @@
   ::selection{background:var(--accent);color:#fff}
   .serif{font-family:'Fraunces',Georgia,serif}
   /* marca d'água gigante */
-  .ghost{position:fixed;right:-6vw;bottom:-12vh;width:62vh;color:var(--accent);opacity:.04;pointer-events:none;z-index:0}
+  .ghost{position:fixed;right:-4vw;bottom:-10vh;width:58vh;height:58vh;color:var(--ink);opacity:.045;pointer-events:none;z-index:0}
   /* card */
   .card{position:relative;z-index:1;width:100%;max-width:412px;background:var(--surface);border:1px solid var(--line);
     border-radius:30px;padding:46px 42px 40px;box-shadow:var(--shadow)}
@@ -35,7 +35,7 @@
   .anim>*:nth-child(3){animation-delay:.19s}.anim>*:nth-child(4){animation-delay:.26s}
   .anim>*:nth-child(5){animation-delay:.33s}.anim>*:nth-child(6){animation-delay:.40s}.anim>*:nth-child(7){animation-delay:.47s}
   @keyframes up{to{opacity:1;transform:none}}
-  .mark{width:46px;height:39px;color:var(--accent);display:block;margin-bottom:18px}
+  .mark{width:48px;height:48px;display:block;margin-bottom:18px}
   .wordmark{font-size:.72rem;font-weight:600;letter-spacing:.34em;text-transform:uppercase;color:var(--faint);padding-left:.34em}
   h1{font-family:'Fraunces';font-weight:400;font-size:2.7rem;letter-spacing:-.03em;line-height:1;margin:14px 0 8px}
   .sub{color:var(--ink-2);font-size:.96rem;margin-bottom:26px}
@@ -55,9 +55,9 @@
 </style>
 </head>
 <body>
-  <svg class="ghost" viewBox="0 0 120 100" fill="none"><path d="M14 86 V20 L60 66 L106 20 V86" stroke="currentColor" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <svg class="ghost" viewBox="0 0 30 30" fill="none"><path d="M3 24V9L12 18L15 5L18 18L27 9V24" stroke="currentColor" stroke-width="2.4" stroke-linejoin="miter" stroke-linecap="square"/></svg>
   <form class="card anim" id="f" autocomplete="on">
-    <svg class="mark" viewBox="0 0 120 100" fill="none"><path d="M14 86 V20 L60 66 L106 20 V86" stroke="currentColor" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg class="mark" viewBox="0 0 30 30" fill="none"><defs><linearGradient id="mgL" x1="15" y1="2" x2="15" y2="28" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#7c7c85"/><stop offset=".55" stop-color="#47474e"/><stop offset="1" stop-color="#202024"/></linearGradient></defs><path d="M3 24V9L12 18L15 5L18 18L27 9V24" stroke="url(#mgL)" stroke-width="2.6" stroke-linejoin="miter" stroke-linecap="square"/></svg>
     <div class="wordmark">MAX Criador</div>
     <h1 class="serif">Bem-vindo.</h1>
     <div>
