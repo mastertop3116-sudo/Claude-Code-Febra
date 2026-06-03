@@ -44,6 +44,7 @@
   #splash{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
     transition:opacity .9s var(--ease),transform 1s var(--ease)}
   #splash.gone{opacity:0;transform:scale(1.06);pointer-events:none}
+  .sp-logo{width:62px;height:auto;color:var(--accent);opacity:0;animation:spIn .9s var(--ease) 0s forwards}
   .sp-mark{font-size:.82rem;font-weight:600;letter-spacing:.42em;text-transform:uppercase;color:var(--ink-2);padding-left:.42em;
     opacity:0;animation:spIn .9s var(--ease) .15s forwards}
   .sp-line{width:0;height:1px;background:var(--ink);animation:spLine 1.3s var(--ease) .5s forwards}
@@ -58,6 +59,7 @@
   .top.scrolled{border-bottom-color:var(--line)}
   .wm{font-weight:600;letter-spacing:.2em;font-size:.82rem;text-transform:uppercase;display:flex;align-items:center;gap:10px}
   .wm .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+  .wm .mark{width:21px;height:18px;color:var(--accent)}
   .nav{display:flex;align-items:center;gap:6px}
   .nbtn{display:flex;align-items:center;gap:8px;height:38px;padding:0 14px;border-radius:99px;border:1px solid transparent;background:transparent;
     color:var(--ink-2);font-size:.9rem;font-weight:600;cursor:pointer;transition:.25s var(--ease)}
@@ -179,6 +181,7 @@
 <body>
   <!-- SPLASH -->
   <div id="splash">
+    <svg class="sp-logo" viewBox="0 0 120 100" fill="none"><path d="M14 86 V20 L60 66 L106 20 V86" stroke="currentColor" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <div class="sp-mark">MAX&nbsp;Criador</div>
     <div class="sp-line"></div>
     <div class="sp-hi serif" id="sp-hi">Olá</div>
@@ -186,7 +189,7 @@
 
   <!-- TOPBAR -->
   <div class="top" id="top">
-    <div class="wm"><span class="dot"></span> MAX Criador</div>
+    <div class="wm"><svg class="mark" viewBox="0 0 120 100" fill="none"><path d="M14 86 V20 L60 66 L106 20 V86" stroke="currentColor" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/></svg> MAX Criador</div>
     <div class="nav">
       <button class="nbtn nicon" id="btn-set" title="Configurações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M4.5 4.5l2 2M17.5 17.5l2 2M2.5 12h3M18.5 12h3M4.5 19.5l2-2M17.5 6.5l2-2"/></svg></button>
       <button class="nbtn chip" id="btn-conta"><span id="u-nome">…</span><span class="pp" id="u-papel"></span></button>

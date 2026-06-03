@@ -4,54 +4,89 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Entrar · MAX Criador</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#0b0f17;--card:#141b26;--line:#222c3a;--txt:#e8eef6;--mut:#8a97aa;--ac:#f97316;--ac2:#fb923c}
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{min-height:100vh;background:radial-gradient(130% 90% at 50% -10%,#1a2536 0%,var(--bg) 60%);color:var(--txt);
-    font-family:'Segoe UI',system-ui,Arial,sans-serif;display:flex;align-items:center;justify-content:center;padding:24px}
-  .card{width:100%;max-width:380px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:34px 30px;
-    box-shadow:0 24px 60px rgba(0,0,0,.45)}
-  .logo{font-size:13px;font-weight:800;letter-spacing:3px;color:var(--ac);text-transform:uppercase}
-  h1{font-size:23px;margin:6px 0 4px}
-  p.sub{color:var(--mut);font-size:13.5px;margin-bottom:22px}
-  label{display:block;font-size:12px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 6px}
-  input{width:100%;background:#0d141e;border:1px solid var(--line);border-radius:10px;color:var(--txt);
-    padding:12px 13px;font-size:15px;outline:none}
-  input:focus{border-color:var(--ac)}
-  button{width:100%;margin-top:22px;background:linear-gradient(100deg,var(--ac),var(--ac2));color:#1a1206;border:0;
-    border-radius:10px;padding:13px;font-size:15px;font-weight:800;cursor:pointer}
-  button:disabled{opacity:.6;cursor:default}
-  .erro{margin-top:14px;background:#2a1416;border:1px solid #5c2730;color:#ff9aa2;border-radius:9px;padding:10px 12px;
-    font-size:13px;display:none}
-  .rodape{margin-top:18px;text-align:center;color:var(--mut);font-size:12px}
+  :root{
+    --bg:#fbfaf7;--surface:#ffffff;--surface-2:#f6f4ef;
+    --ink:#17161a;--ink-2:#56555c;--faint:#8d8c93;
+    --line:rgba(20,18,24,.10);--line-2:rgba(20,18,24,.18);
+    --accent:#e8590c;--accent-2:#ff7a2f;--accent-soft:#fdf0e7;
+    --shadow:0 30px 70px -28px rgba(20,18,24,.30),0 8px 24px -16px rgba(20,18,24,.18);
+    --ease:cubic-bezier(.22,1,.36,1)
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{-webkit-font-smoothing:antialiased}
+  body{min-height:100vh;background:
+      radial-gradient(900px 520px at 50% -8%, #fff6ee 0%, transparent 60%),
+      var(--bg);
+    color:var(--ink);font-family:'Hanken Grotesk',system-ui,sans-serif;letter-spacing:-.01em;
+    display:flex;align-items:center;justify-content:center;padding:24px;overflow:hidden;position:relative}
+  ::selection{background:var(--accent);color:#fff}
+  .serif{font-family:'Fraunces',Georgia,serif}
+  /* marca d'água gigante */
+  .ghost{position:fixed;right:-6vw;bottom:-12vh;width:62vh;color:var(--accent);opacity:.04;pointer-events:none;z-index:0}
+  /* card */
+  .card{position:relative;z-index:1;width:100%;max-width:412px;background:var(--surface);border:1px solid var(--line);
+    border-radius:30px;padding:46px 42px 40px;box-shadow:var(--shadow)}
+  .anim>*{opacity:0;transform:translateY(14px);animation:up .8s var(--ease) forwards}
+  .anim>*:nth-child(1){animation-delay:.05s}.anim>*:nth-child(2){animation-delay:.12s}
+  .anim>*:nth-child(3){animation-delay:.19s}.anim>*:nth-child(4){animation-delay:.26s}
+  .anim>*:nth-child(5){animation-delay:.33s}.anim>*:nth-child(6){animation-delay:.40s}.anim>*:nth-child(7){animation-delay:.47s}
+  @keyframes up{to{opacity:1;transform:none}}
+  .mark{width:46px;height:39px;color:var(--accent);display:block;margin-bottom:18px}
+  .wordmark{font-size:.72rem;font-weight:600;letter-spacing:.34em;text-transform:uppercase;color:var(--faint);padding-left:.34em}
+  h1{font-family:'Fraunces';font-weight:400;font-size:2.7rem;letter-spacing:-.03em;line-height:1;margin:14px 0 8px}
+  .sub{color:var(--ink-2);font-size:.96rem;margin-bottom:26px}
+  label{display:block;font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin:0 0 7px 2px}
+  .field{margin-bottom:16px}
+  input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:14px;color:var(--ink);
+    padding:14px 15px;font-size:1.02rem;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s}
+  input:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+  button{width:100%;margin-top:8px;background:var(--accent);color:#fff;border:0;border-radius:99px;padding:15px;
+    font-size:1.02rem;font-weight:600;font-family:inherit;cursor:pointer;transition:transform .2s var(--ease),filter .2s}
+  button:hover{transform:translateY(-1px);filter:brightness(1.07)}
+  button:active{transform:none}
+  button:disabled{opacity:.6;cursor:default;transform:none}
+  .erro{margin-top:16px;font-size:.9rem;color:#c0392b;background:#fdecea;border:1px solid #f5c6c0;border-radius:12px;
+    padding:11px 13px;display:none}
+  .foot{margin-top:26px;text-align:center;color:var(--faint);font-size:.78rem;letter-spacing:.02em}
 </style>
 </head>
 <body>
-  <form class="card" id="f" autocomplete="on">
-    <div class="logo">MAX</div>
-    <h1>Criador</h1>
-    <p class="sub">Entre com seu usuário e senha pra criar seus materiais.</p>
-    <label for="login">Usuário</label>
-    <input id="login" name="login" type="text" autocomplete="username" autofocus placeholder="seu usuário">
-    <label for="senha">Senha</label>
-    <input id="senha" name="senha" type="password" autocomplete="current-password" placeholder="sua senha">
-    <button type="submit" id="btn">Entrar</button>
-    <div class="erro" id="erro"></div>
-    <div class="rodape">MAX Criador · acesso restrito</div>
+  <svg class="ghost" viewBox="0 0 120 100" fill="none"><path d="M14 86 V20 L60 66 L106 20 V86" stroke="currentColor" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <form class="card anim" id="f" autocomplete="on">
+    <svg class="mark" viewBox="0 0 120 100" fill="none"><path d="M14 86 V20 L60 66 L106 20 V86" stroke="currentColor" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="wordmark">MAX Criador</div>
+    <h1 class="serif">Bem-vindo.</h1>
+    <div>
+      <div class="sub">Entre pra criar seus materiais.</div>
+      <div class="field">
+        <label for="login">Usuário</label>
+        <input id="login" name="login" type="text" autocomplete="username" autofocus placeholder="seu usuário">
+      </div>
+      <div class="field">
+        <label for="senha">Senha</label>
+        <input id="senha" name="senha" type="password" autocomplete="current-password" placeholder="sua senha">
+      </div>
+      <button type="submit" id="btn">Entrar</button>
+      <div class="erro" id="erro"></div>
+    </div>
+    <div class="foot">Acesso restrito</div>
   </form>
 <script>
-  const f=document.getElementById('f'), btn=document.getElementById('btn'), erro=document.getElementById('erro');
+  const f=document.getElementById('f'),btn=document.getElementById('btn'),erro=document.getElementById('erro');
   const next=new URLSearchParams(location.search).get('next')||'/estudio';
-  f.addEventListener('submit', async e=>{
-    e.preventDefault(); erro.style.display='none'; btn.disabled=true; btn.textContent='Entrando...';
+  f.addEventListener('submit',async e=>{
+    e.preventDefault();erro.style.display='none';btn.disabled=true;btn.textContent='Entrando…';
     try{
       const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({login:document.getElementById('login').value,senha:document.getElementById('senha').value})});
       const d=await r.json();
-      if(r.ok&&d.ok){ location.href=next; }
-      else { erro.textContent=d.error||'Usuário ou senha incorretos.'; erro.style.display='block'; }
-    }catch(_){ erro.textContent='Erro de conexão. Tente de novo.'; erro.style.display='block'; }
-    btn.disabled=false; btn.textContent='Entrar';
+      if(r.ok&&d.ok){btn.textContent='✓';location.href=next;}
+      else{erro.textContent=d.error||'Usuário ou senha incorretos.';erro.style.display='block';btn.disabled=false;btn.textContent='Entrar';}
+    }catch(_){erro.textContent='Erro de conexão. Tente de novo.';erro.style.display='block';btn.disabled=false;btn.textContent='Entrar';}
   });
 </script>
 </body>
