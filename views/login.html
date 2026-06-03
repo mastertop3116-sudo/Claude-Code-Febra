@@ -9,31 +9,33 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#fbfaf7;--surface:#ffffff;--surface-2:#f6f4ef;
-    --ink:#17161a;--ink-2:#56555c;--faint:#8d8c93;
-    --line:rgba(20,18,24,.10);--line-2:rgba(20,18,24,.18);
-    --accent:#e8590c;--accent-2:#ff7a2f;--accent-soft:#fdf0e7;
+    --bg:#fbfaf7;--surface:#ffffff;--ink:#17161a;--ink-2:#56555c;--faint:#8d8c93;
+    --line:rgba(20,18,24,.10);--accent:#e8590c;--accent-2:#ff7a2f;--accent-soft:#fdf0e7;
     --shadow:0 30px 70px -28px rgba(20,18,24,.30),0 8px 24px -16px rgba(20,18,24,.18);
-    --ease:cubic-bezier(.22,1,.36,1)
+    --ease:cubic-bezier(.22,1,.36,1);--ease-io:cubic-bezier(.7,0,.2,1)
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html{-webkit-font-smoothing:antialiased}
-  body{min-height:100vh;background:
-      radial-gradient(900px 520px at 50% -8%, #fff6ee 0%, transparent 60%),
-      var(--bg);
+  body{min-height:100vh;background:radial-gradient(900px 520px at 50% -8%, #fff6ee 0%, transparent 60%),var(--bg);
     color:var(--ink);font-family:'Hanken Grotesk',system-ui,sans-serif;letter-spacing:-.01em;
     display:flex;align-items:center;justify-content:center;padding:24px;overflow:hidden;position:relative}
   ::selection{background:var(--accent);color:#fff}
   .serif{font-family:'Fraunces',Georgia,serif}
-  /* marca d'água gigante */
-  .ghost{position:fixed;right:-4vw;bottom:-10vh;width:58vh;height:58vh;color:var(--ink);opacity:.045;pointer-events:none;z-index:0}
-  /* card */
-  .card{position:relative;z-index:1;width:100%;max-width:412px;background:var(--surface);border:1px solid var(--line);
-    border-radius:30px;padding:46px 42px 40px;box-shadow:var(--shadow)}
+  .ms0{stop-color:#9a9aa2}.ms1{stop-color:#5a5a62}.ms2{stop-color:#26262b}
+
+  /* M GRANDE flutuando atrás da caixa */
+  .bigm{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:0;pointer-events:none}
+  .bigm svg{width:min(86vh,86vw);height:auto;opacity:.06;animation:floaty 9s ease-in-out infinite}
+  @keyframes floaty{0%,100%{transform:translateY(-14px) scale(1) rotate(-.5deg)}50%{transform:translateY(16px) scale(1.025) rotate(.5deg)}}
+
+  /* CARD */
+  .card{position:relative;z-index:2;width:100%;max-width:412px;background:var(--surface);border:1px solid var(--line);
+    border-radius:30px;padding:46px 42px 40px;box-shadow:var(--shadow);transition:opacity .45s var(--ease),transform .45s var(--ease)}
+  .card.out{opacity:0;transform:translateY(10px) scale(.965)}
   .anim>*{opacity:0;transform:translateY(14px);animation:up .8s var(--ease) forwards}
   .anim>*:nth-child(1){animation-delay:.05s}.anim>*:nth-child(2){animation-delay:.12s}
   .anim>*:nth-child(3){animation-delay:.19s}.anim>*:nth-child(4){animation-delay:.26s}
-  .anim>*:nth-child(5){animation-delay:.33s}.anim>*:nth-child(6){animation-delay:.40s}.anim>*:nth-child(7){animation-delay:.47s}
+  .anim>*:nth-child(5){animation-delay:.33s}
   @keyframes up{to{opacity:1;transform:none}}
   .mark{width:48px;height:48px;display:block;margin-bottom:18px}
   .wordmark{font-size:.72rem;font-weight:600;letter-spacing:.34em;text-transform:uppercase;color:var(--faint);padding-left:.34em}
@@ -46,37 +48,43 @@
   input:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
   button{width:100%;margin-top:8px;background:var(--accent);color:#fff;border:0;border-radius:99px;padding:15px;
     font-size:1.02rem;font-weight:600;font-family:inherit;cursor:pointer;transition:transform .2s var(--ease),filter .2s}
-  button:hover{transform:translateY(-1px);filter:brightness(1.07)}
-  button:active{transform:none}
+  button:hover{transform:translateY(-1px);filter:brightness(1.07)}button:active{transform:none}
   button:disabled{opacity:.6;cursor:default;transform:none}
-  .erro{margin-top:16px;font-size:.9rem;color:#c0392b;background:#fdecea;border:1px solid #f5c6c0;border-radius:12px;
-    padding:11px 13px;display:none}
-  .foot{margin-top:26px;text-align:center;color:var(--faint);font-size:.78rem;letter-spacing:.02em}
+  .erro{margin-top:16px;font-size:.9rem;color:#c0392b;background:#fdecea;border:1px solid #f5c6c0;border-radius:12px;padding:11px 13px;display:none}
+  .foot{margin-top:26px;text-align:center;color:var(--faint);font-size:.78rem}
+
+  /* TAKEOVER — loader pós-login: o M cresce e cobre tudo */
+  .takeover{position:fixed;inset:0;z-index:70;background:radial-gradient(900px 560px at 50% 42%, #fff6ee 0%, var(--bg) 65%);
+    display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity .45s var(--ease)}
+  .takeover.show{opacity:1;visibility:visible}
+  .takeover svg{width:min(64vh,64vw);height:auto;transform:scale(.26);opacity:.4;
+    transition:transform 1s var(--ease-io),opacity .7s var(--ease)}
+  .takeover.grow svg{transform:scale(1);opacity:1;animation:breathe 2.4s ease-in-out .9s infinite}
+  @keyframes breathe{50%{transform:scale(1.03)}}
 </style>
 </head>
 <body>
-  <svg class="ghost" viewBox="0 0 30 30" fill="none"><path d="M3 24V9L12 18L15 5L18 18L27 9V24" stroke="currentColor" stroke-width="2.4" stroke-linejoin="miter" stroke-linecap="square"/></svg>
+  <div class="bigm"><svg viewBox="0 0 30 30" fill="none"><defs><linearGradient id="mgBig" x1="15" y1="2" x2="15" y2="28" gradientUnits="userSpaceOnUse"><stop class="ms0" offset="0"/><stop class="ms1" offset=".55"/><stop class="ms2" offset="1"/></linearGradient></defs><path d="M3 24V9L12 18L15 5L18 18L27 9V24" stroke="url(#mgBig)" stroke-width="2.6" stroke-linejoin="miter" stroke-linecap="square"/></svg></div>
+
   <form class="card anim" id="f" autocomplete="on">
     <svg class="mark" viewBox="0 0 30 30" fill="none"><defs><linearGradient id="mgL" x1="15" y1="2" x2="15" y2="28" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#7c7c85"/><stop offset=".55" stop-color="#47474e"/><stop offset="1" stop-color="#202024"/></linearGradient></defs><path d="M3 24V9L12 18L15 5L18 18L27 9V24" stroke="url(#mgL)" stroke-width="2.6" stroke-linejoin="miter" stroke-linecap="square"/></svg>
     <div class="wordmark">MAX Criador</div>
     <h1 class="serif">Bem-vindo.</h1>
     <div>
       <div class="sub">Entre pra criar seus materiais.</div>
-      <div class="field">
-        <label for="login">Usuário</label>
-        <input id="login" name="login" type="text" autocomplete="username" autofocus placeholder="seu usuário">
-      </div>
-      <div class="field">
-        <label for="senha">Senha</label>
-        <input id="senha" name="senha" type="password" autocomplete="current-password" placeholder="sua senha">
-      </div>
+      <div class="field"><label for="login">Usuário</label><input id="login" name="login" type="text" autocomplete="username" autofocus placeholder="seu usuário"></div>
+      <div class="field"><label for="senha">Senha</label><input id="senha" name="senha" type="password" autocomplete="current-password" placeholder="sua senha"></div>
       <button type="submit" id="btn">Entrar</button>
       <div class="erro" id="erro"></div>
     </div>
     <div class="foot">Acesso restrito</div>
   </form>
+
+  <div class="takeover" id="takeover"><svg viewBox="0 0 30 30" fill="none"><defs><linearGradient id="mgTk" x1="15" y1="2" x2="15" y2="28" gradientUnits="userSpaceOnUse"><stop class="ms0" offset="0"/><stop class="ms1" offset=".55"/><stop class="ms2" offset="1"/></linearGradient></defs><path d="M3 24V9L12 18L15 5L18 18L27 9V24" stroke="url(#mgTk)" stroke-width="2.6" stroke-linejoin="miter" stroke-linecap="square"/></svg></div>
+
 <script>
-  const f=document.getElementById('f'),btn=document.getElementById('btn'),erro=document.getElementById('erro');
+  const f=document.getElementById('f'),btn=document.getElementById('btn'),erro=document.getElementById('erro'),
+        card=f,takeover=document.getElementById('takeover');
   const next=new URLSearchParams(location.search).get('next')||'/estudio';
   f.addEventListener('submit',async e=>{
     e.preventDefault();erro.style.display='none';btn.disabled=true;btn.textContent='Entrando…';
@@ -84,8 +92,14 @@
       const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({login:document.getElementById('login').value,senha:document.getElementById('senha').value})});
       const d=await r.json();
-      if(r.ok&&d.ok){btn.textContent='✓';location.href=next;}
-      else{erro.textContent=d.error||'Usuário ou senha incorretos.';erro.style.display='block';btn.disabled=false;btn.textContent='Entrar';}
+      if(r.ok&&d.ok){
+        // o M cresce e cobre tudo enquanto o estúdio carrega
+        takeover.classList.add('show'); card.classList.add('out');
+        requestAnimationFrame(()=>requestAnimationFrame(()=>takeover.classList.add('grow')));
+        setTimeout(()=>{location.href=next;}, 900);
+      } else {
+        erro.textContent=d.error||'Usuário ou senha incorretos.';erro.style.display='block';btn.disabled=false;btn.textContent='Entrar';
+      }
     }catch(_){erro.textContent='Erro de conexão. Tente de novo.';erro.style.display='block';btn.disabled=false;btn.textContent='Entrar';}
   });
 </script>

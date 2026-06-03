@@ -41,14 +41,16 @@
   body.noanim .r{opacity:1;transform:none}
 
   /* ── SPLASH ── */
-  #splash{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
-    transition:opacity .9s var(--ease),transform 1s var(--ease)}
-  #splash.gone{opacity:0;transform:scale(1.06);pointer-events:none}
-  .sp-logo{width:58px;height:58px;opacity:0;animation:spIn .9s var(--ease) 0s forwards}
+  #splash{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+    transition:opacity .8s var(--ease),transform .9s var(--ease)}
+  #splash.gone{opacity:0;transform:scale(1.12);pointer-events:none}
+  .sp-logo{width:min(60vh,74vw);height:auto;opacity:0;animation:fadein .55s var(--ease) forwards, breathe 2.6s ease-in-out .55s infinite}
+  @keyframes fadein{to{opacity:1}}
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
   .sp-mark{font-size:.82rem;font-weight:600;letter-spacing:.42em;text-transform:uppercase;color:var(--ink-2);padding-left:.42em;
     opacity:0;animation:spIn .9s var(--ease) .15s forwards}
   .sp-line{width:0;height:1px;background:var(--ink);animation:spLine 1.3s var(--ease) .5s forwards}
-  .sp-hi{font-size:clamp(2rem,5vw,3.2rem);font-weight:400;letter-spacing:-.03em;opacity:0;animation:spIn 1s var(--ease) .9s forwards}
+  .sp-hi{font-size:1.25rem;font-weight:500;color:var(--ink-2);letter-spacing:-.01em;opacity:0;animation:spIn .8s var(--ease) .4s forwards}
   @keyframes spIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
   @keyframes spLine{from{width:0}to{width:160px}}
 
@@ -184,8 +186,6 @@
   <!-- SPLASH -->
   <div id="splash">
     <svg class="sp-logo" viewBox="0 0 30 30" fill="none"><defs><linearGradient id="mgSplash" x1="15" y1="2" x2="15" y2="28" gradientUnits="userSpaceOnUse"><stop class="ms0" offset="0"/><stop class="ms1" offset=".55"/><stop class="ms2" offset="1"/></linearGradient></defs><path d="M3 24V9L12 18L15 5L18 18L27 9V24" stroke="url(#mgSplash)" stroke-width="2.6" stroke-linejoin="miter" stroke-linecap="square"/></svg>
-    <div class="sp-mark">MAX&nbsp;Criador</div>
-    <div class="sp-line"></div>
     <div class="sp-hi serif" id="sp-hi">Olá</div>
   </div>
 
