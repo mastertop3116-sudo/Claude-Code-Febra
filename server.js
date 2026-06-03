@@ -57,11 +57,16 @@ const path = require("path");
 const auth = require("./auth");
 const fsx = require("fs");
 const { execFile } = require("child_process");
+// Criador com IA (usa modelos pagos + ElevenLabs) — DESLIGADO por padrão. Pra religar: env CRIADOR_IA=on
+const IA_BLOQUEADA = process.env.CRIADOR_IA !== "on";
 try { require("./utils/catalogoImagens").catalogar(); } catch (_) {} // garante a galeria do catálogo (mesmo vazia no servidor)
 
 // Porteiro: páginas protegidas exigem login (ANTES do static, pra valer até pro .html)
 const PAGINAS_PROTEGIDAS = new Set(["/estudio", "/criar", "/criar.html", "/criador.html"]);
+const PAGINAS_IA = new Set(["/criar", "/criar.html", "/criador.html"]);
 app.use((req, res, next) => {
+  // Criador com IA bloqueado pra todos (inclusive acesso direto pela URL)
+  if (IA_BLOQUEADA && PAGINAS_IA.has(req.path)) return res.redirect("/estudio");
   if (PAGINAS_PROTEGIDAS.has(req.path) && !auth.usuarioDaReq(req)) {
     return res.redirect("/login?next=" + encodeURIComponent(req.originalUrl));
   }
@@ -288,6 +293,7 @@ IMPORTANTE: num_paginas deve ser entre 10 e 15 (máx 20). num_capitulos entre 5 
 
 // POST /api/criar → inicia job, retorna jobId imediatamente
 app.post("/api/criar", (req, res) => {
+  if (IA_BLOQUEADA) return res.status(403).json({ error: "O Criador com IA está desativado no momento." });
   limparJobsAntigos();
   const jobId = Math.random().toString(36).slice(2, 10);
   criarJobs.set(jobId, { status: "running", progress: 0, message: "Iniciando...", criadoEm: Date.now() });

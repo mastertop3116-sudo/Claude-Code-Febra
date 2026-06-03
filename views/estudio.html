@@ -123,6 +123,10 @@
   .card{background:var(--surface);border:1px solid var(--line);border-radius:26px;padding:30px;display:flex;flex-direction:column;gap:14px;
     box-shadow:var(--shadow-1);transition:transform .5s var(--ease),box-shadow .5s var(--ease),border-color .5s}
   .card:hover{transform:translateY(-6px);box-shadow:var(--shadow-3);border-color:var(--line-2)}
+  .card.blocked{opacity:.6}
+  .card.blocked:hover{transform:none;box-shadow:var(--shadow-1);border-color:var(--line)}
+  .badge.lock{color:#9a6a2a;background:#f3e9dc}
+  [data-theme="dark"] .badge.lock{color:#e0b070;background:#33261a}
   .card .ico{width:48px;height:48px;border-radius:15px;display:flex;align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent);margin-bottom:4px}
   .card .ico svg{width:24px;height:24px;stroke-width:1.7}
   .card .ico.neutral{background:var(--surface-2);color:var(--ink)}
@@ -224,8 +228,8 @@
       </div>
     </section>
 
-    <!-- MODELO -->
-    <section>
+    <!-- MODELO (oculto enquanto o Criador com IA está desligado) -->
+    <section style="display:none">
       <div class="sec-head r" data-reveal>
         <h2 data-i18n="model_h">Como a IA vai escrever</h2>
         <div class="seg" id="seg"><div class="thumb"></div><button data-m="gpt" class="on" data-i18n="model_gpt">GPT</button><button data-m="opus" data-i18n="model_opus">Opus</button></div>
@@ -268,13 +272,13 @@
           <div class="status" id="mat-status"></div>
         </div>
 
-        <div class="card r" data-reveal style="transition-delay:.12s">
+        <div class="card r blocked" data-reveal style="transition-delay:.12s">
           <div class="ico neutral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3l1.9 4.7L18.5 9l-4.6 1.3L12 15l-1.9-4.7L5.5 9l4.6-1.3L12 3zM18 14l.9 2.2L21 17l-2.1.8L18 20l-.9-2.2L15 17l2.1-.8L18 14z"/></svg></div>
-          <h3 data-i18n="ia_title">Criador com IA</h3><span class="badge" data-i18n="uses_model">usa modelo</span>
+          <h3 data-i18n="ia_title">Criador com IA</h3><span class="badge lock" data-i18n="unavailable">indisponível hoje</span>
           <p data-i18n="ia_desc">Ebook, workbook, guia, checklist, ficha, script de VSL — escritos pela IA com o modelo escolhido acima.</p>
-          <small class="dim" id="ia-modelo">GPT</small>
+          <small class="dim" data-i18n="ia_off">Desativado por enquanto (usa serviços pagos).</small>
           <div class="grow"></div>
-          <button class="btn ghost" id="ia-btn" data-i18n="open_ia">Abrir Criador com IA</button>
+          <button class="btn ghost" id="ia-btn" data-i18n="unavailable" disabled>indisponível hoje</button>
         </div>
 
         <div class="card r" data-reveal style="transition-delay:.18s">
@@ -350,7 +354,7 @@
       create_h:'O que você quer criar hoje',free:'grátis',atv_title:'Pack de Atividades',atv_desc:'+100 atividades printáveis com gabarito — caça-palavras, labirinto, ligue, código, desembaralhe. Qualquer tema.',
       theme:'Tema',new_theme_name:'Nome do tema',new_theme_ph:'ex: Animais, Folclore, Inglês Kids',words:'Palavras (uma por linha — PALAVRA: dica)',words_hint:'Mínimo 8 palavras.',qty:'Quantidade',gen_pdf:'Gerar PDF',
       mat_title:'Pack de Matemática',mat_desc:'+100 contas de verdade com gabarito conferido: somar, subtrair, tabuada, ligar resultado, sequência, maior/menor.',
-      ia_title:'Criador com IA',uses_model:'usa modelo',ia_desc:'Ebook, workbook, guia, checklist, ficha, script de VSL — escritos pela IA com o modelo escolhido acima.',open_ia:'Abrir Criador com IA',
+      ia_title:'Criador com IA',uses_model:'usa modelo',ia_desc:'Ebook, workbook, guia, checklist, ficha, script de VSL — escritos pela IA com o modelo escolhido acima.',open_ia:'Abrir Criador com IA',unavailable:'indisponível hoje',ia_off:'Desativado por enquanto (usa serviços pagos).',
       cat_title:'Catálogo de Imagens',reuse:'reuso',cat_desc:'Todas as imagens que a gente criou. O Criador reusa sozinho quando o tema bate — nada se perde.',open_cat:'Abrir Catálogo',
       foot:'Feito pra criar rápido e vender mais.',my_account:'Minha Conta',change_pwd:'Trocar minha senha',cur_pwd:'Senha atual',new_pwd:'Nova senha',rep_pwd:'Repetir nova senha',save_pwd:'Salvar nova senha',
       users:'Usuários',users_sub:'Quem pode acessar. Troque a senha de alguém ou adicione gente nova.',add_user:'Adicionar usuário',name:'Nome',login:'Usuário',password:'Senha',role_user:'Usuário',role_admin:'Admin',create_user:'Criar usuário',
@@ -375,7 +379,7 @@
       create_h:'What do you want to create today',free:'free',atv_title:'Activity Pack',atv_desc:'+100 printable activities with answer key — word search, maze, match, code, unscramble. Any theme.',
       theme:'Theme',new_theme_name:'Theme name',new_theme_ph:'e.g. Animals, Folklore, Kids English',words:'Words (one per line — WORD: hint)',words_hint:'At least 8 words.',qty:'Quantity',gen_pdf:'Generate PDF',
       mat_title:'Math Pack',mat_desc:'+100 real math problems with checked answer key: add, subtract, times tables, match result, sequences, greater/less.',
-      ia_title:'AI Creator',uses_model:'uses model',ia_desc:'Ebook, workbook, guide, checklist, sheet, VSL script — written by AI with the model chosen above.',open_ia:'Open AI Creator',
+      ia_title:'AI Creator',uses_model:'uses model',ia_desc:'Ebook, workbook, guide, checklist, sheet, VSL script — written by AI with the model chosen above.',open_ia:'Open AI Creator',unavailable:'unavailable today',ia_off:'Off for now (uses paid services).',
       cat_title:'Image Catalog',reuse:'reuse',cat_desc:'Every image we made. The Creator reuses them when the theme matches — nothing wasted.',open_cat:'Open Catalog',
       foot:'Built to create fast and sell more.',my_account:'My Account',change_pwd:'Change my password',cur_pwd:'Current password',new_pwd:'New password',rep_pwd:'Repeat new password',save_pwd:'Save new password',
       users:'Users',users_sub:'Who can access. Change someone’s password or add new people.',add_user:'Add user',name:'Name',login:'Username',password:'Password',role_user:'User',role_admin:'Admin',create_user:'Create user',
@@ -400,7 +404,7 @@
       create_h:'Qué quieres crear hoy',free:'gratis',atv_title:'Pack de Actividades',atv_desc:'+100 actividades imprimibles con solucionario — sopa de letras, laberinto, unir, código, descifrar. Cualquier tema.',
       theme:'Tema',new_theme_name:'Nombre del tema',new_theme_ph:'ej: Animales, Folclore, Inglés Kids',words:'Palabras (una por línea — PALABRA: pista)',words_hint:'Mínimo 8 palabras.',qty:'Cantidad',gen_pdf:'Generar PDF',
       mat_title:'Pack de Matemáticas',mat_desc:'+100 cuentas de verdad con solucionario: sumar, restar, tablas, unir resultado, secuencias, mayor/menor.',
-      ia_title:'Creador con IA',uses_model:'usa modelo',ia_desc:'Ebook, workbook, guía, checklist, ficha, guion de VSL — escritos por la IA con el modelo elegido arriba.',open_ia:'Abrir Creador con IA',
+      ia_title:'Creador con IA',uses_model:'usa modelo',ia_desc:'Ebook, workbook, guía, checklist, ficha, guion de VSL — escritos por la IA con el modelo elegido arriba.',open_ia:'Abrir Creador con IA',unavailable:'no disponible hoy',ia_off:'Desactivado por ahora (usa servicios de pago).',
       cat_title:'Catálogo de Imágenes',reuse:'reúso',cat_desc:'Todas las imágenes que creamos. El Creador las reutiliza cuando el tema coincide — nada se pierde.',open_cat:'Abrir Catálogo',
       foot:'Hecho para crear rápido y vender más.',my_account:'Mi Cuenta',change_pwd:'Cambiar mi contraseña',cur_pwd:'Contraseña actual',new_pwd:'Nueva contraseña',rep_pwd:'Repetir nueva contraseña',save_pwd:'Guardar contraseña',
       users:'Usuarios',users_sub:'Quién puede acceder. Cambia la contraseña de alguien o agrega gente.',add_user:'Agregar usuario',name:'Nombre',login:'Usuario',password:'Contraseña',role_user:'Usuario',role_admin:'Admin',create_user:'Crear usuario',
@@ -462,7 +466,7 @@
     $('opus-note').classList.toggle('show',MODELO==='opus');
     const lim=(MODELO==='opus'&&OPUS&&!OPUS.ilimitado)?`(${OPUS.restantes}/${OPUS.limite})`:'';
     $('opus-lim').textContent=lim;
-    $('ia-modelo').textContent=(MODELO==='opus'?'Opus':'GPT')+(lim?' · '+lim:'');
+    const im=$('ia-modelo'); if(im) im.textContent=(MODELO==='opus'?'Opus':'GPT')+(lim?' · '+lim:'');
     localStorage.setItem('max_modelo',MODELO);
   }
   seg.addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(b){MODELO=b.dataset.m;applyModel();}});
