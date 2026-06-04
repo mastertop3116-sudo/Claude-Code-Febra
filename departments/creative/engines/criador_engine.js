@@ -614,10 +614,11 @@ async function gerarConteudo(params) {
   const { tipo, nicho, publico, tema, tom, extensao, autor } = params;
 
   // Idioma do material (e-book na gringa). Default português.
-  const idioma = params.idioma === 'en' ? 'en' : params.idioma === 'es' ? 'es' : 'pt';
-  const _IDI_NOME = { pt: 'português do Brasil', en: 'inglês (English, US)', es: 'espanhol (Español de España)' }[idioma];
+  const _LANGS = ['pt', 'en', 'es', 'de', 'fr', 'it'];
+  const idioma = _LANGS.includes(params.idioma) ? params.idioma : 'pt';
+  const _IDI_NOME = { pt: 'português do Brasil', en: 'inglês (English, US)', es: 'espanhol (Español de España)', de: 'alemão (Deutsch)', fr: 'francês (Français)', it: 'italiano (Italiano)' }[idioma];
   const IDIOMA_INSTR = idioma === 'pt' ? '' :
-    `\n\n⚠️ IDIOMA OBRIGATÓRIO: escreva ABSOLUTAMENTE TODO o conteúdo dos VALORES do JSON em ${_IDI_NOME} — título, subtítulo, textos, exemplos, listas, citações, CTA, TUDO. Use nomes de pessoas, cidades, moeda e referências culturais coerentes com esse idioma/país. NÃO escreva NADA em português. (As CHAVES do JSON continuam exatamente como no schema; só os VALORES mudam de idioma.)`;
+    `\n\n⚠️ IDIOMA OBRIGATÓRIO: escreva ABSOLUTAMENTE TODO o conteúdo dos VALORES do JSON em ${_IDI_NOME} — título, subtítulo, textos, exemplos, listas, citações, CTA, TUDO. Use nomes de pessoas, cidades, moeda e referências culturais coerentes com esse idioma/país. NÃO escreva NADA em português. As CHAVES do JSON continuam exatamente como no schema; só os VALORES mudam de idioma. ⚠️ CRÍTICO: entregue EXATAMENTE a mesma QUANTIDADE de capítulos/itens e toda a estrutura COMPLETA exigida no schema acima (ex: 7 a 9 capítulos cheios) — NÃO resuma, NÃO encurte, NÃO entregue menos capítulos só porque mudou o idioma. Um e-book em ${_IDI_NOME} tem o MESMO tamanho de um em português.`;
 
   const TONS = {
     profissional:   'formal, com autoridade e linguagem de especialista',
@@ -673,9 +674,9 @@ Tom: ${tom}
 Extensão: ${extensao}
 Autor: ${autor}
 
-${schema}
+${schema}${IDIOMA_INSTR}
 
-RETORNE SOMENTE O JSON COMPLETO E VÁLIDO.${IDIOMA_INSTR}`;
+RETORNE SOMENTE O JSON COMPLETO E VÁLIDO.`;
 
   // PRINCIPAL: Claude (melhor pra conteúdo). Se falhar (ex: sem crédito Anthropic),
   // cai automaticamente no GPT-4o — assim o produto NUNCA para. Mesmo prompt nos dois.

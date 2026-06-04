@@ -250,7 +250,7 @@ app.post("/api/estudio/ebook", auth.exigirLogin, async (req, res) => {
   const tom = TONS.includes(b.tom) ? b.tom : "conversacional";
   const EXT = ["curto", "medio", "longo"];
   const extensao = EXT.includes(b.extensao) ? b.extensao : "medio";
-  const idioma = ["pt", "en", "es"].includes(b.idioma) ? b.idioma : "pt";   // material na gringa
+  const idioma = ["pt", "en", "es", "de", "fr", "it"].includes(b.idioma) ? b.idioma : "pt";   // material na gringa
   const modelo = b.modelo === "opus" ? "opus" : "gpt";
   if (tema.length < 3) return res.status(400).json({ error: "Diga sobre o que é o e-book." });
   // Consome 1 da COTA MENSAL do modelo escolhido (admin é ilimitado). Bloqueia SEM gerar se esgotou.
