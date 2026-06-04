@@ -1235,12 +1235,12 @@ body {
   // Rótulos fixos no idioma do material (e-book PT/EN/ES/DE/FR/IT). Default português.
   const _IDI = ['en','es','de','fr','it'].includes(d.idioma) ? d.idioma : 'pt';
   const L = ({
-    pt: { intro:'Introdução', cap:'Capítulo', concl:'Conclusão', prox:'Próximos Passos', sumario:'Sumário', pontos:'Pontos-chave', dica:'Dica do Autor', exemplo:'Exemplo Real', pratica:'Na Prática — Faça Agora', atencao:'Atenção', sabia:'Você Sabia?' },
-    en: { intro:'Introduction', cap:'Chapter', concl:'Conclusion', prox:'Next Steps', sumario:'Contents', pontos:'Key Points', dica:"Author's Tip", exemplo:'Real Example', pratica:'In Practice — Do It Now', atencao:'Warning', sabia:'Did You Know?' },
-    es: { intro:'Introducción', cap:'Capítulo', concl:'Conclusión', prox:'Próximos Pasos', sumario:'Índice', pontos:'Puntos Clave', dica:'Consejo del Autor', exemplo:'Ejemplo Real', pratica:'En la Práctica — Hazlo Ahora', atencao:'Atención', sabia:'¿Sabías?' },
-    de: { intro:'Einleitung', cap:'Kapitel', concl:'Fazit', prox:'Nächste Schritte', sumario:'Inhalt', pontos:'Kernpunkte', dica:'Tipp des Autors', exemplo:'Praxisbeispiel', pratica:'In der Praxis — Jetzt umsetzen', atencao:'Achtung', sabia:'Wussten Sie?' },
-    fr: { intro:'Introduction', cap:'Chapitre', concl:'Conclusion', prox:'Prochaines Étapes', sumario:'Sommaire', pontos:'Points Clés', dica:"Conseil de l'Auteur", exemplo:'Exemple Réel', pratica:'En Pratique — À Faire Maintenant', atencao:'Attention', sabia:'Le Saviez-vous ?' },
-    it: { intro:'Introduzione', cap:'Capitolo', concl:'Conclusione', prox:'Prossimi Passi', sumario:'Indice', pontos:'Punti Chiave', dica:"Consiglio dell'Autore", exemplo:'Esempio Reale', pratica:'In Pratica — Fallo Ora', atencao:'Attenzione', sabia:'Lo Sapevi?' },
+    pt: { intro:'Introdução', cap:'Capítulo', concl:'Conclusão', prox:'Próximos Passos', sumario:'Sumário', pontos:'Pontos-chave', dica:'Dica do Autor', exemplo:'Exemplo Real', pratica:'Na Prática — Faça Agora', atencao:'Atenção', sabia:'Você Sabia?', fecho:'Cada página que você leu foi um passo. Agora é hora de agir.', direitos:'Todos os direitos reservados' },
+    en: { intro:'Introduction', cap:'Chapter', concl:'Conclusion', prox:'Next Steps', sumario:'Contents', pontos:'Key Points', dica:"Author's Tip", exemplo:'Real Example', pratica:'In Practice — Do It Now', atencao:'Warning', sabia:'Did You Know?', fecho:"Every page you read was a step. Now it's time to act.", direitos:'All rights reserved' },
+    es: { intro:'Introducción', cap:'Capítulo', concl:'Conclusión', prox:'Próximos Pasos', sumario:'Índice', pontos:'Puntos Clave', dica:'Consejo del Autor', exemplo:'Ejemplo Real', pratica:'En la Práctica — Hazlo Ahora', atencao:'Atención', sabia:'¿Sabías?', fecho:'Cada página que leíste fue un paso. Ahora es momento de actuar.', direitos:'Todos los derechos reservados' },
+    de: { intro:'Einleitung', cap:'Kapitel', concl:'Fazit', prox:'Nächste Schritte', sumario:'Inhalt', pontos:'Kernpunkte', dica:'Tipp des Autors', exemplo:'Praxisbeispiel', pratica:'In der Praxis — Jetzt umsetzen', atencao:'Achtung', sabia:'Wussten Sie?', fecho:'Jede gelesene Seite war ein Schritt. Jetzt ist es Zeit zu handeln.', direitos:'Alle Rechte vorbehalten' },
+    fr: { intro:'Introduction', cap:'Chapitre', concl:'Conclusion', prox:'Prochaines Étapes', sumario:'Sommaire', pontos:'Points Clés', dica:"Conseil de l'Auteur", exemplo:'Exemple Réel', pratica:'En Pratique — À Faire Maintenant', atencao:'Attention', sabia:'Le Saviez-vous ?', fecho:"Chaque page lue était un pas. Maintenant, il est temps d'agir.", direitos:'Tous droits réservés' },
+    it: { intro:'Introduzione', cap:'Capitolo', concl:'Conclusione', prox:'Prossimi Passi', sumario:'Indice', pontos:'Punti Chiave', dica:"Consiglio dell'Autore", exemplo:'Esempio Reale', pratica:'In Pratica — Fallo Ora', atencao:'Attenzione', sabia:'Lo Sapevi?', fecho:'Ogni pagina letta è stata un passo. Ora è il momento di agire.', direitos:'Tutti i diritti riservati' },
   })[_IDI];
 
   function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -1932,7 +1932,9 @@ body {
     script_vsl:      'Palavras certas. Momento certo. Transformação garantida.',
     debate_politico: 'Dados não têm partido. Quem conhece os fatos, vence o debate.',
   };
-  const fraseFechamento = FRASES_FECHAMENTO[d.tipo] || 'O conhecimento só transforma quando colocado em prática.';
+  const fraseFechamento = (_IDI === 'pt')
+    ? (FRASES_FECHAMENTO[d.tipo] || 'O conhecimento só transforma quando colocado em prática.')
+    : L.fecho;   // idioma estrangeiro → frase de fechamento traduzida (não vaza português)
 
   html += `<div class="page">
     <div class="contracapa">
@@ -1964,7 +1966,7 @@ body {
         </div>
       </div>
 
-      <div class="contracapa-copy">© ${d.ano} ${esc(d.autor)} · Todos os direitos reservados</div>
+      <div class="contracapa-copy">© ${d.ano} ${esc(d.autor)} · ${L.direitos}</div>
     </div>
   </div>`;
 
