@@ -131,9 +131,10 @@ app.post("/api/usuarios/:id/senha", auth.exigirAdmin, (req, res) => {
   const r = auth.trocarSenha(req.params.id, (req.body || {}).nova);
   res.status(r.ok ? 200 : 400).json(r);
 });
-// Admin: dar N créditos de Opus (cada crédito = 1 criação no Opus, que tem custo real)
+// Admin: definir a COTA MENSAL de um usuário (Opus e/ou GPT). Ex: { opus: 15, gpt: 50 }
 app.post("/api/usuarios/:id/creditos", auth.exigirAdmin, (req, res) => {
-  const r = auth.darCreditos(req.params.id, (req.body || {}).qtd);
+  const b = req.body || {};
+  const r = auth.definirLimites(req.params.id, { opus: b.opus, gpt: b.gpt });
   res.status(r.ok ? 200 : 400).json(r);
 });
 // Admin: remover usuário (não pode remover a si mesmo)
@@ -212,18 +213,8 @@ app.post("/api/estudio/atividades", auth.exigirLogin, (req, res) => {
   rodarGerador("gerar-atividades.js", [nicho, String(qtd)], pdf, res);
 });
 
-// Quanto resta de Opus pro usuário (admin = ilimitado)
-app.get("/api/estudio/opus", auth.exigirLogin, (req, res) => { res.json(auth.opusInfo(req.usuario)); });
-
-// Gasta 1 crédito de Opus (barra o usuário comum depois do limite, por causa do CUSTO)
-app.post("/api/estudio/opus/consumir", auth.exigirLogin, (req, res) => {
-  const r = auth.consumirOpus(req.usuario.id);
-  if (r.ok) return res.json(r);
-  return res.status(403).json({
-    ...r,
-    mensagem: `Você já usou suas ${r.limite} criações no Opus. O Opus é limitado pra você porque cada geração tem CUSTO REAL (gasta dinheiro de verdade da conta). Use o GPT, que é grátis e ilimitado — ou peça pro Rodrigo liberar mais.`,
-  });
-});
+// Quanto resta da COTA MENSAL do usuário (Opus e GPT). admin = ilimitado
+app.get("/api/estudio/uso", auth.exigirLogin, (req, res) => { res.json(auth.usoMensal(req.usuario)); });
 
 // Gerar PACK DE MATEMÁTICA
 app.post("/api/estudio/matematica", auth.exigirLogin, (req, res) => {
@@ -243,16 +234,12 @@ app.post("/api/estudio/ebook", auth.exigirLogin, async (req, res) => {
   const extensao = EXT.includes(b.extensao) ? b.extensao : "medio";
   const modelo = b.modelo === "opus" ? "opus" : "gpt";
   if (tema.length < 3) return res.status(400).json({ error: "Diga sobre o que é o e-book." });
-  // Opus tem custo real → gasta 1 crédito do usuário (admin é ilimitado), com teto diário de segurança
-  if (modelo === "opus") {
-    const c = auth.consumirOpus(req.usuario.id);
-    if (!c.ok) {
-      const msg = c.limiteDiario
-        ? `Limite de segurança de ${c.diario} criações no Opus por dia atingido. Tente amanhã ou use o GPT (grátis).`
-        : c.esgotado ? `Você já usou seus ${c.limite} créditos do Opus (cada um tem custo real). Use o GPT, que é grátis — ou peça mais créditos ao Rodrigo.`
-        : "Não foi possível usar o Opus.";
-      return res.status(403).json({ error: msg });
-    }
+  // Consome 1 da COTA MENSAL do modelo escolhido (admin é ilimitado). Bloqueia SEM gerar se esgotou.
+  const cota = auth.consumirGeracao(req.usuario.id, modelo);
+  if (!cota.ok) {
+    const nome = modelo === "opus" ? "Opus" : "GPT";
+    const outro = modelo === "opus" ? "o GPT" : "o Opus";
+    return res.status(403).json({ error: `Você já usou suas ${cota.limite} criações no ${nome} este mês. A cota renova no dia 1º. Use ${outro} ou peça mais ao administrador.` });
   }
   res.setTimeout(6 * 60 * 1000);
   try {

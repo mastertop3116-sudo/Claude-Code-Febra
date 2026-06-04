@@ -18,9 +18,12 @@ const DATA_DIR = path.join(__dirname, 'data');
 const USERS_FILE = path.join(DATA_DIR, 'usuarios.json');
 const COOKIE = 'max_sessao';
 const VALIDADE_DIAS = 30;
-// Quantas criações no Opus por dia, no MÁXIMO, por usuário — trava de SEGURANÇA de custo
-// (vale até pro admin: protege a conta de um gasto disparado por engano/abuso).
-const MAX_OPUS_DIA = parseInt(process.env.MAX_OPUS_DIA) || 40;
+// COTA MENSAL por cliente (controla o custo e garante lucro). Reseta todo mês.
+// Padrão equilibrado pelo CUSTO: Opus custa ~2x o GPT, então a cota de Opus é menor.
+//   Opus 15/mês (~R$ 9 de custo) + GPT 50/mês (~R$ 15 de custo) = ~R$ 24 no MÁXIMO por cliente.
+// Admin (Rodrigo) = ilimitado. Ajustável por env e por usuário (admin define na tela).
+const LIM_OPUS_MES = parseInt(process.env.LIM_OPUS_MES) || 15;
+const LIM_GPT_MES  = parseInt(process.env.LIM_GPT_MES)  || 50;
 
 // ── SEGREDO da sessão ───────────────────────────────────────
 // Se não vier por env (SESSION_SECRET), NÃO usar um segredo fixo conhecido
@@ -41,6 +44,7 @@ const SECRET = (function () {
   }
 })();
 function hojeStr() { return new Date().toISOString().slice(0, 10); }
+function mesStr()  { return new Date().toISOString().slice(0, 7); }   // 'YYYY-MM'
 
 // ── hash de senha (scrypt) ──────────────────────────────────
 function hashSenha(senha, salt = crypto.randomBytes(16).toString('hex')) {
@@ -125,54 +129,51 @@ function limparCookie(res) {
   res.setHeader('Set-Cookie', `${COOKIE}=; HttpOnly; Path=/; Max-Age=0`);
 }
 
-// ── LIMITE DE USO DO OPUS (porque o Opus tem custo REAL) ────
-// admin (Rodrigo) = ilimitado (-1). Demais (Bruno) = 3 criações no Opus.
-function limiteOpus(u) {
-  if (u && typeof u.limiteOpus === 'number') return u.limiteOpus; // override por usuário (Rodrigo ajusta depois)
-  return u && u.papel === 'admin' ? -1 : 3;
+// ── COTA MENSAL (controla custo e garante lucro) ────────────
+// Cada cliente tem uma cota POR MÊS de Opus (caro) e de GPT (barato), que reseta
+// virou o mês. Admin (Rodrigo) = ilimitado. Limites ajustáveis por usuário.
+function limiteMes(u, modelo) {
+  if (u && u.papel === 'admin') return -1;                       // admin ilimitado
+  if (u && u.limites && typeof u.limites[modelo] === 'number') return u.limites[modelo]; // override
+  return modelo === 'opus' ? LIM_OPUS_MES : LIM_GPT_MES;
 }
-function opusInfo(u) {
-  const lim = limiteOpus(u), usado = (u && u.opusUsado) || 0;
-  const oh = (u && u.opusHoje && u.opusHoje.data === hojeStr()) ? u.opusHoje.n : 0;
-  return {
-    ilimitado: lim < 0, limite: lim, usado,
-    restantes: lim < 0 ? null : Math.max(0, lim - usado),
-    diario: MAX_OPUS_DIA, usadoHoje: oh, restantesHoje: Math.max(0, MAX_OPUS_DIA - oh),
+function _usoDoMes(u) {
+  const mes = mesStr();
+  return (u && u.usoMes && u.usoMes.mes === mes) ? u.usoMes : { mes, opus: 0, gpt: 0 };
+}
+// Quanto o usuário já usou e quanto resta no mês (Opus e GPT)
+function usoMensal(u) {
+  const uso = _usoDoMes(u);
+  const linha = (modelo) => {
+    const lim = limiteMes(u, modelo), usado = uso[modelo] || 0;
+    return { ilimitado: lim < 0, limite: lim, usado, restantes: lim < 0 ? null : Math.max(0, lim - usado) };
   };
+  return { mes: uso.mes, opus: linha('opus'), gpt: linha('gpt') };
 }
-// "gasta" 1 crédito de Opus do usuário (server-side, não dá pra burlar).
-// Duas travas: (1) créditos do usuário; (2) teto DIÁRIO de segurança (vale até pro admin).
-function consumirOpus(userId) {
+// "gasta" 1 geração do modelo escolhido (server-side, não dá pra burlar). Reseta no mês novo.
+function consumirGeracao(userId, modelo) {
+  modelo = modelo === 'opus' ? 'opus' : 'gpt';
   const lista = usuarios();
   const u = lista.find(x => x.id === userId);
   if (!u) return { ok: false, error: 'usuário não encontrado' };
-  // trava diária de custo — protege a conta de um gasto disparado
-  const hoje = hojeStr();
-  const oh = (u.opusHoje && u.opusHoje.data === hoje) ? u.opusHoje : { data: hoje, n: 0 };
-  if (oh.n >= MAX_OPUS_DIA) return { ok: false, limiteDiario: true, diario: MAX_OPUS_DIA };
-  const lim = limiteOpus(u);
-  if (lim >= 0) {
-    const usado = u.opusUsado || 0;
-    if (usado >= lim) return { ok: false, esgotado: true, limite: lim, usado };
-    u.opusUsado = usado + 1;
-  }
-  oh.n += 1; u.opusHoje = oh;
-  salvarUsuarios(lista);
-  const base = lim < 0 ? { ilimitado: true } : { limite: lim, usado: u.opusUsado, restantes: lim - u.opusUsado };
-  return { ok: true, ...base, usadoHoje: oh.n, diario: MAX_OPUS_DIA };
+  const mes = mesStr();
+  const uso = (u.usoMes && u.usoMes.mes === mes) ? u.usoMes : { mes, opus: 0, gpt: 0 };
+  const lim = limiteMes(u, modelo);
+  if (lim >= 0 && (uso[modelo] || 0) >= lim) return { ok: false, esgotado: true, modelo, limite: lim };
+  if (lim >= 0) { uso[modelo] = (uso[modelo] || 0) + 1; u.usoMes = uso; salvarUsuarios(lista); }
+  const restantes = lim < 0 ? null : lim - (uso[modelo] || 0);
+  return { ok: true, modelo, ilimitado: lim < 0, limite: lim, usado: uso[modelo] || 0, restantes };
 }
-// admin dá N créditos de Opus a um usuário (aumenta o limite dele)
-function darCreditos(userId, qtd) {
-  const n = parseInt(qtd);
-  if (!n || n < 1) return { ok: false, error: 'Quantidade inválida.' };
+// admin define a cota MENSAL de um usuário ({opus, gpt})
+function definirLimites(userId, { opus, gpt } = {}) {
   const lista = usuarios();
   const u = lista.find(x => x.id === userId);
   if (!u) return { ok: false, error: 'Usuário não encontrado.' };
-  const base = (typeof u.limiteOpus === 'number') ? u.limiteOpus : (u.papel === 'admin' ? -1 : 3);
-  if (base < 0) return { ok: true, ilimitado: true };   // admin já é ilimitado
-  u.limiteOpus = base + n;
+  u.limites = u.limites || {};
+  if (opus != null && !isNaN(parseInt(opus)) && parseInt(opus) >= 0) u.limites.opus = parseInt(opus);
+  if (gpt  != null && !isNaN(parseInt(gpt))  && parseInt(gpt)  >= 0) u.limites.gpt  = parseInt(gpt);
   salvarUsuarios(lista);
-  return { ok: true, limite: u.limiteOpus, restantes: u.limiteOpus - (u.opusUsado || 0) };
+  return { ok: true, limites: u.limites, uso: usoMensal(u) };
 }
 
 // ── gerenciar senhas/usuários (pelo próprio site) ───────────
@@ -206,7 +207,7 @@ function removerUsuario(userId) {
 
 // ── usuário "público" (sem segredos) ────────────────────────
 function publico(u) {
-  return u && { id: u.id, nome: u.nome, login: u.login, papel: u.papel, permissoes: u.permissoes, opus: opusInfo(u), senhaPadrao: !!u.senhaPadrao };
+  return u && { id: u.id, nome: u.nome, login: u.login, papel: u.papel, permissoes: u.permissoes, uso: usoMensal(u), limites: u.limites || null, senhaPadrao: !!u.senhaPadrao };
 }
 
 // ── middlewares ─────────────────────────────────────────────
@@ -233,6 +234,6 @@ module.exports = {
   usuarios, acharPorLogin, conferirSenha, criarToken, lerToken,
   setCookieSessao, limparCookie, exigirLogin, exigirAdmin, usuarioDaReq,
   publico, novoUsuario, salvarUsuarios, hashSenha,
-  limiteOpus, opusInfo, consumirOpus, darCreditos, MAX_OPUS_DIA,
+  usoMensal, consumirGeracao, definirLimites, limiteMes, LIM_OPUS_MES, LIM_GPT_MES,
   trocarSenha, criarUsuarioPersistido, removerUsuario,
 };
