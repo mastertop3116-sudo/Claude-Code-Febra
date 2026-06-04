@@ -144,6 +144,24 @@ app.delete("/api/usuarios/:id", auth.exigirAdmin, (req, res) => {
   res.status(r.ok ? 200 : 400).json(r);
 });
 
+// Admin: PAINEL de gastos/uso do mês (estimativa de custo a partir das gerações)
+const CUSTO_GERACAO = { opus: 0.60, gpt: 0.30 };   // R$ por geração (estimativa nossa)
+app.get("/api/admin/painel", auth.exigirAdmin, (req, res) => {
+  const clientes = auth.usuarios().map((u) => {
+    const uso = auth.usoMensal(u);
+    const custo = +(uso.opus.usado * CUSTO_GERACAO.opus + uso.gpt.usado * CUSTO_GERACAO.gpt).toFixed(2);
+    return { id: u.id, nome: u.nome, login: u.login, papel: u.papel, opus: uso.opus, gpt: uso.gpt, custo };
+  });
+  const totOpus = clientes.reduce((s, c) => s + c.opus.usado, 0);
+  const totGpt = clientes.reduce((s, c) => s + c.gpt.usado, 0);
+  res.json({
+    mes: new Date().toISOString().slice(0, 7),
+    totais: { opus: totOpus, gpt: totGpt, geracoes: totOpus + totGpt, custo: +(totOpus * CUSTO_GERACAO.opus + totGpt * CUSTO_GERACAO.gpt).toFixed(2) },
+    custoUnit: CUSTO_GERACAO,
+    clientes: clientes.sort((a, b) => b.custo - a.custo),
+  });
+});
+
 // Estúdio (protegido pelo porteiro acima)
 app.get("/estudio", (req, res) => { res.setHeader("Cache-Control", "no-store"); res.sendFile(path.join(__dirname, "views", "estudio.html")); });
 // Catálogo: regenera na hora (pra mostrar as imagens que o Criador foi guardando) e serve.
