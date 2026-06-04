@@ -250,6 +250,7 @@ app.post("/api/estudio/ebook", auth.exigirLogin, async (req, res) => {
   const tom = TONS.includes(b.tom) ? b.tom : "conversacional";
   const EXT = ["curto", "medio", "longo"];
   const extensao = EXT.includes(b.extensao) ? b.extensao : "medio";
+  const idioma = ["pt", "en", "es"].includes(b.idioma) ? b.idioma : "pt";   // material na gringa
   const modelo = b.modelo === "opus" ? "opus" : "gpt";
   if (tema.length < 3) return res.status(400).json({ error: "Diga sobre o que é o e-book." });
   // Consome 1 da COTA MENSAL do modelo escolhido (admin é ilimitado). Bloqueia SEM gerar se esgotou.
@@ -263,7 +264,14 @@ app.post("/api/estudio/ebook", auth.exigirLogin, async (req, res) => {
   try {
     const autor = (req.usuario && req.usuario.nome) || "Autor";
     const eng = require("./departments/creative/engines/criador_engine");
-    const conteudo = await eng.gerarConteudo({ tipo: "ebook", nicho: tema, tema, publico, tom, extensao, autor, modelo });
+    let conteudo = await eng.gerarConteudo({ tipo: "ebook", nicho: tema, tema, publico, tom, extensao, autor, modelo, idioma });
+    // QUALIDADE: se vier com poucos capítulos (e-book magro), tenta 1 vez de novo. Nada faltando.
+    const minCap = extensao === "longo" ? 8 : extensao === "medio" ? 6 : 4;
+    if (!Array.isArray(conteudo.capitulos) || conteudo.capitulos.length < minCap) {
+      const retry = await eng.gerarConteudo({ tipo: "ebook", nicho: tema, tema, publico, tom, extensao, autor, modelo, idioma });
+      if (Array.isArray(retry.capitulos) && retry.capitulos.length > (conteudo.capitulos || []).length) conteudo = retry;
+    }
+    conteudo.idioma = idioma;   // o template usa pra traduzir os rótulos fixos (Capítulo, Sumário...)
     const { pdfBuffer } = await eng.renderizarPDF(conteudo, { tipo: "ebook", nicho: tema, tema, autor });
     const buf = Buffer.from(pdfBuffer);
     let paginas = 0; try { paginas = (await require("pdf-lib").PDFDocument.load(buf)).getPageCount(); } catch (_) {}

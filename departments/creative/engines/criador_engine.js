@@ -613,6 +613,12 @@ USE SOMENTE dados de fontes verificáveis e públicas. NUNCA invente estatístic
 async function gerarConteudo(params) {
   const { tipo, nicho, publico, tema, tom, extensao, autor } = params;
 
+  // Idioma do material (e-book na gringa). Default português.
+  const idioma = params.idioma === 'en' ? 'en' : params.idioma === 'es' ? 'es' : 'pt';
+  const _IDI_NOME = { pt: 'português do Brasil', en: 'inglês (English, US)', es: 'espanhol (Español de España)' }[idioma];
+  const IDIOMA_INSTR = idioma === 'pt' ? '' :
+    `\n\n⚠️ IDIOMA OBRIGATÓRIO: escreva ABSOLUTAMENTE TODO o conteúdo dos VALORES do JSON em ${_IDI_NOME} — título, subtítulo, textos, exemplos, listas, citações, CTA, TUDO. Use nomes de pessoas, cidades, moeda e referências culturais coerentes com esse idioma/país. NÃO escreva NADA em português. (As CHAVES do JSON continuam exatamente como no schema; só os VALORES mudam de idioma.)`;
+
   const TONS = {
     profissional:   'formal, com autoridade e linguagem de especialista',
     conversacional: 'direto, próximo, como um amigo especialista falando ao leitor',
@@ -669,7 +675,7 @@ Autor: ${autor}
 
 ${schema}
 
-RETORNE SOMENTE O JSON COMPLETO E VÁLIDO.`;
+RETORNE SOMENTE O JSON COMPLETO E VÁLIDO.${IDIOMA_INSTR}`;
 
   // PRINCIPAL: Claude (melhor pra conteúdo). Se falhar (ex: sem crédito Anthropic),
   // cai automaticamente no GPT-4o — assim o produto NUNCA para. Mesmo prompt nos dois.

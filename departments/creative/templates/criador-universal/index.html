@@ -1232,6 +1232,14 @@ body {
   document.documentElement.style.setProperty('--s', S);
   document.documentElement.style.setProperty('--bg', BG);
 
+  // Rótulos fixos no idioma do material (e-book PT/EN/ES). Default português.
+  const _IDI = (d.idioma === 'en' || d.idioma === 'es') ? d.idioma : 'pt';
+  const L = ({
+    pt: { intro:'Introdução', cap:'Capítulo', concl:'Conclusão', prox:'Próximos Passos', sumario:'Sumário', pontos:'Pontos-chave', dica:'Dica do Autor', exemplo:'Exemplo Real', pratica:'Na Prática — Faça Agora', atencao:'Atenção', sabia:'Você Sabia?' },
+    en: { intro:'Introduction', cap:'Chapter', concl:'Conclusion', prox:'Next Steps', sumario:'Contents', pontos:'Key Points', dica:"Author's Tip", exemplo:'Real Example', pratica:'In Practice — Do It Now', atencao:'Warning', sabia:'Did You Know?' },
+    es: { intro:'Introducción', cap:'Capítulo', concl:'Conclusión', prox:'Próximos Pasos', sumario:'Índice', pontos:'Puntos Clave', dica:'Consejo del Autor', exemplo:'Ejemplo Real', pratica:'En la Práctica — Hazlo Ahora', atencao:'Atención', sabia:'¿Sabías?' },
+  })[_IDI];
+
   function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function paras(t){
     return String(t||'').split(/\n+/).filter(Boolean)
@@ -1246,11 +1254,11 @@ body {
   const ICON_ATENCAO = `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`;
   const ICON_SABIA   = `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`;
 
-  function boxDica(t)    { return t?`<div class="cbox cbox-dica"><div class="cbox-label">${ICON_DICA} Dica do Autor</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
-  function boxExemplo(t) { return t?`<div class="cbox cbox-exemplo"><div class="cbox-label">${ICON_EXEMPLO} Exemplo Real</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
-  function boxPratica(t) { return t?`<div class="cbox cbox-pratica"><div class="cbox-label">${ICON_PRATICA} Na Pratica — Faca Agora</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
-  function boxAtencao(t) { return t?`<div class="cbox cbox-atencao"><div class="cbox-label">${ICON_ATENCAO} Atencao</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
-  function boxSabia(t)   { return t?`<div class="cbox cbox-sabia"><div class="cbox-label">${ICON_SABIA} Voce Sabia?</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
+  function boxDica(t)    { return t?`<div class="cbox cbox-dica"><div class="cbox-label">${ICON_DICA} ${L.dica}</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
+  function boxExemplo(t) { return t?`<div class="cbox cbox-exemplo"><div class="cbox-label">${ICON_EXEMPLO} ${L.exemplo}</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
+  function boxPratica(t) { return t?`<div class="cbox cbox-pratica"><div class="cbox-label">${ICON_PRATICA} ${L.pratica}</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
+  function boxAtencao(t) { return t?`<div class="cbox cbox-atencao"><div class="cbox-label">${ICON_ATENCAO} ${L.atencao}</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
+  function boxSabia(t)   { return t?`<div class="cbox cbox-sabia"><div class="cbox-label">${ICON_SABIA} ${L.sabia}</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
 
   function boxContraste(obj) {
     if (!obj || !(obj.itens_a||[]).length) return '';
@@ -1353,7 +1361,7 @@ body {
     return `<div class="page-toc">
       <div class="pg-acc-bar"></div>
       <div class="toc-header">
-        <div class="toc-label">Sumário</div>
+        <div class="toc-label">${L.sumario}</div>
         <div class="toc-titulo">${esc(d.titulo||'')}</div>
       </div>
       <div class="toc-body">
@@ -1422,8 +1430,8 @@ body {
     }
     if (d.introducao) {
       html += `<div class="page intro-page">
-        ${pgHeader('Introdução')}
-        <div class="intro-label">Introdução</div>
+        ${pgHeader(L.intro)}
+        <div class="intro-label">${L.intro}</div>
         <div class="intro-titulo">${esc(d.titulo)}</div>
         <div class="intro-texto">${paras(d.introducao)}</div>
         ${footer()}
@@ -1434,9 +1442,9 @@ body {
       // pra encher a página sem estourar e deixar páginas quase em branco.
       const visual = boxEquacao(c.equacao) || boxContraste(c.contraste) || boxSteps(c.steps_visuais);
       html += `<div class="page">
-        ${pgHeader('Capítulo '+(c.numero||i+1))}
+        ${pgHeader(L.cap+' '+(c.numero||i+1))}
         <div class="sec-header">
-          <div class="sec-label">Capítulo ${c.numero||i+1}</div>
+          <div class="sec-label">${L.cap} ${c.numero||i+1}</div>
           <div class="sec-titulo">${esc(c.titulo||'')}</div>
           <div class="sec-num-bg">${String(c.numero||i+1).padStart(2,'0')}</div>
         </div>
@@ -1447,7 +1455,7 @@ body {
           ${boxPratica(c.acao_pratica)}
           ${boxDica(c.dica)}
           ${(c.pontos_chave||[]).length?`
-            <div class="kp-label">Pontos-chave</div>
+            <div class="kp-label">${L.pontos}</div>
             <ul class="kp-list">${(c.pontos_chave||[]).map(p=>`<li>${esc(p)}</li>`).join('')}</ul>
           `:''}
         </div>
@@ -1456,9 +1464,9 @@ body {
     });
     if (d.conclusao) {
       html += `<div class="page intro-page">
-        ${pgHeader('Conclusão')}
-        <div class="intro-label">Conclusão</div>
-        <div class="intro-titulo">Próximos Passos</div>
+        ${pgHeader(L.concl)}
+        <div class="intro-label">${L.concl}</div>
+        <div class="intro-titulo">${L.prox}</div>
         <div class="intro-texto">${paras(d.conclusao)}</div>
         ${d.cta?`<div class="tip" style="margin-top:7mm"><div class="tip-icon" style="font-size:11pt">→</div><div class="tip-text">${esc(d.cta)}</div></div>`:''}
         ${footer()}
