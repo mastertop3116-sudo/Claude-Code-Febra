@@ -31,3 +31,4 @@ data/.session_secret
 
 # Cache de imagens baixadas/criadas por tema (alimenta o catálogo em runtime) — não commitar
 assets/catalogo-auto/
+data/demanda.json

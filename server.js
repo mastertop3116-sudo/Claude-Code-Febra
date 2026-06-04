@@ -55,6 +55,7 @@ const path = require("path");
 // [MAX] LOGIN + ESTÚDIO — porta de entrada nova, com usuários
 // ════════════════════════════════════════════════════════════
 const auth = require("./auth");
+const demanda = require("./utils/demanda");   // radar do que a galera cria
 const fsx = require("fs");
 const { execFile } = require("child_process");
 // Criador com IA (usa modelos pagos + ElevenLabs) — DESLIGADO por padrão. Pra religar: env CRIADOR_IA=on
@@ -162,6 +163,9 @@ app.get("/api/admin/painel", auth.exigirAdmin, (req, res) => {
   });
 });
 
+// Admin: RADAR DE DEMANDA — o que a galera mais cria (pra produzir/vender sob medida)
+app.get("/api/admin/demanda", auth.exigirAdmin, (req, res) => { res.json(demanda.resumo()); });
+
 // Estúdio (protegido pelo porteiro acima)
 app.get("/estudio", (req, res) => { res.setHeader("Cache-Control", "no-store"); res.sendFile(path.join(__dirname, "views", "estudio.html")); });
 // Catálogo: regenera na hora (pra mostrar as imagens que o Criador foi guardando) e serve.
@@ -228,6 +232,7 @@ app.post("/api/estudio/atividades", auth.exigirLogin, (req, res) => {
   }
   if (!nicho || !fsx.existsSync(path.join(dir, nicho + ".json"))) return res.status(400).json({ error: "Tema inválido." });
   const pdf = path.join(__dirname, "oferta-" + nicho, `pack-${nicho}-${qtd}-atividades.pdf`);
+  try { demanda.registrar({ tipo: "atividades", tema: (novoNicho && novoNicho.nome) || nicho, idioma: "pt", modelo: "gratis" }); } catch (_) {}   // radar
   rodarGerador("gerar-atividades.js", [nicho, String(qtd)], pdf, res);
 });
 
@@ -238,6 +243,7 @@ app.get("/api/estudio/uso", auth.exigirLogin, (req, res) => { res.json(auth.usoM
 app.post("/api/estudio/matematica", auth.exigirLogin, (req, res) => {
   const qtd = Math.max(10, Math.min(300, parseInt(req.body && req.body.qtd) || 100));
   const pdf = path.join(__dirname, "oferta-matematica", `pack-matematica-${qtd}-atividades.pdf`);
+  try { demanda.registrar({ tipo: "matematica", tema: "matemática", idioma: "pt", modelo: "gratis" }); } catch (_) {}   // radar
   rodarGerador("gerar-matematica.js", [String(qtd)], pdf, res);
 });
 
@@ -276,6 +282,7 @@ app.post("/api/estudio/ebook", auth.exigirLogin, async (req, res) => {
     const buf = Buffer.from(pdfBuffer);
     let paginas = 0; try { paginas = (await require("pdf-lib").PDFDocument.load(buf)).getPageCount(); } catch (_) {}
     const slug = tema.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "novo";
+    try { demanda.registrar({ tipo: "ebook", tema, idioma, modelo }); } catch (_) {}   // radar
     res.json({ ok: true, pdf: buf.toString("base64"), filename: `ebook-${slug}.pdf`, paginas, titulo: conteudo.titulo || tema });
   } catch (e) {
     console.error("[estudio/ebook]", e.message);

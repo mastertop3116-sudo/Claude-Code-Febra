@@ -197,6 +197,13 @@
   .pn-card.hi{background:var(--accent-soft);border-color:transparent}.pn-card.hi .v{color:var(--accent)}
   .pn-row{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px solid var(--line);font-size:.92rem}
   .pn-row .nm{font-weight:600;flex:1}.pn-row .mt{color:var(--ink-2);font-size:.84rem}.pn-row .ct{font-weight:700;color:var(--accent)}
+  /* radar de demanda */
+  .rd-grp{margin:12px 0}
+  .rd-grp .h{font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-bottom:7px}
+  .rd-chips{display:flex;flex-wrap:wrap;gap:7px}
+  .rd-chip{background:var(--surface-2);border:1px solid var(--line);border-radius:99px;padding:5px 12px;font-size:.86rem;font-weight:600;color:var(--ink-2)}
+  .rd-chip b{color:var(--accent);margin-left:6px}
+  .rd-chip.big{background:var(--accent-soft);border-color:transparent;color:var(--ink)}
   /* sheet (configurações) desliza da direita */
   .sheet{position:fixed;top:0;right:0;height:100%;width:400px;max-width:92vw;z-index:130;background:var(--surface);border-left:1px solid var(--line);
     box-shadow:var(--shadow-3);transform:translateX(101%);transition:transform .5s var(--ease);padding:26px 26px 50px;overflow:auto}
@@ -344,6 +351,9 @@
     <div class="divline"></div>
     <div class="field-label" data-i18n="panel_byclient">Por cliente (este mês)</div>
     <div id="painel-list"></div>
+    <div class="divline"></div>
+    <div class="field-label" data-i18n="radar_title">📡 Radar de Demanda — o que a galera mais cria</div>
+    <div id="radar-box"></div>
     <small class="dim" style="display:block;margin-top:12px" data-i18n="panel_note">Custo estimado: cada criação no Opus ~R$0,60, no GPT ~R$0,30. O gasto real está no painel da OpenAI/Anthropic.</small>
   </div></div>
 
@@ -407,7 +417,7 @@
       ia_title:'Criador com IA',uses_model:'usa modelo',ia_desc:'Ebook, workbook, guia, checklist, ficha, script de VSL — escritos pela IA com o modelo escolhido acima.',open_ia:'Abrir Criador com IA',unavailable:'indisponível hoje',ia_off:'Desativado por enquanto (usa serviços pagos).',
       ebook_title:'E-book com IA',ebook_desc:'A IA escreve um e-book completo e ilustrado sobre o tema — capa, capítulos, exemplos e ação. Já nasce com imagem.',ebook_about:'Sobre o que é o e-book?',ebook_about_ph:'ex: Como começar no jiu-jitsu depois dos 30',ebook_public:'Pra quem é? (opcional)',ebook_public_ph:'ex: adultos iniciantes',ebook_tone:'Tom',ebook_len:'Tamanho',ebook_lang:'Idioma do material',tom_conv:'Próximo',tom_prof:'Profissional',tom_insp:'Inspirador',tom_edu:'Didático',len_curto:'Curto',len_medio:'Médio',len_longo:'Longo',create_ebook:'Criar E-book',pw_warn:'Você está com a senha padrão. Troque agora pra proteger sua conta.',pw_warn_btn:'Trocar senha',
       cat_title:'Catálogo de Imagens',reuse:'reuso',cat_desc:'Todas as imagens que a gente criou. O Criador reusa sozinho quando o tema bate — nada se perde.',open_cat:'Abrir Catálogo',
-      foot:'Feito pra criar rápido e vender mais.',my_account:'Minha Conta',change_pwd:'Trocar minha senha',cur_pwd:'Senha atual',new_pwd:'Nova senha',rep_pwd:'Repetir nova senha',save_pwd:'Salvar nova senha',pwd_min4:'Mín. 4 caracteres.',pwd_nomatch:'As senhas não batem.',pwd_saved:'Senha trocada!',panel_title:'Painel de Gastos',panel_byclient:'Por cliente (este mês)',panel_note:'Custo estimado: cada criação no Opus ~R$0,60, no GPT ~R$0,30. O gasto real fica no painel da OpenAI/Anthropic.',
+      foot:'Feito pra criar rápido e vender mais.',my_account:'Minha Conta',change_pwd:'Trocar minha senha',cur_pwd:'Senha atual',new_pwd:'Nova senha',rep_pwd:'Repetir nova senha',save_pwd:'Salvar nova senha',pwd_min4:'Mín. 4 caracteres.',pwd_nomatch:'As senhas não batem.',pwd_saved:'Senha trocada!',panel_title:'Painel do Admin',radar_title:'📡 Radar de Demanda — o que a galera mais cria',panel_byclient:'Por cliente (este mês)',panel_note:'Custo estimado: cada criação no Opus ~R$0,60, no GPT ~R$0,30. O gasto real fica no painel da OpenAI/Anthropic.',
       users:'Usuários',users_sub:'Quem pode acessar. Troque a senha de alguém ou adicione gente nova.',add_user:'Adicionar usuário',name:'Nome',login:'Usuário',password:'Senha',role_user:'Usuário',role_admin:'Admin',create_user:'Criar usuário',
       settings:'Configurações',settings_sub:'Deixe do seu jeito. Tudo salva automático.',language:'Idioma',accent:'Cor de destaque',appearance:'Aparência',dark_mode:'Modo escuro',animations:'Animações',
       g_m:'Bom dia',g_a:'Boa tarde',g_e:'Boa noite',
@@ -433,7 +443,7 @@
       ia_title:'AI Creator',uses_model:'uses model',ia_desc:'Ebook, workbook, guide, checklist, sheet, VSL script — written by AI with the model chosen above.',open_ia:'Open AI Creator',unavailable:'unavailable today',ia_off:'Off for now (uses paid services).',
       ebook_title:'AI E-book',ebook_desc:'The AI writes a full, illustrated e-book on your topic — cover, chapters, examples and action. Born with an image.',ebook_about:'What is the e-book about?',ebook_about_ph:'e.g. How to start jiu-jitsu after 30',ebook_public:'Who is it for? (optional)',ebook_public_ph:'e.g. adult beginners',ebook_tone:'Tone',ebook_len:'Length',ebook_lang:'Material language',tom_conv:'Friendly',tom_prof:'Professional',tom_insp:'Inspiring',tom_edu:'Educational',len_curto:'Short',len_medio:'Medium',len_longo:'Long',create_ebook:'Create E-book',pw_warn:'You are using the default password. Change it now to protect your account.',pw_warn_btn:'Change password',
       cat_title:'Image Catalog',reuse:'reuse',cat_desc:'Every image we made. The Creator reuses them when the theme matches — nothing wasted.',open_cat:'Open Catalog',
-      foot:'Built to create fast and sell more.',my_account:'My Account',change_pwd:'Change my password',cur_pwd:'Current password',new_pwd:'New password',rep_pwd:'Repeat new password',save_pwd:'Save new password',pwd_min4:'At least 4 characters.',pwd_nomatch:"Passwords don't match.",pwd_saved:'Password changed!',panel_title:'Spending Panel',panel_byclient:'By client (this month)',panel_note:'Estimated cost: each Opus creation ~R$0.60, GPT ~R$0.30. Real spend is in the OpenAI/Anthropic dashboard.',
+      foot:'Built to create fast and sell more.',my_account:'My Account',change_pwd:'Change my password',cur_pwd:'Current password',new_pwd:'New password',rep_pwd:'Repeat new password',save_pwd:'Save new password',pwd_min4:'At least 4 characters.',pwd_nomatch:"Passwords don't match.",pwd_saved:'Password changed!',panel_title:'Admin Panel',radar_title:'📡 Demand Radar — what people create most',panel_byclient:'By client (this month)',panel_note:'Estimated cost: each Opus creation ~R$0.60, GPT ~R$0.30. Real spend is in the OpenAI/Anthropic dashboard.',
       users:'Users',users_sub:'Who can access. Change someone’s password or add new people.',add_user:'Add user',name:'Name',login:'Username',password:'Password',role_user:'User',role_admin:'Admin',create_user:'Create user',
       settings:'Settings',settings_sub:'Make it yours. Everything saves automatically.',language:'Language',accent:'Accent color',appearance:'Appearance',dark_mode:'Dark mode',animations:'Animations',
       g_m:'Good morning',g_a:'Good afternoon',g_e:'Good evening',
@@ -459,7 +469,7 @@
       ia_title:'Creador con IA',uses_model:'usa modelo',ia_desc:'Ebook, workbook, guía, checklist, ficha, guion de VSL — escritos por la IA con el modelo elegido arriba.',open_ia:'Abrir Creador con IA',unavailable:'no disponible hoy',ia_off:'Desactivado por ahora (usa servicios de pago).',
       ebook_title:'E-book con IA',ebook_desc:'La IA escribe un e-book completo e ilustrado sobre el tema — portada, capítulos, ejemplos y acción. Nace con imagen.',ebook_about:'¿De qué trata el e-book?',ebook_about_ph:'ej: Cómo empezar jiu-jitsu después de los 30',ebook_public:'¿Para quién es? (opcional)',ebook_public_ph:'ej: adultos principiantes',ebook_tone:'Tono',ebook_len:'Tamaño',ebook_lang:'Idioma del material',tom_conv:'Cercano',tom_prof:'Profesional',tom_insp:'Inspirador',tom_edu:'Didáctico',len_curto:'Corto',len_medio:'Medio',len_longo:'Largo',create_ebook:'Crear E-book',pw_warn:'Estás usando la contraseña por defecto. Cámbiala ahora para proteger tu cuenta.',pw_warn_btn:'Cambiar contraseña',
       cat_title:'Catálogo de Imágenes',reuse:'reúso',cat_desc:'Todas las imágenes que creamos. El Creador las reutiliza cuando el tema coincide — nada se pierde.',open_cat:'Abrir Catálogo',
-      foot:'Hecho para crear rápido y vender más.',my_account:'Mi Cuenta',change_pwd:'Cambiar mi contraseña',cur_pwd:'Contraseña actual',new_pwd:'Nueva contraseña',rep_pwd:'Repetir nueva contraseña',save_pwd:'Guardar contraseña',pwd_min4:'Mínimo 4 caracteres.',pwd_nomatch:'Las contraseñas no coinciden.',pwd_saved:'¡Contraseña cambiada!',panel_title:'Panel de Gastos',panel_byclient:'Por cliente (este mes)',panel_note:'Costo estimado: cada creación en Opus ~R$0,60, en GPT ~R$0,30. El gasto real está en el panel de OpenAI/Anthropic.',
+      foot:'Hecho para crear rápido y vender más.',my_account:'Mi Cuenta',change_pwd:'Cambiar mi contraseña',cur_pwd:'Contraseña actual',new_pwd:'Nueva contraseña',rep_pwd:'Repetir nueva contraseña',save_pwd:'Guardar contraseña',pwd_min4:'Mínimo 4 caracteres.',pwd_nomatch:'Las contraseñas no coinciden.',pwd_saved:'¡Contraseña cambiada!',panel_title:'Panel de Admin',radar_title:'📡 Radar de Demanda — lo que la gente más crea',panel_byclient:'Por cliente (este mes)',panel_note:'Costo estimado: cada creación en Opus ~R$0,60, en GPT ~R$0,30. El gasto real está en el panel de OpenAI/Anthropic.',
       users:'Usuarios',users_sub:'Quién puede acceder. Cambia la contraseña de alguien o agrega gente.',add_user:'Agregar usuario',name:'Nombre',login:'Usuario',password:'Contraseña',role_user:'Usuario',role_admin:'Admin',create_user:'Crear usuario',
       settings:'Configuración',settings_sub:'Hazlo a tu manera. Todo se guarda solo.',language:'Idioma',accent:'Color de acento',appearance:'Apariencia',dark_mode:'Modo oscuro',animations:'Animaciones',
       g_m:'Buenos días',g_a:'Buenas tardes',g_e:'Buenas noches',
@@ -600,6 +610,16 @@
       `<div class="pn-card"><div class="v">${d.totais.opus}<span class="dim"> Opus</span> · ${d.totais.gpt}<span class="dim"> GPT</span></div><div class="k">${LANG==='en'?'By model':'Por modelo'}</div></div>`;
     const lim=x=>x.ilimitado?'∞':x.limite;
     $('painel-list').innerHTML=d.clientes.map(c=>`<div class="pn-row"><span class="nm">${c.nome}${c.papel==='admin'?' <span class="mt">(admin)</span>':''}</span><span class="mt">Opus ${c.opus.usado}/${lim(c.opus)} · GPT ${c.gpt.usado}/${lim(c.gpt)}</span><span class="ct">${real(c.custo)}</span></div>`).join('')||'<div class="dim">—</div>';
+    try{const rd=await(await fetch('/api/admin/demanda')).json();renderRadar(rd);}catch(_){$('radar-box').innerHTML='';}
+  }
+  function renderRadar(rd){
+    const box=$('radar-box');
+    if(!rd||!rd.total){box.innerHTML='<div class="dim">'+(LANG==='en'?'No data yet. As people create, the rankings appear here.':LANG==='es'?'Aún sin datos. A medida que crean, aparecen los rankings.':'Ainda sem dados. Conforme a galera cria, os rankings aparecem aqui.')+'</div>';return;}
+    const grp=(titulo,arr,big)=>arr&&arr.length?`<div class="rd-grp"><div class="h">${titulo}</div><div class="rd-chips">${arr.map(x=>`<span class="rd-chip${big?' big':''}">${x.k}<b>${x.v}</b></span>`).join('')}</div></div>`:'';
+    const T=k=>(LANG==='en'?{temas:'Top topics',nichos:'Top niches',idiomas:'Languages',tipos:'By type',recentes:'Latest'}:LANG==='es'?{temas:'Temas top',nichos:'Nichos top',idiomas:'Idiomas',tipos:'Por tipo',recentes:'Recientes'}:{temas:'Temas mais pedidos',nichos:'Nichos quentes',idiomas:'Idiomas',tipos:'Por tipo',recentes:'Últimos'})[k];
+    box.innerHTML=`<div class="dim" style="margin-bottom:8px">${rd.total} ${LANG==='en'?'creations tracked':LANG==='es'?'creaciones registradas':'criações registradas'}${rd.desde?' · desde '+rd.desde:''}</div>`
+      +grp(T('temas'),rd.temas,true)+grp(T('nichos'),rd.nichos)+grp(T('idiomas'),rd.idiomas)+grp(T('tipos'),rd.tipos)
+      +((rd.recentes&&rd.recentes.length)?`<div class="rd-grp"><div class="h">${T('recentes')}</div><div class="dim" style="font-size:.84rem;line-height:1.7">${rd.recentes.slice(0,8).map(r=>`${r.em} · <b style="color:var(--ink)">${r.tema||'—'}</b> (${r.tipo}${r.idioma&&r.idioma!=='pt'?' · '+r.idioma:''})`).join('<br>')}</div></div>`:'');
   }
   // usuários
   $('btn-users').onclick=()=>{$('ov-users').classList.add('show');loadUsers();};
