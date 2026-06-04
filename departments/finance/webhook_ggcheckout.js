@@ -31,7 +31,10 @@ router.post("/ggcheckout", async (req, res) => {
       }
     }
     // Se foi venda confirmada, salva no financeiro e atualiza metas
-    const eVenda = ["pix_paid", "card_approved"].includes(evento);
+    // GGCheckout manda "card.paid"/"pix.paid"; outras plataformas usam "card_approved"/"pix_paid".
+    // Normaliza (tira pontos/underscores/traços) pra reconhecer qualquer formato de venda paga.
+    const evNorm = String(evento).toLowerCase().replace(/[._-]/g, "");
+    const eVenda = ["cardpaid", "pixpaid", "cardapproved", "pixapproved", "purchaseapproved"].includes(evNorm);
     if (eVenda) {
       const { supabase } = require("../../integrations/supabase");
 
