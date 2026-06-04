@@ -109,6 +109,16 @@ app.post("/api/login", (req, res) => {
   auth.setCookieSessao(res, auth.criarToken(u.id));
   res.json({ ok: true, usuario: auth.publico(u) });
 });
+
+// ── 1º acesso: cliente que comprou define a senha e já entra ──
+app.get("/bem-vindo", (req, res) => { res.setHeader("Cache-Control", "no-store"); res.sendFile(path.join(__dirname, "views", "bem-vindo.html")); });
+app.post("/api/bem-vindo", (req, res) => {
+  const { email, token, senha } = req.body || {};
+  const r = auth.ativarAcesso({ email, token, senha });
+  if (!r.ok) return res.status(400).json(r);
+  auth.setCookieSessao(res, auth.criarToken(r.id));   // ativa e já entra logado
+  res.json({ ok: true, usuario: r.usuario });
+});
 app.post("/api/logout", (req, res) => { auth.limparCookie(res); res.json({ ok: true }); });
 app.get("/api/me", (req, res) => { const u = auth.usuarioDaReq(req); res.json(u ? auth.publico(u) : {}); });
 app.get("/api/usuarios", auth.exigirAdmin, (req, res) => { res.json({ usuarios: auth.usuarios().map(auth.publico) }); });

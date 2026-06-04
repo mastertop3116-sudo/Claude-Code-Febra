@@ -79,6 +79,26 @@ router.post("/ggcheckout", async (req, res) => {
           console.error("[PlanIA] Erro ao gerar token:", e.message);
         }
       }
+
+      // ── MAX Criador: cria o login do cliente automaticamente na compra ──
+      const eCriador = nomeProduto.includes("criador") || nomeProduto.includes("estúdio") || nomeProduto.includes("estudio");
+      if (eCriador) {
+        try {
+          const auth = require("../../auth");
+          const email = payload.customer?.email || payload.buyer_email || payload.email || "";
+          const nome  = payload.customer?.name || payload.buyer_name || cliente || "";
+          const plano = valorNum >= 80 ? "pro" : "essencial";   // R$97 = Pro, R$47 = Essencial
+          const r = auth.criarClienteCompra({ nome, email, plano });
+          if (r.ok) {
+            const base = process.env.RENDER_EXTERNAL_URL || "https://claude-code-febra.onrender.com";
+            console.log(`[Criador] Cliente ${plano} (${r.novo ? "novo" : "recompra"}): ${email} → ativar em ${base}/bem-vindo (token ${r.token})`);
+          } else {
+            console.error("[Criador] Falha ao criar cliente:", r.error);
+          }
+        } catch (e) {
+          console.error("[Criador] Erro:", e.message);
+        }
+      }
     }
 
     res.status(200).json({ ok: true });

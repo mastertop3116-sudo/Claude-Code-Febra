@@ -260,6 +260,51 @@ function removerUsuario(userId) {
   return { ok: true };
 }
 
+// ── VENDA AUTOMÁTICA (Criador): planos + 1º acesso ──────────
+// Cotas mensais de cada plano vendido. Custo controlado pra dar lucro.
+//   Essencial R$47 → Opus 8 + GPT 30 (custo máx ~R$14, lucro ~R$33)
+//   Pro       R$97 → Opus 20 + GPT 80 (custo máx ~R$36, lucro ~R$61)
+const PLANOS = {
+  essencial: { nome: 'Essencial', preco: 47, opus: parseInt(process.env.PLANO_ESS_OPUS) || 8,  gpt: parseInt(process.env.PLANO_ESS_GPT) || 30 },
+  pro:       { nome: 'Pro',       preco: 97, opus: parseInt(process.env.PLANO_PRO_OPUS) || 20, gpt: parseInt(process.env.PLANO_PRO_GPT) || 80 },
+};
+// Na COMPRA: cria (ou atualiza) o cliente com a cota do plano, ainda SEM senha.
+// Ele ativa a conta definindo a senha em /bem-vindo (com o e-mail da compra ou o token).
+function criarClienteCompra({ nome, email, plano }) {
+  const login = String(email || '').toLowerCase().trim();
+  if (!login) return { ok: false, error: 'e-mail não informado' };
+  const p = PLANOS[plano] || PLANOS.essencial;
+  const lista = usuarios();
+  const token = crypto.randomBytes(16).toString('hex');
+  let u = lista.find(x => x.login === login);
+  if (u) {                                   // recompra/upgrade: renova a cota e reabre o 1º acesso
+    u.limites = { opus: p.opus, gpt: p.gpt };
+    u.plano = plano; u.tokenAcesso = token; u.precisaSenha = true;
+    salvarUsuarios(lista);
+    return { ok: true, token, login, novo: false };
+  }
+  u = novoUsuario(nome || login, login, crypto.randomBytes(12).toString('hex'), 'usuario');
+  u.limites = { opus: p.opus, gpt: p.gpt };
+  u.plano = plano; u.tokenAcesso = token; u.precisaSenha = true;
+  lista.push(u);
+  salvarUsuarios(lista);
+  return { ok: true, token, login, novo: true };
+}
+// Cliente ATIVA a conta definindo a senha (pelo e-mail da compra OU por token de link).
+function ativarAcesso({ email, token, senha }) {
+  if (!senha || String(senha).length < 4) return { ok: false, error: 'A senha precisa de pelo menos 4 caracteres.' };
+  const lista = usuarios();
+  const login = String(email || '').toLowerCase().trim();
+  const u = lista.find(x => (token && x.tokenAcesso === token) || (login && x.login === login && x.precisaSenha));
+  if (!u) return { ok: false, error: 'Não achamos uma compra pendente com esses dados. Confira o e-mail usado na compra.' };
+  const { salt, hash } = hashSenha(senha);
+  u.salt = salt; u.hash = hash;
+  u.senhaPadrao = false; u.precisaSenha = false;
+  delete u.tokenAcesso;
+  salvarUsuarios(lista);
+  return { ok: true, id: u.id, usuario: publico(u) };
+}
+
 // ── usuário "público" (sem segredos) ────────────────────────
 function publico(u) {
   return u && { id: u.id, nome: u.nome, login: u.login, papel: u.papel, permissoes: u.permissoes, uso: usoMensal(u), limites: u.limites || null, senhaPadrao: !!u.senhaPadrao };
@@ -292,4 +337,5 @@ module.exports = {
   publico, novoUsuario, salvarUsuarios, hashSenha,
   usoMensal, consumirGeracao, definirLimites, limiteMes, LIM_OPUS_MES, LIM_GPT_MES,
   trocarSenha, criarUsuarioPersistido, removerUsuario,
+  PLANOS, criarClienteCompra, ativarAcesso,
 };

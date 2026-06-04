@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bem-vindo ao MAX Criador</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+  :root{--ink:#0d1424;--dim:#5b6678;--line:#e7ebf2;--accent:#2f54ff;--bg:#f6f8fc}
+  body{background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;color:var(--ink)}
+  .card{background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:0 18px 60px rgba(13,20,36,.08);width:100%;max-width:440px;padding:46px 40px}
+  .badge{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--accent);background:rgba(47,84,255,.08);padding:6px 12px;border-radius:999px;letter-spacing:.2px}
+  h1{font-size:30px;font-weight:800;letter-spacing:-.5px;margin:20px 0 8px;line-height:1.1}
+  .sub{font-size:15px;color:var(--dim);line-height:1.5;margin-bottom:30px}
+  label{display:block;font-size:13px;font-weight:600;color:var(--ink);margin:0 0 7px}
+  input{width:100%;border:1px solid var(--line);border-radius:13px;padding:14px 16px;font-size:15px;color:var(--ink);background:#fbfcfe;transition:border-color .15s,box-shadow .15s}
+  input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(47,84,255,.1);background:#fff}
+  .field{margin-bottom:18px}
+  .btn{width:100%;border:none;border-radius:999px;padding:15px;font-size:15.5px;font-weight:700;color:#fff;background:var(--accent);cursor:pointer;margin-top:8px;transition:transform .12s,box-shadow .2s,opacity .2s}
+  .btn:hover{box-shadow:0 10px 26px rgba(47,84,255,.32);transform:translateY(-1px)}
+  .btn:disabled{opacity:.55;cursor:default;transform:none;box-shadow:none}
+  .msg{font-size:13.5px;margin-top:16px;padding:11px 14px;border-radius:11px;display:none;line-height:1.45}
+  .msg.err{display:block;background:#fff1f2;color:#be1430;border:1px solid #ffd9de}
+  .msg.ok{display:block;background:#ecfdf3;color:#067647;border:1px solid #bbf3d0}
+  .foot{font-size:12px;color:var(--dim);text-align:center;margin-top:24px}
+</style>
+</head>
+<body>
+  <div class="card">
+    <span class="badge">✓ Compra aprovada</span>
+    <h1>Bem-vindo(a) ao MAX Criador</h1>
+    <p class="sub">Falta só um passo: crie a sua senha pra entrar e começar a gerar seus produtos.</p>
+
+    <div class="field" id="campoEmail">
+      <label for="email">E-mail usado na compra</label>
+      <input type="email" id="email" placeholder="voce@exemplo.com" autocomplete="email" />
+    </div>
+    <div class="field">
+      <label for="senha">Crie sua senha</label>
+      <input type="password" id="senha" placeholder="mínimo 4 caracteres" autocomplete="new-password" />
+    </div>
+    <div class="field">
+      <label for="senha2">Confirme a senha</label>
+      <input type="password" id="senha2" placeholder="repita a senha" autocomplete="new-password" />
+    </div>
+    <button class="btn" id="btn" onclick="ativar()">Criar conta e entrar</button>
+    <div class="msg" id="msg"></div>
+    <p class="foot">MAX Criador · seu estúdio de produtos com IA</p>
+  </div>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const TOKEN = params.get('token') || '';
+  const emailURL = params.get('email') || '';
+  if (emailURL) document.getElementById('email').value = emailURL;
+  // se veio por link com token, o e-mail não é necessário
+  if (TOKEN) document.getElementById('campoEmail').style.display = 'none';
+
+  function showMsg(txt, ok) {
+    const m = document.getElementById('msg');
+    m.className = 'msg ' + (ok ? 'ok' : 'err');
+    m.textContent = txt;
+  }
+  async function ativar() {
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value;
+    const senha2 = document.getElementById('senha2').value;
+    if (!TOKEN && !email) return showMsg('Informe o e-mail que você usou na compra.', false);
+    if (senha.length < 4) return showMsg('A senha precisa de pelo menos 4 caracteres.', false);
+    if (senha !== senha2) return showMsg('As senhas não são iguais.', false);
+
+    const btn = document.getElementById('btn');
+    btn.disabled = true; btn.textContent = 'Criando...';
+    try {
+      const r = await fetch('/api/bem-vindo', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, token: TOKEN, senha }),
+      });
+      const d = await r.json();
+      if (!r.ok || !d.ok) { showMsg(d.error || 'Não foi possível ativar. Tente de novo.', false); btn.disabled = false; btn.textContent = 'Criar conta e entrar'; return; }
+      showMsg('Conta criada! Entrando...', true);
+      setTimeout(() => { location.href = '/estudio'; }, 900);
+    } catch (e) {
+      showMsg('Erro de conexão. Tente de novo.', false);
+      btn.disabled = false; btn.textContent = 'Criar conta e entrar';
+    }
+  }
+  document.getElementById('senha2').addEventListener('keydown', e => { if (e.key === 'Enter') ativar(); });
+</script>
+</body>
+</html>
