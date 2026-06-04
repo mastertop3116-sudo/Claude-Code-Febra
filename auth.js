@@ -25,6 +25,23 @@ const VALIDADE_DIAS = 30;
 const LIM_OPUS_MES = parseInt(process.env.LIM_OPUS_MES) || 15;
 const LIM_GPT_MES  = parseInt(process.env.LIM_GPT_MES)  || 50;
 
+// ── PERSISTÊNCIA no Supabase (banco que NÃO some entre publicações) ──────────
+// Antes os usuários ficavam só em data/usuarios.json — que zera a cada deploy no
+// Render (filesystem efêmero), fazendo clientes pagantes sumirem. Agora ficam na
+// tabela criador_usuarios do Supabase, acessada SÓ pelo servidor (service_role;
+// o RLS bloqueia o anon). Um cache em memória mantém as funções abaixo síncronas:
+// toda escrita atualiza o cache E grava no banco. O arquivo vira só backup local.
+let _sb = null;
+try {
+  if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    _sb = require('@supabase/supabase-js').createClient(
+      process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } }
+    );
+  }
+} catch (_) { _sb = null; }
+const TABELA_USERS = 'criador_usuarios';
+let _cache = null;   // array de usuários em memória (fonte rápida; o Supabase é a durável)
+
 // ── SEGREDO da sessão ───────────────────────────────────────
 // Se não vier por env (SESSION_SECRET), NÃO usar um segredo fixo conhecido
 // (isso deixaria qualquer um forjar um cookie de admin). Geramos um aleatório
@@ -58,13 +75,22 @@ function conferirSenha(senha, salt, hash) {
   } catch (_) { return false; }
 }
 
-// ── usuários (arquivo) ──────────────────────────────────────
-function lerUsuarios() {
+// ── usuários (cache em memória + Supabase) ──────────────────
+function _lerArquivo() {
   try { return JSON.parse(fs.readFileSync(USERS_FILE, 'utf8')); } catch (_) { return null; }
 }
+function lerUsuarios() { return _cache; }
 function salvarUsuarios(lista) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  fs.writeFileSync(USERS_FILE, JSON.stringify(lista, null, 2));
+  _cache = lista;
+  // backup local (efêmero no Render, mas ajuda em dev e como rede de segurança)
+  try { fs.mkdirSync(DATA_DIR, { recursive: true }); fs.writeFileSync(USERS_FILE, JSON.stringify(lista, null, 2)); } catch (_) {}
+  // grava no banco durável (fire-and-forget; loga se falhar — não trava o request)
+  if (_sb) {
+    const rows = lista.map(u => ({ id: u.id, login: u.login, dados: u, updated_at: new Date().toISOString() }));
+    _sb.from(TABELA_USERS).upsert(rows, { onConflict: 'id' })
+      .then(({ error }) => { if (error) console.error('[auth] falha ao gravar usuários no Supabase:', error.message); })
+      .catch(e => console.error('[auth] erro Supabase ao gravar:', e.message));
+  }
 }
 function novoUsuario(nome, login, senha, papel, senhaPadrao = false) {
   const { salt, hash } = hashSenha(senha);
@@ -88,7 +114,32 @@ function semeie() {
   salvarUsuarios(lista);
   return lista;
 }
-function usuarios() { return lerUsuarios() || semeie(); }
+function usuarios() {
+  if (_cache) return _cache;
+  const arq = _lerArquivo();              // fallback síncrono se o boot ainda não carregou
+  if (arq && arq.length) { _cache = arq; return _cache; }
+  return semeie();                        // 1ª vez: cria Rodrigo + Bruno (e grava no banco)
+}
+// Carrega os usuários do banco pro cache. Chamar NO BOOT, antes de servir requests.
+async function iniciar() {
+  if (!_sb) { usuarios(); return { fonte: 'arquivo' }; }
+  try {
+    const { data, error } = await _sb.from(TABELA_USERS).select('dados');
+    if (error) throw error;
+    if (data && data.length) {
+      _cache = data.map(r => r.dados).filter(Boolean);
+      console.log(`[auth] ${_cache.length} usuário(s) carregado(s) do Supabase.`);
+      return { fonte: 'supabase', total: _cache.length };
+    }
+    semeie();                             // banco vazio → semeia Rodrigo + Bruno lá
+    console.log('[auth] banco vazio — semeei Rodrigo + Bruno no Supabase.');
+    return { fonte: 'supabase', total: _cache ? _cache.length : 0, semeado: true };
+  } catch (e) {
+    console.error('[auth] Supabase falhou no boot — usando arquivo local:', e.message);
+    usuarios();
+    return { fonte: 'arquivo-fallback', erro: e.message };
+  }
+}
 function acharPorLogin(login) {
   return usuarios().find(u => u.login === String(login || '').toLowerCase().trim());
 }
@@ -202,6 +253,10 @@ function removerUsuario(userId) {
   const lista = usuarios();
   if (!lista.find(x => x.id === userId)) return { ok: false, error: 'Usuário não encontrado.' };
   salvarUsuarios(lista.filter(x => x.id !== userId));
+  // upsert não apaga sozinho — remove explicitamente do banco
+  if (_sb) _sb.from(TABELA_USERS).delete().eq('id', userId)
+    .then(({ error }) => { if (error) console.error('[auth] falha ao remover no Supabase:', error.message); })
+    .catch(e => console.error('[auth] erro Supabase ao remover:', e.message));
   return { ok: true };
 }
 
@@ -231,6 +286,7 @@ function exigirAdmin(req, res, next) {
 }
 
 module.exports = {
+  iniciar,
   usuarios, acharPorLogin, conferirSenha, criarToken, lerToken,
   setCookieSessao, limparCookie, exigirLogin, exigirAdmin, usuarioDaReq,
   publico, novoUsuario, salvarUsuarios, hashSenha,

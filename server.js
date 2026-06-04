@@ -3084,6 +3084,9 @@ app.get('/api/criador/historico', async (req, res) => {
 app.listen(PORT, async () => {
   console.log(`NEXUS — Servidor rodando na porta ${PORT}`);
   console.log(`[Gamma] API KEY: ${process.env.GAMMA_API_KEY ? "✅ configurada" : "❌ NÃO CONFIGURADA — geração PDF usará apenas PDFKit"}`);
+  // Carrega os logins do banco que não some (Supabase) — antes de atender
+  try { console.log('[auth] iniciar →', JSON.stringify(await auth.iniciar())); }
+  catch (e) { console.error('[auth] iniciar falhou:', e.message); }
   await runMigrations();
   await registerWebhook();
 
