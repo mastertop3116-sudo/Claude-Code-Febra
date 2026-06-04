@@ -658,6 +658,7 @@ footer{
 const STATE = {
   token: localStorage.getItem('plania_token') || '',
   tokenValido: false,
+  dom: null,   // acesso liberado pela Dominance (área de membros)
   demoRestantes: parseInt(localStorage.getItem('plania_demo') ?? '3'),
   componenteSelecionado: 'Pensamento Computacional e Programação Desplugada',
   duracaoSelecionada: '50 minutos',
@@ -666,8 +667,16 @@ const STATE = {
 
 // ── Init ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  // Acesso pela DOMINANCE: link /plania?u=ID&s=ASSINATURA → entra JÁ LIBERADO, sem digitar código.
+  const _p = new URLSearchParams(location.search);
+  const _u = _p.get('u'), _s = _p.get('s');
+  if (_u && _s) {
+    STATE.dom = { u: _u, s: _s };
+    STATE.tokenValido = true;
+    const ta = document.querySelector('.token-area'); if (ta) ta.style.display = 'none';
+  }
   atualizarDemoNotice();
-  if (STATE.token) {
+  if (!STATE.dom && STATE.token) {
     document.getElementById('tokenInput').value = STATE.token;
     verificarToken(true);
   }
@@ -768,6 +777,7 @@ async function gerarPlano() {
         duracao: STATE.duracaoSelecionada,
         turma,
         token: STATE.token || undefined,
+        dom: STATE.dom || undefined,
       }),
     });
 

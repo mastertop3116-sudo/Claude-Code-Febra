@@ -2701,8 +2701,22 @@ app.post('/api/plania/ativar', async (req, res) => {
   res.json({ ok: true, token, email, tipo, expira_em });
 });
 
+// Valida o "selo de acesso" da DOMINANCE (área de membros do Carlinhos): a Dominance
+// monta um link assinado (HMAC do id do membro com um segredo só dela e nosso). Assim o
+// membro abre o PlanIA JÁ LIBERADO, sem digitar token. Ninguém de fora consegue forjar.
+function validarSeloDominance(u, s) {
+  const segredo = process.env.PLANIA_DOMINANCE_SECRET;
+  if (!segredo || !u || !s) return false;
+  try {
+    const crypto = require('crypto');
+    const esperado = crypto.createHmac('sha256', segredo).update(String(u)).digest('hex');
+    const a = Buffer.from(esperado), b = Buffer.from(String(s));
+    return a.length === b.length && crypto.timingSafeEqual(a, b);
+  } catch (_) { return false; }
+}
+
 app.post('/api/plania/gerar', async (req, res) => {
-  const { serie, componente, tema, duracao, turma, token } = req.body;
+  const { serie, componente, tema, duracao, turma, token, dom } = req.body;
 
   if (!serie || !componente || !tema?.trim()) {
     return res.status(400).json({ error: 'Preencha série, componente e tema.' });
@@ -2714,7 +2728,10 @@ app.post('/api/plania/gerar', async (req, res) => {
   let acessoId = null;
   let modoDemo = true;
 
-  if (token) {
+  // Acesso vindo da DOMINANCE (link assinado): libera sem token — quem controla quem comprou é a Dominance.
+  if (dom && dom.u && dom.s && validarSeloDominance(dom.u, dom.s)) {
+    modoDemo = false;
+  } else if (token) {
     try {
       const { supabase } = require('./integrations/supabase');
       const { data } = await supabase
