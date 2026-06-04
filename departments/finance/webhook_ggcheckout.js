@@ -63,7 +63,9 @@ router.post("/ggcheckout", async (req, res) => {
       if (ePlania) {
         try {
           const email = payload.customer?.email || payload.buyer_email || payload.email || "";
-          const tipo  = valorNum >= 70 ? "vitalicio" : "30dias";
+          // PlanIA vendido a R$47,90 (Pix ~R$45,50) como VITALÍCIO. Teto R$40 cobre os dois
+          // (e ainda dá 30 dias caso um dia venda algo bem mais barato). Ajustável por env.
+          const tipo  = valorNum >= (Number(process.env.PLANIA_VITALICIO_MIN) || 40) ? "vitalicio" : "30dias";
           const token = Math.random().toString(36).substring(2, 7).toUpperCase()
                       + "-" + Math.random().toString(36).substring(2, 7).toUpperCase();
           const expira_em = tipo === "vitalicio"

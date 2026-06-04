@@ -2744,6 +2744,11 @@ app.post('/api/plania/gerar', async (req, res) => {
       if (data.expira_em && new Date(data.expira_em) < new Date()) {
         return res.status(403).json({ error: 'Seu acesso expirou. Renove para continuar gerando planos.' });
       }
+      // Teto de segurança (protege o custo de IA do vitalício "ilimitado"). Invisível pro professor normal.
+      const LIM_PLANIA = Number(process.env.PLANIA_LIMITE_PLANOS) || 150;
+      if ((data.planos_gerados || 0) >= LIM_PLANIA) {
+        return res.status(403).json({ error: `Você já gerou ${LIM_PLANIA} planos com este acesso. Fale com o suporte para liberar mais.` });
+      }
       acessoId = data.id;
       modoDemo = false;
     } catch (e) {
