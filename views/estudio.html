@@ -81,6 +81,15 @@
   .nbtn .pp{font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:2px 7px;border-radius:6px}
   .nicon{width:38px;height:38px;padding:0;justify-content:center;color:var(--ink-2)}
   .nicon svg{width:19px;height:19px}
+  /* celular: aperta a topbar pra TODOS os botões caberem (inclusive o Sair) */
+  @media (max-width:480px){
+    .top{padding-left:14px;padding-right:14px;gap:8px}
+    .nav{gap:2px}
+    .nbtn.chip{padding:0 10px}
+    .nbtn.chip .pp{display:none}   /* esconde o selo ADMIN no celular; o nome continua */
+    .wm{font-size:0;gap:0}         /* mostra só o M no celular (texto MAX CRIADOR some) */
+    .wm .mark{width:24px;height:24px}
+  }
 
   /* ── LAYOUT ── */
   .wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(20px,5vw,64px)}
@@ -376,7 +385,7 @@
       ia_title:'Criador com IA',uses_model:'usa modelo',ia_desc:'Ebook, workbook, guia, checklist, ficha, script de VSL — escritos pela IA com o modelo escolhido acima.',open_ia:'Abrir Criador com IA',unavailable:'indisponível hoje',ia_off:'Desativado por enquanto (usa serviços pagos).',
       ebook_title:'E-book com IA',ebook_desc:'A IA escreve um e-book completo e ilustrado sobre o tema — capa, capítulos, exemplos e ação. Já nasce com imagem.',ebook_about:'Sobre o que é o e-book?',ebook_about_ph:'ex: Como começar no jiu-jitsu depois dos 30',ebook_public:'Pra quem é? (opcional)',ebook_public_ph:'ex: adultos iniciantes',ebook_tone:'Tom',ebook_len:'Tamanho',tom_conv:'Próximo',tom_prof:'Profissional',tom_insp:'Inspirador',tom_edu:'Didático',len_curto:'Curto',len_medio:'Médio',len_longo:'Longo',create_ebook:'Criar E-book',pw_warn:'Você está com a senha padrão. Troque agora pra proteger sua conta.',pw_warn_btn:'Trocar senha',
       cat_title:'Catálogo de Imagens',reuse:'reuso',cat_desc:'Todas as imagens que a gente criou. O Criador reusa sozinho quando o tema bate — nada se perde.',open_cat:'Abrir Catálogo',
-      foot:'Feito pra criar rápido e vender mais.',my_account:'Minha Conta',change_pwd:'Trocar minha senha',cur_pwd:'Senha atual',new_pwd:'Nova senha',rep_pwd:'Repetir nova senha',save_pwd:'Salvar nova senha',
+      foot:'Feito pra criar rápido e vender mais.',my_account:'Minha Conta',change_pwd:'Trocar minha senha',cur_pwd:'Senha atual',new_pwd:'Nova senha',rep_pwd:'Repetir nova senha',save_pwd:'Salvar nova senha',pwd_min4:'Mín. 4 caracteres.',pwd_nomatch:'As senhas não batem.',pwd_saved:'Senha trocada!',
       users:'Usuários',users_sub:'Quem pode acessar. Troque a senha de alguém ou adicione gente nova.',add_user:'Adicionar usuário',name:'Nome',login:'Usuário',password:'Senha',role_user:'Usuário',role_admin:'Admin',create_user:'Criar usuário',
       settings:'Configurações',settings_sub:'Deixe do seu jeito. Tudo salva automático.',language:'Idioma',accent:'Cor de destaque',appearance:'Aparência',dark_mode:'Modo escuro',animations:'Animações',
       g_m:'Bom dia',g_a:'Boa tarde',g_e:'Boa noite',
@@ -402,7 +411,7 @@
       ia_title:'AI Creator',uses_model:'uses model',ia_desc:'Ebook, workbook, guide, checklist, sheet, VSL script — written by AI with the model chosen above.',open_ia:'Open AI Creator',unavailable:'unavailable today',ia_off:'Off for now (uses paid services).',
       ebook_title:'AI E-book',ebook_desc:'The AI writes a full, illustrated e-book on your topic — cover, chapters, examples and action. Born with an image.',ebook_about:'What is the e-book about?',ebook_about_ph:'e.g. How to start jiu-jitsu after 30',ebook_public:'Who is it for? (optional)',ebook_public_ph:'e.g. adult beginners',ebook_tone:'Tone',ebook_len:'Length',tom_conv:'Friendly',tom_prof:'Professional',tom_insp:'Inspiring',tom_edu:'Educational',len_curto:'Short',len_medio:'Medium',len_longo:'Long',create_ebook:'Create E-book',pw_warn:'You are using the default password. Change it now to protect your account.',pw_warn_btn:'Change password',
       cat_title:'Image Catalog',reuse:'reuse',cat_desc:'Every image we made. The Creator reuses them when the theme matches — nothing wasted.',open_cat:'Open Catalog',
-      foot:'Built to create fast and sell more.',my_account:'My Account',change_pwd:'Change my password',cur_pwd:'Current password',new_pwd:'New password',rep_pwd:'Repeat new password',save_pwd:'Save new password',
+      foot:'Built to create fast and sell more.',my_account:'My Account',change_pwd:'Change my password',cur_pwd:'Current password',new_pwd:'New password',rep_pwd:'Repeat new password',save_pwd:'Save new password',pwd_min4:'At least 4 characters.',pwd_nomatch:"Passwords don't match.",pwd_saved:'Password changed!',
       users:'Users',users_sub:'Who can access. Change someone’s password or add new people.',add_user:'Add user',name:'Name',login:'Username',password:'Password',role_user:'User',role_admin:'Admin',create_user:'Create user',
       settings:'Settings',settings_sub:'Make it yours. Everything saves automatically.',language:'Language',accent:'Accent color',appearance:'Appearance',dark_mode:'Dark mode',animations:'Animations',
       g_m:'Good morning',g_a:'Good afternoon',g_e:'Good evening',
@@ -428,7 +437,7 @@
       ia_title:'Creador con IA',uses_model:'usa modelo',ia_desc:'Ebook, workbook, guía, checklist, ficha, guion de VSL — escritos por la IA con el modelo elegido arriba.',open_ia:'Abrir Creador con IA',unavailable:'no disponible hoy',ia_off:'Desactivado por ahora (usa servicios de pago).',
       ebook_title:'E-book con IA',ebook_desc:'La IA escribe un e-book completo e ilustrado sobre el tema — portada, capítulos, ejemplos y acción. Nace con imagen.',ebook_about:'¿De qué trata el e-book?',ebook_about_ph:'ej: Cómo empezar jiu-jitsu después de los 30',ebook_public:'¿Para quién es? (opcional)',ebook_public_ph:'ej: adultos principiantes',ebook_tone:'Tono',ebook_len:'Tamaño',tom_conv:'Cercano',tom_prof:'Profesional',tom_insp:'Inspirador',tom_edu:'Didáctico',len_curto:'Corto',len_medio:'Medio',len_longo:'Largo',create_ebook:'Crear E-book',pw_warn:'Estás usando la contraseña por defecto. Cámbiala ahora para proteger tu cuenta.',pw_warn_btn:'Cambiar contraseña',
       cat_title:'Catálogo de Imágenes',reuse:'reúso',cat_desc:'Todas las imágenes que creamos. El Creador las reutiliza cuando el tema coincide — nada se pierde.',open_cat:'Abrir Catálogo',
-      foot:'Hecho para crear rápido y vender más.',my_account:'Mi Cuenta',change_pwd:'Cambiar mi contraseña',cur_pwd:'Contraseña actual',new_pwd:'Nueva contraseña',rep_pwd:'Repetir nueva contraseña',save_pwd:'Guardar contraseña',
+      foot:'Hecho para crear rápido y vender más.',my_account:'Mi Cuenta',change_pwd:'Cambiar mi contraseña',cur_pwd:'Contraseña actual',new_pwd:'Nueva contraseña',rep_pwd:'Repetir nueva contraseña',save_pwd:'Guardar contraseña',pwd_min4:'Mínimo 4 caracteres.',pwd_nomatch:'Las contraseñas no coinciden.',pwd_saved:'¡Contraseña cambiada!',
       users:'Usuarios',users_sub:'Quién puede acceder. Cambia la contraseña de alguien o agrega gente.',add_user:'Agregar usuario',name:'Nombre',login:'Usuario',password:'Contraseña',role_user:'Usuario',role_admin:'Admin',create_user:'Crear usuario',
       settings:'Configuración',settings_sub:'Hazlo a tu manera. Todo se guarda solo.',language:'Idioma',accent:'Color de acento',appearance:'Apariencia',dark_mode:'Modo oscuro',animations:'Animaciones',
       g_m:'Buenos días',g_a:'Buenas tardes',g_e:'Buenas noches',
@@ -550,9 +559,9 @@
   $('sw-anim').onclick=()=>{CFG.anim=!CFG.anim;saveCfg();applyCfg();};
   // conta senha
   $('s-btn').onclick=async()=>{const atual=$('s-atual').value,nova=$('s-nova').value,rep=$('s-rep').value,st=$('s-status');
-    if(nova.length<4){st.className='status err';st.textContent='Mín. 4 caracteres.';return;}if(nova!==rep){st.className='status err';st.textContent='As senhas não batem.';return;}
+    if(nova.length<4){st.className='status err';st.textContent=t('pwd_min4');return;}if(nova!==rep){st.className='status err';st.textContent=t('pwd_nomatch');return;}
     st.className='status';st.textContent='…';const r=await fetch('/api/conta/senha',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({atual,nova})});const d=await r.json();
-    if(r.ok&&d.ok){st.className='status ok';st.textContent='✓ Senha trocada!';$('s-atual').value=$('s-nova').value=$('s-rep').value='';}else{st.className='status err';st.textContent='× '+(d.error||'erro');}};
+    if(r.ok&&d.ok){st.className='status ok';st.textContent='✓ '+t('pwd_saved');$('s-atual').value=$('s-nova').value=$('s-rep').value='';}else{st.className='status err';st.textContent='× '+(d.error||'erro');}};
   // usuários
   $('btn-users').onclick=()=>{$('ov-users').classList.add('show');loadUsers();};
   async function loadUsers(){const box=$('users-list');box.innerHTML='…';const d=await(await fetch('/api/usuarios')).json();if(!d.usuarios){box.innerHTML='<div class="status err">'+(d.error||'erro')+'</div>';return;}
