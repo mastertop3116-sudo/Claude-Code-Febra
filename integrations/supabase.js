@@ -128,7 +128,7 @@ async function salvarReport(dados) {
     .insert({
       receita_bruta: dados.receitaBruta || 0,
       custos: dados.custos || 0,
-      lucro_liquido: dados.lucroLiquido || 0,
+      // lucro_liquido é coluna CALCULADA pelo banco (receita - custos) — não inserir
       conversoes: dados.conversoes || 0,
       leads: dados.leads || 0,
       notas: dados.notas || "",

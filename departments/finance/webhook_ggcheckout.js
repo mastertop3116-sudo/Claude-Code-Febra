@@ -33,28 +33,27 @@ router.post("/ggcheckout", async (req, res) => {
     // Se foi venda confirmada, salva no financeiro e atualiza metas
     const eVenda = ["pix_paid", "card_approved"].includes(evento);
     if (eVenda) {
-
-      await salvarReport({
-        receitaBruta: valorNum,
-        custos: 0,
-        conversoes: 1,
-        leads: 0,
-        notas: `${produto} — ${cliente}`,
-      });
-
-      // Atualiza meta de faturamento no Caderno Preto
       const { supabase } = require("../../integrations/supabase");
-      const { data: meta } = await supabase
-        .from("caderno_preto")
-        .select("valor_atual")
-        .eq("nome", "Faturamento Mensal (R$)")
-        .single();
 
-      if (meta) {
-        await atualizarMeta(
-          "Faturamento Mensal (R$)",
-          Number(meta.valor_atual) + valorNum
-        );
+      // Registro financeiro (SECUNDÁRIO): se falhar, loga mas NÃO derruba a entrega do acesso.
+      try {
+        await salvarReport({
+          receitaBruta: valorNum,
+          custos: 0,
+          conversoes: 1,
+          leads: 0,
+          notas: `${produto} — ${cliente}`,
+        });
+        const { data: meta } = await supabase
+          .from("caderno_preto")
+          .select("valor_atual")
+          .eq("nome", "Faturamento Mensal (R$)")
+          .single();
+        if (meta) {
+          await atualizarMeta("Faturamento Mensal (R$)", Number(meta.valor_atual) + valorNum);
+        }
+      } catch (e) {
+        console.error("[Finance] erro no registro financeiro (segue pra entrega do acesso):", e.message);
       }
 
       // ── PlanIA: gerar token de acesso automaticamente ─────
