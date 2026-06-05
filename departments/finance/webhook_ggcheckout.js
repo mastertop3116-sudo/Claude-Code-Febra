@@ -10,6 +10,20 @@ require("dotenv").config();
 
 const router = express.Router();
 
+// Busca em profundidade o 1º valor-string que passe no teste — assim achamos o
+// nome do produto / e-mail mesmo que o GG mude o nome do campo no aviso (webhook).
+function _buscaFundo(obj, teste, prof = 0) {
+  if (obj == null || prof > 6) return null;
+  if (typeof obj === "string") return teste(obj) ? obj : null;
+  if (typeof obj === "object") {
+    for (const k of Object.keys(obj)) {
+      const r = _buscaFundo(obj[k], teste, prof + 1);
+      if (r) return r;
+    }
+  }
+  return null;
+}
+
 router.post("/ggcheckout", async (req, res) => {
   try {
     const payload = req.body;
@@ -17,7 +31,11 @@ router.post("/ggcheckout", async (req, res) => {
 
     console.log(`[Finance] Evento recebido: ${evento}`, payload);
 
-    const produto = payload.product?.name || payload.product_name || payload.productName || payload.item_name || "Produto";
+    const produto = payload.product?.name || payload.product_name || payload.productName || payload.item_name
+      || payload.titleOffer || payload.title || payload.product?.title || payload.offer?.title || payload.mainProduct?.title
+      || (Array.isArray(payload.items) && payload.items[0] && (payload.items[0].title || payload.items[0].name))
+      || _buscaFundo(payload, (s) => /criador|cr[eé]ditos?|est[uú]dio|plania|plano de aula/i.test(s))
+      || "Produto";
     const cliente = payload.customer?.name || payload.buyer_name || payload.customerName || payload.name || "—";
 
     // Valor: tenta vários campos (centavos ou reais)
@@ -87,7 +105,8 @@ router.post("/ggcheckout", async (req, res) => {
       if (eCriador) {
         try {
           const auth = require("../../auth");
-          const email = payload.customer?.email || payload.buyer_email || payload.email || "";
+          const email = payload.customer?.email || payload.buyer_email || payload.email || payload.customerEmail || payload.customer_email
+            || _buscaFundo(payload, (s) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(s).trim())) || "";
           const nome  = payload.customer?.name || payload.buyer_name || cliente || "";
           // créditos do pacote: acha "N créditos" no nome do produto (robusto contra cupom); senão, pelo valor cheio.
           const mCred = nomeProduto.match(/(\d+)\s*cr[eé]dito/i);
