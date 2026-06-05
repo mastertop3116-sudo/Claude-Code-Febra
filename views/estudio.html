@@ -365,6 +365,10 @@
               <option value="capa" data-i18n="ilus_capa">Capa ilustrada — +3 créditos</option>
               <option value="total" data-i18n="ilus_total">Totalmente ilustrado — +15 créditos</option>
             </select></div>
+          <div><label class="field-label" data-i18n="model_h">Como a IA vai escrever o e-book</label>
+            <div class="seg" id="seg"><div class="thumb"></div><button data-m="gpt" class="on" data-i18n="model_gpt">GPT</button><button data-m="opus" data-i18n="model_opus">Opus</button></div>
+            <div class="opus-note" id="opus-note"><span class="pill" data-i18n="opus_tag">custo real</span><span><span data-i18n="opus_warn">O Opus tem custo real — cada criação usa seu crédito. Para testar, fique no GPT (grátis).</span> <b id="opus-lim"></b></span></div>
+          </div>
           <div class="grow"></div>
           <button class="btn accent" id="eb-btn" data-i18n="create_ebook">Criar E-book</button>
           <div class="status" id="eb-status"></div>
@@ -377,18 +381,6 @@
           <div class="grow"></div>
           <button class="btn ghost" id="cat-btn" data-i18n="open_cat">Abrir Catálogo</button>
         </div>
-      </div>
-    </section>
-
-    <!-- MODELO (motor da IA — usado pelo E-book) -->
-    <section>
-      <div class="sec-head r" data-reveal>
-        <h2 data-i18n="model_h">Como a IA vai escrever o e-book</h2>
-        <div class="seg" id="seg"><div class="thumb"></div><button data-m="gpt" class="on" data-i18n="model_gpt">GPT</button><button data-m="opus" data-i18n="model_opus">Opus</button></div>
-      </div>
-      <div class="opus-note r" id="opus-note" data-reveal>
-        <span class="pill" data-i18n="opus_tag">custo real</span>
-        <span><span data-i18n="opus_warn">O Opus tem custo real — cada criação usa seu crédito. Para testar, fique no GPT (grátis).</span> <b id="opus-lim"></b></span>
       </div>
     </section>
 
