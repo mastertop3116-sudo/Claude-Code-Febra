@@ -1115,4 +1115,44 @@ async function executar(params, onProgress = () => {}) {
   }
 }
 
-module.exports = { executar, renderizarPDF, gerarConteudo, CORES, LABELS };
+// AUTOPREENCHIMENTO: dado o nome de um tema, a IA sugere ~12 palavras com dica
+// (pro Pack de Atividades). Barato e rápido (Sonnet); cai no GPT se o Claude falhar.
+async function sugerirPalavras(tema, idioma = 'pt') {
+  const t = String(tema || '').trim().slice(0, 80);
+  if (t.length < 2) return [];
+  const lng = idioma === 'en' ? 'inglês' : idioma === 'es' ? 'espanhol' : 'português';
+  const sistema = 'Você cria listas de palavras para atividades infantis impressas (caça-palavras, ligue, código). Responda SEMPRE só com JSON válido.';
+  const prompt = `Tema: "${t}".\nGere 12 palavras relacionadas a esse tema, boas para crianças, em ${lng}. Cada palavra deve ser UMA só (sem espaços nem hífen), de 3 a 11 letras, e ter uma dica curta (até 6 palavras).\nResponda APENAS: {"palavras":[{"p":"PALAVRA","d":"dica curta"}]} com exatamente 12 itens.`;
+  let raw;
+  try {
+    const Anthropic = require('@anthropic-ai/sdk');
+    const anthropic = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const r = await anthropic.messages.create({
+      model: process.env.CRIADOR_MODELO || 'claude-sonnet-4-6',
+      max_tokens: 1500, temperature: 0.7, system: sistema,
+      messages: [{ role: 'user', content: prompt + '\n\nResponda APENAS o JSON, começando em { e terminando em }.' }],
+    });
+    raw = (r.content || []).map(b => b.text || '').join('');
+  } catch (claudeErr) {
+    const OpenAI = require('openai');
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const r = await client.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'system', content: sistema }, { role: 'user', content: prompt }],
+      response_format: { type: 'json_object' }, temperature: 0.7, max_tokens: 1200,
+    });
+    raw = r.choices[0].message.content;
+  }
+  raw = String(raw).replace(/```json/gi, '').replace(/```/g, '').trim();
+  const i = raw.indexOf('{'), j = raw.lastIndexOf('}');
+  if (i >= 0 && j > i) raw = raw.slice(i, j + 1);
+  let arr = [];
+  try { arr = JSON.parse(raw).palavras || []; }
+  catch (_) { try { const { jsonrepair } = require('jsonrepair'); arr = JSON.parse(jsonrepair(raw)).palavras || []; } catch (__) { arr = []; } }
+  return (Array.isArray(arr) ? arr : []).map(o => ({
+    p: String(o.p || o.palavra || '').toUpperCase().replace(/[^A-ZÇÃÕÁÉÍÓÚÂÊÔÀÜÑ]/g, '').slice(0, 14),
+    d: String(o.d || o.dica || '').trim().slice(0, 60),
+  })).filter(o => o.p.length >= 2).slice(0, 14);
+}
+
+module.exports = { executar, renderizarPDF, gerarConteudo, sugerirPalavras, CORES, LABELS };

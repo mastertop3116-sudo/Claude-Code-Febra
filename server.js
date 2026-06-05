@@ -259,6 +259,30 @@ app.post("/api/estudio/atividades", auth.exigirLogin, (req, res) => {
   rodarGerador("gerar-atividades.js", [nicho, String(qtd)], pdf, res);
 });
 
+// AUTOPREENCHIMENTO: a IA sugere as palavras de um tema novo (pro Pack de Atividades)
+// Aceita cliente logado OU a chave de admin (pra o Claude testar sem login).
+app.post("/api/estudio/sugerir-palavras", (req, res, next) => {
+  const u = auth.usuarioDaReq(req);
+  const chave = req.headers["x-admin-key"];
+  if (u || (process.env.ADMIN_API_KEY && chave && chave === process.env.ADMIN_API_KEY)) { req.usuario = u || { id: "api", papel: "admin" }; return next(); }
+  return res.status(401).json({ error: "Faça login." });
+}, async (req, res) => {
+  const tema = String((req.body && req.body.tema) || "").trim().slice(0, 80);
+  const idioma = ["pt", "en", "es"].includes(req.body && req.body.idioma) ? req.body.idioma : "pt";
+  if (tema.length < 2) return res.status(400).json({ error: "Dê um nome ao tema primeiro." });
+  res.setTimeout(60 * 1000);
+  try {
+    const eng = require("./departments/creative/engines/criador_engine");
+    const palavras = await eng.sugerirPalavras(tema, idioma);
+    if (!palavras.length) return res.status(502).json({ error: "Não consegui sugerir agora. Tente de novo." });
+    const texto = palavras.map((o) => o.p + (o.d ? ": " + o.d : "")).join("\n");
+    res.json({ ok: true, texto, total: palavras.length });
+  } catch (e) {
+    console.error("[estudio/sugerir-palavras]", e.message);
+    res.status(500).json({ error: "Falha ao sugerir palavras." });
+  }
+});
+
 // Saldo de CRÉDITOS do usuário. admin = ilimitado
 app.get("/api/estudio/uso", auth.exigirLogin, (req, res) => { res.json(auth.saldo(req.usuario)); });
 
