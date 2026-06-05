@@ -374,7 +374,7 @@
           <div class="status" id="eb-status"></div>
         </div>
 
-        <div class="card r" data-reveal style="transition-delay:.18s">
+        <div class="card hide" id="card-catalogo" style="transition-delay:.18s"><!-- só admin: catálogo é o pool compartilhado do sistema, não as imagens do cliente -->
           <div class="ico neutral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4.5" width="18" height="15" rx="3"/><circle cx="8.5" cy="10" r="1.8"/><path d="m4 17 5-4.5 4 3.2L17 12l4 3.5"/></svg></div>
           <span class="help" data-tip="Banco com todas as imagens que você já criou. O Criador reaproveita sozinho quando o tema combina — nada se desperdiça.">?</span><h3 data-i18n="cat_title">Catálogo de Imagens</h3><span class="badge" data-i18n="reuse">reuso</span>
           <p data-i18n="cat_desc">Todas as imagens que a gente criou. O Criador reusa sozinho quando o tema bate — nada se perde.</p>
@@ -640,7 +640,7 @@
     EU=u;USO=u.saldo||null;const fn=u.nome.split(' ')[0];
     $('nome').textContent=fn;$('sp-hi').textContent='Olá, '+fn;
     $('u-nome').textContent=fn;$('u-papel').textContent=u.papel;
-    if(u.papel==='admin'){$('btn-users').classList.remove('hide');$('btn-painel').classList.remove('hide');}
+    if(u.papel==='admin'){$('btn-users').classList.remove('hide');$('btn-painel').classList.remove('hide');const cc=$('card-catalogo');if(cc)cc.classList.remove('hide');}
     if(u.senhaPadrao)$('pw-warn').classList.remove('hide');
     $('conta-info').innerHTML='<b>'+u.nome+'</b> ('+u.login+') — '+(u.papel==='admin'?'admin':'usuário')+'.';
     renderSaldo();pronto=true;
