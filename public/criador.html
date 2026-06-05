@@ -925,6 +925,8 @@ async function iniciar() {
       method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(params)
     });
     if (r.status === 429) { goTo(2); mostrarErro('Você atingiu o limite de gerações por hora. Aguarde e tente novamente.'); return; }
+    if (r.status === 401) { goTo(2); mostrarErro('Entre na sua conta pra criar. Te levando pro login…'); setTimeout(()=>location.href='/login?next=/criador',1200); return; }
+    if (r.status === 403) { const e = await r.json().catch(()=>({})); goTo(2); mostrarErro(e.error || 'Seus créditos acabaram. Compre mais em /comprar.'); return; }
     if (!r.ok) throw new Error('Servidor retornou '+r.status);
     const { jobId: id } = await r.json();
     jobId = id;

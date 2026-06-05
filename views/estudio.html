@@ -253,6 +253,10 @@
     <section class="hero">
       <div class="eyebrow r" id="eyebrow">…</div>
       <h1 class="r" id="hero-h1" style="transition-delay:.06s"><span id="greet">Olá</span>, <span class="nm" id="nome">…</span>.</h1>
+      <div class="r" id="cred-bar" style="display:none;align-items:center;gap:12px;margin-top:12px;transition-delay:.1s">
+        <span class="badge" id="cred-chip" style="font-size:.95rem;padding:8px 15px">💎 <b id="cred-n">…</b>&nbsp;<span data-i18n="credits">créditos</span></span>
+        <button class="btn accent sm" id="btn-comprar" data-i18n="buy_credits">Comprar créditos</button>
+      </div>
       <div class="tipline r" id="tipline" style="transition-delay:.14s">
         <div class="bar"><i id="tipbar"></i></div>
         <div class="tip-wrap">
@@ -523,14 +527,21 @@
   // ───── model ─────
   let MODELO=localStorage.getItem('max_modelo')||'gpt',USO=null,EU=null;
   const seg=$('seg');
+  function custoDe(m){return (m==='opus')?((USO&&USO.custoAvancada)||2):((USO&&USO.custoRapida)||1);}
+  // mostra o saldo de créditos no topo + atualiza a nota do modelo
+  function renderSaldo(){
+    const bar=$('cred-bar'); if(bar) bar.style.display='flex';
+    const ilim=USO&&USO.ilimitado, cr=USO?USO.creditos:null;
+    const n=$('cred-n'); if(n) n.textContent=ilim?'∞':(cr!=null?cr:'…');
+    applyModel();
+  }
   function applyModel(){
     seg.classList.toggle('opus',MODELO==='opus');
     seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.m===MODELO));
     $('opus-note').classList.toggle('show',MODELO==='opus');
-    const m=USO&&USO[MODELO];
-    const lim=(m&&!m.ilimitado)?`${m.restantes}/${m.limite}`:'';
-    $('opus-lim').textContent=(MODELO==='opus'&&lim)?`(${lim} este mês)`:'';
-    const im=$('ia-modelo'); if(im) im.textContent=(MODELO==='opus'?'Opus':'GPT')+(lim?` · ${lim}`:'');
+    const custo=custoDe(MODELO), ilim=USO&&USO.ilimitado, cr=USO?USO.creditos:null;
+    $('opus-lim').textContent = ilim ? '(ilimitado)' : (cr!=null?`(custa ${custo} créditos · você tem ${cr})`:'');
+    const im=$('ia-modelo'); if(im) im.textContent=(MODELO==='opus'?'Opus':'GPT');
     localStorage.setItem('max_modelo',MODELO);
   }
   seg.addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(b){MODELO=b.dataset.m;applyModel();}});
@@ -538,15 +549,16 @@
   let pronto=false;
   fetch('/api/me').then(r=>r.json()).then(u=>{
     if(!u||!u.nome){location.href='/login';return;}
-    EU=u;USO=u.uso||null;const fn=u.nome.split(' ')[0];
+    EU=u;USO=u.saldo||null;const fn=u.nome.split(' ')[0];
     $('nome').textContent=fn;$('sp-hi').textContent='Olá, '+fn;
     $('u-nome').textContent=fn;$('u-papel').textContent=u.papel;
     if(u.papel==='admin'){$('btn-users').classList.remove('hide');$('btn-painel').classList.remove('hide');}
     if(u.senhaPadrao)$('pw-warn').classList.remove('hide');
     $('conta-info').innerHTML='<b>'+u.nome+'</b> ('+u.login+') — '+(u.papel==='admin'?'admin':'usuário')+'.';
-    applyModel();pronto=true;
+    renderSaldo();pronto=true;
   }).catch(()=>location.href='/login');
   $('sair').onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.href='/login';};
+  if($('btn-comprar'))$('btn-comprar').onclick=()=>window.open('/comprar','_blank');
   // ───── nichos ─────
   fetch('/api/estudio/nichos').then(r=>r.json()).then(d=>{const sel=$('atv-nicho');
     (d.nichos||[]).forEach(n=>{const o=document.createElement('option');o.value=n.id;o.textContent=n.nome;sel.appendChild(o);});
@@ -554,7 +566,7 @@
     sel.onchange=()=>$('novo-wrap').classList.toggle('hide',sel.value!=='__novo__');});
   // ───── gerar ─────
   function baixar(b,n){const a=document.createElement('a');a.href='data:application/pdf;base64,'+b;a.download=n;a.click();}
-  async function refreshUso(){try{const o=await(await fetch('/api/estudio/uso')).json();if(o&&o.opus){USO=o;applyModel();}}catch(_){}}
+  async function refreshUso(){try{const o=await(await fetch('/api/estudio/uso')).json();if(o&&(o.creditos!=null||o.ilimitado)){USO=o;renderSaldo();}}catch(_){}}
   // mostra o cronômetro enquanto gera (tranquiliza o usuário de que não travou)
   async function gerar(url,body,st,btn,waitMsg){
     const t0=Date.now();st.className='status';btn.disabled=true;
@@ -573,8 +585,8 @@
   $('mat-btn').onclick=()=>gerar('/api/estudio/matematica',{qtd:+$('mat-qtd').value||100},$('mat-status'),$('mat-btn'));
   $('eb-btn').onclick=()=>{const tema=$('eb-tema').value.trim(),st=$('eb-status');
     if(tema.length<3){st.className='status err';st.textContent='× '+(LANG==='en'?'Say what the e-book is about.':LANG==='es'?'Di de qué trata el ebook.':'Diga sobre o que é o e-book.');return;}
-    const _m=USO&&USO[MODELO],_nm=(MODELO==='opus'?'Opus':'GPT');
-    if(_m&&!_m.ilimitado&&_m.restantes<=0){st.className='status err';st.textContent='× '+(LANG==='en'?'Your '+_nm+' quota for this month is used up.':LANG==='es'?'Tu cuota de '+_nm+' de este mes se acabó.':'Sua cota de '+_nm+' acabou este mês.');return;}
+    const _custo=custoDe(MODELO);
+    if(USO&&!USO.ilimitado&&(USO.creditos||0)<_custo){st.className='status err';st.textContent='× '+(LANG==='en'?'Not enough credits ('+_custo+' needed, you have '+(USO.creditos||0)+').':LANG==='es'?'Créditos insuficientes ('+_custo+', tienes '+(USO.creditos||0)+').':'Créditos insuficientes (precisa '+_custo+', você tem '+(USO.creditos||0)+'). Compre mais pra continuar.');return;}
     const body={tema,publico:$('eb-publico').value.trim(),tom:$('eb-tom').value,extensao:$('eb-ext').value,idioma:$('eb-idioma').value,modelo:MODELO};
     gerar('/api/estudio/ebook',body,st,$('eb-btn'),(LANG==='en'?'Writing your e-book…':LANG==='es'?'Escribiendo tu ebook…':'Escrevendo seu e-book…'));};
   $('cat-btn').onclick=()=>window.open('/estudio/catalogo','_blank');
@@ -603,13 +615,11 @@
     const d=await(await fetch('/api/admin/painel')).json();
     if(!d.totais){$('painel-list').innerHTML='<div class="status err">'+(d.error||'erro')+'</div>';return;}
     const real=v=>'R$ '+(v||0).toFixed(2).replace('.',',');
-    $('painel-mes').textContent=(LANG==='en'?'Month ':LANG==='es'?'Mes ':'Mês ')+d.mes;
+    $('painel-mes').textContent='';
     $('painel-cards').innerHTML=
-      `<div class="pn-card hi"><div class="v">${real(d.totais.custo)}</div><div class="k">${LANG==='en'?'Est. cost / month':LANG==='es'?'Costo est. / mes':'Custo estimado / mês'}</div></div>`+
-      `<div class="pn-card"><div class="v">${d.totais.geracoes}</div><div class="k">${LANG==='en'?'Generations':LANG==='es'?'Creaciones':'Criações'}</div></div>`+
-      `<div class="pn-card"><div class="v">${d.totais.opus}<span class="dim"> Opus</span> · ${d.totais.gpt}<span class="dim"> GPT</span></div><div class="k">${LANG==='en'?'By model':'Por modelo'}</div></div>`;
-    const lim=x=>x.ilimitado?'∞':x.limite;
-    $('painel-list').innerHTML=d.clientes.map(c=>`<div class="pn-row"><span class="nm">${c.nome}${c.papel==='admin'?' <span class="mt">(admin)</span>':''}</span><span class="mt">Opus ${c.opus.usado}/${lim(c.opus)} · GPT ${c.gpt.usado}/${lim(c.gpt)}</span><span class="ct">${real(c.custo)}</span></div>`).join('')||'<div class="dim">—</div>';
+      `<div class="pn-card hi"><div class="v">${d.totais.creditosEmCarteira}</div><div class="k">${LANG==='en'?'Credits in wallets':LANG==='es'?'Créditos en cartera':'Créditos em carteira'}</div></div>`+
+      `<div class="pn-card"><div class="v">${d.totais.clientes}</div><div class="k">${LANG==='en'?'Clients':LANG==='es'?'Clientes':'Clientes'}</div></div>`;
+    $('painel-list').innerHTML=d.clientes.map(c=>`<div class="pn-row"><span class="nm">${c.nome}${c.papel==='admin'?' <span class="mt">(admin)</span>':''}</span><span class="ct">${c.ilimitado?'∞':((c.creditos||0)+' 💎')}</span></div>`).join('')||'<div class="dim">—</div>';
     try{const rd=await(await fetch('/api/admin/demanda')).json();renderRadar(rd);}catch(_){$('radar-box').innerHTML='';}
   }
   function renderRadar(rd){
@@ -625,19 +635,17 @@
   $('btn-users').onclick=()=>{$('ov-users').classList.add('show');loadUsers();};
   async function loadUsers(){const box=$('users-list');box.innerHTML='…';const d=await(await fetch('/api/usuarios')).json();if(!d.usuarios){box.innerHTML='<div class="status err">'+(d.error||'erro')+'</div>';return;}
     box.innerHTML='';d.usuarios.forEach(u=>{const div=document.createElement('div');div.className='uitem';const eu=EU&&u.id===EU.id;
-      const uso=u.uso||{};const fmt=x=>x?(x.ilimitado?'∞':(x.restantes+'/'+x.limite)):'?';
-      const ilim=uso.opus&&uso.opus.ilimitado;
-      const cota=ilim?'cota ilimitada':('Opus '+fmt(uso.opus)+' · GPT '+fmt(uso.gpt)+' /mês');
+      const s=u.saldo||{};const ilim=s.ilimitado;
+      const cota=ilim?'créditos ilimitados':((s.creditos!=null?s.creditos:'?')+' créditos');
       div.innerHTML=`<div class="grow"><span class="nm">${u.nome}</span> <span class="lg">(${u.login})</span><div class="lg" style="margin-top:2px">${cota}${u.senhaPadrao?' · <span style="color:#c0392b">senha padrão</span>':''}</div></div><span class="pp ${u.papel==='admin'?'admin':''}">${u.papel}</span>
-        <button class="btn ghost sm" data-reset="${u.id}">senha</button>${ilim?'':`<button class="btn ghost sm" data-cred="${u.id}">cota</button>`}${eu?'':`<button class="btn danger sm" data-del="${u.id}">remover</button>`}
+        <button class="btn ghost sm" data-reset="${u.id}">senha</button>${ilim?'':`<button class="btn ghost sm" data-cred="${u.id}">créditos</button>`}${eu?'':`<button class="btn danger sm" data-del="${u.id}">remover</button>`}
         <div class="reset-row hide" id="rr-${u.id}"><input class="inp" type="text" placeholder="nova senha" id="rs-${u.id}"><button class="btn sm" data-savereset="${u.id}">OK</button></div>`;
       box.appendChild(div);});
     box.querySelectorAll('[data-reset]').forEach(b=>b.onclick=()=>$('rr-'+b.dataset.reset).classList.toggle('hide'));
     box.querySelectorAll('[data-cred]').forEach(b=>b.onclick=async()=>{
-      const opus=prompt('Cota de OPUS por mês (premium, ~R$0,60 cada):','15');if(opus===null)return;
-      const gpt=prompt('Cota de GPT por mês (rápido, ~R$0,30 cada):','50');if(gpt===null)return;
-      const r=await fetch('/api/usuarios/'+b.dataset.cred+'/creditos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({opus:parseInt(opus),gpt:parseInt(gpt)})});const d=await r.json();
-      alert(r.ok&&d.ok?'✓ Cota atualizada':'× '+(d.error||'erro'));if(r.ok)loadUsers();});
+      const cr=prompt('Definir o saldo de CRÉDITOS deste usuário:','30');if(cr===null)return;
+      const r=await fetch('/api/usuarios/'+b.dataset.cred+'/creditos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({creditos:parseInt(cr)})});const d=await r.json();
+      alert(r.ok&&d.ok?'✓ Créditos: '+d.creditos:'× '+(d.error||'erro'));if(r.ok)loadUsers();});
     box.querySelectorAll('[data-savereset]').forEach(b=>b.onclick=async()=>{const id=b.dataset.savereset,nova=$('rs-'+id).value;if(nova.length<4){alert('Mín. 4 caracteres.');return;}
       const r=await fetch('/api/usuarios/'+id+'/senha',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nova})});const d=await r.json();alert(r.ok&&d.ok?'✓ Trocada!':'× '+(d.error||'erro'));if(r.ok)loadUsers();});
     box.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{if(!confirm('Remover?'))return;const r=await fetch('/api/usuarios/'+b.dataset.del,{method:'DELETE'});const d=await r.json();if(r.ok&&d.ok)loadUsers();else alert('× '+(d.error||'erro'));});}

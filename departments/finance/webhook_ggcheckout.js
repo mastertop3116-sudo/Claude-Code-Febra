@@ -82,20 +82,23 @@ router.post("/ggcheckout", async (req, res) => {
         }
       }
 
-      // ── MAX Criador: cria o login do cliente automaticamente na compra ──
+      // ── MAX Criador: credita o pacote de créditos automaticamente na compra ──
       const eCriador = nomeProduto.includes("criador") || nomeProduto.includes("estúdio") || nomeProduto.includes("estudio");
       if (eCriador) {
         try {
           const auth = require("../../auth");
           const email = payload.customer?.email || payload.buyer_email || payload.email || "";
           const nome  = payload.customer?.name || payload.buyer_name || cliente || "";
-          const plano = valorNum >= 80 ? "pro" : "essencial";   // R$97 = Pro, R$47 = Essencial
-          const r = auth.criarClienteCompra({ nome, email, plano });
+          // créditos do pacote: acha "N créditos" no nome do produto (robusto contra cupom); senão, pelo valor cheio.
+          const mCred = nomeProduto.match(/(\d+)\s*cr[eé]dito/i);
+          const creditos = mCred ? parseInt(mCred[1]) : null;
+          const pacote = creditos ? null : auth.pacotePorValor(valorNum);
+          const r = auth.creditarCompra({ nome, email, creditos, pacote });
           if (r.ok) {
             const base = process.env.RENDER_EXTERNAL_URL || "https://claude-code-febra.onrender.com";
-            console.log(`[Criador] Cliente ${plano} (${r.novo ? "novo" : "recompra"}): ${email} → ativar em ${base}/bem-vindo (token ${r.token})`);
+            console.log(`[Criador] +${creditos || (pacote && auth.PACOTES[pacote] && auth.PACOTES[pacote].creditos)} créditos p/ ${email} → saldo ${r.creditos} (${r.novo ? "conta nova" : "somado"})${r.token ? ` · ativar em ${base}/bem-vindo (token ${r.token})` : ""}`);
           } else {
-            console.error("[Criador] Falha ao criar cliente:", r.error);
+            console.error("[Criador] Falha ao creditar:", r.error);
           }
         } catch (e) {
           console.error("[Criador] Erro:", e.message);

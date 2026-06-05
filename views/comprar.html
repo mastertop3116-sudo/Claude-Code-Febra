@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Comprar créditos — MAX Criador</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+  :root{--ink:#0d1424;--dim:#5b6678;--line:#e7ebf2;--accent:#2f54ff;--bg:#f6f8fc;--gold:#b8860b}
+  body{background:radial-gradient(1200px 600px at 50% -10%,#eef2ff,var(--bg));min-height:100vh;color:var(--ink);padding:48px 22px 70px}
+  .wrap{max-width:1040px;margin:0 auto}
+  .head{text-align:center;margin-bottom:14px}
+  .kicker{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--accent);background:rgba(47,84,255,.08);padding:6px 13px;border-radius:999px;letter-spacing:.3px}
+  h1{font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-.6px;margin:16px 0 8px;line-height:1.08}
+  .sub{font-size:16px;color:var(--dim);max-width:560px;margin:0 auto 6px;line-height:1.5}
+  .tag{font-size:13px;color:var(--dim);margin-top:8px}
+  .tag b{color:var(--ink)}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:38px}
+  @media(max-width:840px){.grid{grid-template-columns:1fr;max-width:420px;margin-inline:auto}}
+  .card{position:relative;background:#fff;border:1px solid var(--line);border-radius:22px;padding:30px 26px 28px;display:flex;flex-direction:column;box-shadow:0 14px 44px rgba(13,20,36,.06);transition:transform .18s,box-shadow .18s}
+  .card:hover{transform:translateY(-4px);box-shadow:0 22px 60px rgba(13,20,36,.12)}
+  .card.hero{border-color:var(--accent);box-shadow:0 22px 64px rgba(47,84,255,.18);transform:scale(1.035)}
+  @media(max-width:840px){.card.hero{transform:none}}
+  .pop{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:11.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;padding:6px 15px;border-radius:999px;white-space:nowrap;box-shadow:0 8px 20px rgba(47,84,255,.4)}
+  .pname{font-size:15px;font-weight:700;color:var(--dim);letter-spacing:.4px;text-transform:uppercase}
+  .price{font-size:40px;font-weight:800;letter-spacing:-1px;margin:12px 0 2px}
+  .price small{font-size:17px;font-weight:600;color:var(--dim);vertical-align:6px}
+  .cr{display:inline-flex;align-items:center;gap:7px;font-size:17px;font-weight:700;margin:8px 0 4px}
+  .cr b{color:var(--accent)}
+  .perc{font-size:13px;font-weight:700;color:#067647;background:#ecfdf3;border:1px solid #bbf3d0;padding:3px 10px;border-radius:999px;align-self:flex-start;margin-top:6px}
+  ul{list-style:none;margin:20px 0 24px;display:flex;flex-direction:column;gap:11px}
+  li{font-size:14.5px;color:var(--ink);display:flex;gap:10px;align-items:flex-start;line-height:1.4}
+  li svg{flex:0 0 auto;width:18px;height:18px;color:var(--accent);margin-top:1px}
+  .grow{flex:1}
+  .btn{display:block;text-align:center;text-decoration:none;border-radius:999px;padding:15px;font-size:15.5px;font-weight:700;transition:transform .12s,box-shadow .2s}
+  .btn.primary{background:var(--accent);color:#fff}
+  .btn.primary:hover{box-shadow:0 12px 28px rgba(47,84,255,.36);transform:translateY(-1px)}
+  .btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+  .btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+  .btn.soon{background:#f1f3f8;color:#9aa3b2;pointer-events:none}
+  .foot{text-align:center;margin-top:40px;font-size:13.5px;color:var(--dim);line-height:1.7}
+  .foot .pix{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--ink)}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="head">
+      <span class="kicker">💎 Créditos MAX Criador</span>
+      <h1>Escolha seu pacote de créditos</h1>
+      <p class="sub">Pague uma vez no Pix e use quando quiser. <b>Os créditos não vencem</b> — quanto maior o pacote, mais barato sai cada crédito.</p>
+      <p class="tag">1 crédito = 1 criação rápida · criação avançada = 2 créditos · <b>atividades e matemática são grátis</b></p>
+    </div>
+
+    <div class="grid">
+      <!-- INICIAL -->
+      <div class="card">
+        <div class="pname">Inicial</div>
+        <div class="price">R$ 27</div>
+        <div class="cr">💎 <b>30</b> créditos</div>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg> Pra começar e testar a ferramenta</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg> ~15 criações avançadas ou 30 rápidas</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg> Atividades e matemática grátis</li>
+        </ul>
+        <div class="grow"></div>
+        <a class="btn soon" id="lk-inicial" href="#">Em breve</a>
+      </div>
+
+      <!-- PRO -->
+      <div class="card hero">
+        <span class="pop">⭐ Mais vendido</span>
+        <div class="pname">Pro</div>
+        <div class="price">R$ 97</div>
+        <div class="cr">💎 <b>130</b> créditos</div>
+        <span class="perc">crédito ~28% mais barato</span>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg> O preferido de quem produz de verdade</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg> ~65 criações avançadas ou 130 rápidas</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg> Atividades e matemática grátis</li>
+        </ul>
+        <div class="grow"></div>
+        <a class="btn primary" id="lk-pro" href="https://ggcheckout.app/checkout/v2/2kPfFzoLXMgbQLyZzzws">Comprar no Pix</a>
+      </div>
+
+      <!-- STUDIO -->
+      <div class="card">
+        <div class="pname">Studio</div>
+        <div class="price">R$ 297</div>
+        <div class="cr">💎 <b>450</b> créditos</div>
+        <span class="perc">crédito ~39% mais barato</span>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg> Pra quem cria em escala/agência</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg> ~225 criações avançadas ou 450 rápidas</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg> Atividades e matemática grátis</li>
+        </ul>
+        <div class="grow"></div>
+        <a class="btn soon" id="lk-studio" href="#">Em breve</a>
+      </div>
+    </div>
+
+    <div class="foot">
+      <span class="pix">🔒 Pagamento 100% seguro no Pix</span><br>
+      Assim que o pagamento cair, seus créditos entram na conta <b>na hora</b> e você já volta a criar.
+    </div>
+  </div>
+</body>
+</html>

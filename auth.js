@@ -18,12 +18,12 @@ const DATA_DIR = path.join(__dirname, 'data');
 const USERS_FILE = path.join(DATA_DIR, 'usuarios.json');
 const COOKIE = 'max_sessao';
 const VALIDADE_DIAS = 30;
-// COTA MENSAL por cliente (controla o custo e garante lucro). Reseta todo mês.
-// Padrão equilibrado pelo CUSTO: Opus custa ~2x o GPT, então a cota de Opus é menor.
-//   Opus 15/mês (~R$ 9 de custo) + GPT 50/mês (~R$ 15 de custo) = ~R$ 24 no MÁXIMO por cliente.
-// Admin (Rodrigo) = ilimitado. Ajustável por env e por usuário (admin define na tela).
-const LIM_OPUS_MES = parseInt(process.env.LIM_OPUS_MES) || 15;
-const LIM_GPT_MES  = parseInt(process.env.LIM_GPT_MES)  || 50;
+// CRÉDITOS — MOEDA ÚNICA (pré-pago). Cada cliente tem um SALDO de créditos (1 número).
+// Gerar gasta créditos: avançada (Opus) = 2 · rápida (GPT) = 1. NÃO vence e NÃO zera no mês.
+// Admin (Rodrigo) = ilimitado. Comprar de novo SOMA ao saldo. (Decidido com Rodrigo 2026-06-04.)
+const CUSTO_CR = { opus: parseInt(process.env.CUSTO_OPUS_CR) || 2, gpt: parseInt(process.env.CUSTO_GPT_CR) || 1 };
+const CREDITOS_PADRAO = parseInt(process.env.CREDITOS_PADRAO) || 50;  // saldo inicial de usuário interno criado na mão (ex: Bruno)
+const CREDITOS_TRIAL  = parseInt(process.env.CREDITOS_TRIAL)  || 2;   // test-drive: créditos grátis de IA pra cada usuário novo
 
 // ── PERSISTÊNCIA no Supabase (banco que NÃO some entre publicações) ──────────
 // Antes os usuários ficavam só em data/usuarios.json — que zera a cada deploy no
@@ -180,51 +180,52 @@ function limparCookie(res) {
   res.setHeader('Set-Cookie', `${COOKIE}=; HttpOnly; Path=/; Max-Age=0`);
 }
 
-// ── COTA MENSAL (controla custo e garante lucro) ────────────
-// Cada cliente tem uma cota POR MÊS de Opus (caro) e de GPT (barato), que reseta
-// virou o mês. Admin (Rodrigo) = ilimitado. Limites ajustáveis por usuário.
-function limiteMes(u, modelo) {
-  if (u && u.papel === 'admin') return -1;                       // admin ilimitado
-  if (u && u.limites && typeof u.limites[modelo] === 'number') return u.limites[modelo]; // override
-  return modelo === 'opus' ? LIM_OPUS_MES : LIM_GPT_MES;
+// ── CRÉDITOS (moeda única; pré-pago: controla custo e garante lucro) ──
+function custoCreditos(modelo) { return modelo === 'opus' ? CUSTO_CR.opus : CUSTO_CR.gpt; }
+// Saldo atual de créditos do usuário. admin = ilimitado (-1). Migra do modelo antigo (opus/gpt) se preciso.
+function saldoCreditos(u) {
+  if (u && u.papel === 'admin') return -1;
+  if (u && typeof u.creditos === 'number') return u.creditos;
+  if (u && u.limites) {   // migração: converte o saldo antigo (restante de opus/gpt) em créditos
+    const usoOld = u.uso || u.usoMes || { opus: 0, gpt: 0 };
+    const restOpus = Math.max(0, (u.limites.opus || 0) - (usoOld.opus || 0));
+    const restGpt  = Math.max(0, (u.limites.gpt  || 0) - (usoOld.gpt  || 0));
+    return restOpus * CUSTO_CR.opus + restGpt * CUSTO_CR.gpt;
+  }
+  return CREDITOS_PADRAO;
 }
-function _usoDoMes(u) {
-  const mes = mesStr();
-  return (u && u.usoMes && u.usoMes.mes === mes) ? u.usoMes : { mes, opus: 0, gpt: 0 };
+// Resumo do saldo pra mostrar na tela.
+function saldo(u) {
+  const c = saldoCreditos(u);
+  return { ilimitado: c < 0, creditos: c < 0 ? null : c, custoAvancada: CUSTO_CR.opus, custoRapida: CUSTO_CR.gpt };
 }
-// Quanto o usuário já usou e quanto resta no mês (Opus e GPT)
-function usoMensal(u) {
-  const uso = _usoDoMes(u);
-  const linha = (modelo) => {
-    const lim = limiteMes(u, modelo), usado = uso[modelo] || 0;
-    return { ilimitado: lim < 0, limite: lim, usado, restantes: lim < 0 ? null : Math.max(0, lim - usado) };
-  };
-  return { mes: uso.mes, opus: linha('opus'), gpt: linha('gpt') };
-}
-// "gasta" 1 geração do modelo escolhido (server-side, não dá pra burlar). Reseta no mês novo.
+// "gasta" os créditos de 1 geração (server-side, não dá pra burlar). Bloqueia SEM gerar se faltou saldo.
 function consumirGeracao(userId, modelo) {
   modelo = modelo === 'opus' ? 'opus' : 'gpt';
+  const custo = custoCreditos(modelo);
   const lista = usuarios();
   const u = lista.find(x => x.id === userId);
   if (!u) return { ok: false, error: 'usuário não encontrado' };
-  const mes = mesStr();
-  const uso = (u.usoMes && u.usoMes.mes === mes) ? u.usoMes : { mes, opus: 0, gpt: 0 };
-  const lim = limiteMes(u, modelo);
-  if (lim >= 0 && (uso[modelo] || 0) >= lim) return { ok: false, esgotado: true, modelo, limite: lim };
-  if (lim >= 0) { uso[modelo] = (uso[modelo] || 0) + 1; u.usoMes = uso; salvarUsuarios(lista); }
-  const restantes = lim < 0 ? null : lim - (uso[modelo] || 0);
-  return { ok: true, modelo, ilimitado: lim < 0, limite: lim, usado: uso[modelo] || 0, restantes };
+  if (u.papel === 'admin') return { ok: true, modelo, ilimitado: true, custo, creditos: null };
+  const atual = saldoCreditos(u);
+  if (atual < custo) return { ok: false, esgotado: true, modelo, custo, creditos: atual };
+  u.creditos = atual - custo;                       // grava já no modelo novo
+  delete u.limites; delete u.uso; delete u.usoMes;  // limpa o modelo antigo
+  salvarUsuarios(lista);
+  return { ok: true, modelo, ilimitado: false, custo, creditos: u.creditos };
 }
-// admin define a cota MENSAL de um usuário ({opus, gpt})
-function definirLimites(userId, { opus, gpt } = {}) {
+// admin define (ou soma) o saldo de créditos de um usuário.
+function definirCreditos(userId, { creditos, somar } = {}) {
   const lista = usuarios();
   const u = lista.find(x => x.id === userId);
   if (!u) return { ok: false, error: 'Usuário não encontrado.' };
-  u.limites = u.limites || {};
-  if (opus != null && !isNaN(parseInt(opus)) && parseInt(opus) >= 0) u.limites.opus = parseInt(opus);
-  if (gpt  != null && !isNaN(parseInt(gpt))  && parseInt(gpt)  >= 0) u.limites.gpt  = parseInt(gpt);
+  const n = parseInt(creditos);
+  if (isNaN(n) || n < 0) return { ok: false, error: 'Quantidade de créditos inválida.' };
+  const base = (typeof u.creditos === 'number') ? u.creditos : Math.max(0, saldoCreditos(u));
+  u.creditos = somar ? base + n : n;
+  delete u.limites; delete u.uso; delete u.usoMes;
   salvarUsuarios(lista);
-  return { ok: true, limites: u.limites, uso: usoMensal(u) };
+  return { ok: true, creditos: u.creditos };
 }
 
 // ── gerenciar senhas/usuários (pelo próprio site) ───────────
@@ -260,35 +261,48 @@ function removerUsuario(userId) {
   return { ok: true };
 }
 
-// ── VENDA AUTOMÁTICA (Criador): planos + 1º acesso ──────────
-// Cotas mensais de cada plano vendido. Custo controlado pra dar lucro.
-//   Essencial R$47 → Opus 8 + GPT 30 (custo máx ~R$14, lucro ~R$33)
-//   Pro       R$97 → Opus 20 + GPT 80 (custo máx ~R$36, lucro ~R$61)
-const PLANOS = {
-  essencial: { nome: 'Essencial', preco: 47, opus: parseInt(process.env.PLANO_ESS_OPUS) || 8,  gpt: parseInt(process.env.PLANO_ESS_GPT) || 30 },
-  pro:       { nome: 'Pro',       preco: 97, opus: parseInt(process.env.PLANO_PRO_OPUS) || 20, gpt: parseInt(process.env.PLANO_PRO_GPT) || 80 },
+// ── VENDA AUTOMÁTICA (Criador): pacotes de crédito + 1º acesso ──
+// Pacotes (compra ÚNICA via GGCheckout; comprar de novo SOMA ao saldo). Moeda única.
+//   Inicial R$27 = 30 créditos · Pro R$97 = 130 (mais vendido) · Studio R$297 = 450.
+const PACOTES = {
+  inicial: { nome: 'Inicial', preco: 27,  creditos: parseInt(process.env.PACOTE_INICIAL_CR) || 30 },
+  pro:     { nome: 'Pro',     preco: 97,  creditos: parseInt(process.env.PACOTE_PRO_CR)     || 130 },
+  studio:  { nome: 'Studio',  preco: 297, creditos: parseInt(process.env.PACOTE_STUDIO_CR)  || 450 },
 };
-// Na COMPRA: cria (ou atualiza) o cliente com a cota do plano, ainda SEM senha.
-// Ele ativa a conta definindo a senha em /bem-vindo (com o e-mail da compra ou o token).
-function criarClienteCompra({ nome, email, plano }) {
+// Fallback do webhook: escolhe o pacote pelo valor cheio quando o nome não traz a quantidade.
+function pacotePorValor(valor) {
+  const v = Number(valor) || 0;
+  if (v >= 200) return 'studio';
+  if (v >= 70)  return 'pro';
+  return 'inicial';
+}
+// Na COMPRA de um pacote: cliente novo → cria com 1º acesso; cliente que já existe → SOMA
+// os créditos ao saldo (top-up). Passe { creditos } direto OU { pacote } (usa a tabela acima).
+function creditarCompra({ nome, email, creditos, pacote }) {
   const login = String(email || '').toLowerCase().trim();
   if (!login) return { ok: false, error: 'e-mail não informado' };
-  const p = PLANOS[plano] || PLANOS.essencial;
+  let cr = parseInt(creditos);
+  if ((isNaN(cr) || cr <= 0) && pacote && PACOTES[pacote]) cr = PACOTES[pacote].creditos;
+  if (isNaN(cr) || cr <= 0) return { ok: false, error: 'créditos do pacote não informados' };
   const lista = usuarios();
-  const token = crypto.randomBytes(16).toString('hex');
   let u = lista.find(x => x.login === login);
-  if (u) {                                   // recompra/upgrade: renova a cota e reabre o 1º acesso
-    u.limites = { opus: p.opus, gpt: p.gpt };
-    u.plano = plano; u.tokenAcesso = token; u.precisaSenha = true;
+  if (u) {                                   // já é cliente: SOMA os créditos
+    const base = (typeof u.creditos === 'number') ? u.creditos : Math.max(0, saldoCreditos(u));
+    u.creditos = base + cr;
+    delete u.limites; delete u.uso; delete u.usoMes;
+    if (pacote) u.pacote = pacote;
+    let token = u.tokenAcesso;
+    if (u.precisaSenha) { token = crypto.randomBytes(16).toString('hex'); u.tokenAcesso = token; }
     salvarUsuarios(lista);
-    return { ok: true, token, login, novo: false };
+    return { ok: true, token, login, novo: false, jaAtivo: !u.precisaSenha, creditos: u.creditos };
   }
+  const token = crypto.randomBytes(16).toString('hex');
   u = novoUsuario(nome || login, login, crypto.randomBytes(12).toString('hex'), 'usuario');
-  u.limites = { opus: p.opus, gpt: p.gpt };
-  u.plano = plano; u.tokenAcesso = token; u.precisaSenha = true;
+  u.creditos = cr; if (pacote) u.pacote = pacote;
+  u.tokenAcesso = token; u.precisaSenha = true;
   lista.push(u);
   salvarUsuarios(lista);
-  return { ok: true, token, login, novo: true };
+  return { ok: true, token, login, novo: true, creditos: cr };
 }
 // Cliente ATIVA a conta definindo a senha (pelo e-mail da compra OU por token de link).
 function ativarAcesso({ email, token, senha }) {
@@ -307,7 +321,7 @@ function ativarAcesso({ email, token, senha }) {
 
 // ── usuário "público" (sem segredos) ────────────────────────
 function publico(u) {
-  return u && { id: u.id, nome: u.nome, login: u.login, papel: u.papel, permissoes: u.permissoes, uso: usoMensal(u), limites: u.limites || null, senhaPadrao: !!u.senhaPadrao };
+  return u && { id: u.id, nome: u.nome, login: u.login, papel: u.papel, permissoes: u.permissoes, saldo: saldo(u), senhaPadrao: !!u.senhaPadrao };
 }
 
 // ── middlewares ─────────────────────────────────────────────
@@ -335,7 +349,7 @@ module.exports = {
   usuarios, acharPorLogin, conferirSenha, criarToken, lerToken,
   setCookieSessao, limparCookie, exigirLogin, exigirAdmin, usuarioDaReq,
   publico, novoUsuario, salvarUsuarios, hashSenha,
-  usoMensal, consumirGeracao, definirLimites, limiteMes, LIM_OPUS_MES, LIM_GPT_MES,
+  saldo, saldoCreditos, consumirGeracao, definirCreditos, custoCreditos, CUSTO_CR, CREDITOS_TRIAL,
   trocarSenha, criarUsuarioPersistido, removerUsuario,
-  PLANOS, criarClienteCompra, ativarAcesso,
+  PACOTES, pacotePorValor, creditarCompra, ativarAcesso,
 };

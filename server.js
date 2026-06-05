@@ -142,10 +142,10 @@ app.post("/api/usuarios/:id/senha", auth.exigirAdmin, (req, res) => {
   const r = auth.trocarSenha(req.params.id, (req.body || {}).nova);
   res.status(r.ok ? 200 : 400).json(r);
 });
-// Admin: definir a COTA MENSAL de um usuário (Opus e/ou GPT). Ex: { opus: 15, gpt: 50 }
+// Admin: definir/somar os CRÉDITOS de um usuário. Ex: { creditos: 100 } ou { creditos: 50, somar: true }
 app.post("/api/usuarios/:id/creditos", auth.exigirAdmin, (req, res) => {
   const b = req.body || {};
-  const r = auth.definirLimites(req.params.id, { opus: b.opus, gpt: b.gpt });
+  const r = auth.definirCreditos(req.params.id, { creditos: b.creditos, somar: !!b.somar });
   res.status(r.ok ? 200 : 400).json(r);
 });
 // Admin: remover usuário (não pode remover a si mesmo)
@@ -155,21 +155,16 @@ app.delete("/api/usuarios/:id", auth.exigirAdmin, (req, res) => {
   res.status(r.ok ? 200 : 400).json(r);
 });
 
-// Admin: PAINEL de gastos/uso do mês (estimativa de custo a partir das gerações)
-const CUSTO_GERACAO = { opus: 0.60, gpt: 0.30 };   // R$ por geração (estimativa nossa)
+// Admin: PAINEL — saldo de créditos de cada cliente (e total em carteira)
 app.get("/api/admin/painel", auth.exigirAdmin, (req, res) => {
   const clientes = auth.usuarios().map((u) => {
-    const uso = auth.usoMensal(u);
-    const custo = +(uso.opus.usado * CUSTO_GERACAO.opus + uso.gpt.usado * CUSTO_GERACAO.gpt).toFixed(2);
-    return { id: u.id, nome: u.nome, login: u.login, papel: u.papel, opus: uso.opus, gpt: uso.gpt, custo };
+    const s = auth.saldo(u);
+    return { id: u.id, nome: u.nome, login: u.login, papel: u.papel, ilimitado: s.ilimitado, creditos: s.creditos };
   });
-  const totOpus = clientes.reduce((s, c) => s + c.opus.usado, 0);
-  const totGpt = clientes.reduce((s, c) => s + c.gpt.usado, 0);
+  const totalCreditos = clientes.reduce((s, c) => s + (c.creditos || 0), 0);
   res.json({
-    mes: new Date().toISOString().slice(0, 7),
-    totais: { opus: totOpus, gpt: totGpt, geracoes: totOpus + totGpt, custo: +(totOpus * CUSTO_GERACAO.opus + totGpt * CUSTO_GERACAO.gpt).toFixed(2) },
-    custoUnit: CUSTO_GERACAO,
-    clientes: clientes.sort((a, b) => b.custo - a.custo),
+    totais: { creditosEmCarteira: totalCreditos, clientes: clientes.length },
+    clientes: clientes.sort((a, b) => (b.creditos || 0) - (a.creditos || 0)),
   });
 });
 
@@ -246,8 +241,8 @@ app.post("/api/estudio/atividades", auth.exigirLogin, (req, res) => {
   rodarGerador("gerar-atividades.js", [nicho, String(qtd)], pdf, res);
 });
 
-// Quanto resta da COTA MENSAL do usuário (Opus e GPT). admin = ilimitado
-app.get("/api/estudio/uso", auth.exigirLogin, (req, res) => { res.json(auth.usoMensal(req.usuario)); });
+// Saldo de CRÉDITOS do usuário. admin = ilimitado
+app.get("/api/estudio/uso", auth.exigirLogin, (req, res) => { res.json(auth.saldo(req.usuario)); });
 
 // Gerar PACK DE MATEMÁTICA
 app.post("/api/estudio/matematica", auth.exigirLogin, (req, res) => {
@@ -269,12 +264,10 @@ app.post("/api/estudio/ebook", auth.exigirLogin, async (req, res) => {
   const idioma = ["pt", "en", "es", "de", "fr", "it"].includes(b.idioma) ? b.idioma : "pt";   // material na gringa
   const modelo = b.modelo === "opus" ? "opus" : "gpt";
   if (tema.length < 3) return res.status(400).json({ error: "Diga sobre o que é o e-book." });
-  // Consome 1 da COTA MENSAL do modelo escolhido (admin é ilimitado). Bloqueia SEM gerar se esgotou.
+  // Gasta créditos da geração (avançada=2, rápida=1). admin = ilimitado. Bloqueia SEM gerar se faltou saldo.
   const cota = auth.consumirGeracao(req.usuario.id, modelo);
   if (!cota.ok) {
-    const nome = modelo === "opus" ? "Opus" : "GPT";
-    const outro = modelo === "opus" ? "o GPT" : "o Opus";
-    return res.status(403).json({ error: `Você já usou suas ${cota.limite} criações no ${nome} este mês. A cota renova no dia 1º. Use ${outro} ou peça mais ao administrador.` });
+    return res.status(403).json({ error: `Seus créditos acabaram (esta criação custa ${cota.custo}, você tem ${cota.creditos}). Compre mais créditos pra continuar.`, esgotado: true, creditos: cota.creditos, custo: cota.custo });
   }
   res.setTimeout(6 * 60 * 1000);
   try {
@@ -311,6 +304,12 @@ app.get("/criar", (req, res) => {
 app.get("/kit-builder", (req, res) => {
   res.setHeader("Cache-Control", "no-store");
   res.sendFile(path.join(__dirname, "public", "kit-builder.html"));
+});
+
+// Página de COMPRAR CRÉDITOS (3 pacotes → checkout no GG/Pix). Destino do botão do Estúdio.
+app.get("/comprar", (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  res.sendFile(path.join(__dirname, "views", "comprar.html"));
 });
 
 // Jobs em memória: jobId → { status, progress, message, result, error }
@@ -2990,7 +2989,10 @@ const criadorLimiter = require('express-rate-limit').rateLimit({
 });
 
 // POST /api/criador/iniciar → inicia geração, retorna jobId
-app.post('/api/criador/iniciar', criadorLimiter, (req, res) => {
+app.post('/api/criador/iniciar', criadorLimiter, auth.exigirLogin, (req, res) => {
+  // CRÉDITO: criação premium custa 2 créditos (admin = ilimitado). Bloqueia SEM gerar se faltou saldo.
+  const cota = auth.consumirGeracao(req.usuario.id, 'opus');
+  if (!cota.ok) return res.status(403).json({ error: `Créditos insuficientes — esta criação custa ${cota.custo} e você tem ${cota.creditos}. Compre mais em /comprar.`, esgotado: true });
   limparCriadorJobs();
   const jobId = Math.random().toString(36).slice(2, 11);
   criadorJobs.set(jobId, { status: 'running', progress: 0, message: 'Iniciando...', criadoEm: Date.now() });
