@@ -147,9 +147,32 @@
   .trend .tg.hot{color:var(--accent)}
   .trend .go{flex:0 0 auto;margin-left:1px;font-size:1.1rem;font-weight:700;color:var(--faint);opacity:0;transform:translateX(-5px);transition:opacity .28s,transform .28s}
   .trend:hover .go{opacity:1;transform:none}
+  /* ── EXEMPLOS (galeria "veja o que dá pra criar") ── */
+  .ex-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+  .ex-head .sub{color:var(--ink-2);font-size:.95rem}
+  .ex-row{display:flex;gap:18px;overflow-x:auto;padding:6px 2px 14px;scroll-snap-type:x proximity}
+  .ex-row::-webkit-scrollbar{height:8px}
+  .ex-row::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:99px}
+  .ex-row::-webkit-scrollbar-track{background:transparent}
+  .ex{flex:0 0 auto;margin:0;scroll-snap-align:start;display:flex;flex-direction:column;gap:11px}
+  .ex img{height:250px;width:auto;border-radius:14px;border:1px solid var(--line);box-shadow:var(--shadow-2);display:block;
+    transition:transform .4s var(--ease),box-shadow .4s var(--ease)}
+  .ex:hover img{transform:translateY(-6px);box-shadow:var(--shadow-3)}
+  .ex figcaption{display:flex;flex-direction:column;line-height:1.3;padding-left:3px}
+  .ex figcaption b{font-size:.68rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--accent)}
+  .ex figcaption span{font-size:.86rem;color:var(--ink-2);font-weight:500}
+  @media(max-width:560px){.ex img{height:198px}}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:20px}
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:26px;padding:30px;display:flex;flex-direction:column;gap:14px;
+  .card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:26px;padding:30px;display:flex;flex-direction:column;gap:14px;
     box-shadow:var(--shadow-1);transition:transform .5s var(--ease),box-shadow .5s var(--ease),border-color .5s}
+  /* ── card PRINCIPAL (produto-herói) + ajuda (?) ── */
+  .card.principal{border-color:var(--accent);background:linear-gradient(180deg,var(--accent-soft),var(--surface));box-shadow:var(--shadow-2),0 0 0 1.5px var(--accent)}
+  .card-flag{position:absolute;top:-12px;left:24px;display:inline-flex;align-items:center;gap:5px;background:var(--accent);color:#fff;font-size:.68rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:99px;box-shadow:var(--shadow-1)}
+  .help{position:absolute;top:18px;right:18px;width:23px;height:23px;border-radius:50%;border:1px solid var(--line-2);background:var(--bg);color:var(--faint);font-size:.82rem;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:help;z-index:3;transition:color .2s,border-color .2s,background .2s}
+  .help:hover{color:#fff;border-color:var(--accent);background:var(--accent)}
+  .help::after{content:attr(data-tip);position:absolute;top:135%;right:-4px;width:250px;background:var(--ink);color:var(--bg);padding:12px 14px;border-radius:12px;font-size:.8rem;font-weight:500;line-height:1.45;letter-spacing:0;text-transform:none;text-align:left;opacity:0;pointer-events:none;transform:translateY(-5px);transition:opacity .22s var(--ease),transform .22s var(--ease);box-shadow:var(--shadow-3);z-index:20}
+  .help:hover::after{opacity:1;transform:none}
+  @media(max-width:560px){.help::after{width:200px}}
   .card:hover{transform:translateY(-6px);box-shadow:var(--shadow-3);border-color:var(--line-2)}
   .card.blocked{opacity:.6}
   .card.blocked:hover{transform:none;box-shadow:var(--shadow-1);border-color:var(--line)}
@@ -306,13 +329,28 @@
       <div class="trend-row r" id="trend-row" data-reveal></div>
     </section>
 
+    <!-- EXEMPLOS — galeria do que dá pra criar -->
+    <section>
+      <div class="ex-head r" data-reveal>
+        <h2 data-i18n="ex_h">Veja o que dá pra criar</h2>
+        <span class="sub" data-i18n="ex_sub">páginas de verdade do que sai daqui — e-book, atividades, dinâmicas e guias prontos pra vender</span>
+      </div>
+      <div class="ex-row r" data-reveal>
+        <figure class="ex"><img src="/exemplos/miolo-jiujitsu-1.png" alt="Página interna de uma dinâmica de Jiu-Jitsu" loading="lazy"><figcaption><b>Dinâmica</b><span>Jiu-Jitsu Infantil</span></figcaption></figure>
+        <figure class="ex"><img src="/exemplos/miolo-ebook.png" alt="Página interna de e-book de aulas com fotos" loading="lazy"><figcaption><b>E-book</b><span>Aulas de Jiu-Jitsu</span></figcaption></figure>
+        <figure class="ex"><img src="/exemplos/miolo-matematica.png" alt="Página interna do pack de Matemática" loading="lazy"><figcaption><b>Atividades</b><span>Matemática</span></figcaption></figure>
+        <figure class="ex"><img src="/exemplos/miolo-guia.png" alt="Página interna do guia de Pensamento Computacional" loading="lazy"><figcaption><b>Guia</b><span>Pensamento Computacional</span></figcaption></figure>
+        <figure class="ex"><img src="/exemplos/miolo-jiujitsu-2.png" alt="Página interna de uma dinâmica de Jiu-Jitsu" loading="lazy"><figcaption><b>Dinâmica</b><span>Jiu-Jitsu Infantil</span></figcaption></figure>
+      </div>
+    </section>
+
     <!-- CRIAR -->
     <section>
       <div class="sec-head r" data-reveal><h2 data-i18n="create_h">O que você quer criar hoje</h2></div>
       <div class="grid">
         <div class="card r" data-reveal>
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg></div>
-          <h3 data-i18n="atv_title">Pack de Atividades</h3><span class="badge go" data-i18n="free">grátis</span>
+          <span class="help" data-tip="Gera +100 atividades pra imprimir (caça-palavras, labirinto, ligue, código…) com gabarito, em qualquer tema. Escolha um tema pronto ou crie um novo — a IA preenche as palavras pra você. Grátis.">?</span><h3 data-i18n="atv_title">Pack de Atividades</h3><span class="badge go" data-i18n="free">grátis</span>
           <p data-i18n="atv_desc">+100 atividades printáveis com gabarito — caça-palavras, labirinto, ligue, código, desembaralhe. Qualquer tema.</p>
           <div><label class="field-label" data-i18n="theme">Tema</label><select id="atv-nicho"></select></div>
           <div id="novo-wrap" class="hide">
@@ -331,7 +369,7 @@
 
         <div class="card r" data-reveal style="transition-delay:.06s">
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 9h14M5 15h14M9.5 4.5 8 19.5M16 4.5 14.5 19.5"/></svg></div>
-          <h3 data-i18n="mat_title">Pack de Matemática</h3><span class="badge go" data-i18n="free">grátis</span>
+          <span class="help" data-tip="Gera +100 contas com gabarito conferido (somar, subtrair, tabuada, sequência, maior/menor). É só escolher a quantidade e gerar. Grátis.">?</span><h3 data-i18n="mat_title">Pack de Matemática</h3><span class="badge go" data-i18n="free">grátis</span>
           <p data-i18n="mat_desc">+100 contas de verdade com gabarito conferido: somar, subtrair, tabuada, ligar resultado, sequência, maior/menor.</p>
           <div><label class="field-label" data-i18n="qty">Quantidade</label><input class="inp" id="mat-qtd" type="number" value="100" min="10" max="300"></div>
           <div class="grow"></div>
@@ -339,7 +377,9 @@
           <div class="status" id="mat-status"></div>
         </div>
 
-        <div class="card r" data-reveal style="transition-delay:.12s">
+        <div class="card r principal" data-reveal style="transition-delay:.12s">
+          <span class="card-flag">⭐ Principal</span>
+          <span class="help" data-tip="⭐ Seu produto principal. Digite o tema e a IA escreve um e-book COMPLETO e ilustrado, pra QUALQUER nicho — capa, capítulos, exemplos e ação. Pronto pra vender. Cada criação usa créditos.">?</span>
           <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v15H5.5A1.5 1.5 0 0 0 4 20.5V5.5zM20 5.5A1.5 1.5 0 0 0 18.5 4H13v15h5.5a1.5 1.5 0 0 1 1.5 1.5V5.5z"/></svg></div>
           <h3 data-i18n="ebook_title">E-book com IA</h3><span class="badge" id="ia-modelo">GPT</span>
           <p data-i18n="ebook_desc">A IA escreve um e-book completo e ilustrado sobre o tema — capa, capítulos, exemplos e ação. Já nasce com imagem.</p>
@@ -362,7 +402,7 @@
 
         <div class="card r" data-reveal style="transition-delay:.18s">
           <div class="ico neutral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4.5" width="18" height="15" rx="3"/><circle cx="8.5" cy="10" r="1.8"/><path d="m4 17 5-4.5 4 3.2L17 12l4 3.5"/></svg></div>
-          <h3 data-i18n="cat_title">Catálogo de Imagens</h3><span class="badge" data-i18n="reuse">reuso</span>
+          <span class="help" data-tip="Banco com todas as imagens que você já criou. O Criador reaproveita sozinho quando o tema combina — nada se desperdiça.">?</span><h3 data-i18n="cat_title">Catálogo de Imagens</h3><span class="badge" data-i18n="reuse">reuso</span>
           <p data-i18n="cat_desc">Todas as imagens que a gente criou. O Criador reusa sozinho quando o tema bate — nada se perde.</p>
           <div class="grow"></div>
           <button class="btn ghost" id="cat-btn" data-i18n="open_cat">Abrir Catálogo</button>
@@ -454,6 +494,7 @@
     pt:{tip_title:'Dica de infoproduto',model_h:'Como a IA vai escrever o e-book',model_gpt:'GPT',model_opus:'Opus',opus_tag:'custo real',
       opus_warn:'O Opus tem custo real — cada criação usa seu crédito. Para testar, fique no GPT.',
       trend_h:'🔥 Em alta',trend_sub:'o que está vendendo agora — clique e a IA já monta pra você',
+      ex_h:'Veja o que dá pra criar',ex_sub:'páginas de verdade do que sai daqui — e-book, atividades, dinâmicas e guias prontos pra vender',
       create_h:'O que você quer criar hoje',free:'grátis',atv_title:'Pack de Atividades',atv_desc:'+100 atividades printáveis com gabarito — caça-palavras, labirinto, ligue, código, desembaralhe. Qualquer tema.',
       theme:'Tema',new_theme_name:'Nome do tema',ai_fill:'✨ Preencher palavras com a IA',new_theme_ph:'ex: Animais, Folclore, Inglês Kids',words:'Palavras (uma por linha — PALAVRA: dica)',words_hint:'Mínimo 8 palavras.',qty:'Quantidade',gen_pdf:'Gerar PDF',
       mat_title:'Pack de Matemática',mat_desc:'+100 contas de verdade com gabarito conferido: somar, subtrair, tabuada, ligar resultado, sequência, maior/menor.',
@@ -481,6 +522,7 @@
     en:{tip_title:'Infoproduct tip',model_h:'How AI will write the e-book',model_gpt:'GPT',model_opus:'Opus',opus_tag:'real cost',
       opus_warn:'Opus has a real cost — each creation uses your credit. To test, stay on GPT.',
       trend_h:'🔥 Trending',trend_sub:'selling right now — click and the AI builds it for you',
+      ex_h:'See what you can create',ex_sub:'real inside pages of what comes out — e-books, activities and guides ready to sell',
       create_h:'What do you want to create today',free:'free',atv_title:'Activity Pack',atv_desc:'+100 printable activities with answer key — word search, maze, match, code, unscramble. Any theme.',
       theme:'Theme',new_theme_name:'Theme name',ai_fill:'✨ Fill the words with AI',new_theme_ph:'e.g. Animals, Folklore, Kids English',words:'Words (one per line — WORD: hint)',words_hint:'At least 8 words.',qty:'Quantity',gen_pdf:'Generate PDF',
       mat_title:'Math Pack',mat_desc:'+100 real math problems with checked answer key: add, subtract, times tables, match result, sequences, greater/less.',
@@ -508,6 +550,7 @@
     es:{tip_title:'Consejo de infoproducto',model_h:'Cómo escribirá la IA el e-book',model_gpt:'GPT',model_opus:'Opus',opus_tag:'costo real',
       opus_warn:'Opus tiene costo real — cada creación usa tu crédito. Para probar, quédate en GPT.',
       trend_h:'🔥 En alza',trend_sub:'lo que se vende ahora — haz clic y la IA lo arma por ti',
+      ex_h:'Mira lo que puedes crear',ex_sub:'páginas reales de lo que sale de aquí — e-books, actividades y guías listos para vender',
       create_h:'Qué quieres crear hoy',free:'gratis',atv_title:'Pack de Actividades',atv_desc:'+100 actividades imprimibles con solucionario — sopa de letras, laberinto, unir, código, descifrar. Cualquier tema.',
       theme:'Tema',new_theme_name:'Nombre del tema',ai_fill:'✨ Rellenar las palabras con IA',new_theme_ph:'ej: Animales, Folclore, Inglés Kids',words:'Palabras (una por línea — PALABRA: pista)',words_hint:'Mínimo 8 palabras.',qty:'Cantidad',gen_pdf:'Generar PDF',
       mat_title:'Pack de Matemáticas',mat_desc:'+100 cuentas de verdad con solucionario: sumar, restar, tablas, unir resultado, secuencias, mayor/menor.',
