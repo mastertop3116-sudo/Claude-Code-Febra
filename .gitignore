@@ -32,3 +32,33 @@ data/.session_secret
 # Cache de imagens baixadas/criadas por tema (alimenta o catálogo em runtime) — não commitar
 assets/catalogo-auto/
 data/demanda.json
+
+# ── Artefatos GERADOS / testes (saída das máquinas — não versionar) ──
+# PDFs de teste/saída na raiz do projeto
+/*.pdf
+# Pastas de saída geradas pelos geradores
+oferta-*/
+audit-pdfs/
+test_guia_1080/
+test_guia_pages/
+# Previews/temporários dentro do public
+public/folhinhas-tmp/
+public/folhinhas-demo.html
+public/preview-folhinha.html
+public/preview-*.pdf
+public/test-*.pdf
+public/*.pdf
+public/kit-avancado-*.png
+public/grimorio.jpg
+# Screenshots e PDFs gerados dentro dos templates
+**/screenshots/
+**/pdfs/
+**/planejamento-exemplo.png
+# Pasta com nome quebrado (lixo de caminho mal formado)
+**/UsersRodrigo*/
+# Log de runtime do NexusPDF
+data/nexuspdf_log.json
+# Artes/imagens pesadas — ficam salvas no PC e no catálogo, fora do Git (incham demais)
+assets/mascotes/
+assets/natacao/
+assets/catalogo/

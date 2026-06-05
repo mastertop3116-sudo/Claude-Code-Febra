@@ -146,4 +146,32 @@ SUPABASE_KEY            — chave do Supabase
 
 ---
 
+## Atualização 2026-06-02 — 3 estilos + conteúdo variado + robô de comentário
+
+Pedido do Rodrigo: os posts estavam sempre iguais (sempre Dark, sempre "5 dicas para...").
+
+**1. Três estilos visuais revezando por dia** (`ESTILOS_POR_DIA` em `gerar-conteudo-ia.js`):
+- **Dark** — preto #0a0a0f + laranja #f97316 (único que usa o fundo 3D cartoon).
+- **Premium** — preto liso elegante, detalhes finos de laranja (`templates/premium/`).
+- **Color** — **laranja quente da marca + card branco** (NÃO é mais azul/verde; reescrito pra respeitar a regra "nunca azul"). `templates/color/`.
+- Criadas as peças de carrossel que faltavam: `templates/premium/slide.js` e `templates/color/slide.js` (antes só o Dark tinha `slide.js`).
+- O fundo 3D só entra no Dark (`gerar-post.js`: `if (bgBase64 && estilo === 'dark')`).
+
+**2. Conteúdo de verdade e variado** (`gerar-conteudo-ia.js`):
+- Carrossel da manhã gira por **8 ângulos** (`ANGULOS_CARROSSEL`, por dia-do-ano): curiosidades, erros comuns, passo a passo, soluções de problemas, sugestões de brincadeiras, pedagogia, mito x verdade, benefícios.
+- Carrossel mais cheio: **5–6 cards de conteúdo** (antes 3), texto específico (28–42 palavras) com exemplo do tatame. Numeração dos slides recalculada no código (robusto).
+- Noite com foco rotativo (`FOCOS_DICA/MOTIV/ENGAJ`) e **post de produto 1x/semana** (`TIPOS_NOITE` inclui 'produto').
+
+**3. Robô de comentário** (`responder-comentarios.js`):
+- Responde comentários sozinho. Quem pergunta preço/link → resposta com CTA pro link da bio (Básico R$10 / Premium R$27). Demais → resposta simpática via GPT-4o Mini.
+- Travas: não responde a si mesmo, não responde 2x (checa se já tem reply nosso), máx 20/rodada, só últimos 7 dias. Tem modo teste (`dryRun`) que mostra sem postar.
+- Atalho: `/instagram-responder-comentarios?secret=...`. Cron a cada 30 min no `instagram-scheduler.js`.
+- **DESLIGADO por padrão.** Liga com a variável de ambiente `IG_COMENTARIOS_AUTO=true` no Render (ou trocando o default no `instagram-scheduler.js`). Rodrigo pediu pra deixar pronto mas desligado em 2026-06-02.
+
+**Status:** commitado e enviado pro GitHub (commit 344c2f8). Render reconstrói sozinho. Testado local em dry run (manhã = carrossel; noite = post único) com a IA real — OK, sem vazar texto.
+
+**Ferramenta de prévia:** `preview-estilos.js` renderiza os 3 estilos sem postar nem chamar a IA.
+
+---
+
 *Arquivo criado em 2026-05-26. Atualizar quando houver mudança na estrutura ou nos arquivos.*

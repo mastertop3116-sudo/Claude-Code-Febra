@@ -1,0 +1,447 @@
+[
+  {
+    "id": "mat-01", "faixa": "Maternal", "idade": "2-3 anos", "cor": "#FF6B6B",
+    "titulo": "Pinte os Círculos",
+    "instrucao": "Use seu lápis de cor favorito e pinte todos os círculos!",
+    "tipo": "colorir-formas",
+    "formas": ["circulo","circulo","circulo","circulo","circulo","circulo"]
+  },
+  {
+    "id": "mat-02", "faixa": "Maternal", "idade": "2-3 anos", "cor": "#FF6B6B",
+    "titulo": "As Cores",
+    "instrucao": "Pinte cada balão com a cor escrita embaixo!",
+    "tipo": "cores",
+    "itens": [
+      {"emoji":"🔴","nome":"Vermelho"},
+      {"emoji":"🔵","nome":"Azul"},
+      {"emoji":"🟡","nome":"Amarelo"},
+      {"emoji":"🟢","nome":"Verde"}
+    ]
+  },
+  {
+    "id": "mat-03", "faixa": "Maternal", "idade": "2-3 anos", "cor": "#FF6B6B",
+    "titulo": "Grande e Pequeno",
+    "instrucao": "Circule o maior de cada par!",
+    "tipo": "grande-pequeno",
+    "pares": [
+      ["🐘","🐭"],
+      ["🌳","🌱"],
+      ["🏠","🏚️"],
+      ["🚗","🚌"]
+    ]
+  },
+  {
+    "id": "mat-04", "faixa": "Maternal", "idade": "2-3 anos", "cor": "#FF6B6B",
+    "titulo": "Ligue os Pontos",
+    "instrucao": "Ligue os pontos de 1 até 5 para descobrir o desenho!",
+    "tipo": "ligar-pontos",
+    "pontos": 5,
+    "resultado": "⭐"
+  },
+  {
+    "id": "mat-05", "faixa": "Maternal", "idade": "2-3 anos", "cor": "#FF6B6B",
+    "titulo": "Trace as Linhas",
+    "instrucao": "Trace por cima das linhas pontilhadas com seu lápis!",
+    "tipo": "tracado",
+    "linhas": ["reta","reta","curva","curva","zigue-zague"]
+  },
+  {
+    "id": "mat-06", "faixa": "Maternal", "idade": "2-3 anos", "cor": "#FF6B6B",
+    "titulo": "Os Animais",
+    "instrucao": "Escreva o nome de cada animal na linha abaixo!",
+    "tipo": "galeria-emoji",
+    "itens": [
+      {"emoji":"🐶","nome":"Cachorro"},
+      {"emoji":"🐱","nome":"Gato"},
+      {"emoji":"🐟","nome":"Peixe"},
+      {"emoji":"🐦","nome":"Pássaro"},
+      {"emoji":"🐰","nome":"Coelho"},
+      {"emoji":"🐮","nome":"Vaca"}
+    ]
+  },
+  {
+    "id": "mat-07", "faixa": "Maternal", "idade": "2-3 anos", "cor": "#FF6B6B",
+    "titulo": "As Formas",
+    "instrucao": "Pinte cada forma com uma cor diferente!",
+    "tipo": "formas-geometricas",
+    "formas": [
+      {"forma":"circulo","nome":"Círculo"},
+      {"forma":"quadrado","nome":"Quadrado"},
+      {"forma":"triangulo","nome":"Triângulo"},
+      {"forma":"retangulo","nome":"Retângulo"}
+    ]
+  },
+  {
+    "id": "mat-08", "faixa": "Maternal", "idade": "2-3 anos", "cor": "#FF6B6B",
+    "titulo": "Igual ou Diferente?",
+    "instrucao": "Circule os pares que são iguais!",
+    "tipo": "igual-diferente",
+    "pares": [
+      ["🍎","🍎","✅"],
+      ["🌞","🌝","❌"],
+      ["🚗","🚗","✅"],
+      ["🌸","🌼","❌"],
+      ["⭐","⭐","✅"],
+      ["🎈","🎀","❌"]
+    ]
+  },
+  {
+    "id": "mat-09", "faixa": "Maternal", "idade": "2-3 anos", "cor": "#FF6B6B",
+    "titulo": "As Frutas",
+    "instrucao": "Escreva o nome de cada fruta na linha abaixo!",
+    "tipo": "galeria-emoji",
+    "itens": [
+      {"emoji":"🍎","nome":"Maçã"},
+      {"emoji":"🍌","nome":"Banana"},
+      {"emoji":"🍇","nome":"Uva"},
+      {"emoji":"🍓","nome":"Morango"},
+      {"emoji":"🍊","nome":"Laranja"},
+      {"emoji":"🍉","nome":"Melancia"}
+    ]
+  },
+  {
+    "id": "mat-10", "faixa": "Maternal", "idade": "2-3 anos", "cor": "#FF6B6B",
+    "titulo": "1, 2, 3 — Vamos Contar!",
+    "instrucao": "Conte os objetos e pinte o número certo!",
+    "tipo": "contar-simples",
+    "grupos": [
+      {"emoji":"⭐","qtd":1},
+      {"emoji":"🌸","qtd":2},
+      {"emoji":"🎈","qtd":3}
+    ]
+  },
+
+  {
+    "id": "jar-01", "faixa": "Jardim", "idade": "4-5 anos", "cor": "#4ECDC4",
+    "titulo": "As Vogais",
+    "instrucao": "Trace as vogais e pinte as imagens que começam com cada uma!",
+    "tipo": "vogais",
+    "vogais": [
+      {"letra":"A","emoji":"🍎","palavra":"Avião"},
+      {"letra":"E","emoji":"🐘","palavra":"Elefante"},
+      {"letra":"I","emoji":"🏠","palavra":"Igreja"},
+      {"letra":"O","emoji":"👁️","palavra":"Óculos"},
+      {"letra":"U","emoji":"🍇","palavra":"Uva"}
+    ]
+  },
+  {
+    "id": "jar-02", "faixa": "Jardim", "idade": "4-5 anos", "cor": "#4ECDC4",
+    "titulo": "Contando até 5",
+    "instrucao": "Conte os objetos e escreva o número na caixinha!",
+    "tipo": "contagem",
+    "grupos": [
+      {"emoji":"🍎","qtd":1},
+      {"emoji":"⭐","qtd":2},
+      {"emoji":"🌸","qtd":3},
+      {"emoji":"🎈","qtd":4},
+      {"emoji":"🦋","qtd":5}
+    ]
+  },
+  {
+    "id": "jar-03", "faixa": "Jardim", "idade": "4-5 anos", "cor": "#4ECDC4",
+    "titulo": "Associe a Sombra",
+    "instrucao": "Ligue cada animal à sua sombra!",
+    "tipo": "associar-sombra",
+    "itens": [
+      {"emoji":"🐶","nome":"Cachorro"},
+      {"emoji":"🦁","nome":"Leão"},
+      {"emoji":"🐘","nome":"Elefante"},
+      {"emoji":"🦋","nome":"Borboleta"}
+    ]
+  },
+  {
+    "id": "jar-04", "faixa": "Jardim", "idade": "4-5 anos", "cor": "#4ECDC4",
+    "titulo": "Ordene por Tamanho",
+    "instrucao": "Numere do menor para o maior! Escreva 1, 2, 3 e 4.",
+    "tipo": "ordenar-tamanho",
+    "series": [
+      {"emojis":["🐭","🐱","🐶","🐘"],"nomes":["Rato","Gato","Cachorro","Elefante"]},
+      {"emojis":["🌱","🌿","🌳","🏔️"],"nomes":["Broto","Planta","Árvore","Montanha"]}
+    ]
+  },
+  {
+    "id": "jar-05", "faixa": "Jardim", "idade": "4-5 anos", "cor": "#4ECDC4",
+    "titulo": "Sequência de Formas",
+    "instrucao": "Complete a sequência desenhando a forma que falta!",
+    "tipo": "sequencia",
+    "sequencias": [
+      ["circulo","quadrado","circulo","quadrado","?"],
+      ["triangulo","triangulo","circulo","triangulo","triangulo","?"],
+      ["quadrado","circulo","triangulo","quadrado","circulo","?"]
+    ]
+  },
+  {
+    "id": "jar-06", "faixa": "Jardim", "idade": "4-5 anos", "cor": "#4ECDC4",
+    "titulo": "Labirinto: Ajude o Coelho!",
+    "instrucao": "Ajude o coelho a chegar na cenoura! Trace o caminho.",
+    "tipo": "labirinto",
+    "inicio": "🐰",
+    "fim": "🥕",
+    "dificuldade": "facil"
+  },
+  {
+    "id": "jar-07", "faixa": "Jardim", "idade": "4-5 anos", "cor": "#4ECDC4",
+    "titulo": "Pinte por Número",
+    "instrucao": "Use as cores do código para pintar o desenho!",
+    "tipo": "pintar-numero",
+    "codigo": [
+      {"numero":1,"cor":"Vermelho","hex":"#FF6B6B"},
+      {"numero":2,"cor":"Azul","hex":"#4ECDC4"},
+      {"numero":3,"cor":"Amarelo","hex":"#FFE66D"},
+      {"numero":4,"cor":"Verde","hex":"#95E1A3"}
+    ]
+  },
+  {
+    "id": "jar-08", "faixa": "Jardim", "idade": "4-5 anos", "cor": "#4ECDC4",
+    "titulo": "Os Números 1 a 5",
+    "instrucao": "Trace os números e desenhe a quantidade certa de objetos!",
+    "tipo": "trace-numeros",
+    "numeros": [1,2,3,4,5]
+  },
+  {
+    "id": "jar-09", "faixa": "Jardim", "idade": "4-5 anos", "cor": "#4ECDC4",
+    "titulo": "Que Letra Começa?",
+    "instrucao": "Escreva a letra com que cada palavra começa!",
+    "tipo": "letra-inicial",
+    "itens": [
+      {"emoji":"🍎","palavra":"Maçã","letra":"M"},
+      {"emoji":"🐶","palavra":"Cachorro","letra":"C"},
+      {"emoji":"🌞","palavra":"Sol","letra":"S"},
+      {"emoji":"🍌","palavra":"Banana","letra":"B"},
+      {"emoji":"🏠","palavra":"Casa","letra":"C"},
+      {"emoji":"🐟","palavra":"Peixe","letra":"P"}
+    ]
+  },
+  {
+    "id": "jar-10", "faixa": "Jardim", "idade": "4-5 anos", "cor": "#4ECDC4",
+    "titulo": "Pares Iguais",
+    "instrucao": "Encontre os pares iguais e ligue com uma linha!",
+    "tipo": "pares",
+    "itens": ["🍎","🚗","⭐","🌸","🎈","🦋","🍎","🚗","⭐","🌸","🎈","🦋"]
+  },
+  {
+    "id": "jar-11", "faixa": "Jardim", "idade": "4-5 anos", "cor": "#4ECDC4",
+    "titulo": "Na Escola",
+    "instrucao": "Circule os objetos que usamos na escola!",
+    "tipo": "circule-correto",
+    "itens": [
+      {"emoji":"✏️","escola":true,"nome":"Lápis"},
+      {"emoji":"📚","escola":true,"nome":"Livro"},
+      {"emoji":"🍔","escola":false,"nome":"Hamburguer"},
+      {"emoji":"🎒","escola":true,"nome":"Mochila"},
+      {"emoji":"🏈","escola":false,"nome":"Bola de Futebol Americano"},
+      {"emoji":"✂️","escola":true,"nome":"Tesoura"},
+      {"emoji":"🚗","escola":false,"nome":"Carro"},
+      {"emoji":"📐","escola":true,"nome":"Régua"}
+    ]
+  },
+  {
+    "id": "jar-12", "faixa": "Jardim", "idade": "4-5 anos", "cor": "#4ECDC4",
+    "titulo": "As Estações do Ano",
+    "instrucao": "Ligue cada imagem à estação do ano certa!",
+    "tipo": "associar",
+    "pares": [
+      {"item":"☃️","categoria":"Inverno"},
+      {"item":"🌸","categoria":"Primavera"},
+      {"item":"☀️","categoria":"Verão"},
+      {"item":"🍂","categoria":"Outono"}
+    ]
+  },
+  {
+    "id": "jar-13", "faixa": "Jardim", "idade": "4-5 anos", "cor": "#4ECDC4",
+    "titulo": "Dentro ou Fora?",
+    "instrucao": "Escreva D para DENTRO e F para FORA!",
+    "tipo": "dentro-fora",
+    "cenas": [
+      {"emoji":"🐟","contexto":"aquário","estado":"D"},
+      {"emoji":"🐦","contexto":"gaiola","estado":"F"},
+      {"emoji":"🌸","contexto":"vaso","estado":"D"},
+      {"emoji":"🐶","contexto":"casinha","estado":"F"}
+    ]
+  },
+  {
+    "id": "jar-14", "faixa": "Jardim", "idade": "4-5 anos", "cor": "#4ECDC4",
+    "titulo": "Qual É o Meio de Transporte?",
+    "instrucao": "Ligue cada meio de transporte ao lugar onde ele anda!",
+    "tipo": "associar",
+    "pares": [
+      {"item":"✈️","categoria":"Ar"},
+      {"item":"🚗","categoria":"Terra"},
+      {"item":"⛵","categoria":"Água"},
+      {"item":"🚂","categoria":"Trilho"},
+      {"item":"🚁","categoria":"Ar"},
+      {"item":"🚢","categoria":"Água"}
+    ]
+  },
+  {
+    "id": "jar-15", "faixa": "Jardim", "idade": "4-5 anos", "cor": "#4ECDC4",
+    "titulo": "Complete o Desenho",
+    "instrucao": "O lado direito do desenho está apagado. Complete para ficar igual!",
+    "tipo": "completar-desenho",
+    "figuras": ["rosto","casa","borboleta"]
+  },
+
+  {
+    "id": "pre-01", "faixa": "Pré-Escola", "idade": "5-6 anos", "cor": "#A29BFE",
+    "titulo": "O Alfabeto",
+    "instrucao": "Trace as letras e escreva uma palavra que começa com cada uma!",
+    "tipo": "alfabeto",
+    "letras": ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
+  },
+  {
+    "id": "pre-02", "faixa": "Pré-Escola", "idade": "5-6 anos", "cor": "#A29BFE",
+    "titulo": "Contando até 10",
+    "instrucao": "Conte os objetos e escreva o número!",
+    "tipo": "contagem",
+    "grupos": [
+      {"emoji":"🍎","qtd":6},
+      {"emoji":"⭐","qtd":7},
+      {"emoji":"🌸","qtd":8},
+      {"emoji":"🎈","qtd":9},
+      {"emoji":"🦋","qtd":10}
+    ]
+  },
+  {
+    "id": "pre-03", "faixa": "Pré-Escola", "idade": "5-6 anos", "cor": "#A29BFE",
+    "titulo": "Dividindo em Sílabas",
+    "instrucao": "Separe as sílabas de cada palavra com um traço! Ex: ca-sa",
+    "tipo": "silabas",
+    "palavras": [
+      {"palavra":"BOLA","silabas":"BO-LA","emoji":"⚽"},
+      {"palavra":"GATO","silabas":"GA-TO","emoji":"🐱"},
+      {"palavra":"SAPATO","silabas":"SA-PA-TO","emoji":"👟"},
+      {"palavra":"BORBOLETA","silabas":"BOR-BO-LE-TA","emoji":"🦋"},
+      {"palavra":"ELEFANTE","silabas":"E-LE-FAN-TE","emoji":"🐘"},
+      {"palavra":"CASA","silabas":"CA-SA","emoji":"🏠"}
+    ]
+  },
+  {
+    "id": "pre-04", "faixa": "Pré-Escola", "idade": "5-6 anos", "cor": "#A29BFE",
+    "titulo": "Adição Simples",
+    "instrucao": "Resolva as continhas! Conte os objetos para ajudar.",
+    "tipo": "adicao",
+    "contas": [
+      {"a":1,"b":1,"emoji":"🍎"},
+      {"a":2,"b":1,"emoji":"⭐"},
+      {"a":1,"b":2,"emoji":"🌸"},
+      {"a":2,"b":2,"emoji":"🎈"},
+      {"a":3,"b":1,"emoji":"🦋"},
+      {"a":1,"b":3,"emoji":"🍌"}
+    ]
+  },
+  {
+    "id": "pre-05", "faixa": "Pré-Escola", "idade": "5-6 anos", "cor": "#A29BFE",
+    "titulo": "Labirinto: O Urso Perdido!",
+    "instrucao": "Ajude o urso a chegar no mel! Trace o caminho certo.",
+    "tipo": "labirinto",
+    "inicio": "🐻",
+    "fim": "🍯",
+    "dificuldade": "medio"
+  },
+  {
+    "id": "pre-06", "faixa": "Pré-Escola", "idade": "5-6 anos", "cor": "#A29BFE",
+    "titulo": "Palavras com Figuras",
+    "instrucao": "Escreva o nome de cada figura nas linhas abaixo!",
+    "tipo": "escrever-palavra",
+    "itens": [
+      {"emoji":"🐶","palavra":"CACHORRO"},
+      {"emoji":"🌞","palavra":"SOL"},
+      {"emoji":"🏠","palavra":"CASA"},
+      {"emoji":"🌳","palavra":"ÁRVORE"},
+      {"emoji":"🚗","palavra":"CARRO"},
+      {"emoji":"🍎","palavra":"MAÇÃ"}
+    ]
+  },
+  {
+    "id": "pre-07", "faixa": "Pré-Escola", "idade": "5-6 anos", "cor": "#A29BFE",
+    "titulo": "Antes e Depois",
+    "instrucao": "Escreva o número que vem ANTES e DEPOIS!",
+    "tipo": "antes-depois",
+    "numeros": [3,5,7,9,2,6,4,8]
+  },
+  {
+    "id": "pre-08", "faixa": "Pré-Escola", "idade": "5-6 anos", "cor": "#A29BFE",
+    "titulo": "Rimas Divertidas",
+    "instrucao": "Ligue as palavras que rimam!",
+    "tipo": "rimas",
+    "pares": [
+      {"palavra":"BOLA","rima":"ESCOLA"},
+      {"palavra":"GATO","rima":"PATO"},
+      {"palavra":"FLOR","rima":"COR"},
+      {"palavra":"CHUVA","rima":"LUVA"},
+      {"palavra":"MEL","rima":"PASTEL"}
+    ]
+  },
+  {
+    "id": "pre-09", "faixa": "Pré-Escola", "idade": "5-6 anos", "cor": "#A29BFE",
+    "titulo": "Família de Palavras",
+    "instrucao": "Complete com a sílaba que está faltando!",
+    "tipo": "completar-silaba",
+    "itens": [
+      {"palavra":"CA__","silaba":"SA","emoji":"🏠"},
+      {"palavra":"__LA","silaba":"BO","emoji":"⚽"},
+      {"palavra":"PE__E","silaba":"IX","emoji":"🐟"},
+      {"palavra":"BO__ECA","silaba":"NE","emoji":"🪆"},
+      {"palavra":"__VRO","silaba":"LI","emoji":"📚"},
+      {"palavra":"MA__Ã","silaba":"Ç","emoji":"🍎"}
+    ]
+  },
+  {
+    "id": "pre-10", "faixa": "Pré-Escola", "idade": "5-6 anos", "cor": "#A29BFE",
+    "titulo": "7 Diferenças",
+    "instrucao": "As duas cenas parecem iguais, mas têm 7 diferenças! Encontre todas.",
+    "tipo": "sete-diferencas",
+    "tema": "sala de aula"
+  },
+  {
+    "id": "pre-11", "faixa": "Pré-Escola", "idade": "5-6 anos", "cor": "#A29BFE",
+    "titulo": "Maior, Menor ou Igual?",
+    "instrucao": "Coloque o sinal certo: > maior, < menor ou = igual!",
+    "tipo": "comparar-numeros",
+    "pares": [
+      [3,5],[7,4],[6,6],[2,8],[9,3],[5,5],[1,4],[8,6]
+    ]
+  },
+  {
+    "id": "pre-12", "faixa": "Pré-Escola", "idade": "5-6 anos", "cor": "#A29BFE",
+    "titulo": "Meu Corpo",
+    "instrucao": "Escreva o nome de cada parte do corpo indicada!",
+    "tipo": "partes-corpo",
+    "partes": ["Cabeça","Braço","Mão","Perna","Pé","Olho","Boca","Nariz"]
+  },
+  {
+    "id": "pre-13", "faixa": "Pré-Escola", "idade": "5-6 anos", "cor": "#A29BFE",
+    "titulo": "Subtração Simples",
+    "instrucao": "Resolva as continhas! Risque os objetos que saem.",
+    "tipo": "subtracao",
+    "contas": [
+      {"a":2,"b":1,"emoji":"🍎"},
+      {"a":3,"b":1,"emoji":"⭐"},
+      {"a":4,"b":2,"emoji":"🌸"},
+      {"a":5,"b":2,"emoji":"🎈"},
+      {"a":4,"b":3,"emoji":"🦋"},
+      {"a":5,"b":4,"emoji":"🍌"}
+    ]
+  },
+  {
+    "id": "pre-14", "faixa": "Pré-Escola", "idade": "5-6 anos", "cor": "#A29BFE",
+    "titulo": "As Horas",
+    "instrucao": "Escreva que horas marcam os relógios!",
+    "tipo": "horas",
+    "horarios": ["8:00","10:00","12:00","3:00","6:00","9:00"]
+  },
+  {
+    "id": "pre-15", "faixa": "Pré-Escola", "idade": "5-6 anos", "cor": "#A29BFE",
+    "titulo": "Sequência Numérica",
+    "instrucao": "Complete os espaços com os números que faltam!",
+    "tipo": "sequencia-numerica",
+    "sequencias": [
+      [1,2,"_",4,5],
+      [6,"_",8,9,10],
+      ["_",2,3,"_",5],
+      [3,"_",5,6,"_"],
+      [1,"_","_",4,5],
+      [6,7,"_",9,"_"]
+    ]
+  }
+]
