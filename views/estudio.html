@@ -571,7 +571,7 @@
   function custoDe(m){return (m==='opus')?((USO&&USO.custoAvancada)||2):((USO&&USO.custoRapida)||1);}
   // mostra o saldo de créditos no topo + atualiza a nota do modelo
   function renderSaldo(){
-    const bar=$('cred-bar'); if(bar) bar.style.display='flex';
+    const bar=$('cred-bar'); if(bar){bar.style.display='flex';bar.classList.add('in');}
     const ilim=USO&&USO.ilimitado, cr=USO?USO.creditos:null;
     const n=$('cred-n'); if(n) n.textContent=ilim?'∞':(cr!=null?cr:'…');
     applyModel();
