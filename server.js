@@ -311,9 +311,15 @@ app.post("/api/estudio/ebook", auth.exigirLogin, async (req, res) => {
   const extensao = EXT.includes(b.extensao) ? b.extensao : "medio";
   const idioma = ["pt", "en", "es", "de", "fr", "it"].includes(b.idioma) ? b.idioma : "pt";   // material na gringa
   const modelo = b.modelo === "opus" ? "opus" : "gpt";
+  // Imagens ilustradas por IA (opcional, +créditos a 3/imagem). 'capa' = 1 imagem; 'total' = capa + 4 capítulos = 5 imagens.
+  const ILUS = ["nenhuma", "capa", "total"];
+  const ilustracao = ILUS.includes(b.ilustracao) ? b.ilustracao : "nenhuma";
+  const CR_POR_IMG = 3;
+  const nImgs = ilustracao === "total" ? 5 : ilustracao === "capa" ? 1 : 0;
+  const extraCred = nImgs * CR_POR_IMG;   // capa=3, total=15
   if (tema.length < 3) return res.status(400).json({ error: "Diga sobre o que é o e-book." });
-  // Gasta créditos da geração (avançada=2, rápida=1). admin = ilimitado. Bloqueia SEM gerar se faltou saldo.
-  const cota = auth.consumirGeracao(req.usuario.id, modelo);
+  // Gasta créditos: base do modelo (gpt=1/opus=2) + imagens ilustradas (3/imagem). admin = ilimitado. Bloqueia SEM gerar se faltou saldo.
+  const cota = auth.consumirGeracao(req.usuario.id, modelo, extraCred);
   if (!cota.ok) {
     return res.status(403).json({ error: `Seus créditos acabaram (esta criação custa ${cota.custo}, você tem ${cota.creditos}). Compre mais créditos pra continuar.`, esgotado: true, creditos: cota.creditos, custo: cota.custo });
   }
@@ -329,13 +335,20 @@ app.post("/api/estudio/ebook", auth.exigirLogin, async (req, res) => {
       if (Array.isArray(retry.capitulos) && retry.capitulos.length > (conteudo.capitulos || []).length) conteudo = retry;
     }
     conteudo.idioma = idioma;   // o template usa pra traduzir os rótulos fixos (Capítulo, Sumário...)
-    const { pdfBuffer } = await eng.renderizarPDF(conteudo, { tipo: "ebook", nicho: tema, tema, autor });
+    const { pdfBuffer, imagensIA } = await eng.renderizarPDF(conteudo, { tipo: "ebook", nicho: tema, tema, autor, imagemIA: ilustracao !== "nenhuma", ilustrarCapitulos: ilustracao === "total" ? 4 : 0 });
+    // Reembolsa as imagens ilustradas que NÃO saíram (ex: IA de imagem fora do ar): o cliente só paga o que recebeu.
+    if (!cota.ilimitado && nImgs > 0) {
+      const faltaram = Math.max(0, nImgs - (imagensIA || 0));
+      if (faltaram > 0) { try { auth.definirCreditos(req.usuario.id, { creditos: faltaram * CR_POR_IMG, somar: true }); } catch (_) {} }
+    }
     const buf = Buffer.from(pdfBuffer);
     let paginas = 0; try { paginas = (await require("pdf-lib").PDFDocument.load(buf)).getPageCount(); } catch (_) {}
     const slug = tema.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "novo";
     try { demanda.registrar({ tipo: "ebook", tema, idioma, modelo }); } catch (_) {}   // radar
     res.json({ ok: true, pdf: buf.toString("base64"), filename: `ebook-${slug}.pdf`, paginas, titulo: conteudo.titulo || tema });
   } catch (e) {
+    // Erro na geração: devolve os créditos consumidos (não cobra por algo que não foi entregue).
+    if (cota && !cota.ilimitado) { try { auth.definirCreditos(req.usuario.id, { creditos: cota.custo, somar: true }); } catch (_) {} }
     console.error("[estudio/ebook]", e.message);
     res.status(500).json({ error: "Não consegui gerar o e-book. " + String(e.message).slice(0, 160) });
   }

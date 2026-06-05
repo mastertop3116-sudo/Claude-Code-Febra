@@ -514,6 +514,27 @@ body {
   padding: 5mm 0 13mm;
 }
 
+/* ══ Página-abertura ILUSTRADA de capítulo (opção "totalmente ilustrado") ══ */
+.cap-divisor { position: relative; padding: 0; overflow: hidden; background: var(--bg, #0f0e1f); }
+.cap-divisor-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.cap-divisor-scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom,
+    rgba(8,5,10,0.30) 0%, transparent 30%,
+    transparent 50%,
+    color-mix(in srgb, var(--bg, #0f0e1f) 86%, transparent) 84%,
+    var(--bg, #0f0e1f) 100%);
+}
+.cap-divisor-meta { position: absolute; left: 18mm; right: 18mm; bottom: 30mm; z-index: 2; }
+.cap-divisor-num {
+  font-family: 'Montserrat', sans-serif; font-size: 9pt; font-weight: 800;
+  letter-spacing: 3.5px; text-transform: uppercase; color: var(--s, #fff); margin-bottom: 4mm;
+}
+.cap-divisor-titulo {
+  font-family: 'Playfair Display', Georgia, serif; font-size: 38pt; font-weight: 800;
+  color: #fff; line-height: 1.06; letter-spacing: -0.5px;
+}
+
 /* ══════════════════════ PÁGINA DE CONTEÚDO ══════════════════════ */
 
 /* Barra de acento lateral — injetada pelo pgHeader em toda página de conteúdo */
@@ -1504,6 +1525,17 @@ body {
       </div>`;
     }
     (d.capitulos||[]).forEach((c,i)=>{
+      // Página-abertura ilustrada — só quando a opção "totalmente ilustrado" gerou a imagem do capítulo.
+      if (c.imagem) {
+        html += `<div class="page cap-divisor">
+          <img class="cap-divisor-img" src="${c.imagem}">
+          <div class="cap-divisor-scrim"></div>
+          <div class="cap-divisor-meta">
+            <div class="cap-divisor-num">${L.cap} ${String(c.numero||i+1).padStart(2,'0')}</div>
+            <div class="cap-divisor-titulo">${esc(c.titulo||'')}</div>
+          </div>
+        </div>`;
+      }
       // 1 capítulo = 1 página CHEIA. Curamos os blocos visuais (máx ~1 destaque grande)
       // pra encher a página sem estourar e deixar páginas quase em branco.
       const visual = boxEquacao(c.equacao) || boxContraste(c.contraste) || boxSteps(c.steps_visuais);

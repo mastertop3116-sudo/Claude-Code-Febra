@@ -412,7 +412,7 @@ async function gerarImagemIA(nicho, tema) {
     const { openaiImage } = require('../integrations/openai');
     const assunto = [tema, nicho].filter(Boolean).join(', ');
     const prompt = `A cute 3D rendered cartoon illustration, Pixar/Disney style, glossy soft lighting, about "${assunto}". Friendly, colorful, centered composition, plain soft solid background, no text, no words, high quality render.`;
-    const buf = await openaiImage(prompt, '1024x1024', 'high');
+    const buf = await openaiImage(prompt, '1024x1024', 'medium');   // 'medium' ~4x mais barato que 'high', visual quase igual em capa
     if (buf && buf.length) {
       const slug = slugify(nicho);
       salvarLocal(slug, buf, 'png', 'ia');

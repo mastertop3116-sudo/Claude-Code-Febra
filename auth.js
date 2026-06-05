@@ -203,9 +203,9 @@ function saldo(u) {
   return { ilimitado: c < 0, creditos: c < 0 ? null : c, custoAvancada: CUSTO_CR.opus, custoRapida: CUSTO_CR.gpt };
 }
 // "gasta" os créditos de 1 geração (server-side, não dá pra burlar). Bloqueia SEM gerar se faltou saldo.
-function consumirGeracao(userId, modelo) {
+function consumirGeracao(userId, modelo, extra = 0) {
   modelo = modelo === 'opus' ? 'opus' : 'gpt';
-  const custo = custoCreditos(modelo);
+  const custo = custoCreditos(modelo) + Math.max(0, parseInt(extra) || 0);   // extra = imagens ilustradas (IA)
   const lista = usuarios();
   const u = lista.find(x => x.id === userId);
   if (!u) return { ok: false, error: 'usuário não encontrado' };

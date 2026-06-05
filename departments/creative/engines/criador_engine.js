@@ -834,13 +834,25 @@ async function renderizarPDF(conteudo, params) {
   // Imagem de capa: o tema "nasce com imagem". Usa o que já temos (catálogo nosso,
   // cache local, Supabase) ou baixa 1 de banco GRÁTIS na hora (com timeout, custo zero)
   // e guarda pra próxima vez. Se nada vier, o template cai na ilustração SVG.
+  let imagensIA = 0;   // quantas imagens a IA REALMENTE gerou — p/ o endpoint cobrar/reembolsar certo
   let imagemCapa = null;
   if (!TIPOS_KIDS.includes(tipo) && params.nicho) {
-    imagemCapa = await garantirImagemCapa(params.nicho, params.tema).catch(() => null);
-    // (opcional, COM CUSTO) só gera com a nossa IA se foi pedido de propósito
-    if (!imagemCapa && params.imagemIA) {
+    // Opção "ilustrada" ligada (COM CUSTO): a IA cria a capa (vai pro catálogo). Senão: banco grátis.
+    if (params.imagemIA) {
       imagemCapa = await gerarImagemIA(params.nicho, params.tema).catch(() => null);
+      if (imagemCapa) imagensIA++;
     }
+    if (!imagemCapa) imagemCapa = await garantirImagemCapa(params.nicho, params.tema).catch(() => null);
+  }
+
+  // Ilustração por CAPÍTULO (opcional, COM CUSTO): gera p/ os N primeiros capítulos, em paralelo.
+  // Cada imagem vira uma página-abertura do capítulo e vai pro catálogo por nicho (reuso futuro).
+  if (params.ilustrarCapitulos > 0 && Array.isArray(conteudo.capitulos) && conteudo.capitulos.length) {
+    const n = Math.min(params.ilustrarCapitulos, conteudo.capitulos.length);
+    await Promise.all(conteudo.capitulos.slice(0, n).map(async (cap) => {
+      try { cap.imagem = await gerarImagemIA(params.nicho, cap.titulo || params.tema); } catch (_) {}
+    }));
+    imagensIA += conteudo.capitulos.slice(0, n).filter(c => c.imagem).length;
   }
 
   // Ficha de dinâmica: usa o mascote 3D salvo da FAIXA (recortado, sem gastar geração).
@@ -971,7 +983,7 @@ async function renderizarPDF(conteudo, params) {
         try { fs.unlinkSync(tmpOut); } catch (_) {}
       } catch (e) { console.warn('[criador] mascote HD falhou (segue normal):', e.message); }
     }
-    return { pdfBuffer: outBuffer, thumbnailBuffer };
+    return { pdfBuffer: outBuffer, thumbnailBuffer, imagensIA };
   } finally {
     await browser.close();
   }
