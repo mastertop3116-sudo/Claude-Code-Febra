@@ -1,94 +1,196 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Bem-vindo ao MAX Criador</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bem-vindo · MAX Criador</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  *{margin:0;padding:0;box-sizing:border-box;font-family:'Plus Jakarta Sans',system-ui,sans-serif}
-  :root{--ink:#0d1424;--dim:#5b6678;--line:#e7ebf2;--accent:#2f54ff;--bg:#f6f8fc}
-  body{background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;color:var(--ink)}
-  .card{background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:0 18px 60px rgba(13,20,36,.08);width:100%;max-width:440px;padding:46px 40px}
-  .badge{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--accent);background:rgba(47,84,255,.08);padding:6px 12px;border-radius:999px;letter-spacing:.2px}
-  h1{font-size:30px;font-weight:800;letter-spacing:-.5px;margin:20px 0 8px;line-height:1.1}
-  .sub{font-size:15px;color:var(--dim);line-height:1.5;margin-bottom:30px}
-  label{display:block;font-size:13px;font-weight:600;color:var(--ink);margin:0 0 7px}
-  input{width:100%;border:1px solid var(--line);border-radius:13px;padding:14px 16px;font-size:15px;color:var(--ink);background:#fbfcfe;transition:border-color .15s,box-shadow .15s}
-  input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(47,84,255,.1);background:#fff}
-  .field{margin-bottom:18px}
-  .btn{width:100%;border:none;border-radius:999px;padding:15px;font-size:15.5px;font-weight:700;color:#fff;background:var(--accent);cursor:pointer;margin-top:8px;transition:transform .12s,box-shadow .2s,opacity .2s}
-  .btn:hover{box-shadow:0 10px 26px rgba(47,84,255,.32);transform:translateY(-1px)}
-  .btn:disabled{opacity:.55;cursor:default;transform:none;box-shadow:none}
-  .msg{font-size:13.5px;margin-top:16px;padding:11px 14px;border-radius:11px;display:none;line-height:1.45}
-  .msg.err{display:block;background:#fff1f2;color:#be1430;border:1px solid #ffd9de}
-  .msg.ok{display:block;background:#ecfdf3;color:#067647;border:1px solid #bbf3d0}
-  .foot{font-size:12px;color:var(--dim);text-align:center;margin-top:24px}
+  :root{
+    --bg:#fbfaf7;--surface:#fff;--ink:#17161a;--ink-2:#56555c;--faint:#8d8c93;
+    --line:rgba(20,18,24,.10);--accent:#e8590c;--accent-2:#ff7a2f;--accent-soft:#fdf0e7;
+    --gold:#e0a93b;--gold-2:#f3d27a;
+    --ok:#1a7f4b;--shadow:0 30px 70px -28px rgba(20,18,24,.30),0 8px 24px -16px rgba(20,18,24,.18);
+    --ease:cubic-bezier(.22,1,.36,1)
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{-webkit-font-smoothing:antialiased}
+  body{min-height:100vh;background:radial-gradient(1100px 640px at 50% -4%, #fff1e3 0%, transparent 60%),var(--bg);
+    color:var(--ink);font-family:'Hanken Grotesk',system-ui,sans-serif;letter-spacing:-.01em;
+    display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden}
+  ::selection{background:var(--accent);color:#fff}
+  .serif{font-family:'Fraunces',Georgia,serif}
+
+  /* BOTAO liga/desliga particulas */
+  .fxbtn{position:fixed;right:16px;bottom:16px;z-index:6;display:inline-flex;align-items:center;gap:8px;
+    background:rgba(255,255,255,.82);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);
+    border:1px solid var(--line);color:var(--ink-2);font:600 .8rem 'Hanken Grotesk',sans-serif;
+    padding:8px 14px;border-radius:99px;cursor:pointer;box-shadow:0 8px 22px -10px rgba(20,18,24,.3);
+    transition:color .2s,border-color .2s,transform .15s}
+  .fxbtn:hover{color:var(--ink);border-color:var(--gold);transform:translateY(-1px)}
+  .fxbtn .dot{width:9px;height:9px;border-radius:50%;background:var(--gold);
+    box-shadow:0 0 9px var(--gold);transition:.2s}
+  body.no-fx .fxbtn .dot{background:#cfcdd4;box-shadow:none}
+
+  .stage{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;width:100%;max-width:430px}
+
+  /* CENA — LIVRO 2D FLUTUANDO com aura + particulas subindo PRA DENTRO dele */
+  .scene{position:relative;width:100%;height:236px;display:flex;align-items:center;justify-content:center;
+    perspective:900px;margin-bottom:-10px}
+
+  /* AURA dourada em volta do livro (cor das particulas) */
+  .aura{position:absolute;left:50%;top:50%;width:250px;height:250px;transform:translate(-50%,-50%);
+    border-radius:50%;z-index:0;pointer-events:none;
+    background:radial-gradient(circle, rgba(243,210,122,.55) 0%, rgba(224,169,59,.32) 36%, rgba(232,120,30,.12) 58%, transparent 72%);
+    filter:blur(9px);animation:aura 4.4s ease-in-out infinite}
+  @keyframes aura{0%,100%{transform:translate(-50%,-50%) scale(.92);opacity:.72}50%{transform:translate(-50%,-50%) scale(1.1);opacity:1}}
+
+  /* PARTICULAS que sobem e convergem pro livro */
+  .fx{position:absolute;left:50%;top:47%;width:0;height:0;z-index:0;pointer-events:none;overflow:visible}
+  .fx .p{position:absolute;left:0;top:0;border-radius:50%;
+    background:radial-gradient(circle at 40% 35%, #fff7da 0%, var(--gold) 56%, rgba(224,169,59,0) 74%);
+    box-shadow:0 0 9px rgba(243,210,122,.85);
+    opacity:0;will-change:transform,opacity;
+    animation-name:suga;animation-timing-function:ease-in;animation-iteration-count:infinite}
+  @keyframes suga{
+    0%{transform:translate(calc(-50% + var(--sx,0px)),calc(-50% + var(--sy,0px))) scale(.95);opacity:0}
+    20%{opacity:var(--o,.8)}
+    74%{opacity:var(--o,.8)}
+    100%{transform:translate(-50%,-50%) scale(.2);opacity:0}
+  }
+  body.no-fx .fx{display:none}
+
+  .float{position:relative;z-index:1;animation:bob 5.4s ease-in-out infinite, fadeIn 1.1s var(--ease) both;will-change:transform}
+  @keyframes bob{0%,100%{transform:translateY(-8px)}50%{transform:translateY(8px)}}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(22px) scale(.92)}to{opacity:1}}
+  .hero-img{display:block;width:262px;max-width:80vw;height:auto;
+    filter:drop-shadow(0 16px 22px rgba(150,90,15,.32));
+    transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .45s var(--ease)}
+
+  .card{position:relative;z-index:2;width:100%;background:var(--surface);border:1px solid var(--line);
+    border-radius:30px;padding:50px 40px 36px;box-shadow:var(--shadow);text-align:center}
+  .badge{display:inline-flex;align-items:center;gap:7px;font-size:.73rem;font-weight:700;letter-spacing:.05em;
+    text-transform:uppercase;color:var(--ok);background:#eaf7f0;border:1px solid #c3e9d4;padding:6px 13px;border-radius:99px}
+  h1{font-family:'Fraunces';font-weight:400;font-size:2.5rem;letter-spacing:-.03em;line-height:1.04;margin:18px 0 9px}
+  .sub{color:var(--ink-2);font-size:.98rem;line-height:1.5;margin-bottom:26px}
+  .field{margin-bottom:15px;text-align:left}
+  label{display:block;font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin:0 0 7px 2px}
+  input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:14px;color:var(--ink);
+    padding:14px 15px;font-size:1.02rem;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s}
+  input:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+  button.cta{width:100%;margin-top:8px;background:var(--accent);color:#fff;border:0;border-radius:99px;padding:15px;
+    font-size:1.02rem;font-weight:600;font-family:inherit;cursor:pointer;transition:transform .2s var(--ease),filter .2s}
+  button.cta:hover{transform:translateY(-1px);filter:brightness(1.07)}
+  button.cta:disabled{opacity:.6;cursor:default;transform:none}
+  .msg{margin-top:15px;font-size:.9rem;border-radius:12px;padding:11px 13px;display:none;line-height:1.45}
+  .msg.err{display:block;color:#c0392b;background:#fdecea;border:1px solid #f5c6c0}
+  .msg.ok{display:block;color:var(--ok);background:#eaf7f0;border:1px solid #c3e9d4}
+  .foot{margin-top:22px;text-align:center;color:var(--faint);font-size:.78rem}
+  .card.entra{opacity:0;transform:translateY(16px);animation:up .85s var(--ease) .15s forwards}
+  @keyframes up{to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
-  <div class="card">
-    <span class="badge">✓ Compra aprovada</span>
-    <h1>Bem-vindo(a) ao MAX Criador</h1>
-    <p class="sub">Falta só um passo: crie a sua senha pra entrar e começar a gerar seus produtos.</p>
-
-    <div class="field" id="campoEmail">
-      <label for="email">E-mail usado na compra</label>
-      <input type="email" id="email" placeholder="voce@exemplo.com" autocomplete="email" />
+  <div class="stage">
+    <div class="scene" id="scene">
+      <div class="aura"></div>
+      <div class="fx" id="fx" aria-hidden="true"></div>
+      <div class="float"><img class="hero-img" id="hero" src="/livro-dinheiro.png" alt="Livro com moedas e dinheiro saindo"></div>
     </div>
-    <div class="field">
-      <label for="senha">Crie sua senha</label>
-      <input type="password" id="senha" placeholder="mínimo 4 caracteres" autocomplete="new-password" />
+    <div class="card entra">
+      <span class="badge">✓ Compra aprovada</span>
+      <h1 class="serif">Seu estúdio<br>está pronto.</h1>
+      <p class="sub">Falta só criar sua senha pra entrar e começar a criar seus produtos.</p>
+      <div class="field" id="campoEmail">
+        <label for="email">E-mail da compra</label>
+        <input type="email" id="email" placeholder="voce@exemplo.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="senha">Crie sua senha</label>
+        <input type="password" id="senha" placeholder="mínimo 4 caracteres" autocomplete="new-password">
+      </div>
+      <div class="field">
+        <label for="senha2">Confirme a senha</label>
+        <input type="password" id="senha2" placeholder="repita a senha" autocomplete="new-password">
+      </div>
+      <button class="cta" id="btn" onclick="ativar()">Criar conta e entrar →</button>
+      <div class="msg" id="msg"></div>
+      <div class="foot">MAX Criador · seu estúdio de produtos com IA</div>
     </div>
-    <div class="field">
-      <label for="senha2">Confirme a senha</label>
-      <input type="password" id="senha2" placeholder="repita a senha" autocomplete="new-password" />
-    </div>
-    <button class="btn" id="btn" onclick="ativar()">Criar conta e entrar</button>
-    <div class="msg" id="msg"></div>
-    <p class="foot">MAX Criador · seu estúdio de produtos com IA</p>
   </div>
 
+  <button class="fxbtn" id="fxbtn" type="button" aria-pressed="true" title="Ligar/desligar as partículas">
+    <span class="dot"></span><span id="fxlabel">Partículas</span>
+  </button>
+
 <script>
-  const params = new URLSearchParams(location.search);
-  const TOKEN = params.get('token') || '';
-  const emailURL = params.get('email') || '';
-  if (emailURL) document.getElementById('email').value = emailURL;
-  // se veio por link com token, o e-mail não é necessário
-  if (TOKEN) document.getElementById('campoEmail').style.display = 'none';
+  // LIVRO 2D FLUTUANTE — leve inclinacao seguindo o mouse (suave, so pra dar vida)
+  const scene=document.getElementById('scene'), hero=document.getElementById('hero');
+  scene.addEventListener('mousemove',e=>{
+    const r=scene.getBoundingClientRect();
+    const x=(e.clientX-r.left)/r.width-0.5, y=(e.clientY-r.top)/r.height-0.5;
+    hero.style.setProperty('--ry',(x*16).toFixed(1)+'deg');
+    hero.style.setProperty('--rx',(-y*11).toFixed(1)+'deg');
+  });
+  scene.addEventListener('mouseleave',()=>{hero.style.setProperty('--ry','0deg');hero.style.setProperty('--rx','0deg');});
 
-  function showMsg(txt, ok) {
-    const m = document.getElementById('msg');
-    m.className = 'msg ' + (ok ? 'ok' : 'err');
-    m.textContent = txt;
-  }
-  async function ativar() {
-    const email = document.getElementById('email').value.trim();
-    const senha = document.getElementById('senha').value;
-    const senha2 = document.getElementById('senha2').value;
-    if (!TOKEN && !email) return showMsg('Informe o e-mail que você usou na compra.', false);
-    if (senha.length < 4) return showMsg('A senha precisa de pelo menos 4 caracteres.', false);
-    if (senha !== senha2) return showMsg('As senhas não são iguais.', false);
-
-    const btn = document.getElementById('btn');
-    btn.disabled = true; btn.textContent = 'Criando...';
-    try {
-      const r = await fetch('/api/bem-vindo', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, token: TOKEN, senha }),
-      });
-      const d = await r.json();
-      if (!r.ok || !d.ok) { showMsg(d.error || 'Não foi possível ativar. Tente de novo.', false); btn.disabled = false; btn.textContent = 'Criar conta e entrar'; return; }
-      showMsg('Conta criada! Entrando...', true);
-      setTimeout(() => { location.href = '/estudio'; }, 900);
-    } catch (e) {
-      showMsg('Erro de conexão. Tente de novo.', false);
-      btn.disabled = false; btn.textContent = 'Criar conta e entrar';
+  // PARTICULAS douradas que vem de VARIAS DIRECOES e convergem pra DENTRO do livro
+  const fx=document.getElementById('fx');
+  (function buildFx(){
+    const N=46;
+    for(let i=0;i<N;i++){
+      const p=document.createElement('span');p.className='p';
+      let sx=(Math.random()*2-1)*205;                    // espalhadas na largura
+      let sy=(Math.random()*1.55-1.05)*160;              // mais de cima e dos lados, pouco de baixo
+      const d=Math.hypot(sx,sy);
+      if(d<90){ const k=(90+Math.random()*50)/(d||1); sx*=k; sy*=k; }   // garante que venham de longe
+      const size=4+Math.random()*6, dur=3.6+Math.random()*4,
+            delay=-Math.random()*8, o=.55+Math.random()*.4;
+      p.style.cssText='width:'+size.toFixed(1)+'px;height:'+size.toFixed(1)+'px;'+
+        '--sx:'+sx.toFixed(0)+'px;--sy:'+sy.toFixed(0)+'px;--o:'+o.toFixed(2)+';'+
+        'animation-duration:'+dur.toFixed(2)+'s;animation-delay:'+delay.toFixed(2)+'s';
+      fx.appendChild(p);
     }
+  })();
+
+  // BOTAO liga/desliga (lembra a escolha)
+  const fxbtn=document.getElementById('fxbtn'), fxlabel=document.getElementById('fxlabel');
+  function aplicarFx(off){
+    document.body.classList.toggle('no-fx',off);
+    fxbtn.setAttribute('aria-pressed',(!off).toString());
+    fxlabel.textContent = off ? 'Partículas off' : 'Partículas';
   }
-  document.getElementById('senha2').addEventListener('keydown', e => { if (e.key === 'Enter') ativar(); });
+  aplicarFx(localStorage.getItem('fx')==='off');
+  fxbtn.addEventListener('click',()=>{
+    const off=!document.body.classList.contains('no-fx');
+    localStorage.setItem('fx',off?'off':'on');
+    aplicarFx(off);
+  });
+
+  // ATIVACAO DA CONTA
+  const params=new URLSearchParams(location.search);
+  const TOKEN=params.get('token')||'';const emailURL=params.get('email')||'';
+  if(emailURL)document.getElementById('email').value=emailURL;
+  if(TOKEN)document.getElementById('campoEmail').style.display='none';
+  function showMsg(txt,ok){const m=document.getElementById('msg');m.className='msg '+(ok?'ok':'err');m.textContent=txt;}
+  async function ativar(){
+    const email=document.getElementById('email').value.trim();
+    const senha=document.getElementById('senha').value;const senha2=document.getElementById('senha2').value;
+    if(!TOKEN&&!email)return showMsg('Informe o e-mail que você usou na compra.',false);
+    if(senha.length<4)return showMsg('A senha precisa de pelo menos 4 caracteres.',false);
+    if(senha!==senha2)return showMsg('As senhas não são iguais.',false);
+    const btn=document.getElementById('btn');btn.disabled=true;btn.textContent='Criando…';
+    try{
+      const r=await fetch('/api/bem-vindo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,token:TOKEN,senha})});
+      const d=await r.json();
+      if(!r.ok||!d.ok){showMsg(d.error||'Não foi possível ativar. Tente de novo.',false);btn.disabled=false;btn.textContent='Criar conta e entrar →';return;}
+      showMsg('Conta criada! Entrando…',true);
+      setTimeout(()=>{location.href='/estudio';},900);
+    }catch(e){showMsg('Erro de conexão. Tente de novo.',false);btn.disabled=false;btn.textContent='Criar conta e entrar →';}
+  }
+  document.getElementById('senha2').addEventListener('keydown',e=>{if(e.key==='Enter')ativar();});
 </script>
 </body>
 </html>
