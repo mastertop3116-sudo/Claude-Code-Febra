@@ -634,6 +634,7 @@ async function gerarConteudo(params) {
 • ERRO COMUM em cada parte importante: o erro exato que a maioria comete, POR QUE acontece, e o certo a fazer no lugar.
 • CONTEXTO CULTURAL DO NICHO: use a linguagem, os termos técnicos, as referências e os exemplos REAIS desse universo (${nicho}). Quem é do meio tem que reconhecer "isso é de quem entende de verdade".
 • AÇÃO CONCRETA ao fim de cada seção: um passo prático (verbo imperativo + o quê + como saber que deu certo).
+• TÍTULO QUE VENDE: sempre que casar com o conteúdo, inclua um NÚMERO concreto no título, de preferência no começo (ex: "7 Passos para...", "50 Receitas de...", "Método dos 3 Pilares..."). Número ancora valor e especificidade e vende mais no low ticket — mas só quando é verdade e combina com o material, nunca force nem invente.
 
 NUNCA FAÇA (mata a credibilidade e entrega que é robô/IA):
 • NÃO invente estatística nem pesquisa ("estudos mostram que 73%...", "uma pesquisa recente revelou..."). Sem fonte real, não cite número de pesquisa.
