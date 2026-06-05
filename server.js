@@ -292,6 +292,20 @@ app.post("/api/estudio/sugerir-palavras", (req, res, next) => {
 // Saldo de CRÉDITOS do usuário. admin = ilimitado
 app.get("/api/estudio/uso", auth.exigirLogin, (req, res) => { res.json(auth.saldo(req.usuario)); });
 
+// DIAGNOSTICO TEMPORARIO (remover apos): testa a IA de imagem e devolve o erro exato da OpenAI.
+app.get("/api/diag/imagem", auth.exigirAdmin, async (req, res) => {
+  const keyConfig = !!process.env.OPENAI_API_KEY;
+  const keyTail = keyConfig ? String(process.env.OPENAI_API_KEY).slice(-4) : null;
+  const imgModel = process.env.IMG_MODEL || "gpt-image-2";
+  try {
+    const { openaiImage } = require("./integrations/openai");
+    const buf = await openaiImage("a cute red apple, simple, white background", "1024x1024", "medium");
+    res.json({ ok: true, bytes: buf ? buf.length : 0, keyConfig, keyTail, imgModel });
+  } catch (e) {
+    res.json({ ok: false, erro: String((e && e.message) || e).slice(0, 500), status: (e && (e.status || e.statusCode || e.code)) || null, keyConfig, keyTail, imgModel });
+  }
+});
+
 // Gerar PACK DE MATEMÁTICA
 app.post("/api/estudio/matematica", auth.exigirLogin, (req, res) => {
   const qtd = Math.max(10, Math.min(300, parseInt(req.body && req.body.qtd) || 100));
