@@ -129,7 +129,7 @@ app.get("/demo", (req, res) => {
 });
 app.post("/api/logout", (req, res) => { auth.limparCookie(res); res.json({ ok: true }); });
 app.get("/api/me", (req, res) => { const u = auth.usuarioDaReq(req); res.json(u ? auth.publico(u) : {}); });
-app.get("/api/usuarios", auth.exigirAdmin, (req, res) => { res.json({ usuarios: auth.usuarios().map(auth.publico) }); });
+app.get("/api/usuarios", auth.exigirAdminOuChave, (req, res) => { res.json({ usuarios: auth.usuarios().map(auth.publico) }); });
 
 // Trocar a PRÓPRIA senha (qualquer usuário logado)
 app.post("/api/conta/senha", auth.exigirLogin, (req, res) => {
@@ -174,7 +174,7 @@ app.post("/api/demo", auth.exigirAdmin, (req, res) => {
 });
 
 // Admin: PAINEL — saldo de créditos de cada cliente (e total em carteira)
-app.get("/api/admin/painel", auth.exigirAdmin, (req, res) => {
+app.get("/api/admin/painel", auth.exigirAdminOuChave, (req, res) => {
   const clientes = auth.usuarios().map((u) => {
     const s = auth.saldo(u);
     return { id: u.id, nome: u.nome, login: u.login, papel: u.papel, ilimitado: s.ilimitado, creditos: s.creditos };
@@ -187,7 +187,7 @@ app.get("/api/admin/painel", auth.exigirAdmin, (req, res) => {
 });
 
 // Admin: RADAR DE DEMANDA — o que a galera mais cria (pra produzir/vender sob medida)
-app.get("/api/admin/demanda", auth.exigirAdmin, (req, res) => { res.json(demanda.resumo()); });
+app.get("/api/admin/demanda", auth.exigirAdminOuChave, (req, res) => { res.json(demanda.resumo()); });
 
 // Estúdio (protegido pelo porteiro acima)
 app.get("/estudio", (req, res) => { res.setHeader("Cache-Control", "no-store"); res.sendFile(path.join(__dirname, "views", "estudio.html")); });

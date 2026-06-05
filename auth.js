@@ -377,11 +377,23 @@ function exigirAdmin(req, res, next) {
   req.usuario = u;
   next();
 }
+// Consulta admin por CHAVE (pro Claude ver usuários/créditos sem login). Aceita o
+// cookie de admin OU o header 'x-admin-key' (= env ADMIN_API_KEY). Inerte se a env não existir.
+function exigirAdminOuChave(req, res, next) {
+  const u = usuarioDaReq(req);
+  if (u && u.papel === 'admin') { req.usuario = u; return next(); }
+  const chave = req.headers['x-admin-key'] || (req.query && req.query.adminKey) || '';
+  if (process.env.ADMIN_API_KEY && chave && chave === process.env.ADMIN_API_KEY) {
+    req.usuario = { id: 'api', nome: 'API (chave de leitura)', papel: 'admin', viaChave: true };
+    return next();
+  }
+  return res.status(403).json({ error: 'Só o admin pode fazer isso.' });
+}
 
 module.exports = {
   iniciar,
   usuarios, acharPorLogin, conferirSenha, criarToken, lerToken,
-  setCookieSessao, limparCookie, exigirLogin, exigirAdmin, usuarioDaReq,
+  setCookieSessao, limparCookie, exigirLogin, exigirAdmin, exigirAdminOuChave, usuarioDaReq,
   publico, novoUsuario, salvarUsuarios, hashSenha,
   saldo, saldoCreditos, consumirGeracao, definirCreditos, custoCreditos, CUSTO_CR, CREDITOS_TRIAL,
   trocarSenha, criarUsuarioPersistido, removerUsuario,
