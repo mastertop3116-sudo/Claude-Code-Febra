@@ -248,7 +248,7 @@ function getPromptSchema(tipo, extensao, params = {}) {
       "titulo": "título do capítulo — direto, sem rodeios",
       "conteudo": "texto corrido (${wpp} palavras) — ESTRUTURA: (1) PROBLEMA: dor real do nicho; (2) SOLUÇÃO com passo específico; (3) desenvolva o conteúdo principal. REGRA CULTURAL: se o tema/nicho envolver técnicas milenares, ancestrais, orientais ou históricas — mencione a origem real da técnica (nome nativo, civilização, período) e como ela era praticada originalmente antes de conectar ao contexto moderno. SEM incluir a dica, exemplo e ação aqui — eles aparecem nos campos abaixo.",
       "dica": "dica prática do autor em 1ª pessoa — 1 frase curta e direta, começa com 'Quando eu...' ou 'O que funcionou pra mim foi...' (máx 2 linhas)",
-      "exemplo_real": "história concreta: '[Nome brasileiro], [idade] anos, [cidade] — [situação com número real]. Em [prazo], ela/ele [resultado mensurável].' (máx 3 linhas)",
+      "exemplo_real": "história concreta e plausível, SEM inventar nome próprio + idade + cidade (ex: 'tinha um aluno meu que...', 'uma pessoa que acompanhei...') — descreva a situação e o que mudou, sem fabricar número de resultado (máx 3 linhas)",
       "acao_pratica": "tarefa que o leitor faz AGORA: '[Verbo imperativo] [número] [objeto concreto do nicho] em [prazo curto]. [Por que isso funciona em 1 frase.]' (máx 2 linhas)",
       "atencao": "erro comum neste ponto que arruína o resultado — 1 frase direta, começa com 'O erro mais comum aqui é...' (opcional, omita se não há erro relevante)",
       "pontos_chave": ["ponto direto e específico ao nicho — começa com verbo ou número", "idem", "idem"],
@@ -277,7 +277,7 @@ REGRA DOS BLOCOS VISUAIS: use contraste, equacao e steps_visuais com parcimônia
       "objetivo": "o que o leitor será capaz de fazer — começa com verbo de ação forte (ex: Calcular, Eliminar, Criar, Mapear)",
       "teoria": "em 1ª pessoa (180 a 250 palavras) — comece com 'Quando eu comecei a trabalhar com isso...' ou 'Uma vez, acompanhei [Nome], [perfil] que...'; mostre o problema, a descoberta e a solução com número concreto.",
       "dica": "dica do autor em 1ª pessoa — o detalhe que faz diferença neste módulo (1-2 linhas)",
-      "exemplo_real": "história de alguém que aplicou este módulo: '[Nome], [idade], [cidade] — fez [ação] e obteve [resultado com número] em [prazo]' (máx 3 linhas)",
+      "exemplo_real": "história plausível de quem aplicou este módulo, SEM nome próprio + idade + cidade inventados (ex: 'uma pessoa que fiz acompanhamento...') — a ação e o que mudou, sem número de resultado fabricado (máx 3 linhas)",
       "contraste": { "label_a": "estado antes (ex: Sem Sistema, O Problema)", "label_b": "estado depois (ex: Com Sistema, A Solução)", "itens_a": ["item negativo (3–7 palavras)"], "itens_b": ["item positivo (3–7 palavras)"] },
       "steps_visuais": ["passo do módulo em 4–8 palavras", "passo 2", "passo 3"],
       "exercicios": [
@@ -309,7 +309,7 @@ OBRIGATÓRIO: gere de ${qtd} módulos, cada um com 2 a 3 exercícios`,
       "equacao": { "a": "elemento 1 (2–5 palavras)", "sub_a": "legenda", "b": "elemento 2 (2–5 palavras)", "sub_b": "legenda", "resultado": "resultado (2–5 palavras)", "sub_r": "legenda" },
       "steps_visuais": ["sub-passo em 4–8 palavras", "sub-passo 2", "sub-passo 3"],
       "dica": "dica do autor em 1ª pessoa — detalhe que não é óbvio neste passo (1-2 linhas)",
-      "exemplo_real": "pessoa real que executou este passo: '[Nome], [perfil] — fez [ação] em [prazo] e conseguiu [resultado]' (máx 3 linhas)",
+      "exemplo_real": "exemplo plausível de quem executou este passo, SEM inventar nome próprio (ex: 'alguém que fez [ação]...') — o que mudou, sem resultado fabricado (máx 3 linhas)",
       "acao_pratica": "o que o leitor faz AGORA neste passo: '[Verbo] [número] [coisa] em [prazo]. Critério: [como saber se concluiu].' (máx 2 linhas)"
     }
   ],
@@ -849,9 +849,10 @@ async function renderizarPDF(conteudo, params) {
   // Cada imagem vira uma página-abertura do capítulo e vai pro catálogo por nicho (reuso futuro).
   if (params.ilustrarCapitulos > 0 && Array.isArray(conteudo.capitulos) && conteudo.capitulos.length) {
     const n = Math.min(params.ilustrarCapitulos, conteudo.capitulos.length);
-    await Promise.all(conteudo.capitulos.slice(0, n).map(async (cap) => {
+    // SEQUENCIAL (uma de cada vez) p/ não estourar o rate limit de imagem da OpenAI
+    for (const cap of conteudo.capitulos.slice(0, n)) {
       try { cap.imagem = await gerarImagemIA(params.nicho, cap.titulo || params.tema); } catch (_) {}
-    }));
+    }
     imagensIA += conteudo.capitulos.slice(0, n).filter(c => c.imagem).length;
   }
 
