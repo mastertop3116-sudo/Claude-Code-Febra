@@ -473,6 +473,47 @@ body {
   font-size: 7.5pt; color: rgba(255,255,255,0.22);
 }
 
+/* ══ CAPA v3 — FOTO EM DESTAQUE (hero vibrante, usada quando o tema tem imagem) ══ */
+.capa--foto { background: var(--bg, #0f0e1f); }
+.capa-foto-hero { position: relative; height: 172mm; flex-shrink: 0; overflow: hidden; }
+.capa-foto-hero > img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  display: block; /* imagem em COR CHEIA — sem lavagem */
+}
+.capa-foto-scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom,
+    rgba(8,5,10,0.34) 0%, transparent 20%,
+    transparent 55%,
+    color-mix(in srgb, var(--bg, #0f0e1f) 80%, transparent) 86%,
+    var(--bg, #0f0e1f) 100%);
+}
+.capa--foto .capa-top {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 12;
+  padding: 12mm 14mm 0;
+}
+.capa--foto .capa-badge {
+  background: rgba(255,255,255,0.16);
+  border-color: rgba(255,255,255,0.4);
+  color: #fff;
+}
+.capa--foto .capa-ano { color: rgba(255,255,255,0.85); }
+.capa-foto-panel {
+  flex: 1; position: relative; z-index: 10;
+  padding: 9mm 16mm 0;
+  display: flex; flex-direction: column;
+  background: linear-gradient(165deg,
+    color-mix(in srgb, var(--p) 15%, var(--bg)) 0%, var(--bg) 72%);
+}
+.capa--foto .capa-pretitulo { color: var(--s); margin-bottom: 5mm; }
+.capa-foto-footer {
+  margin-top: auto;
+  display: flex; align-items: center; gap: 3.5mm;
+  border-top: 0.4mm solid rgba(255,255,255,0.14);
+  padding: 5mm 0 13mm;
+}
+
 /* ══════════════════════ PÁGINA DE CONTEÚDO ══════════════════════ */
 
 /* Barra de acento lateral — injetada pelo pgHeader em toda página de conteúdo */
@@ -1382,9 +1423,34 @@ body {
   }
 
   html += `<div class="page">
-    <div class="capa">
+    <div class="capa ${d.imagem_capa ? 'capa--foto' : ''}">
+      ${d.imagem_capa ? `
+      <div class="capa-foto-hero">
+        <img src="${d.imagem_capa}">
+        <div class="capa-foto-scrim"></div>
+      </div>
+      <div class="capa-top">
+        <div class="capa-badge">${esc(d.label_tipo)}</div>
+        <div class="capa-ano">${d.ano}</div>
+      </div>
+      <div class="capa-foto-panel">
+        <div class="capa-pretitulo">${esc(d.nicho||d.tema||'')}</div>
+        <div class="capa-titulo">${esc(d.titulo||'')}</div>
+        <div class="capa-accent-bar">
+          <div class="capa-accent-fill"></div>
+          <div class="capa-accent-dot"></div>
+          <div class="capa-accent-dot" style="opacity:0.5"></div>
+        </div>
+        <div class="capa-subtitulo">${esc(d.subtitulo||d.nicho||'')}</div>
+        <div class="capa-foto-footer">
+          <div class="capa-footer-bar"></div>
+          <div class="capa-autor">por ${esc(d.autor)}</div>
+          <div class="capa-footer-sep"></div>
+          <div class="capa-footer-tipo">${esc(d.label_tipo)} · ${d.ano}</div>
+        </div>
+      </div>
+      ` : `
       <div class="capa-bg"></div>
-      ${d.imagem_capa ? `<img class="capa-foto-bg" src="${d.imagem_capa}">` : ''}
       <div class="capa-lines"></div>
       <div class="capa-deco-c1"></div>
       <div class="capa-deco-c2"></div>
@@ -1393,16 +1459,13 @@ body {
       <div class="capa-deco-line"></div>
       <div class="capa-ghost">${esc(d.label_tipo)}</div>
       ${d.ilustracao ? `<div class="capa-illus">${d.ilustracao}</div>` : ''}
-
       <div class="capa-top">
         <div class="capa-badge">${esc(d.label_tipo)}</div>
         <div class="capa-ano">${d.ano}</div>
       </div>
-
       <div class="capa-icon-zone">
         <div class="capa-icon-box">${capaIcon}</div>
       </div>
-
       <div class="capa-hero">
         <div class="capa-pretitulo">${esc(d.nicho||d.tema||'')}</div>
         <div class="capa-titulo">${esc(d.titulo||'')}</div>
@@ -1413,13 +1476,13 @@ body {
         </div>
         <div class="capa-subtitulo">${esc(d.subtitulo||d.nicho||'')}</div>
       </div>
-
       <div class="capa-footer">
         <div class="capa-footer-bar"></div>
         <div class="capa-autor">por ${esc(d.autor)}</div>
         <div class="capa-footer-sep"></div>
         <div class="capa-footer-tipo">${esc(d.label_tipo)} · ${d.ano}</div>
       </div>
+      `}
     </div>
   </div>`;
 
