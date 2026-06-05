@@ -119,6 +119,14 @@ app.post("/api/bem-vindo", (req, res) => {
   auth.setCookieSessao(res, auth.criarToken(r.id));   // ativa e já entra logado
   res.json({ ok: true, usuario: r.usuario });
 });
+// ── LINK DE DEMONSTRAÇÃO: entra como visitante temporário e já vai pro Estúdio ──
+app.get("/demo", (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  const r = auth.entrarComDemo(req.query.token);
+  if (!r.ok) return res.redirect("/login?demo=expirado");
+  auth.setCookieSessao(res, auth.criarToken(r.id));
+  res.redirect("/estudio");
+});
 app.post("/api/logout", (req, res) => { auth.limparCookie(res); res.json({ ok: true }); });
 app.get("/api/me", (req, res) => { const u = auth.usuarioDaReq(req); res.json(u ? auth.publico(u) : {}); });
 app.get("/api/usuarios", auth.exigirAdmin, (req, res) => { res.json({ usuarios: auth.usuarios().map(auth.publico) }); });
@@ -153,6 +161,16 @@ app.delete("/api/usuarios/:id", auth.exigirAdmin, (req, res) => {
   if (req.params.id === req.usuario.id) return res.status(400).json({ error: "Você não pode remover a si mesmo." });
   const r = auth.removerUsuario(req.params.id);
   res.status(r.ok ? 200 : 400).json(r);
+});
+
+// Admin: gerar LINK DE DEMONSTRAÇÃO (acesso por X horas, sem senha, com créditos de teste)
+app.post("/api/demo", auth.exigirAdmin, (req, res) => {
+  const b = req.body || {};
+  const r = auth.criarDemo({ horas: b.horas, creditos: b.creditos });
+  if (!r.ok) return res.status(400).json(r);
+  const proto = String(req.headers["x-forwarded-proto"] || req.protocol || "https").split(",")[0];
+  const base = process.env.BASE_URL || `${proto}://${req.get("host")}`;
+  res.json({ ok: true, url: `${base}/demo?token=${r.token}`, horas: r.horas, creditos: r.creditos, expiraEm: r.expiraEm });
 });
 
 // Admin: PAINEL — saldo de créditos de cada cliente (e total em carteira)

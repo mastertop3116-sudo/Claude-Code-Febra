@@ -385,6 +385,15 @@
     <div class="grp" style="display:flex;gap:10px"><input class="inp" id="nu-senha" type="text" data-i18n-ph="password" placeholder="Senha"><select id="nu-papel"><option value="usuario" data-i18n="role_user">Usuário</option><option value="admin" data-i18n="role_admin">Admin</option></select></div>
     <button class="btn" id="nu-btn" data-i18n="create_user">Criar usuário</button>
     <div class="status" id="nu-status" style="margin-top:10px"></div>
+    <div class="divline"></div>
+    <div class="field-label">🔗 Link de demonstração</div>
+    <p class="msub" style="margin:-2px 0 10px">Gere um link pra alguém testar o Estúdio por algumas horas, sem cadastro (entra com créditos de teste).</p>
+    <div class="grp" style="display:flex;gap:10px;align-items:center">
+      <input class="inp" id="demo-horas" type="number" min="1" max="168" value="24" style="max-width:110px" title="Horas de acesso">
+      <span class="dim" style="font-size:.86rem">horas de acesso</span>
+      <button class="btn" id="demo-btn" style="margin-left:auto;width:auto;padding:11px 18px">Gerar link</button>
+    </div>
+    <div class="status" id="demo-status" style="margin-top:10px"></div>
   </div></div>
 
   <!-- SHEET CONFIG -->
@@ -652,6 +661,15 @@
   $('nu-btn').onclick=async()=>{const body={nome:$('nu-nome').value.trim(),login:$('nu-login').value.trim(),senha:$('nu-senha').value,papel:$('nu-papel').value};const st=$('nu-status');st.className='status';st.textContent='…';
     const r=await fetch('/api/usuarios',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();
     if(r.ok&&d.ok){st.className='status ok';st.textContent='✓ Criado!';$('nu-nome').value=$('nu-login').value=$('nu-senha').value='';loadUsers();}else{st.className='status err';st.textContent='× '+(d.error||'erro');}};
+  // link de demonstração (admin gera um acesso temporário)
+  if($('demo-btn'))$('demo-btn').onclick=async()=>{
+    const horas=parseInt($('demo-horas').value)||24;const st=$('demo-status');st.className='status';st.textContent='Gerando…';
+    const r=await fetch('/api/demo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({horas})});const d=await r.json();
+    if(r.ok&&d.ok){st.className='status ok';
+      st.innerHTML=`✓ Link válido por <b>${d.horas}h</b> · entra com <b>${d.creditos} créditos</b> de teste:<div style="display:flex;gap:8px;margin-top:8px"><input class="inp" id="demo-url" readonly value="${d.url}" style="font-size:.82rem"><button class="btn sm" id="demo-copy">copiar</button></div>`;
+      $('demo-copy').onclick=()=>{const i=$('demo-url');i.select();try{navigator.clipboard.writeText(i.value);}catch(_){}{}$('demo-copy').textContent='copiado!';setTimeout(()=>$('demo-copy').textContent='copiar',1500);};
+    }else{st.className='status err';st.textContent='× '+(d.error||'erro');}
+  };
 
   // ───── MOTION: scroll-reveal + parallax + topbar ─────
   const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.14,rootMargin:'0px 0px -8% 0px'});

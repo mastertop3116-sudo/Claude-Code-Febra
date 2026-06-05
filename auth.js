@@ -160,7 +160,10 @@ function lerToken(token) {
   try {
     const dados = JSON.parse(Buffer.from(payload, 'base64url').toString());
     if (!dados.exp || dados.exp < Date.now()) return null;
-    return acharPorId(dados.uid) || null;
+    const u = acharPorId(dados.uid);
+    if (!u) return null;
+    if (u.demo && u.expiraEm && u.expiraEm < Date.now()) return null;  // link de demonstração expirou
+    return u;
   } catch (_) { return null; }
 }
 function lerCookie(req, nome) {
@@ -319,6 +322,37 @@ function ativarAcesso({ email, token, senha }) {
   return { ok: true, id: u.id, usuario: publico(u) };
 }
 
+// ── LINK DE DEMONSTRAÇÃO (admin gera; acesso por X horas, sem senha) ──
+// Cria um "visitante" temporário com alguns créditos de teste e um token de
+// acesso. O link /demo?token=… loga essa pessoa e expira sozinho em `horas`.
+function criarDemo({ horas, creditos } = {}) {
+  const h = Math.max(1, Math.min(168, parseInt(horas) || 24));   // 1h … 7 dias (padrão 24h)
+  const cr = (creditos != null && !isNaN(parseInt(creditos)))
+    ? Math.max(0, parseInt(creditos))
+    : (parseInt(process.env.DEMO_CREDITOS) || 6);
+  const lista = usuarios();
+  const id = crypto.randomBytes(6).toString('hex');
+  const token = crypto.randomBytes(16).toString('hex');
+  const u = {
+    id, nome: 'Visitante (demonstração)', login: 'demo_' + id + '@demo.local',
+    papel: 'usuario', salt: '', hash: '',          // sem senha: acesso só pelo link
+    permissoes: { criar: true, atividades: true, matematica: true, usarOpus: true, gerenciarUsuarios: false, verCustos: false },
+    creditos: cr, demo: true, demoToken: token,
+    expiraEm: Date.now() + h * 3600e3,
+    criadoEm: hojeStr(),
+  };
+  lista.push(u); salvarUsuarios(lista);
+  return { ok: true, token, horas: h, creditos: cr, expiraEm: u.expiraEm };
+}
+// Valida o token do link de demonstração (existe e não expirou) → devolve o id pra logar.
+function entrarComDemo(token) {
+  if (!token) return { ok: false, error: 'Link inválido.' };
+  const u = usuarios().find(x => x.demo && x.demoToken === token);
+  if (!u) return { ok: false, error: 'Link de demonstração inválido.' };
+  if (u.expiraEm && u.expiraEm < Date.now()) return { ok: false, error: 'Este link de demonstração expirou.' };
+  return { ok: true, id: u.id };
+}
+
 // ── usuário "público" (sem segredos) ────────────────────────
 function publico(u) {
   return u && { id: u.id, nome: u.nome, login: u.login, papel: u.papel, permissoes: u.permissoes, saldo: saldo(u), senhaPadrao: !!u.senhaPadrao };
@@ -352,4 +386,5 @@ module.exports = {
   saldo, saldoCreditos, consumirGeracao, definirCreditos, custoCreditos, CUSTO_CR, CREDITOS_TRIAL,
   trocarSenha, criarUsuarioPersistido, removerUsuario,
   PACOTES, pacotePorValor, creditarCompra, ativarAcesso,
+  criarDemo, entrarComDemo,
 };
