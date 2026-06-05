@@ -1122,7 +1122,7 @@ async function sugerirPalavras(tema, idioma = 'pt') {
   if (t.length < 2) return [];
   const lng = idioma === 'en' ? 'inglês' : idioma === 'es' ? 'espanhol' : 'português';
   const sistema = 'Você cria listas de palavras para atividades infantis impressas (caça-palavras, ligue, código). Responda SEMPRE só com JSON válido.';
-  const prompt = `Tema: "${t}".\nGere 12 palavras relacionadas a esse tema, boas para crianças, em ${lng}. Cada palavra deve ser UMA só (sem espaços nem hífen), de 3 a 11 letras, e ter uma dica curta (até 6 palavras).\nResponda APENAS: {"palavras":[{"p":"PALAVRA","d":"dica curta"}]} com exatamente 12 itens.`;
+  const prompt = `Tema: "${t}".\nGere 14 palavras para uma atividade INFANTIL (caça-palavras), em ${lng}.\nREGRAS OBRIGATÓRIAS:\n- Cada palavra: UMA só (sem espaços, sem hífen), de 3 a 11 letras.\n- Apenas substantivos simples, comuns e 100% apropriados para CRIANÇAS.\n- PROIBIDO: palavras compostas/abreviadas, gírias, e QUALQUER palavra com duplo sentido ou que possa soar ofensiva/adulta. Na menor dúvida, troque por outra.\n- Cada palavra com uma dica curta (até 6 palavras).\nResponda APENAS: {"palavras":[{"p":"PALAVRA","d":"dica"}]} com 14 itens.`;
   let raw;
   try {
     const Anthropic = require('@anthropic-ai/sdk');
@@ -1149,10 +1149,12 @@ async function sugerirPalavras(tema, idioma = 'pt') {
   let arr = [];
   try { arr = JSON.parse(raw).palavras || []; }
   catch (_) { try { const { jsonrepair } = require('jsonrepair'); arr = JSON.parse(jsonrepair(raw)).palavras || []; } catch (__) { arr = []; } }
+  // PENEIRA DE SEGURANÇA: barra palavrão/duplo sentido mesmo que a IA escorregue (material infantil).
+  const BLOCK = new Set(['PICA','PAU','ROLA','CARALHO','PORRA','BOSTA','MERDA','CU','CUZAO','CUZÃO','BUCETA','BOCETA','XOXOTA','XANA','XERECA','PIROCA','PERERECA','PENIS','PÊNIS','VAGINA','PUTA','PUTO','PUTARIA','VIADO','BICHA','FODA','FODER','GOZADA','PUNHETA','PERIGUETE','VAGABUNDA','PORCARIA','TROUXA']);
   return (Array.isArray(arr) ? arr : []).map(o => ({
     p: String(o.p || o.palavra || '').toUpperCase().replace(/[^A-ZÇÃÕÁÉÍÓÚÂÊÔÀÜÑ]/g, '').slice(0, 14),
     d: String(o.d || o.dica || '').trim().slice(0, 60),
-  })).filter(o => o.p.length >= 2).slice(0, 14);
+  })).filter(o => o.p.length >= 3 && !BLOCK.has(o.p)).slice(0, 12);
 }
 
 module.exports = { executar, renderizarPDF, gerarConteudo, sugerirPalavras, CORES, LABELS };
