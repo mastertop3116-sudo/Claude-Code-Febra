@@ -216,6 +216,12 @@ app.get("/api/estudio/nichos", auth.exigirLogin, (req, res) => {
   } catch (_) { res.json({ nichos: [] }); }
 });
 
+// RANKING "EM ALTA" — nichos quentes (curado + sazonal + uso real). Alimenta o quadro do Estúdio.
+app.get("/api/estudio/em-alta", auth.exigirLogin, (req, res) => {
+  try { res.json(require("./utils/emAlta").ranking(8)); }
+  catch (_) { res.json({ itens: [] }); }
+});
+
 // Roda um gerador (CLI) e devolve o PDF pronto em base64
 function rodarGerador(script, args, pdfPath, res) {
   res.setTimeout(6 * 60 * 1000);

@@ -128,6 +128,25 @@
   .opus-note b{color:var(--ink)}
 
   /* CARDS */
+  /* ── EM ALTA (ranking de nichos quentes) ── */
+  .trend-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+  .trend-head .sub{color:var(--ink-2);font-size:.95rem}
+  .trend-row{display:flex;gap:12px;flex-wrap:wrap}
+  .trend{position:relative;display:flex;align-items:center;gap:11px;padding:11px 15px 11px 11px;background:var(--surface);
+    border:1px solid var(--line);border-radius:16px;cursor:pointer;box-shadow:var(--shadow-1);text-align:left;
+    transition:transform .28s var(--ease),box-shadow .28s var(--ease),border-color .28s}
+  .trend:hover{transform:translateY(-3px);box-shadow:var(--shadow-2);border-color:var(--line-2)}
+  .trend:active{transform:translateY(-1px)}
+  .trend .rk{flex:0 0 auto;width:23px;height:23px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+    font-size:.76rem;font-weight:800;color:var(--ink-2);background:var(--surface-2)}
+  .trend.top1 .rk,.trend.top2 .rk,.trend.top3 .rk{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent-2))}
+  .trend .em{font-size:1.18rem;line-height:1}
+  .trend .bd{display:flex;flex-direction:column;gap:2px;line-height:1.18}
+  .trend .nm{font-weight:700;font-size:.95rem;letter-spacing:-.01em;color:var(--ink)}
+  .trend .tg{font-size:.66rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
+  .trend .tg.hot{color:var(--accent)}
+  .trend .go{flex:0 0 auto;margin-left:1px;font-size:1.1rem;font-weight:700;color:var(--faint);opacity:0;transform:translateX(-5px);transition:opacity .28s,transform .28s}
+  .trend:hover .go{opacity:1;transform:none}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:20px}
   .card{background:var(--surface);border:1px solid var(--line);border-radius:26px;padding:30px;display:flex;flex-direction:column;gap:14px;
     box-shadow:var(--shadow-1);transition:transform .5s var(--ease),box-shadow .5s var(--ease),border-color .5s}
@@ -278,6 +297,15 @@
       </div>
     </section>
 
+    <!-- EM ALTA -->
+    <section id="trend-sec" class="hide">
+      <div class="trend-head r" data-reveal>
+        <h2 data-i18n="trend_h">🔥 Em alta</h2>
+        <span class="sub" data-i18n="trend_sub">o que está vendendo agora — clique e a IA já monta pra você</span>
+      </div>
+      <div class="trend-row r" id="trend-row" data-reveal></div>
+    </section>
+
     <!-- CRIAR -->
     <section>
       <div class="sec-head r" data-reveal><h2 data-i18n="create_h">O que você quer criar hoje</h2></div>
@@ -425,6 +453,7 @@
   const I18N={
     pt:{tip_title:'Dica de infoproduto',model_h:'Como a IA vai escrever o e-book',model_gpt:'GPT',model_opus:'Opus',opus_tag:'custo real',
       opus_warn:'O Opus tem custo real — cada criação usa seu crédito. Para testar, fique no GPT.',
+      trend_h:'🔥 Em alta',trend_sub:'o que está vendendo agora — clique e a IA já monta pra você',
       create_h:'O que você quer criar hoje',free:'grátis',atv_title:'Pack de Atividades',atv_desc:'+100 atividades printáveis com gabarito — caça-palavras, labirinto, ligue, código, desembaralhe. Qualquer tema.',
       theme:'Tema',new_theme_name:'Nome do tema',ai_fill:'✨ Preencher palavras com a IA',new_theme_ph:'ex: Animais, Folclore, Inglês Kids',words:'Palavras (uma por linha — PALAVRA: dica)',words_hint:'Mínimo 8 palavras.',qty:'Quantidade',gen_pdf:'Gerar PDF',
       mat_title:'Pack de Matemática',mat_desc:'+100 contas de verdade com gabarito conferido: somar, subtrair, tabuada, ligar resultado, sequência, maior/menor.',
@@ -451,6 +480,7 @@
         'O criativo campeão não se troca: escale o vencedor e varie só o gancho.']},
     en:{tip_title:'Infoproduct tip',model_h:'How AI will write the e-book',model_gpt:'GPT',model_opus:'Opus',opus_tag:'real cost',
       opus_warn:'Opus has a real cost — each creation uses your credit. To test, stay on GPT.',
+      trend_h:'🔥 Trending',trend_sub:'selling right now — click and the AI builds it for you',
       create_h:'What do you want to create today',free:'free',atv_title:'Activity Pack',atv_desc:'+100 printable activities with answer key — word search, maze, match, code, unscramble. Any theme.',
       theme:'Theme',new_theme_name:'Theme name',ai_fill:'✨ Fill the words with AI',new_theme_ph:'e.g. Animals, Folklore, Kids English',words:'Words (one per line — WORD: hint)',words_hint:'At least 8 words.',qty:'Quantity',gen_pdf:'Generate PDF',
       mat_title:'Math Pack',mat_desc:'+100 real math problems with checked answer key: add, subtract, times tables, match result, sequences, greater/less.',
@@ -477,6 +507,7 @@
         'The winning creative isn’t swapped: scale the champion and vary only the hook.']},
     es:{tip_title:'Consejo de infoproducto',model_h:'Cómo escribirá la IA el e-book',model_gpt:'GPT',model_opus:'Opus',opus_tag:'costo real',
       opus_warn:'Opus tiene costo real — cada creación usa tu crédito. Para probar, quédate en GPT.',
+      trend_h:'🔥 En alza',trend_sub:'lo que se vende ahora — haz clic y la IA lo arma por ti',
       create_h:'Qué quieres crear hoy',free:'gratis',atv_title:'Pack de Actividades',atv_desc:'+100 actividades imprimibles con solucionario — sopa de letras, laberinto, unir, código, descifrar. Cualquier tema.',
       theme:'Tema',new_theme_name:'Nombre del tema',ai_fill:'✨ Rellenar las palabras con IA',new_theme_ph:'ej: Animales, Folclore, Inglés Kids',words:'Palabras (una por línea — PALABRA: pista)',words_hint:'Mínimo 8 palabras.',qty:'Cantidad',gen_pdf:'Generar PDF',
       mat_title:'Pack de Matemáticas',mat_desc:'+100 cuentas de verdad con solucionario: sumar, restar, tablas, unir resultado, secuencias, mayor/menor.',
@@ -574,6 +605,25 @@
     (d.nichos||[]).forEach(n=>{const o=document.createElement('option');o.value=n.id;o.textContent=n.nome;sel.appendChild(o);});
     const o=document.createElement('option');o.value='__novo__';o.textContent='＋ '+(LANG==='en'?'New theme…':LANG==='es'?'Tema nuevo…':'Criar tema novo…');sel.appendChild(o);
     sel.onchange=()=>$('novo-wrap').classList.toggle('hide',sel.value!=='__novo__');});
+  // ───── EM ALTA (ranking de nichos quentes) ─────
+  const TREND_TAGS={temporada:{pt:'da temporada',en:'in season',es:'de temporada',hot:true},campeao:{pt:'campeão',en:'top pick',es:'campeón',hot:true},quente:{pt:'em alta',en:'hot',es:'en alza',hot:false},novo:{pt:'🆕 novo',en:'🆕 new',es:'🆕 nuevo',hot:false}};
+  function trendEsc(s){return String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));}
+  function trendTag(it){
+    if(it.tag==='em_alta'&&it.n){const w=LANG==='en'?'this week':'esta semana';return{txt:'🔥 '+it.n+' '+w,hot:true};}
+    const d=TREND_TAGS[it.tag]||TREND_TAGS.quente;return{txt:(d[LANG]||d.pt),hot:!!d.hot};}
+  function trendIrAtividades(nome){
+    const sel=$('atv-nicho');if(sel){sel.value='__novo__';$('novo-wrap').classList.remove('hide');}
+    $('novo-nome').value=nome;const card=sel&&sel.closest('.card');if(card)card.scrollIntoView({behavior:'smooth',block:'center'});
+    setTimeout(()=>{if($('atv-sugerir'))$('atv-sugerir').click();},520);}
+  function trendIrMatematica(){const c=$('mat-qtd')&&$('mat-qtd').closest('.card');if(c)c.scrollIntoView({behavior:'smooth',block:'center'});}
+  window.__renderEmAlta=function(d){
+    const row=$('trend-row'),sec=$('trend-sec');if(!row||!sec)return;
+    const itens=(d&&d.itens)||[];if(!itens.length){sec.classList.add('hide');return;}
+    row.innerHTML=itens.map((it,i)=>{const tg=trendTag(it),top=i<3?(' top'+(i+1)):'';
+      return '<button class="trend'+top+'" data-i="'+i+'"><span class="rk">'+(i+1)+'</span><span class="em">'+(it.emoji||'✨')+'</span><span class="bd"><span class="nm">'+trendEsc(it.nome)+'</span><span class="tg'+(tg.hot?' hot':'')+'">'+trendEsc(tg.txt)+'</span></span><span class="go">›</span></button>';}).join('');
+    row.querySelectorAll('.trend').forEach(b=>b.onclick=()=>{const it=itens[+b.dataset.i];if(!it)return;if(it.acao==='matematica')trendIrMatematica();else trendIrAtividades(it.nome);});
+    sec.classList.remove('hide');sec.querySelectorAll('.r').forEach(el=>el.classList.add('in'));};
+  fetch('/api/estudio/em-alta').then(r=>r.json()).then(d=>{window.__emAltaData=d;window.__renderEmAlta(d);}).catch(()=>{});
   // ───── gerar ─────
   function baixar(b,n){const a=document.createElement('a');a.href='data:application/pdf;base64,'+b;a.download=n;a.click();}
   async function refreshUso(){try{const o=await(await fetch('/api/estudio/uso')).json();if(o&&(o.creditos!=null||o.ilimitado)){USO=o;renderSaldo();}}catch(_){}}
@@ -621,7 +671,7 @@
   $('btn-set').onclick=()=>$('sheet').classList.add('show');
   $('set-close').onclick=()=>$('sheet').classList.remove('show');
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.ov.show').forEach(o=>o.classList.remove('show'));$('sheet').classList.remove('show');}});
-  $('lang-opts').querySelectorAll('.opt').forEach(o=>o.onclick=()=>{LANG=o.dataset.lang;localStorage.setItem('max_lang',LANG);markLang();applyI18n();});
+  $('lang-opts').querySelectorAll('.opt').forEach(o=>o.onclick=()=>{LANG=o.dataset.lang;localStorage.setItem('max_lang',LANG);markLang();applyI18n();if(window.__emAltaData&&window.__renderEmAlta)window.__renderEmAlta(window.__emAltaData);});
   function markLang(){$('lang-opts').querySelectorAll('.opt').forEach(o=>o.classList.toggle('on',o.dataset.lang===LANG));}
   $('accent-opts').querySelectorAll('.swatch').forEach(s=>s.onclick=()=>{CFG.ac=s.dataset.ac;saveCfg();applyCfg();});
   $('sw-theme').onclick=()=>{CFG.dark=!CFG.dark;saveCfg();applyCfg();};
