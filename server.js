@@ -314,6 +314,8 @@ app.post("/api/estudio/ebook", auth.exigirLogin, async (req, res) => {
   // Imagens ilustradas por IA (opcional, +créditos a 3/imagem). 'capa' = 1 imagem; 'total' = capa + 4 capítulos = 5 imagens.
   const ILUS = ["nenhuma", "capa", "total"];
   const ilustracao = ILUS.includes(b.ilustracao) ? b.ilustracao : "nenhuma";
+  const EST = ["auto", "jovem", "adulto", "premium"];
+  const estilo = EST.includes(b.estilo) ? b.estilo : "auto";   // estilo visual escolhido pelo lead
   const CR_POR_IMG = 3;
   const nImgs = ilustracao === "total" ? 5 : ilustracao === "capa" ? 1 : 0;
   const extraCred = nImgs * CR_POR_IMG;   // capa=3, total=15
@@ -335,7 +337,7 @@ app.post("/api/estudio/ebook", auth.exigirLogin, async (req, res) => {
       if (Array.isArray(retry.capitulos) && retry.capitulos.length > (conteudo.capitulos || []).length) conteudo = retry;
     }
     conteudo.idioma = idioma;   // o template usa pra traduzir os rótulos fixos (Capítulo, Sumário...)
-    const { pdfBuffer, imagensIA } = await eng.renderizarPDF(conteudo, { tipo: "ebook", nicho: tema, tema, autor, imagemIA: ilustracao !== "nenhuma", ilustrarCapitulos: ilustracao === "total" ? 4 : 0 });
+    const { pdfBuffer, imagensIA } = await eng.renderizarPDF(conteudo, { tipo: "ebook", nicho: tema, tema, autor, estilo, imagemIA: ilustracao !== "nenhuma", ilustrarCapitulos: ilustracao === "total" ? 4 : 0 });
     // Reembolsa as imagens ilustradas que NÃO saíram (ex: IA de imagem fora do ar): o cliente só paga o que recebeu.
     if (!cota.ilimitado && nImgs > 0) {
       const faltaram = Math.max(0, nImgs - (imagensIA || 0));

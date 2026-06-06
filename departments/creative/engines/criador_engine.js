@@ -178,6 +178,14 @@ const CORES = {
   debate_politico:   { primaria: '#1d4ed8', secundaria: '#93c5fd', bg: '#020b1a' },
 };
 
+// ── Estilo visual ESCOLHIDO PELO LEAD (sobrepõe a cor automática do nicho) ──
+// O cliente conhece o público dele: tema de finanças, mas público jovem? Ele escolhe "jovem".
+const ESTILO_PALETAS = {
+  jovem:   { primaria: '#6d28d9', secundaria: '#a78bfa', bg: '#160f2e' }, // vibrante, descolado
+  adulto:  { primaria: '#245574', secundaria: '#7fb0cc', bg: '#0d1b26' }, // profissional, sóbrio
+  premium: { primaria: '#b0852f', secundaria: '#e0c477', bg: '#1a1611' }, // elegante, dourado
+};
+
 // ── Cores por FAIXA (graduação) — pinta a página inteira na cor da faixa ──
 // Cada entrada: primaria (cor forte p/ títulos/destaques), secundaria (clara p/ degradês), rotulo (nome exibido).
 const PALETAS_FAIXA = {
@@ -824,7 +832,8 @@ async function renderizarPDF(conteudo, params) {
   const { tipo, nicho } = params;
   // FAIXA tem prioridade: se vier uma faixa (param ou conteúdo), a página inteira usa a cor dela.
   const _faixa = paletaFaixa(params.faixa || conteudo.faixa);
-  const cores = _faixa || detectarPaletaNicho(nicho) || CORES[tipo] || CORES.ebook;
+  const _estilo = ESTILO_PALETAS[params.estilo];  // escolha explícita do lead vence a cor automática
+  const cores = _estilo || _faixa || detectarPaletaNicho(nicho) || CORES[tipo] || CORES.ebook;
 
   const templateFile = TIPOS_KIDS.includes(tipo) ? TEMPLATE_KIDS_PATH : TEMPLATE_PATH;
   const templateHtml = fs.readFileSync(templateFile, 'utf8');

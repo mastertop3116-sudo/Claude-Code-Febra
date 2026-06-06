@@ -365,6 +365,13 @@
               <option value="capa" data-i18n="ilus_capa">Capa ilustrada — +3 créditos</option>
               <option value="total" data-i18n="ilus_total">Totalmente ilustrado — +15 créditos</option>
             </select></div>
+          <div><label class="field-label" data-i18n="ebook_estilo">🖌️ Estilo visual (escolha pelo seu público)</label>
+            <select id="eb-estilo">
+              <option value="auto" data-i18n="estilo_auto">Automático — combina com o tema</option>
+              <option value="jovem" data-i18n="estilo_jovem">Jovem — vibrante e descolado</option>
+              <option value="adulto" data-i18n="estilo_adulto">Adulto — profissional e sóbrio</option>
+              <option value="premium" data-i18n="estilo_premium">Premium — elegante e sofisticado</option>
+            </select></div>
           <div><label class="field-label" data-i18n="model_h">Como a IA vai escrever o e-book</label>
             <div class="seg" id="seg"><div class="thumb"></div><button data-m="gpt" class="on" data-i18n="model_gpt">GPT</button><button data-m="opus" data-i18n="model_opus">Opus</button></div>
             <div class="opus-note" id="opus-note"><span class="pill" data-i18n="opus_tag">custo real</span><span><span data-i18n="opus_warn">O Opus tem custo real — cada criação usa seu crédito. Para testar, fique no GPT (grátis).</span> <b id="opus-lim"></b></span></div>
@@ -494,6 +501,7 @@
       trend_h:'🔥 Em alta',trend_sub:'o que está vendendo agora — clique e a IA já monta pra você',
       ex_h:'Veja o que dá pra criar',ex_sub:'páginas de verdade do que sai daqui — e-book, atividades, dinâmicas e guias prontos pra vender',
       ebook_ilus:'🎨 Imagens ilustradas (IA)',ilus_none:'Banco de imagens — grátis',ilus_capa:'Capa ilustrada — +3 créditos',ilus_total:'Totalmente ilustrado — +15 créditos',
+      ebook_estilo:'🖌️ Estilo visual (escolha pelo seu público)',estilo_auto:'Automático — combina com o tema',estilo_jovem:'Jovem — vibrante e descolado',estilo_adulto:'Adulto — profissional e sóbrio',estilo_premium:'Premium — elegante e sofisticado',
       credits:'créditos',buy_credits:'Comprar créditos',
       create_h:'O que você quer criar hoje',free:'grátis',atv_title:'Pack de Atividades',atv_desc:'+100 atividades printáveis com gabarito — caça-palavras, labirinto, ligue, código, desembaralhe. Qualquer tema.',
       theme:'Tema',new_theme_name:'Nome do tema',ai_fill:'✨ Preencher palavras com a IA',new_theme_ph:'ex: Animais, Folclore, Inglês Kids',words:'Palavras (uma por linha — PALAVRA: dica)',words_hint:'Mínimo 8 palavras.',qty:'Quantidade',gen_pdf:'Gerar PDF',
@@ -524,6 +532,7 @@
       trend_h:'🔥 Trending',trend_sub:'selling right now — click and the AI builds it for you',
       ex_h:'See what you can create',ex_sub:'real inside pages of what comes out — e-books, activities and guides ready to sell',
       ebook_ilus:'🎨 AI illustrated images',ilus_none:'Stock images — free',ilus_capa:'Illustrated cover — +3 credits',ilus_total:'Fully illustrated — +15 credits',
+      ebook_estilo:'🖌️ Visual style (pick by your audience)',estilo_auto:'Automatic — matches the theme',estilo_jovem:'Young — vibrant and bold',estilo_adulto:'Adult — professional and sober',estilo_premium:'Premium — elegant and refined',
       credits:'credits',buy_credits:'Buy credits',
       create_h:'What do you want to create today',free:'free',atv_title:'Activity Pack',atv_desc:'+100 printable activities with answer key — word search, maze, match, code, unscramble. Any theme.',
       theme:'Theme',new_theme_name:'Theme name',ai_fill:'✨ Fill the words with AI',new_theme_ph:'e.g. Animals, Folklore, Kids English',words:'Words (one per line — WORD: hint)',words_hint:'At least 8 words.',qty:'Quantity',gen_pdf:'Generate PDF',
@@ -554,6 +563,7 @@
       trend_h:'🔥 En alza',trend_sub:'lo que se vende ahora — haz clic y la IA lo arma por ti',
       ex_h:'Mira lo que puedes crear',ex_sub:'páginas reales de lo que sale de aquí — e-books, actividades y guías listos para vender',
       ebook_ilus:'🎨 Imágenes ilustradas (IA)',ilus_none:'Banco de imágenes — gratis',ilus_capa:'Portada ilustrada — +3 créditos',ilus_total:'Totalmente ilustrado — +15 créditos',
+      ebook_estilo:'🖌️ Estilo visual (elige por tu público)',estilo_auto:'Automático — combina con el tema',estilo_jovem:'Joven — vibrante y desenfadado',estilo_adulto:'Adulto — profesional y sobrio',estilo_premium:'Premium — elegante y sofisticado',
       credits:'créditos',buy_credits:'Comprar créditos',
       create_h:'Qué quieres crear hoy',free:'gratis',atv_title:'Pack de Actividades',atv_desc:'+100 actividades imprimibles con solucionario — sopa de letras, laberinto, unir, código, descifrar. Cualquier tema.',
       theme:'Tema',new_theme_name:'Nombre del tema',ai_fill:'✨ Rellenar las palabras con IA',new_theme_ph:'ej: Animales, Folclore, Inglés Kids',words:'Palabras (una por línea — PALABRA: pista)',words_hint:'Mínimo 8 palabras.',qty:'Cantidad',gen_pdf:'Generar PDF',
@@ -707,7 +717,7 @@
     if(tema.length<3){st.className='status err';st.textContent='× '+(LANG==='en'?'Say what the e-book is about.':LANG==='es'?'Di de qué trata el ebook.':'Diga sobre o que é o e-book.');return;}
     const _custo=custoDe(MODELO);
     if(USO&&!USO.ilimitado&&(USO.creditos||0)<_custo){st.className='status err';st.textContent='× '+(LANG==='en'?'Not enough credits ('+_custo+' needed, you have '+(USO.creditos||0)+').':LANG==='es'?'Créditos insuficientes ('+_custo+', tienes '+(USO.creditos||0)+').':'Créditos insuficientes (precisa '+_custo+', você tem '+(USO.creditos||0)+'). Compre mais pra continuar.');return;}
-    const body={tema,publico:$('eb-publico').value.trim(),tom:$('eb-tom').value,extensao:$('eb-ext').value,idioma:$('eb-idioma').value,modelo:MODELO,ilustracao:$('eb-ilustracao').value};
+    const body={tema,publico:$('eb-publico').value.trim(),tom:$('eb-tom').value,extensao:$('eb-ext').value,idioma:$('eb-idioma').value,modelo:MODELO,ilustracao:$('eb-ilustracao').value,estilo:$('eb-estilo').value};
     gerar('/api/estudio/ebook',body,st,$('eb-btn'),(LANG==='en'?'Writing your e-book…':LANG==='es'?'Escribiendo tu ebook…':'Escrevendo seu e-book…'));};
   $('cat-btn').onclick=()=>window.open('/estudio/catalogo','_blank');
   // ───── modais / sheet ─────
