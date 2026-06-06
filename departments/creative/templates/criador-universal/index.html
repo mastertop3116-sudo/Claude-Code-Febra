@@ -666,6 +666,20 @@ body {
   line-height: 1.62;
 }
 
+/* ── BLOCO "FAÇA AGORA" — ação em destaque forte (quebra a monotonia das caixas) ── */
+.act-card {
+  margin: 6mm 0; padding: 5mm 7mm; border-radius: 3mm; position: relative; overflow: hidden;
+  background: linear-gradient(150deg, var(--p, #6366f1), color-mix(in srgb, var(--p, #6366f1) 66%, #000));
+  color: #fff;
+}
+.act-card .act-tag { font-family:'Montserrat',sans-serif; font-size:6.5pt; font-weight:800; letter-spacing:2px; text-transform:uppercase; opacity:.82; }
+.act-card .act-b   { font-family:'Inter',sans-serif; font-size:10pt; font-weight:600; line-height:1.5; margin-top:1.8mm; color:#fff; position:relative; }
+.act-card .act-ghost { position:absolute; right:4mm; bottom:-9mm; font-family:'Playfair Display',serif; font-size:52pt; opacity:.13; line-height:1; }
+
+/* ── DUAS COLUNAS lado a lado (quebra a verticalidade das caixas empilhadas) ── */
+.duo { display:flex; gap:5mm; align-items:stretch; margin:0; }
+.duo > .cbox { flex:1; margin:0; }
+
 /* ── PONTOS-CHAVE — badges numerados ── */
 .kp-label {
   font-family: 'Montserrat', sans-serif;
@@ -1536,9 +1550,16 @@ body {
           </div>
         </div>`;
       }
-      // 1 capítulo = 1 página CHEIA. Curamos os blocos visuais (máx ~1 destaque grande)
-      // pra encher a página sem estourar e deixar páginas quase em branco.
+      // COMPOSIÇÃO VARIADA: alterna a cada capítulo pra nenhuma página ficar igual à outra.
+      // Aproveita citacao (citação) e atencao (erro comum) — que o motor gera e o template NÃO usava.
       const visual = boxEquacao(c.equacao) || boxContraste(c.contraste) || boxSteps(c.steps_visuais);
+      const quote  = c.citacao ? `<div class="quote"><div class="quote-text">${esc(c.citacao)}</div></div>` : '';
+      const acao   = c.acao_pratica ? `<div class="act-card"><div class="act-ghost">→</div><div class="act-tag">${L.pratica}</div><div class="act-b">${esc(c.acao_pratica)}</div></div>` : '';
+      const kp     = (c.pontos_chave||[]).length ? `<div class="kp-label">${L.pontos}</div><ul class="kp-list">${(c.pontos_chave||[]).map(p=>`<li>${esc(p)}</li>`).join('')}</ul>` : '';
+      // par: bloco visual + exemplo & dica lado a lado.  ímpar: citação grande + erro comum.
+      const corpo = (i % 2 === 0)
+        ? `${visual}<div class="duo">${boxExemplo(c.exemplo_real)}${boxDica(c.dica)}</div>${acao}${kp}`
+        : `${quote || visual}${boxAtencao(c.atencao)}${acao}${kp}`;
       html += `<div class="page">
         ${pgHeader(L.cap+' '+(c.numero||i+1))}
         <div class="sec-header">
@@ -1548,14 +1569,7 @@ body {
         </div>
         <div class="pg-body">
           <div class="texto">${paras(c.conteudo||'')}</div>
-          ${visual}
-          ${boxExemplo(c.exemplo_real)}
-          ${boxPratica(c.acao_pratica)}
-          ${boxDica(c.dica)}
-          ${(c.pontos_chave||[]).length?`
-            <div class="kp-label">${L.pontos}</div>
-            <ul class="kp-list">${(c.pontos_chave||[]).map(p=>`<li>${esc(p)}</li>`).join('')}</ul>
-          `:''}
+          ${corpo}
         </div>
         ${footer()}
       </div>`;
