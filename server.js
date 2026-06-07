@@ -316,6 +316,8 @@ app.post("/api/estudio/ebook", auth.exigirLogin, async (req, res) => {
   const ilustracao = ILUS.includes(b.ilustracao) ? b.ilustracao : "nenhuma";
   const EST = ["auto", "jovem", "adulto", "premium"];
   const estilo = EST.includes(b.estilo) ? b.estilo : "auto";   // estilo visual escolhido pelo lead
+  const CORES_OK = ["verde", "azul", "laranja", "rosa", "roxo", "vermelho", "turquesa", "dourado", "grafite"];
+  const cor = CORES_OK.includes(b.cor) ? b.cor : null;          // cor escolhida na mão (vence a automática); vazio = automática
   // FORMATO: "premium" = e-book premium ILUSTRADO (qualquer nicho, cor pelo nicho, pessoa na capa).
   // Uma faixa de jiu-jitsu = premium + mascote daquela faixa (só pra quem faz jiu-jitsu). Usa mascote, não IA de imagem.
   const FAIXAS = ["branca", "cinza", "amarela", "laranja", "verde", "azul", "roxa", "marrom", "preta", "vermelha"];
@@ -347,9 +349,9 @@ app.post("/api/estudio/ebook", auth.exigirLogin, async (req, res) => {
     if (premium) {
       // E-BOOK PREMIUM ILUSTRADO: enriquece (passo a passo + o que observar) e renderiza no padrão aprovado.
       conteudo = await eng.enriquecerEbookPremium(conteudo, { nicho: tema, autor, modelo });
-      ({ pdfBuffer } = await eng.renderizarEbookPremium(conteudo, { faixa, estilo, nicho: tema, publico, autor }));
+      ({ pdfBuffer } = await eng.renderizarEbookPremium(conteudo, { faixa, estilo, cor, nicho: tema, publico, autor }));
     } else {
-      ({ pdfBuffer, imagensIA } = await eng.renderizarPDF(conteudo, { tipo: "ebook", nicho: tema, tema, autor, estilo, imagemIA: ilustracao !== "nenhuma", ilustrarCapitulos: ilustracao === "total" ? 4 : 0 }));
+      ({ pdfBuffer, imagensIA } = await eng.renderizarPDF(conteudo, { tipo: "ebook", nicho: tema, tema, autor, estilo, cor, imagemIA: ilustracao !== "nenhuma", ilustrarCapitulos: ilustracao === "total" ? 4 : 0 }));
     }
     // Reembolsa as imagens ilustradas que NÃO saíram (ex: IA de imagem fora do ar): o cliente só paga o que recebeu.
     if (!cota.ilimitado && nImgs > 0) {

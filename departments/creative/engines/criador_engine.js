@@ -186,6 +186,19 @@ const ESTILO_PALETAS = {
   premium: { primaria: '#b0852f', secundaria: '#e0c477', bg: '#1a1611' }, // elegante, dourado
 };
 
+// Cores que o CLIENTE pode escolher na mão (vence a cor automática do nicho). Cada uma já é um par bonito.
+const PALETAS_COR = {
+  verde:    { primaria: '#10b981', secundaria: '#6ee7b7', bg: '#051a10' },
+  azul:     { primaria: '#2563eb', secundaria: '#93c5fd', bg: '#070f18' },
+  laranja:  { primaria: '#ea580c', secundaria: '#fdba74', bg: '#180a00' },
+  rosa:     { primaria: '#ec4899', secundaria: '#f9a8d4', bg: '#180710' },
+  roxo:     { primaria: '#7c3aed', secundaria: '#c4b5fd', bg: '#0d0718' },
+  vermelho: { primaria: '#e11d48', secundaria: '#fda4af', bg: '#180309' },
+  turquesa: { primaria: '#0d9488', secundaria: '#5eead4', bg: '#031412' },
+  dourado:  { primaria: '#b0852f', secundaria: '#e0c477', bg: '#1a1611' },
+  grafite:  { primaria: '#334155', secundaria: '#94a3b8', bg: '#0a0c10' },
+};
+
 // ── Cores por FAIXA (graduação) — pinta a página inteira na cor da faixa ──
 // Cada entrada: primaria (cor forte p/ títulos/destaques), secundaria (clara p/ degradês), rotulo (nome exibido).
 const PALETAS_FAIXA = {
@@ -867,7 +880,7 @@ async function renderizarPDF(conteudo, params) {
   // FAIXA tem prioridade: se vier uma faixa (param ou conteúdo), a página inteira usa a cor dela.
   const _faixa = paletaFaixa(params.faixa || conteudo.faixa);
   const _estilo = ESTILO_PALETAS[params.estilo];  // escolha explícita do lead vence a cor automática
-  const cores = _estilo || _faixa || detectarPaletaNicho(nicho) || CORES[tipo] || CORES.ebook;
+  const cores = PALETAS_COR[params.cor] || _estilo || _faixa || detectarPaletaNicho(nicho) || CORES[tipo] || CORES.ebook;
 
   const templateFile = TIPOS_KIDS.includes(tipo) ? TEMPLATE_KIDS_PATH : TEMPLATE_PATH;
   const templateHtml = fs.readFileSync(templateFile, 'utf8');
@@ -1133,7 +1146,7 @@ async function renderizarEbookPremium(conteudo, params) {
   const { montarHtml } = require('../templates/criador-ebook-premium/montar');
   // COR pelo nicho (genérico): estilo escolhido > faixa (jiu-jitsu) > detecção pelo nicho > padrão.
   const _faixa = paletaFaixa(params.faixa);
-  const cores = ESTILO_PALETAS[params.estilo] || _faixa || detectarPaletaNicho(params.nicho) || CORES.ebook;
+  const cores = PALETAS_COR[params.cor] || ESTILO_PALETAS[params.estilo] || _faixa || detectarPaletaNicho(params.nicho) || CORES.ebook;
   const html = montarHtml(conteudo, {
     cores,
     faixa: _faixa ? _faixa.chave : null,   // mascote SÓ quando faixa de jiu-jitsu escolhida
