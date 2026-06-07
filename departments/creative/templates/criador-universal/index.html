@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Marcellus&family=Fraunces:opsz,ital,wght@9..144,0,400;9..144,0,600;9..144,0,900;9..144,1,500&display=swap" rel="stylesheet">
 <style>
 @page { size: A4; margin: 0; }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1014,10 +1015,13 @@ body {
 
 /* ══════════════════════ INTRO PAGE ══════════════════════ */
 .intro-page {
-  padding: 0 16mm 14mm 20mm;
+  padding: 18mm 16mm 16mm 20mm;   /* topo reserva espaço pro cabeçalho fixo */
   display: flex;
   flex-direction: column;
+  justify-content: center;         /* conteúdo no centro vertical → nunca "abandonado" embaixo */
 }
+/* nas páginas-abertura o cabeçalho vai pro topo (fixo) p/ o conteúdo poder centralizar */
+.intro-page > .pg-header { position: absolute; top: 0; left: 0; right: 0; }
 .intro-label {
   font-family: 'Montserrat', sans-serif;
   font-size: 7pt; font-weight: 700;
@@ -1037,71 +1041,232 @@ body {
 }
 .intro-texto p { margin-bottom: 3mm; }
 
-/* ══════════════════════ CONTRACAPA ══════════════════════ */
+/* ══════════════════════ CAPA v4 — EDITORIAL PREMIUM (Dark / Metálico) ══════════════════════ */
+/* Capa tipográfica de luxo. Dark = padrão (puxa a cor do tema); Metálico = estilo "premium". */
+.cv-cover {
+  width: 210mm;
+  min-height: 297mm;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ───────── DARK SOFISTICADO (padrão, cor do tema) ───────── */
+.cv-dark {
+  background:
+    radial-gradient(90% 70% at 50% 16%,
+      color-mix(in srgb, var(--p, #57c79a) 26%, var(--bg, #0b1512)) 0%,
+      var(--bg, #0b1512) 54%,
+      color-mix(in srgb, #000 55%, var(--bg, #0b1512)) 100%);
+}
+.cv-dark-glow {
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(circle at 50% 19%,
+    color-mix(in srgb, var(--p, #57c79a) 26%, transparent) 0%, transparent 46%);
+}
+.cv-dark-grid {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0.4;
+  background-image: radial-gradient(rgba(255,255,255,0.05) 0.4mm, transparent 0.4mm);
+  background-size: 6.9mm 6.9mm;
+}
+.cv-dark-in {
+  position: relative; z-index: 5; flex: 1;
+  display: flex; flex-direction: column;
+  padding: 22mm 18mm 20mm;
+}
+.cv-dark-head { display: flex; align-items: center; gap: 6mm; }
+.cv-dark .d-mark {
+  width: 15mm; height: 15mm; border-radius: 50%;
+  border: 0.6mm solid color-mix(in srgb, var(--p, #57c79a) 78%, transparent);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Marcellus', serif; font-size: 18pt;
+  color: color-mix(in srgb, var(--p, #57c79a) 88%, #fff);
+  flex-shrink: 0;
+}
+.cv-dark .d-eyebrow {
+  font-family: 'Marcellus', serif; font-size: 10.5pt;
+  letter-spacing: 5px; text-transform: uppercase;
+  color: color-mix(in srgb, var(--p, #57c79a) 85%, #fff);
+}
+.cv-dark-body { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; }
+.cv-dark .d-kicker {
+  font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-size: 15pt; color: color-mix(in srgb, var(--s, #bcc9c2) 80%, #fff);
+  margin-bottom: 6mm; letter-spacing: 0.3px;
+}
+.cv-dark .d-title {
+  font-family: 'Marcellus', serif; font-weight: 400;
+  font-size: 42pt; line-height: 1.1;
+  color: #f4f1ea; letter-spacing: 0.2px;
+}
+.cv-dark .d-line {
+  width: 21mm; height: 0.4mm; margin: 8mm 0 6mm;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--p, #57c79a) 90%, transparent), transparent);
+}
+.cv-dark .d-sub {
+  font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-size: 16.5pt; line-height: 1.45;
+  color: color-mix(in srgb, var(--s, #bcc9c2) 60%, #fff);
+  max-width: 150mm;
+}
+.cv-dark-foot {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-top: 16mm;
+  border-top: 0.3mm solid rgba(255,255,255,0.1);
+  padding-top: 6mm;
+}
+.cv-dark .d-author {
+  font-family: 'Marcellus', serif; font-size: 9.75pt;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: color-mix(in srgb, var(--s, #8aa39a) 55%, #fff);
+}
+.cv-dark .d-year {
+  font-family: 'Marcellus', serif; font-size: 8pt;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.28);
+}
+
+/* ───────── METÁLICO + OURO (estilo premium) ───────── */
+.cv-metal {
+  background:
+    radial-gradient(130% 80% at 50% -8%, rgba(255,255,255,0.12), transparent 52%),
+    linear-gradient(100deg, rgba(255,255,255,0.06) 0%, transparent 24%,
+      rgba(0,0,0,0.28) 50%, transparent 73%, rgba(255,255,255,0.05) 100%),
+    repeating-linear-gradient(100deg, #2f3338 0px, #3b3f46 1.5px, #2b2e33 3px),
+    linear-gradient(160deg, #41454c, #191b1f);
+}
+.cv-metal-frame {
+  position: absolute; inset: 11mm; pointer-events: none;
+  border: 0.4mm solid rgba(203,161,74,0.45);
+}
+.cv-metal-frame::after {
+  content: ''; position: absolute; inset: 1.8mm;
+  border: 0.2mm solid rgba(203,161,74,0.28);
+}
+.cv-metal-in {
+  position: relative; z-index: 5; flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 30mm 24mm;
+}
+.cv-metal .m-eyebrow {
+  font-family: 'Cinzel', serif; font-weight: 700;
+  font-size: 10.5pt; letter-spacing: 6px; text-transform: uppercase;
+  color: #cda14a; margin-bottom: 4mm;
+}
+.cv-metal .m-kicker {
+  font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-size: 14pt; color: #cfc8bb; margin-bottom: 8mm;
+}
+.cv-metal .m-title {
+  font-family: 'Cinzel', serif; font-weight: 900;
+  font-size: 39pt; line-height: 1.14;
+  background: linear-gradient(180deg, #fbe6ac 0%, #cda14a 44%, #9a7327 56%, #f4dd97 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.cv-metal .m-rule {
+  width: 17mm; height: 0.5mm; margin: 8mm 0;
+  background: linear-gradient(90deg, transparent, #cda14a, transparent);
+}
+.cv-metal .m-sub {
+  font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-size: 15.75pt; line-height: 1.5; color: #cfc8bb; max-width: 140mm;
+}
+.cv-metal .m-author {
+  position: absolute; bottom: 18mm; left: 0; right: 0; text-align: center;
+  font-family: 'Cinzel', serif; font-weight: 500;
+  font-size: 9.75pt; letter-spacing: 4px; text-transform: uppercase;
+  color: rgba(207,200,187,0.7);
+}
+
+/* ══════════════════════ CONTRACAPA (mesmo kit visual da capa) ══════════════════════ */
 .contracapa {
   width: 210mm;
   min-height: 297mm;
-  background: #0a0a18;
+  /* mesmo degradê quente da capa — usa as cores do tema (não navy fixo) */
+  background: linear-gradient(165deg,
+    color-mix(in srgb, var(--p, #6366f1) 16%, var(--bg, #0f0e1f)) 0%,
+    var(--bg, #0f0e1f) 70%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 16mm;
+  padding: 24mm 22mm;
   position: relative;
+  overflow: hidden;
 }
-.contracapa-top-bar {
+/* brilho quente suave (mesma temperatura da capa) */
+.contracapa-glow {
   position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3mm;
-  background: linear-gradient(90deg, var(--p, #6366f1), var(--s, #818cf8), #22d3a5);
+  width: 150mm; height: 150mm; border-radius: 50%;
+  top: -42mm; right: -52mm;
+  background: radial-gradient(circle, color-mix(in srgb, var(--s, #818cf8) 18%, transparent) 0%, transparent 66%);
+  pointer-events: none;
 }
-.contracapa-circle {
-  position: absolute;
-  bottom: -30mm; right: -20mm;
-  width: 100mm; height: 100mm;
-  border-radius: 50%;
-  background: radial-gradient(circle, color-mix(in srgb, var(--p, #6366f1) 20%, transparent), transparent 70%);
+.contracapa-inner {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; align-items: center;
+  width: 100%; text-align: center;
+}
+/* eyebrow do nicho — mesmo vocabulário da capa nova (Marcellus, tom da cor primária) */
+.contracapa-eyebrow {
+  font-family: 'Marcellus', serif;
+  font-size: 10pt;
+  color: color-mix(in srgb, var(--p) 80%, #fff);
+  letter-spacing: 5px; text-transform: uppercase;
+  margin-bottom: 7mm;
 }
 .contracapa-titulo {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 22pt; font-weight: 700;
-  color: #fff; text-align: center;
-  margin-bottom: 5mm; line-height: 1.3;
-  position: relative;
+  font-family: 'Marcellus', serif;
+  font-size: 30pt; font-weight: 400;
+  color: #f4f1ea; text-align: center;
+  line-height: 1.2; max-width: 150mm;
 }
+/* fio fino central — igual ao tracinho da capa nova (.d-line / .m-rule) */
+.cc-accent { display: flex; align-items: center; justify-content: center; margin: 8mm 0; }
+.cc-accent-fill {
+  height: 0.4mm; width: 22mm;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--p) 90%, transparent), transparent);
+}
+.cc-accent-dot { display: none; }
 .contracapa-sub {
-  font-family: 'Inter', sans-serif;
-  font-size: 10.5pt; font-weight: 300;
-  color: rgba(255,255,255,0.55);
-  text-align: center; line-height: 1.7;
-  max-width: 150mm; margin-bottom: 10mm;
-  position: relative;
+  font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-size: 15pt;
+  color: color-mix(in srgb, var(--s) 60%, #fff);
+  text-align: center; line-height: 1.5;
+  max-width: 145mm;
 }
-.contracapa-div {
-  width: 18mm; height: 0.8mm;
-  background: var(--p, #6366f1);
-  margin: 0 auto 10mm;
-  border-radius: 1mm;
-  position: relative;
+/* frase de fechamento — caixa sutil na cor do tema */
+.contracapa-quote {
+  margin-top: 14mm;
+  padding: 8mm 14mm;
+  border: 0.3mm solid color-mix(in srgb, var(--p) 24%, transparent);
+  border-radius: 1.5mm;
+  max-width: 150mm;
+  background: rgba(255,255,255,0.025);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16pt; font-style: italic;
+  color: rgba(255,255,255,0.78); line-height: 1.55;
 }
+/* assinatura — mesmo padrão do rodapé da capa nova */
+.contracapa-assina { margin-top: 14mm; display: flex; align-items: center; gap: 3.5mm; }
 .contracapa-autor {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 11pt; font-weight: 700;
-  color: #fff; text-align: center;
-  margin-bottom: 3mm;
-  position: relative;
+  font-family: 'Marcellus', serif;
+  font-size: 9.5pt;
+  color: color-mix(in srgb, var(--s) 60%, #fff);
+  letter-spacing: 3px; text-transform: uppercase;
 }
 .contracapa-tipo {
-  font-family: 'Inter', sans-serif;
-  font-size: 9pt; color: rgba(255,255,255,0.35);
-  text-align: center;
-  position: relative;
+  font-family: 'Marcellus', serif;
+  font-size: 8pt; letter-spacing: 1.5px; text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
 }
 .contracapa-copy {
   position: absolute;
-  bottom: 7mm; left: 0; right: 0;
+  bottom: 9mm; left: 0; right: 0;
   font-family: 'Inter', sans-serif;
-  font-size: 7.5pt; color: rgba(255,255,255,0.2);
+  font-size: 7.5pt; color: rgba(255,255,255,0.22);
   text-align: center;
 }
 
@@ -1111,7 +1276,26 @@ body {
   padding: 4.5mm 6mm;
   border-radius: 3mm;
   page-break-inside: avoid;
+  position: relative;
 }
+
+/* ── Pessoinha-guia da seção (avatar 3D) ──
+   Chip redondo DENTRO do rótulo de cada seção (integrado — nunca flutua nem empilha).
+   O motor liga (.psn-<slug>) só quando tem a imagem daquela seção no catálogo. */
+.psn {
+  display: none;
+  width: 8.5mm; height: 8.5mm;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center top;
+  background-color: #eef1f5;
+  border: 0.5mm solid #fff;
+  box-shadow: 0 0.4mm 1.3mm rgba(0,0,0,.22), 0 0 0 0.4mm var(--p, #6366f1);
+  flex-shrink: 0;
+}
+.act-card .act-tag { display: flex; align-items: center; gap: 2.5mm; }
+/* Citação: a pessoa pensativa fica como um retrato à direita (quem "fala" a frase) */
+.quote .psn { position: absolute; right: 7mm; top: 50%; transform: translateY(-50%); width: 11mm; height: 11mm; }
 .cbox-label {
   font-family: 'Montserrat', sans-serif;
   font-size: 6.5pt; font-weight: 800;
@@ -1333,11 +1517,13 @@ body {
   const ICON_ATENCAO = `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`;
   const ICON_SABIA   = `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`;
 
-  function boxDica(t)    { return t?`<div class="cbox cbox-dica"><div class="cbox-label">${ICON_DICA} ${L.dica}</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
-  function boxExemplo(t) { return t?`<div class="cbox cbox-exemplo"><div class="cbox-label">${ICON_EXEMPLO} ${L.exemplo}</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
-  function boxPratica(t) { return t?`<div class="cbox cbox-pratica"><div class="cbox-label">${ICON_PRATICA} ${L.pratica}</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
-  function boxAtencao(t) { return t?`<div class="cbox cbox-atencao"><div class="cbox-label">${ICON_ATENCAO} ${L.atencao}</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
-  function boxSabia(t)   { return t?`<div class="cbox cbox-sabia"><div class="cbox-label">${ICON_SABIA} ${L.sabia}</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
+  // Quando a carinha (avatar) entra, ela É o marcador da seção. O iconezinho SVG fica de
+  // reserva e some quando há avatar (o motor injeta a regra que esconde o svg).
+  function boxDica(t)    { return t?`<div class="cbox cbox-dica"><div class="cbox-label"><span class="psn psn-dica"></span>${ICON_DICA} ${L.dica}</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
+  function boxExemplo(t) { return t?`<div class="cbox cbox-exemplo"><div class="cbox-label"><span class="psn psn-explicando"></span>${ICON_EXEMPLO} ${L.exemplo}</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
+  function boxPratica(t) { return t?`<div class="cbox cbox-pratica"><div class="cbox-label"><span class="psn psn-acao"></span>${ICON_PRATICA} ${L.pratica}</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
+  function boxAtencao(t) { return t?`<div class="cbox cbox-atencao"><div class="cbox-label"><span class="psn psn-atencao"></span>${ICON_ATENCAO} ${L.atencao}</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
+  function boxSabia(t)   { return t?`<div class="cbox cbox-sabia"><div class="cbox-label"><span class="psn psn-curiosidade"></span>${ICON_SABIA} ${L.sabia}</div><div class="cbox-body">${esc(t)}</div></div>`:''; }
 
   function boxContraste(obj) {
     if (!obj || !(obj.itens_a||[]).length) return '';
@@ -1457,69 +1643,52 @@ body {
     </div>`;
   }
 
-  html += `<div class="page">
-    <div class="capa ${d.imagem_capa ? 'capa--foto' : ''}">
-      ${d.imagem_capa ? `
-      <div class="capa-foto-hero">
-        <img src="${d.imagem_capa}">
-        <div class="capa-foto-scrim"></div>
-      </div>
-      <div class="capa-top">
-        <div class="capa-badge">${esc(d.label_tipo)}</div>
-        <div class="capa-ano">${d.ano}</div>
-      </div>
-      <div class="capa-foto-panel">
-        <div class="capa-pretitulo">${esc(d.nicho||d.tema||'')}</div>
-        <div class="capa-titulo">${esc(d.titulo||'')}</div>
-        <div class="capa-accent-bar">
-          <div class="capa-accent-fill"></div>
-          <div class="capa-accent-dot"></div>
-          <div class="capa-accent-dot" style="opacity:0.5"></div>
+  // ── CAPA v4 (tipográfica premium): 'premium' → Metálico + Ouro; senão → Dark Sofisticado (cor do tema) ──
+  {
+    const _t    = esc(d.titulo || '');
+    const _sub  = esc(d.subtitulo || '');
+    const _kick = esc(d.nicho || d.tema || '');
+    const _au   = esc(d.autor || '');
+    const _lt   = esc(d.label_tipo || '');
+    const _tl   = (d.titulo || '').length;
+    if (d.estilo === 'premium') {
+      const mz = _tl > 44 ? 24 : _tl > 34 ? 29 : _tl > 24 ? 34 : 39;
+      html += `<div class="page"><div class="cv-cover cv-metal">
+        <div class="cv-metal-frame"></div>
+        <div class="cv-metal-in">
+          <div class="m-eyebrow">${_lt}</div>
+          ${_kick ? `<div class="m-kicker">${_kick}</div>` : ''}
+          <h1 class="m-title" style="font-size:${mz}pt">${_t}</h1>
+          <div class="m-rule"></div>
+          ${_sub ? `<div class="m-sub">${_sub}</div>` : ''}
+          <div class="m-author">por ${_au} &middot; ${d.ano}</div>
         </div>
-        <div class="capa-subtitulo">${esc(d.subtitulo||d.nicho||'')}</div>
-        <div class="capa-foto-footer">
-          <div class="capa-footer-bar"></div>
-          <div class="capa-autor">por ${esc(d.autor)}</div>
-          <div class="capa-footer-sep"></div>
-          <div class="capa-footer-tipo">${esc(d.label_tipo)} · ${d.ano}</div>
+      </div></div>`;
+    } else {
+      const dz = _tl > 44 ? 27 : _tl > 34 ? 32 : _tl > 24 ? 37 : 42;
+      const inicial = (d.titulo || d.label_tipo || 'A').trim().charAt(0).toUpperCase();
+      html += `<div class="page"><div class="cv-cover cv-dark">
+        <div class="cv-dark-glow"></div>
+        <div class="cv-dark-grid"></div>
+        <div class="cv-dark-in">
+          <div class="cv-dark-head">
+            <div class="d-mark">${inicial}</div>
+            <div class="d-eyebrow">${_lt}</div>
+          </div>
+          <div class="cv-dark-body">
+            ${_kick ? `<div class="d-kicker">${_kick}</div>` : ''}
+            <h1 class="d-title" style="font-size:${dz}pt">${_t}</h1>
+            <div class="d-line"></div>
+            ${_sub ? `<div class="d-sub">${_sub}</div>` : ''}
+          </div>
+          <div class="cv-dark-foot">
+            <div class="d-author">por ${_au}</div>
+            <div class="d-year">${_lt} &middot; ${d.ano}</div>
+          </div>
         </div>
-      </div>
-      ` : `
-      <div class="capa-bg"></div>
-      <div class="capa-lines"></div>
-      <div class="capa-deco-c1"></div>
-      <div class="capa-deco-c2"></div>
-      <div class="capa-deco-r1"></div>
-      <div class="capa-deco-r2"></div>
-      <div class="capa-deco-line"></div>
-      <div class="capa-ghost">${esc(d.label_tipo)}</div>
-      ${d.ilustracao ? `<div class="capa-illus">${d.ilustracao}</div>` : ''}
-      <div class="capa-top">
-        <div class="capa-badge">${esc(d.label_tipo)}</div>
-        <div class="capa-ano">${d.ano}</div>
-      </div>
-      <div class="capa-icon-zone">
-        <div class="capa-icon-box">${capaIcon}</div>
-      </div>
-      <div class="capa-hero">
-        <div class="capa-pretitulo">${esc(d.nicho||d.tema||'')}</div>
-        <div class="capa-titulo">${esc(d.titulo||'')}</div>
-        <div class="capa-accent-bar">
-          <div class="capa-accent-fill"></div>
-          <div class="capa-accent-dot"></div>
-          <div class="capa-accent-dot" style="opacity:0.5"></div>
-        </div>
-        <div class="capa-subtitulo">${esc(d.subtitulo||d.nicho||'')}</div>
-      </div>
-      <div class="capa-footer">
-        <div class="capa-footer-bar"></div>
-        <div class="capa-autor">por ${esc(d.autor)}</div>
-        <div class="capa-footer-sep"></div>
-        <div class="capa-footer-tipo">${esc(d.label_tipo)} · ${d.ano}</div>
-      </div>
-      `}
-    </div>
-  </div>`;
+      </div></div>`;
+    }
+  }
 
   /* ═══════════════ POR TIPO ═══════════════ */
 
@@ -1553,8 +1722,8 @@ body {
       // COMPOSIÇÃO VARIADA: alterna a cada capítulo pra nenhuma página ficar igual à outra.
       // Aproveita citacao (citação) e atencao (erro comum) — que o motor gera e o template NÃO usava.
       const visual = boxEquacao(c.equacao) || boxContraste(c.contraste) || boxSteps(c.steps_visuais);
-      const quote  = c.citacao ? `<div class="quote"><div class="quote-text">${esc(c.citacao)}</div></div>` : '';
-      const acao   = c.acao_pratica ? `<div class="act-card"><div class="act-ghost">→</div><div class="act-tag">${L.pratica}</div><div class="act-b">${esc(c.acao_pratica)}</div></div>` : '';
+      const quote  = c.citacao ? `<div class="quote"><div class="psn psn-reflexao"></div><div class="quote-text">${esc(c.citacao)}</div></div>` : '';
+      const acao   = c.acao_pratica ? `<div class="act-card"><div class="act-ghost">→</div><div class="act-tag"><span class="psn psn-acao"></span>${L.pratica}</div><div class="act-b">${esc(c.acao_pratica)}</div></div>` : '';
       const kp     = (c.pontos_chave||[]).length ? `<div class="kp-label">${L.pontos}</div><ul class="kp-list">${(c.pontos_chave||[]).map(p=>`<li>${esc(p)}</li>`).join('')}</ul>` : '';
       // par: bloco visual + exemplo & dica lado a lado.  ímpar: citação grande + erro comum.
       const corpo = (i % 2 === 0)
@@ -2047,31 +2216,20 @@ body {
 
   html += `<div class="page">
     <div class="contracapa">
-      <div class="contracapa-top-bar"></div>
-      <div class="contracapa-circle"></div>
-      <div class="contracapa-circle" style="left:-20mm;top:-20mm;right:auto;bottom:auto;width:70mm;height:70mm"></div>
-
-      <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;width:100%">
-        <div style="opacity:0.20;margin-bottom:8mm">${capaIcon}</div>
-
+      <div class="contracapa-glow"></div>
+      <div class="contracapa-inner">
+        <div class="contracapa-eyebrow">${esc(d.nicho||d.label_tipo||'')}</div>
         <div class="contracapa-titulo">${esc(d.titulo||'')}</div>
+        <div class="cc-accent"><span class="cc-accent-fill"></span><span class="cc-accent-dot"></span><span class="cc-accent-dot"></span></div>
         <div class="contracapa-sub">${esc(d.subtitulo||d.nicho||'')}</div>
-        <div class="contracapa-div"></div>
-        <div class="contracapa-autor">${esc(d.autor)}</div>
-        <div class="contracapa-tipo">${esc(d.label_tipo)} · ${d.ano}</div>
 
-        <div style="margin-top:14mm;padding:6mm 12mm;border:0.5mm solid rgba(255,255,255,0.14);border-radius:3mm;max-width:145mm;text-align:center;background:rgba(255,255,255,0.03)">
-          <div style="font-family:'Playfair Display',serif;font-size:11pt;font-style:italic;color:rgba(255,255,255,0.5);line-height:1.72">
-            "${esc(fraseFechamento)}"
-          </div>
-        </div>
+        <div class="contracapa-quote">"${esc(fraseFechamento)}"</div>
 
-        <div style="margin-top:10mm;display:flex;align-items:center;gap:3mm">
-          <div style="width:4mm;height:0.5mm;background:var(--s);border-radius:1mm;opacity:0.5"></div>
-          <div style="font-family:'Montserrat',sans-serif;font-size:7pt;color:rgba(255,255,255,0.22);letter-spacing:1.5px;text-transform:uppercase">
-            ${esc(d.nicho||d.label_tipo||'')}
-          </div>
-          <div style="width:4mm;height:0.5mm;background:var(--s);border-radius:1mm;opacity:0.5"></div>
+        <div class="contracapa-assina">
+          <span class="capa-footer-bar"></span>
+          <span class="contracapa-autor">${esc(d.autor)}</span>
+          <span class="capa-footer-sep"></span>
+          <span class="contracapa-tipo">${esc(d.label_tipo)} · ${d.ano}</span>
         </div>
       </div>
 

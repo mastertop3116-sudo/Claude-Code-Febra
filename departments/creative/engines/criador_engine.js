@@ -9,7 +9,7 @@ const path          = require('path');
 const fs            = require('fs');
 const OpenAI        = require('openai');
 const aprendizados  = require('../../../utils/aprendizados');
-const { buscarImagemCapa, popularNicho, garantirImagemCapa, gerarImagemIA } = require('../../../utils/imageLibrary');
+const { buscarImagemCapa, popularNicho, garantirImagemCapa, gerarImagemIA, buscarLocalAuto, slugify, AUTO_DIR } = require('../../../utils/imageLibrary');
 
 const TEMPLATE_PATH      = path.join(__dirname, '../templates/criador-universal/index.html');
 const TEMPLATE_KIDS_PATH = path.join(__dirname, '../templates/criador-kids/index.html');
@@ -700,15 +700,20 @@ RETORNE SOMENTE O JSON COMPLETO E VÁLIDO.`;
     const Anthropic = require('@anthropic-ai/sdk');
     const anthropic = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
     const MODELO_CLAUDE = _escolha === 'opus' ? 'claude-opus-4-8' : (process.env.CRIADOR_MODELO || 'claude-sonnet-4-6');
-    const response = await anthropic.messages.create({
+    const _payload = {
       model: MODELO_CLAUDE,
-      max_tokens: 16000,
-      temperature: 0.7,
+      // 32k evita TRUNCAR e-book longo (10 caps com todos os campos passava de 16k → cortava
+      // no meio, perdia conclusão/CTA e deixava lixo que o jsonrepair "fechava"). Só paga o que gera.
+      max_tokens: 32000,
       system: sistema,
       messages: [
         { role: 'user', content: prompt + '\n\nIMPORTANTE: responda APENAS com o JSON, começando em { e terminando em }. Nada de texto antes ou depois.' },
       ],
-    });
+    };
+    // ⚠️ Opus 4.8 NÃO aceita mais 'temperature' (deprecated → erro 400). Sem esta guarda, o Opus
+    // quebrava e caía no GPT-4o — o cliente pagava Opus e recebia GPT-4o. Só envia em quem aceita (Sonnet).
+    if (!/opus-4-8/.test(MODELO_CLAUDE)) _payload.temperature = 0.7;
+    const response = await anthropic.messages.create(_payload);
     raw = (response.content || []).map(b => b.text || '').join('');
     console.log(`[criador] conteúdo gerado pelo Claude (${MODELO_CLAUDE})`);
   } catch (claudeErr) {
@@ -827,6 +832,35 @@ async function uploadArquivo(buffer, filename) {
 // Alias para compatibilidade com chamadas existentes
 const uploadPDF = uploadArquivo;
 
+// ── Pessoas-guia por seção ──────────────────────────────────
+// Cada seção do entregável (dica, exemplo, atenção, ação, curiosidade, citação…) ganha
+// um avatar 3D de uma "pessoa" no GESTO daquela seção. As imagens vivem no catálogo
+// (pessoas-<slug>-<genero>/avatar.b64, miniatura leve) e são REUSADAS em TODO entregável.
+// O motor liga só as classes .psn-<slug> que existem → seções sem imagem ficam invisíveis.
+const PESSOAS_SLUGS = ['dica','explicando','acao','atencao','curiosidade','reflexao','pergunta','recomendacao','aprovacao','saudacao'];
+function montarPessoasCss(seed) {
+  const path = require('path');
+  let base; try { base = require('../../../utils/imageLibrary').AUTO_DIR; } catch (_) { return ''; }
+  // semente determinística vinda do título → cada produto ganha um "elenco" misto próprio
+  let h = 0; const s = String(seed || ''); for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  let rules = '';
+  PESSOAS_SLUGS.forEach((slug, idx) => {
+    const pref = ((h + idx) % 2 === 0) ? 'homem' : 'mulher';
+    for (const gen of [pref, pref === 'homem' ? 'mulher' : 'homem']) {
+      try {
+        const f = path.join(base, `pessoas-${slug}-${gen}`, 'avatar.b64');
+        if (fs.existsSync(f)) {
+          const dataUrl = fs.readFileSync(f, 'utf8').trim();
+          if (dataUrl) { rules += `.psn-${slug}{display:block;background-image:url(${dataUrl})}`; break; }
+        }
+      } catch (_) {}
+    }
+  });
+  // Tem avatar? Então a carinha vira o marcador e o iconezinho SVG do rótulo some (sem redundância).
+  if (rules) rules += '.cbox-label svg,.act-card .act-tag svg{display:none}';
+  return rules ? `<style>${rules}</style>` : '';
+}
+
 // ── Renderização PDF via Puppeteer ──────────────────────────
 async function renderizarPDF(conteudo, params) {
   const { tipo, nicho } = params;
@@ -851,7 +885,16 @@ async function renderizarPDF(conteudo, params) {
       imagemCapa = await gerarImagemIA(params.nicho, params.tema).catch(() => null);
       if (imagemCapa) imagensIA++;
     }
-    if (!imagemCapa) imagemCapa = await garantirImagemCapa(params.nicho, params.tema).catch(() => null);
+    // SEM IA: a capa NÃO usa foto de banco grátis (risco de vir off-topic) → cai na ILUSTRAÇÃO coerente
+    // do tema. Só reusa uma imagem já existente se ela for da NOSSA IA (origem 'ia') — coerente + grátis.
+    if (!imagemCapa) {
+      try {
+        const slugCapa = slugify(params.nicho);
+        let origem = '';
+        try { origem = fs.readFileSync(path.join(AUTO_DIR, slugCapa, '.origem'), 'utf8').trim(); } catch (_) {}
+        if (origem === 'ia') imagemCapa = buscarLocalAuto(slugCapa);
+      } catch (_) {}
+    }
   }
 
   // Ilustração por CAPÍTULO (opcional, COM CUSTO): gera p/ os N primeiros capítulos, em paralelo.
@@ -897,6 +940,7 @@ async function renderizarPDF(conteudo, params) {
     faixa_rotulo:  _faixa ? _faixa.rotulo : null,   // ex: 'Faixa Azul' — pinta o selo do topo
     pagina:        params.pagina != null ? params.pagina : null,   // nº da página no pack (senão usa o interno)
     label_tipo:    LABELS[tipo] || tipo,
+    estilo:        params.estilo || null,   // 'jovem'|'adulto'|'premium' — escolhe o desenho da CAPA
     autor:         conteudo.autor || params.autor || 'Autor',
     nicho:         params.nicho   || '',
     ano:           new Date().getFullYear(),
@@ -915,9 +959,15 @@ async function renderizarPDF(conteudo, params) {
     fontStyle = `<style>@font-face{font-family:'Gagalin';src:url(data:font/otf;base64,${fontB64}) format('opentype');font-weight:normal;font-style:normal;font-display:block;}</style>`;
   } catch (e) { console.warn('[criador] fonte Gagalin não embutida (segue sem):', e.message); }
 
+  // Pessoas-guia por seção: só nos entregáveis adultos (o template kids já é ilustrado).
+  const pessoasStyle = !TIPOS_KIDS.includes(tipo) ? montarPessoasCss(conteudo.titulo || params.tema || nicho) : '';
+
   const html = templateHtml
     .replace('/* __CRIADOR_DATA__ */', `window.__D = ${JSON.stringify(data)};`)
-    .replace('</head>', fontStyle + '</head>');
+    .replace('</head>', fontStyle + pessoasStyle + '</head>');
+
+  // Gancho de depuração: grava o HTML final p/ inspeção visual (só quando a env aponta um caminho).
+  if (process.env.CRIADOR_DEBUG_HTML) { try { fs.writeFileSync(process.env.CRIADOR_DEBUG_HTML, html); } catch (_) {} }
 
   const isProd = !!(process.env.NODE_ENV === 'production' || process.env.RENDER);
 
@@ -1028,6 +1078,127 @@ async function registrarErro(entregaId, rota, erro, contexto) {
   } catch (_) {}
 }
 
+// ── E-BOOK PREMIUM (padrão aprovado: Gagalin, mascote, caixas capoeira, destaques, A4 cheia) ──
+// Gatilho: ebook + faixa escolhida. Usa o módulo montar.js (mesmo render testado).
+
+// Enriquece o conteúdo já gerado com Passo a Passo + O Que Observar por capítulo (+ para_quem/fecho).
+// Roda à parte pra não estourar o limite de tokens da geração principal. Falha graciosa.
+async function enriquecerEbookPremium(conteudo, params) {
+  const caps = (conteudo.capitulos || []).map((c, i) => ({ n: c.numero || i + 1, titulo: c.titulo, resumo: String(c.conteudo || '').slice(0, 650) }));
+  if (!caps.length) return conteudo;
+  const autor = conteudo.autor || params.autor || 'o autor';
+  const nicho = params.nicho || conteudo.nicho || '';
+  const sistema = `Você é ${autor}, especialista de verdade em ${nicho}. Escreve prático, em 1ª pessoa, SEM inventar nome de pessoa/estatística. Responde SOMENTE JSON válido.`;
+  const prompt = `Para CADA capítulo do meu e-book, crie dois blocos práticos no estilo ficha de aula:
+1) "passo_a_passo": 4 a 5 passos NUMERADOS, concretos e aplicáveis, pra colocar em prática o que o capítulo ensina. Verbo no imperativo, específico do nicho. Cada passo curto (1 linha).
+2) "o_que_observar": 3 sinais OBSERVÁVEIS de que está funcionando (ou de alerta). Curtos, concretos.
+Também devolva no topo: "para_quem" (1 frase — pra quem é este e-book) e "fecho" (1 frase curta e inspiradora de fechamento pra contracapa, máx 8 palavras).
+
+Capítulos:
+${caps.map(c => `#${c.n} — ${c.titulo}\n${c.resumo}`).join('\n\n')}
+
+Responda SOMENTE JSON: {"para_quem":"...","fecho":"...","capitulos":[{"n":1,"passo_a_passo":["1. ..."],"o_que_observar":["..."]}]} com os ${caps.length} capítulos, na ordem.`;
+  try {
+    const Anthropic = require('@anthropic-ai/sdk');
+    const anthropic = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const MOD = (params.modelo === 'gpt' && process.env.OPENAI_API_KEY) ? null : (params.modelo === 'opus' ? 'claude-opus-4-8' : (process.env.CRIADOR_MODELO || 'claude-sonnet-4-6'));
+    let raw;
+    if (MOD) {
+      const _payload = { model: MOD, max_tokens: 14000, system: sistema, messages: [{ role: 'user', content: prompt + '\n\nResponda APENAS o JSON, começando em { e terminando em }.' }] };
+      if (!/opus-4-8/.test(MOD)) _payload.temperature = 0.7;
+      const r = await anthropic.messages.create(_payload);
+      raw = (r.content || []).map(b => b.text || '').join('');
+    } else {
+      const OpenAI = require('openai');
+      const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      const r = await client.chat.completions.create({ model: 'gpt-4o', messages: [{ role: 'system', content: sistema }, { role: 'user', content: prompt }], response_format: { type: 'json_object' }, temperature: 0.7, max_tokens: 8000 });
+      raw = r.choices[0].message.content;
+    }
+    raw = String(raw).replace(/```json/gi, '').replace(/```/g, '').trim();
+    const i = raw.indexOf('{'), j = raw.lastIndexOf('}'); if (i >= 0 && j > i) raw = raw.slice(i, j + 1);
+    let obj; try { obj = JSON.parse(raw); } catch (_) { const { jsonrepair } = require('jsonrepair'); obj = JSON.parse(jsonrepair(raw)); }
+    if (obj.para_quem) conteudo.para_quem = obj.para_quem;
+    if (obj.fecho) conteudo.fecho = obj.fecho;
+    const byN = {}; (obj.capitulos || []).forEach(c => byN[c.n] = c);
+    conteudo.capitulos.forEach((c, idx) => {
+      const e = byN[c.numero || idx + 1];
+      if (e) { c.passo_a_passo = e.passo_a_passo || c.passo_a_passo; c.o_que_observar = e.o_que_observar || c.o_que_observar; }
+    });
+  } catch (e) { console.warn('[criador] enriquecimento premium falhou (segue sem):', e.message); }
+  return conteudo;
+}
+
+// Renderiza o e-book premium em PDF usando o módulo montar.js (HTML self-contained + paginador no navegador).
+async function renderizarEbookPremium(conteudo, params) {
+  const { montarHtml } = require('../templates/criador-ebook-premium/montar');
+  // COR pelo nicho (genérico): estilo escolhido > faixa (jiu-jitsu) > detecção pelo nicho > padrão.
+  const _faixa = paletaFaixa(params.faixa);
+  const cores = ESTILO_PALETAS[params.estilo] || _faixa || detectarPaletaNicho(params.nicho) || CORES.ebook;
+  const html = montarHtml(conteudo, {
+    cores,
+    faixa: _faixa ? _faixa.chave : null,   // mascote SÓ quando faixa de jiu-jitsu escolhida
+    nicho: params.nicho, publico: params.publico, autor: conteudo.autor || params.autor,
+  });
+  if (process.env.CRIADOR_DEBUG_HTML) { try { fs.writeFileSync(process.env.CRIADOR_DEBUG_HTML, html); } catch (_) {} }
+
+  const isProd = !!(process.env.NODE_ENV === 'production' || process.env.RENDER);
+  const ARGS = ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--font-render-hinting=none'];
+  let browser;
+  if (isProd) {
+    const chromium = require('@sparticuz/chromium');
+    const puppeteerCore = require('puppeteer-core');
+    browser = await puppeteerCore.launch({ args: [...chromium.args, ...ARGS], executablePath: await chromium.executablePath(), headless: chromium.headless });
+  } else {
+    const puppeteer = require('puppeteer');
+    browser = await puppeteer.launch({ headless: 'new', args: ARGS });
+  }
+  try {
+    const page = await browser.newPage();
+    await page.setViewport({ width: 794, height: 1123 });
+    // 'load' (não 'networkidle0', que engasga com HTML grande do mascote repetido): espera a folha de
+    // estilo da Nunito carregar; o paginador roda depois com document.fonts.ready (fontes já prontas).
+    await page.setContent(html, { waitUntil: 'load', timeout: 60000 });
+    await page.waitForFunction("document.body.getAttribute('data-paginado')==='1'", { timeout: 45000 }).catch(() => {});
+    await new Promise(r => setTimeout(r, 400));
+    const rawBuffer = await page.pdf({ format: 'A4', printBackground: true, margin: { top: 0, right: 0, bottom: 0, left: 0 } });
+    let thumbnailBuffer = null;
+    try { thumbnailBuffer = await page.screenshot({ type: 'jpeg', quality: 80, clip: { x: 0, y: 0, width: 794, height: 500 } }); } catch (_) {}
+    await page.close();
+    let outBuffer = rawBuffer;
+    try {
+      const { PDFDocument } = require('pdf-lib');
+      const pdfDoc = await PDFDocument.load(rawBuffer);
+      pdfDoc.setTitle(conteudo.titulo || params.nicho || 'E-book');
+      pdfDoc.setAuthor(conteudo.autor || params.autor || 'Autor');
+      pdfDoc.setSubject(params.nicho || '');
+      pdfDoc.setCreator('MAX Criador'); pdfDoc.setProducer('MAX Criador');
+      outBuffer = Buffer.from(await pdfDoc.save());
+    } catch (_) {}
+
+    // Compressão (Python/fitz): o Chromium embute as imagens por página → deduplica + subseta fontes
+    // (~9MB → ~4MB, sem perda visual). Fallback gracioso: se não houver Python/PyMuPDF, segue sem comprimir.
+    try {
+      const cp = require('child_process'), os = require('os'), _p = require('path');
+      const tin = _p.join(os.tmpdir(), `ebpf_${Date.now()}_${Math.random().toString(36).slice(2)}.pdf`);
+      const tout = tin.replace('.pdf', '_z.pdf');
+      const script = _p.join(__dirname, '../../../scripts/comprimir-pdf.py');
+      fs.writeFileSync(tin, outBuffer);
+      let ok = false;
+      for (const py of [process.env.PYTHON_BIN, 'python', 'python3'].filter(Boolean)) {
+        try { cp.execFileSync(py, [script, tin, tout], { stdio: 'ignore', timeout: 45000 }); ok = true; break; } catch (e) {}
+      }
+      if (ok && fs.existsSync(tout)) {
+        const z = fs.readFileSync(tout);
+        if (z.length > 2000 && z.length < outBuffer.length) outBuffer = z;
+      }
+      try { fs.unlinkSync(tin); } catch (_) {}
+      try { fs.unlinkSync(tout); } catch (_) {}
+    } catch (_) {}
+
+    return { pdfBuffer: outBuffer, thumbnailBuffer, imagensIA: 0 };
+  } finally { try { await browser.close(); } catch (_) {} }
+}
+
 // ── Motor principal ─────────────────────────────────────────
 async function executar(params, onProgress = () => {}) {
   const {
@@ -1047,7 +1218,7 @@ async function executar(params, onProgress = () => {}) {
     onProgress(8,  'Preparando estrutura do produto...');
 
     onProgress(20, `Gerando ${LABELS[tipo] || tipo} com IA — aguarde (30–90s)...`);
-    let conteudo = await gerarConteudo({ tipo, nicho, publico, tema, tom, extensao, autor, perspectiva });
+    let conteudo = await gerarConteudo({ tipo, nicho, publico, tema, tom, extensao, autor, perspectiva, modelo: params.modelo, idioma: params.idioma });
 
     // Valida conteúdo — retry automático se insuficiente
     try {
@@ -1063,7 +1234,7 @@ async function executar(params, onProgress = () => {}) {
         tags: [tipo, 'validacao', 'retry'],
         fonte: 'engine',
       });
-      conteudo = await gerarConteudo({ tipo, nicho, publico, tema, tom, extensao, autor });
+      conteudo = await gerarConteudo({ tipo, nicho, publico, tema, tom, extensao, autor, perspectiva, modelo: params.modelo, idioma: params.idioma });
       validarConteudo(conteudo, tipo, extensao); // lança se ainda inválido após retry
     }
 
@@ -1081,8 +1252,19 @@ async function executar(params, onProgress = () => {}) {
       }
     }
 
-    onProgress(68, 'Renderizando PDF profissional...');
-    const { pdfBuffer, thumbnailBuffer } = await renderizarPDF(conteudo, { tipo, nicho, autor, perspectiva });
+    // E-BOOK PREMIUM: ebook + faixa escolhida → padrão aprovado (Gagalin, mascote, caixas capoeira,
+    // passo a passo, o que observar, destaques, A4 cheia). Senão, render padrão (universal/kids).
+    const _ehPremium = (tipo === 'ebook') && !!paletaFaixa(params.faixa);
+    let pdfBuffer, thumbnailBuffer;
+    if (_ehPremium) {
+      onProgress(58, 'Deixando no padrão premium (passo a passo, o que observar)...');
+      conteudo = await enriquecerEbookPremium(conteudo, params);
+      onProgress(72, 'Renderizando e-book premium...');
+      ({ pdfBuffer, thumbnailBuffer } = await renderizarEbookPremium(conteudo, params));
+    } else {
+      onProgress(68, 'Renderizando PDF profissional...');
+      ({ pdfBuffer, thumbnailBuffer } = await renderizarPDF(conteudo, { tipo, nicho, autor, perspectiva }));
+    }
 
     onProgress(92, 'Salvando resultado...');
     const titulo = conteudo.titulo || tema || nicho || tipo;
@@ -1181,4 +1363,4 @@ async function sugerirPalavras(tema, idioma = 'pt') {
   })).filter(o => o.p.length >= 3 && !BLOCK.has(o.p)).slice(0, 12);
 }
 
-module.exports = { executar, renderizarPDF, gerarConteudo, sugerirPalavras, CORES, LABELS };
+module.exports = { executar, renderizarPDF, renderizarEbookPremium, enriquecerEbookPremium, gerarConteudo, sugerirPalavras, CORES, LABELS };

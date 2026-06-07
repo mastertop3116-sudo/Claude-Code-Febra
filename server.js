@@ -316,8 +316,14 @@ app.post("/api/estudio/ebook", auth.exigirLogin, async (req, res) => {
   const ilustracao = ILUS.includes(b.ilustracao) ? b.ilustracao : "nenhuma";
   const EST = ["auto", "jovem", "adulto", "premium"];
   const estilo = EST.includes(b.estilo) ? b.estilo : "auto";   // estilo visual escolhido pelo lead
+  // FORMATO: "premium" = e-book premium ILUSTRADO (qualquer nicho, cor pelo nicho, pessoa na capa).
+  // Uma faixa de jiu-jitsu = premium + mascote daquela faixa (só pra quem faz jiu-jitsu). Usa mascote, não IA de imagem.
+  const FAIXAS = ["branca", "cinza", "amarela", "laranja", "verde", "azul", "roxa", "marrom", "preta", "vermelha"];
+  const fmt = String(b.formato || b.faixa || "");
+  const premium = fmt === "premium" || FAIXAS.includes(fmt);
+  const faixa = FAIXAS.includes(fmt) ? fmt : null;
   const CR_POR_IMG = 3;
-  const nImgs = ilustracao === "total" ? 5 : ilustracao === "capa" ? 1 : 0;
+  const nImgs = premium ? 0 : (ilustracao === "total" ? 5 : ilustracao === "capa" ? 1 : 0);
   const extraCred = nImgs * CR_POR_IMG;   // capa=3, total=15
   if (tema.length < 3) return res.status(400).json({ error: "Diga sobre o que é o e-book." });
   // Gasta créditos: base do modelo (gpt=1/opus=2) + imagens ilustradas (3/imagem). admin = ilimitado. Bloqueia SEM gerar se faltou saldo.
@@ -337,7 +343,14 @@ app.post("/api/estudio/ebook", auth.exigirLogin, async (req, res) => {
       if (Array.isArray(retry.capitulos) && retry.capitulos.length > (conteudo.capitulos || []).length) conteudo = retry;
     }
     conteudo.idioma = idioma;   // o template usa pra traduzir os rótulos fixos (Capítulo, Sumário...)
-    const { pdfBuffer, imagensIA } = await eng.renderizarPDF(conteudo, { tipo: "ebook", nicho: tema, tema, autor, estilo, imagemIA: ilustracao !== "nenhuma", ilustrarCapitulos: ilustracao === "total" ? 4 : 0 });
+    let pdfBuffer, imagensIA = 0;
+    if (premium) {
+      // E-BOOK PREMIUM ILUSTRADO: enriquece (passo a passo + o que observar) e renderiza no padrão aprovado.
+      conteudo = await eng.enriquecerEbookPremium(conteudo, { nicho: tema, autor, modelo });
+      ({ pdfBuffer } = await eng.renderizarEbookPremium(conteudo, { faixa, estilo, nicho: tema, publico, autor }));
+    } else {
+      ({ pdfBuffer, imagensIA } = await eng.renderizarPDF(conteudo, { tipo: "ebook", nicho: tema, tema, autor, estilo, imagemIA: ilustracao !== "nenhuma", ilustrarCapitulos: ilustracao === "total" ? 4 : 0 }));
+    }
     // Reembolsa as imagens ilustradas que NÃO saíram (ex: IA de imagem fora do ar): o cliente só paga o que recebeu.
     if (!cota.ilimitado && nImgs > 0) {
       const faltaram = Math.max(0, nImgs - (imagensIA || 0));

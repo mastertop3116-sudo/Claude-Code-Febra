@@ -372,6 +372,23 @@
               <option value="adulto" data-i18n="estilo_adulto">Adulto — profissional e sóbrio</option>
               <option value="premium" data-i18n="estilo_premium">Premium — elegante e sofisticado</option>
             </select></div>
+          <div><label class="field-label">✨ Formato do e-book</label>
+            <select id="eb-formato">
+              <option value="">Simples — texto editorial</option>
+              <option value="premium">Premium Ilustrado — colorido, com pessoas e caixas (qualquer nicho)</option>
+              <optgroup label="Premium + Mascote de Jiu-Jitsu (só pra jiu-jitsu)">
+                <option value="branca">Premium · Mascote Faixa Branca</option>
+                <option value="cinza">Premium · Mascote Faixa Cinza</option>
+                <option value="amarela">Premium · Mascote Faixa Amarela</option>
+                <option value="laranja">Premium · Mascote Faixa Laranja</option>
+                <option value="verde">Premium · Mascote Faixa Verde</option>
+                <option value="azul">Premium · Mascote Faixa Azul</option>
+                <option value="roxa">Premium · Mascote Faixa Roxa</option>
+                <option value="marrom">Premium · Mascote Faixa Marrom</option>
+                <option value="preta">Premium · Mascote Faixa Preta</option>
+                <option value="vermelha">Premium · Mascote Faixa Vermelha</option>
+              </optgroup>
+            </select></div>
           <div><label class="field-label" data-i18n="model_h">Como a IA vai escrever o e-book</label>
             <div class="seg" id="seg"><div class="thumb"></div><button data-m="gpt" class="on" data-i18n="model_gpt">GPT</button><button data-m="opus" data-i18n="model_opus">Opus</button></div>
             <div class="opus-note" id="opus-note"><span class="pill" data-i18n="opus_tag">custo real</span><span><span data-i18n="opus_warn">O Opus tem custo real — cada criação usa seu crédito. Para testar, fique no GPT (grátis).</span> <b id="opus-lim"></b></span></div>
@@ -717,7 +734,7 @@
     if(tema.length<3){st.className='status err';st.textContent='× '+(LANG==='en'?'Say what the e-book is about.':LANG==='es'?'Di de qué trata el ebook.':'Diga sobre o que é o e-book.');return;}
     const _custo=custoDe(MODELO);
     if(USO&&!USO.ilimitado&&(USO.creditos||0)<_custo){st.className='status err';st.textContent='× '+(LANG==='en'?'Not enough credits ('+_custo+' needed, you have '+(USO.creditos||0)+').':LANG==='es'?'Créditos insuficientes ('+_custo+', tienes '+(USO.creditos||0)+').':'Créditos insuficientes (precisa '+_custo+', você tem '+(USO.creditos||0)+'). Compre mais pra continuar.');return;}
-    const body={tema,publico:$('eb-publico').value.trim(),tom:$('eb-tom').value,extensao:$('eb-ext').value,idioma:$('eb-idioma').value,modelo:MODELO,ilustracao:$('eb-ilustracao').value,estilo:$('eb-estilo').value};
+    const body={tema,publico:$('eb-publico').value.trim(),tom:$('eb-tom').value,extensao:$('eb-ext').value,idioma:$('eb-idioma').value,modelo:MODELO,ilustracao:$('eb-ilustracao').value,estilo:$('eb-estilo').value,formato:$('eb-formato').value};
     gerar('/api/estudio/ebook',body,st,$('eb-btn'),(LANG==='en'?'Writing your e-book…':LANG==='es'?'Escribiendo tu ebook…':'Escrevendo seu e-book…'));};
   $('cat-btn').onclick=()=>window.open('/estudio/catalogo','_blank');
   // ───── modais / sheet ─────
