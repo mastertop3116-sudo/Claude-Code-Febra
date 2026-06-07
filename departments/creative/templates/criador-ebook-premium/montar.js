@@ -72,6 +72,13 @@ function montarHtml(d, opts = {}) {
   // avatar = <img> (o Chromium DEDUPLICA <img> igual; background-image CSS ele duplica = PDF gigante)
   const psn = (gesto, extra='') => AV[gesto] ? `<div class="psn ${extra}"><img src="${AV[gesto]}"></div>` : '';
 
+  // PESSOAS DE CORPO INTEIRO (bloco "destaque") — fundo recortado, web. Cast de apresentadores; usadas POUCAS vezes (3/e-book), variando.
+  const CORPO_KEYS = ['saudacao-mulher','explicando-homem','aprovacao-mulher','recomendacao-homem','dica-mulher','acao-homem','explicando-mulher','saudacao-homem'];
+  const CORPO = [];
+  for (const k of CORPO_KEYS) { try { CORPO.push(fs.readFileSync(path.join(ROOT, `assets/catalogo-auto/pessoas-${k}/corpo.b64`), 'utf8').trim()); } catch (_) {} }
+  const _af = String(autor||'').trim().split(/\s+/)[0];
+  const autorFirst = (_af && !/^autor$/i.test(_af)) ? _af : '';
+
   const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const splitParas = t => String(t||'').split(/\n+/).map(s=>s.trim()).filter(p=>p.length>2);
   const marcarDestaques = raw => esc(raw).replace(/'[^']{1,45}'/g, m => m.split(' ').map(w => `<b>${w}</b>`).join(' '));
@@ -98,6 +105,14 @@ function montarHtml(d, opts = {}) {
   B('sec-titulo', esc(d.titulo), { knext:true });
   splitParas(d.introducao).forEach((p,i)=>T(p, { lead:i===0, knext:i===0 }));
 
+  // ~3 blocos "destaque pessoa de corpo inteiro" ESPALHADOS (começo/meio/fim), só onde há passo a passo. Personagens variam.
+  const _comPasso = (d.capitulos||[]).map((c,i)=> (Array.isArray(c.passo_a_passo||c.steps_visuais) && (c.passo_a_passo||c.steps_visuais).length) ? i : -1).filter(i=>i>=0);
+  const _nSpot = CORPO.length===0 ? 0 : (_comPasso.length>=6 ? 3 : (_comPasso.length>=3 ? 2 : Math.min(1,_comPasso.length)));
+  const SPOT = new Set();
+  for (let k=1;k<=_nSpot;k++){ const pos = Math.round(_comPasso.length*k/(_nSpot+1)); SPOT.add(_comPasso[Math.min(pos,_comPasso.length-1)]); }
+  let _hoff=0; for (const ch of String(d.titulo||'x')) _hoff=(_hoff*31+ch.charCodeAt(0))>>>0;
+  let spotN = 0;
+
   // Capítulos
   (d.capitulos||[]).forEach((c, idx) => {
     const n = String(c.numero||idx+1).padStart(2,'0');
@@ -120,7 +135,13 @@ function montarHtml(d, opts = {}) {
     if (c.exemplo_real) B('card card-ex', cardH(IC.exemplo,'Na Prática','explicando')+`<div class="card-b">${marcarDestaques(c.exemplo_real)}</div>`);
     if (c.acao_pratica) B('card card-acao', cardH(IC.acao,'Faça Agora','acao')+`<div class="card-b">${marcarDestaques(c.acao_pratica)}</div>`);
     const passo = c.passo_a_passo || c.steps_visuais;
-    if (Array.isArray(passo) && passo.length) {
+    if (Array.isArray(passo) && passo.length && SPOT.has(idx) && CORPO.length) {
+      const corpo = CORPO[(spotN + _hoff) % CORPO.length]; spotN++;
+      B('spot', `<div class="spot-fig"><img src="${corpo}"></div>` +
+        `<div class="spot-txt"><div class="spot-eye">Passo a passo${autorFirst?` com ${esc(autorFirst)}`:' na prática'}</div>` +
+        `<div class="spot-tit">${passo.length} Passos ${autorFirst?'Pra Aplicar':'Na Prática'}</div>` +
+        `<ul class="spot-list">${passo.map((p,i)=>`<li class="spot-item"><span class="spot-n">${i+1}</span><span>${marcarDestaques(String(p).replace(/^\s*\d+[\.\)\-]\s*/,''))}</span></li>`).join('')}</ul></div>`);
+    } else if (Array.isArray(passo) && passo.length) {
       B('card card-passo', cardH(IC.passo,'Passo a Passo','aprovacao') +
         `<div class="passo-list">${passo.map((p,i)=>`<div class="passo-item"><span class="passo-n">${i+1}</span><span>${esc(String(p).replace(/^\s*\d+[\.\)\-]\s*/,''))}</span></div>`).join('')}</div>`);
     }
@@ -272,6 +293,22 @@ body{ font-family:'Nunito',sans-serif; color:var(--ink); background:#fff; -webki
 .cc-tit{ letter-spacing:.4px; }
 .bk b, .card-b b, .cv-sub b{ color:var(--p); font-weight:800; font-style:normal; }
 .pg-tint .bk b{ color:color-mix(in srgb, var(--p) 86%, #000); }
+/* ===== BLOCO DESTAQUE: pessoa de corpo inteiro + conteúdo ao lado (atômico, ~3 por e-book) ===== */
+.spot{ display:flex; gap:6mm; align-items:stretch; margin:5mm 0; position:relative; overflow:hidden;
+  background:linear-gradient(135deg, color-mix(in srgb,var(--p) 7%,#fff), color-mix(in srgb,var(--s) 18%,#fff));
+  border:2px solid color-mix(in srgb,var(--p) 16%,#fff); border-radius:18px; padding:6mm 7mm 0; }
+.spot-fig{ flex:0 0 36%; align-self:flex-end; position:relative; text-align:center; }
+.spot-fig::before{ content:''; position:absolute; left:50%; bottom:0; transform:translateX(-50%); width:94%; height:80%;
+  border-radius:50% 50% 0 0 / 62% 62% 0 0;
+  background:radial-gradient(ellipse at 50% 42%, color-mix(in srgb,var(--p) 22%,#fff), color-mix(in srgb,var(--p) 9%,#fff) 70%, transparent); }
+.spot-fig img{ position:relative; max-height:70mm; max-width:100%; display:inline-block; filter:drop-shadow(0 8px 16px rgba(0,0,0,.18)); }
+.spot-txt{ flex:1; padding:2.5mm 0 6mm; }
+.spot-eye{ font-family:'Nunito'; font-weight:800; font-size:8.5pt; letter-spacing:1.5px; text-transform:uppercase; color:var(--p); margin-bottom:2.5mm; }
+.spot-tit{ font-family:'Gagalin','Nunito',sans-serif; font-weight:normal; font-size:17pt; line-height:1.1; letter-spacing:.3px; color:var(--ink); margin-bottom:3.5mm; }
+.spot-list{ display:flex; flex-direction:column; gap:2.8mm; }
+.spot-item{ display:flex; gap:3mm; align-items:flex-start; font-size:10pt; line-height:1.45; font-weight:600; color:#33384a; }
+.spot-item .spot-n{ flex-shrink:0; width:7mm; height:7mm; border-radius:50%; background:var(--p); color:#fff; font-family:'Nunito'; font-weight:800; font-size:9pt; display:flex; align-items:center; justify-content:center; }
+.spot-item b{ color:var(--p); font-weight:800; }
 </style></head>
 <body>
 <div class="page">
