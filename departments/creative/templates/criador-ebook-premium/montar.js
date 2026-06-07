@@ -158,13 +158,14 @@ ${fontFace()}
 body{ font-family:'Nunito',sans-serif; color:var(--ink); background:#fff; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
 .page{ width:210mm; height:297mm; position:relative; overflow:hidden; background:#fff; page-break-after:always; }
 .page:last-child{ page-break-after:auto; }
-.confetti{ position:absolute; inset:0; pointer-events:none; opacity:.10;
-  background-image:radial-gradient(circle, var(--p) 2px, transparent 2.5px),radial-gradient(circle, var(--y) 1.6px, transparent 2px),radial-gradient(circle, var(--s) 2px, transparent 2.5px);
+/* confete: alpha BAIXO direto na cor (NUNCA 'opacity' no elemento full-page — vira raster da página inteira = PDF gigante) */
+.confetti{ position:absolute; inset:0; pointer-events:none;
+  background-image:radial-gradient(circle, color-mix(in srgb,var(--p) 11%,transparent) 2px, transparent 2.5px),radial-gradient(circle, color-mix(in srgb,var(--y) 11%,transparent) 1.6px, transparent 2px),radial-gradient(circle, color-mix(in srgb,var(--s) 11%,transparent) 2px, transparent 2.5px);
   background-size:42px 42px,60px 60px,52px 52px; background-position:0 0,22px 20px,12px 34px; }
 .cv-faixa{ position:relative; min-height:158mm; padding:20mm 16mm 20mm;
   background:linear-gradient(140deg, var(--p) 0%, color-mix(in srgb, var(--p) 55%, var(--s)) 100%);
   clip-path:polygon(0 0,100% 0,100% 86%,0 100%); display:flex; flex-direction:column; justify-content:center; overflow:hidden; }
-.cv-faixa .confetti{ opacity:.16; }
+.cv-faixa .confetti{ background-image:radial-gradient(circle, rgba(255,255,255,.16) 2px, transparent 2.5px),radial-gradient(circle, rgba(255,255,255,.12) 1.6px, transparent 2px),radial-gradient(circle, rgba(255,255,255,.14) 2px, transparent 2.5px); }
 .cv-badge{ align-self:flex-start; background:rgba(255,255,255,.22); border:2px solid rgba(255,255,255,.55); border-radius:40px;
   padding:2.5mm 6mm; font-family:'Nunito'; font-weight:800; font-size:8.5pt; letter-spacing:2px; text-transform:uppercase; color:#fff; margin-bottom:7mm; }
 .cv-titulo{ font-family:'Nunito'; font-weight:900; font-size:29pt; line-height:1.1; color:#fff; text-shadow:0 2px 10px rgba(0,0,0,.18); max-width:100mm; }
@@ -205,7 +206,7 @@ body{ font-family:'Nunito',sans-serif; color:var(--ink); background:#fff; -webki
   box-shadow:0 4px 10px color-mix(in srgb,var(--p) 35%,transparent); }
 .cap-open-rot{ font-family:'Nunito'; font-weight:800; font-size:8.5pt; letter-spacing:2px; text-transform:uppercase; color:var(--p); margin-bottom:1mm; }
 .cap-open-tit{ font-family:'Nunito'; font-weight:900; font-size:17pt; line-height:1.12; color:var(--ink); max-width:120mm; }
-.cap-open-masc{ position:absolute; right:-4mm; bottom:-6mm; width:34mm; opacity:.92; }
+.cap-open-masc{ position:absolute; right:-4mm; bottom:-6mm; width:34mm; }
 .card{ border-radius:16px; padding:5mm 6mm; margin:4mm 0; border:2px solid; }
 .card-h{ display:flex; align-items:center; justify-content:space-between; gap:3mm; font-family:'Nunito'; font-weight:800; font-size:9.5pt; letter-spacing:.5px; text-transform:uppercase; margin-bottom:2.5mm; }
 .card-h-lab{ display:flex; align-items:center; gap:2.5mm; }

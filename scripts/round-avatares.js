@@ -17,7 +17,7 @@ const BASE = path.join(__dirname, '../assets/catalogo-auto');
       const img = new Image();
       await new Promise(r => { img.onload = r; img.src = src; });
       // anel branco + sombra ASSADOS no PNG → no e-book o <img> não precisa de efeito CSS (deduplica)
-      const S = 256, R = 104, cx = 128, cy = 122, ring = 7;
+      const S = 150, R = 61, cx = 75, cy = 71, ring = 4;
       const c = document.createElement('canvas'); c.width = S; c.height = S;
       const ctx = c.getContext('2d');
       // círculo branco (base do anel) com sombra suave
