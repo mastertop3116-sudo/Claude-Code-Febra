@@ -51,10 +51,22 @@ function montarHtml(d, opts = {}) {
   if (faixa) for (const nome of [`jj-${faixa}-web.png`, `jj-${faixa}-transp.png`]) {
     try { mascB64 = 'data:image/png;base64,' + fs.readFileSync(path.join(ROOT, `assets/mascotes/${nome}`)).toString('base64'); break; } catch (_) {}
   }
-  // retrato de capa (pessoa) — escolhido por hash do título (varia o elenco). Gestos acolhedores.
+  // VIBE pelo nicho: troca o elenco da CAPA + SPOTLIGHT por pessoas que combinam com o tema
+  // (fitness=atleta, culinária=avental, fé/bem-estar=aconchegante, lifestyle=casual); senão, elenco profissional.
+  const _VIBES = { fitness:['fitness-mulher','fitness-homem'], chef:['chef-mulher','chef-homem'], bemestar:['bemestar-mulher','bemestar-homem'], casual:['casual-mulher','casual-homem'] };
+  const _VIBE_KW = [
+    ['fitness',  ['fitness','emagre','dieta','academia','treino','muscula','corrida','crossfit','esporte','perder peso','boa forma','hipertrofia']],
+    ['chef',     ['culinár','culinar','confeit','receita','cozinha','gastronom','bolo','doce','salgado','marmita']],
+    ['bemestar', ['cristã','crista','cristão','cristao','devocional','deus','oração','oracao','medita','mindfulness','bem-estar','bem estar','yoga','sono','dormir','espiritual','gratidão','gratidao','ansiedade','paz interior']],
+    ['casual',   ['moda','estilo','lifestyle','relacionament','namoro','casamento','viagem','maternidade','beleza','skincare']],
+  ];
+  const _nlow = (nicho||'').toLowerCase();
+  let _vibe = null; for (const [v,kws] of _VIBE_KW){ if (kws.some(k=>_nlow.includes(k))){ _vibe = v; break; } }
+
+  // retrato de capa (pessoa) — vibe do nicho ou elenco profissional, escolhido por hash do título.
   let pessoaB64 = '';
   if (!mascB64) {
-    const COVER = ['saudacao-mulher','aprovacao-homem','explicando-mulher','recomendacao-homem','saudacao-homem','aprovacao-mulher','explicando-homem','recomendacao-mulher'];
+    const COVER = _vibe ? _VIBES[_vibe] : ['saudacao-mulher','aprovacao-homem','explicando-mulher','recomendacao-homem','saudacao-homem','aprovacao-mulher','explicando-homem','recomendacao-mulher'];
     let h = 0; for (const ch of String(d.titulo || nicho || 'x')) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
     const key = COVER[h % COVER.length];
     try { pessoaB64 = fs.readFileSync(path.join(ROOT, `assets/catalogo-auto/pessoas-${key}/cover.b64`), 'utf8').trim(); } catch (_) {}
@@ -73,7 +85,7 @@ function montarHtml(d, opts = {}) {
   const psn = (gesto, extra='') => AV[gesto] ? `<div class="psn ${extra}"><img src="${AV[gesto]}"></div>` : '';
 
   // PESSOAS DE CORPO INTEIRO (bloco "destaque") — fundo recortado, web. Cast de apresentadores; usadas POUCAS vezes (3/e-book), variando.
-  const CORPO_KEYS = ['saudacao-mulher','explicando-homem','aprovacao-mulher','recomendacao-homem','dica-mulher','acao-homem','explicando-mulher','saudacao-homem'];
+  const CORPO_KEYS = _vibe ? _VIBES[_vibe] : ['saudacao-mulher','explicando-homem','aprovacao-mulher','recomendacao-homem','dica-mulher','acao-homem','explicando-mulher','saudacao-homem'];
   const CORPO = [];
   for (const k of CORPO_KEYS) { try { CORPO.push(fs.readFileSync(path.join(ROOT, `assets/catalogo-auto/pessoas-${k}/corpo.b64`), 'utf8').trim()); } catch (_) {} }
   const _af = String(autor||'').trim().split(/\s+/)[0];
