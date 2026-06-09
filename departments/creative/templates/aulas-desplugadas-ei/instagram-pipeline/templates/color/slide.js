@@ -29,7 +29,7 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, ba
     return `
 <div style="width:1080px;height:1080px;background:${BG};position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:${temMascote ? 'flex-start' : 'center'};padding:80px 60px;">
   ${decor}
-  ${temMascote ? `<img src="${mascote}" style="position:absolute;bottom:18px;right:18px;height:700px;z-index:2;filter:drop-shadow(0 16px 30px rgba(0,0,0,0.32));">` : ''}
+  ${temMascote ? `<img src="${mascote}" style="position:absolute;bottom:18px;right:18px;height:700px;z-index:5;filter:drop-shadow(-10px 14px 22px rgba(0,0,0,0.28));">` : ''}
   <div style="background:rgba(255,255,255,0.97);border-radius:32px;padding:64px 64px;width:100%;max-width:${temMascote ? '660px' : '940px'};box-shadow:0 24px 72px rgba(0,0,0,0.4);position:relative;z-index:3;">
     <div style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#f97316,#ea580c);border-radius:50px;padding:11px 24px;margin-bottom:34px;">
       <span style="font-size:18px;">${emoji}</span>
@@ -79,7 +79,7 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, ba
       return `
 <div style="width:1080px;height:1080px;background:${BG};position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:80px 60px;">
   ${decor}
-  <img src="${mascote}" style="position:absolute;bottom:18px;right:18px;height:700px;z-index:2;filter:drop-shadow(0 16px 30px rgba(0,0,0,0.32));">
+  <img src="${mascote}" style="position:absolute;bottom:18px;right:18px;height:700px;z-index:5;filter:drop-shadow(-10px 14px 22px rgba(0,0,0,0.28));">
   <div style="background:rgba(255,255,255,0.97);border-radius:32px;padding:60px 60px;width:100%;max-width:640px;box-shadow:0 24px 72px rgba(0,0,0,0.4);position:relative;z-index:3;">
     <div style="font-size:13px;font-weight:800;color:#f97316;letter-spacing:3px;text-transform:uppercase;margin-bottom:22px;">${badge}</div>
     <div style="font-size:50px;font-weight:900;color:#1c1917;line-height:1.04;letter-spacing:-1.5px;margin-bottom:24px;">${titulo}</div>

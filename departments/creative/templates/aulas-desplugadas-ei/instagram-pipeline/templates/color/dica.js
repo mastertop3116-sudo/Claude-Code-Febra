@@ -14,7 +14,7 @@ module.exports = function templateDica({ titulo, dica, destaque, resposta, cta, 
   <div style="position:absolute;bottom:72px;left:72px;font-size:36px;opacity:0.75;transform:rotate(6deg);">💪</div>
   <div style="position:absolute;bottom:80px;right:68px;font-size:40px;opacity:0.8;transform:rotate(-8deg);">🎯</div>
   <div style="position:absolute;top:220px;right:52px;font-size:30px;opacity:0.65;transform:rotate(15deg);">⚡</div>`}
-  ${m ? `<img src="${mascote}" style="position:absolute;bottom:28px;right:18px;height:650px;z-index:2;filter:drop-shadow(0 16px 30px rgba(0,0,0,0.32));">` : ''}
+  ${m ? `<img src="${mascote}" style="position:absolute;bottom:28px;right:18px;height:650px;z-index:5;filter:drop-shadow(-10px 14px 22px rgba(0,0,0,0.28));">` : ''}
   <div style="background:rgba(255,255,255,0.97);border-radius:28px;padding:${m ? '48px 52px' : '52px 56px'};width:100%;max-width:${m ? '620px' : '940px'};box-shadow:0 24px 72px rgba(0,0,0,0.4);position:relative;z-index:3;">
     <div style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#f97316,#ea580c);border-radius:50px;padding:10px 22px;margin-bottom:26px;">
       <span style="font-size:16px;">🥋</span>
