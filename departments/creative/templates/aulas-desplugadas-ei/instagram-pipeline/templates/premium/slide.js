@@ -60,26 +60,30 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, ba
   if (tipo === 'conteudo') {
     const passoStr = String(numero - 1).padStart(2, '0');
     return `
-<div style="width:1080px;height:1080px;background:#000000;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 104px;">
+<div style="width:1080px;height:1080px;background:#000000;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:120px 104px 128px;">
   ${detalhes}
 
-  <!-- Número decorativo gigante, bem suave -->
-  <div style="position:absolute;top:50%;right:40px;transform:translateY(-50%);font-size:400px;font-weight:900;line-height:1;z-index:1;color:rgba(255,255,255,0.035);user-select:none;">${numero}</div>
+  <!-- Número decorativo gigante -->
+  <div style="position:absolute;top:50%;right:8px;transform:translateY(-50%);font-size:540px;font-weight:900;line-height:1;z-index:1;color:rgba(255,255,255,0.05);user-select:none;">${numero}</div>
 
-  <!-- Passo -->
-  <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:30px;z-index:4;">
-    <span style="font-size:30px;font-weight:900;color:#f97316;letter-spacing:1px;">${passoStr}</span>
-    <span style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.34);letter-spacing:3px;text-transform:uppercase;">de ${total - 2}</span>
+  <!-- TOPO: passo -->
+  <div style="display:flex;align-items:baseline;gap:16px;z-index:4;">
+    <span style="font-size:36px;font-weight:900;color:#f97316;letter-spacing:1px;">${passoStr}</span>
+    <span style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.34);letter-spacing:3px;text-transform:uppercase;">de ${total - 2}</span>
   </div>
 
-  <!-- Título -->
-  <div style="font-size:68px;font-weight:900;color:#ffffff;line-height:0.98;letter-spacing:-2.5px;margin-bottom:32px;z-index:4;">${titulo}</div>
+  <!-- MEIO: título + corpo -->
+  <div style="z-index:4;">
+    <div style="font-size:74px;font-weight:900;color:#ffffff;line-height:0.98;letter-spacing:-2.5px;margin-bottom:30px;">${titulo}</div>
+    <div style="width:64px;height:3px;background:#f97316;margin-bottom:34px;"></div>
+    <div style="font-size:31px;color:#a1a1aa;line-height:1.62;max-width:780px;font-weight:400;">${texto}</div>
+  </div>
 
-  <!-- Divisor fino -->
-  <div style="width:60px;height:2px;background:#f97316;margin-bottom:36px;z-index:4;"></div>
-
-  <!-- Corpo -->
-  <div style="font-size:27px;color:#a1a1aa;line-height:1.65;max-width:840px;font-weight:400;z-index:4;">${texto}</div>
+  <!-- BASE: assinatura -->
+  <div style="display:flex;align-items:center;gap:14px;z-index:4;">
+    <div style="width:46px;height:3px;background:#f97316;"></div>
+    <span style="font-size:17px;font-weight:700;color:#52525b;letter-spacing:1.5px;text-transform:uppercase;">Dinâmicas de Jiu-Jitsu</span>
+  </div>
 
   ${dots(numero)}
 </div>`;

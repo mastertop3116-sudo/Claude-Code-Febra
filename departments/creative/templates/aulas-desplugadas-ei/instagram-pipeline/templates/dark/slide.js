@@ -73,31 +73,35 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, te
 <div style="width:1080px;height:1080px;background:#0a0a0f;position:relative;overflow:hidden;">
   ${overlay()}
 
-  <!-- Número decorativo BRANCO transparente — centralizado verticalmente para equilíbrio -->
-  <div style="position:absolute;top:50%;right:24px;transform:translateY(-50%);font-size:380px;font-weight:900;line-height:1;z-index:2;pointer-events:none;user-select:none;color:rgba(255,255,255,0.05);">${numero}</div>
+  <!-- Número decorativo BRANCO transparente — preenche a direita -->
+  <div style="position:absolute;top:50%;right:8px;transform:translateY(-50%);font-size:500px;font-weight:900;line-height:1;z-index:2;pointer-events:none;user-select:none;color:rgba(255,255,255,0.055);">${numero}</div>
 
   <!-- Gradiente laranja no canto inferior esquerdo — contrapeso ao número -->
-  <div style="position:absolute;bottom:0;left:0;width:500px;height:400px;background:radial-gradient(ellipse at bottom left,rgba(249,115,22,0.10) 0%,transparent 65%);z-index:2;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:0;left:0;width:520px;height:430px;background:radial-gradient(ellipse at bottom left,rgba(249,115,22,0.12) 0%,transparent 65%);z-index:2;pointer-events:none;"></div>
 
-  <!-- Conteúdo centralizado -->
-  <div style="position:absolute;top:0;left:0;width:100%;height:calc(100% - 100px);z-index:4;display:flex;flex-direction:column;justify-content:center;padding:0 96px;">
+  <!-- Conteúdo distribuído de cima a baixo (preenche o quadro) -->
+  <div style="position:absolute;top:0;left:0;width:100%;height:calc(100% - 100px);z-index:4;display:flex;flex-direction:column;justify-content:space-between;padding:120px 96px 34px;">
 
-    <!-- Badge de passo — laranja sólido -->
-    <div style="display:inline-flex;align-items:center;gap:14px;margin-bottom:32px;width:fit-content;">
-      <div style="background:#f97316;border-radius:3px;padding:8px 18px;">
-        <span style="font-size:20px;font-weight:900;color:#000000;letter-spacing:1px;">${passoStr}</span>
+    <!-- TOPO: badge de passo — laranja sólido -->
+    <div style="display:inline-flex;align-items:center;gap:14px;width:fit-content;">
+      <div style="background:#f97316;border-radius:3px;padding:9px 20px;">
+        <span style="font-size:22px;font-weight:900;color:#000000;letter-spacing:1px;">${passoStr}</span>
       </div>
-      <span style="font-size:12px;font-weight:800;color:rgba(255,255,255,0.35);letter-spacing:3px;text-transform:uppercase;">DE ${total - 2}</span>
+      <span style="font-size:13px;font-weight:800;color:rgba(255,255,255,0.35);letter-spacing:3px;text-transform:uppercase;">DE ${total - 2}</span>
     </div>
 
-    <!-- Título -->
-    <div style="font-size:66px;font-weight:900;color:#ffffff;line-height:0.95;letter-spacing:-2.5px;margin-bottom:32px;text-transform:uppercase;">${titulo}</div>
+    <!-- MEIO: título + corpo -->
+    <div>
+      <div style="font-size:74px;font-weight:900;color:#ffffff;line-height:0.95;letter-spacing:-2.5px;margin-bottom:30px;text-transform:uppercase;">${titulo}</div>
+      <div style="width:60px;height:4px;background:#f97316;margin-bottom:34px;"></div>
+      <div style="font-size:31px;color:#cbd5e1;line-height:1.6;max-width:780px;">${texto}</div>
+    </div>
 
-    <!-- Divisor -->
-    <div style="width:56px;height:4px;background:#f97316;margin-bottom:40px;"></div>
-
-    <!-- Corpo -->
-    <div style="font-size:28px;color:#cbd5e1;line-height:1.65;max-width:840px;">${texto}</div>
+    <!-- BASE: assinatura -->
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div style="width:46px;height:4px;background:#f97316;"></div>
+      <span style="font-size:16px;font-weight:800;color:rgba(255,255,255,0.3);letter-spacing:2px;text-transform:uppercase;">Dinâmicas de Jiu-Jitsu</span>
+    </div>
 
   </div>
 
