@@ -15,7 +15,7 @@ const FAIXAS = {
   verde: 'a green belt', azul: 'a blue belt', roxa: 'a purple belt', marrom: 'a brown belt',
   preta: 'a black belt', vermelha: 'a red belt',
 };
-const MODEL = process.env.IMG_MODEL || 'gpt-image-2';
+const MODEL = process.env.IMG_MODEL || 'gpt-image-1'; // gpt-image-1 é o confiável; gpt-image-2 trava/pendura
 const SIZE = process.env.IMG_SIZE || '2048x2048';   // alta resolução nativa (4x mais pixels que 1024)
 
 const prompt = (beltEn) => `A cute 3D rendered cartoon character, Pixar / Disney Animation movie style, of a happy little kid practicing Brazilian jiu-jitsu. The kid wears a clean white gi (jiu-jitsu kimono) tied with ${beltEn} at the waist. Big friendly smile, confident and playful ready stance. Soft studio lighting, glossy polished 3D render, smooth rounded shapes, vibrant colors, subtle soft shadow. IMPORTANT anatomy: full body in frame, both arms and both legs fully visible with correct natural proportions, exactly two arms and two legs, two hands and two feet, no missing, extra, merged or distorted limbs, feet flat and well-formed. Centered, plain solid pure white background (#ffffff), no text, no words, no logo.`;
