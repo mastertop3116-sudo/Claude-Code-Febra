@@ -1,5 +1,5 @@
 // Template: ENGAJAMENTO — Premium (opções limpas, sem ruído, editorial)
-module.exports = function templateEngajamento({ pergunta, opcoes, contexto, cta }) {
+module.exports = function templateEngajamento({ pergunta, opcoes, contexto, cta, mascote = null }) {
   const letras = ['A', 'B', 'C', 'D'];
 
   const opcoesList = (opcoes || []).map((opcao, i) => {
@@ -19,17 +19,19 @@ module.exports = function templateEngajamento({ pergunta, opcoes, contexto, cta 
   <!-- Linha horizontal topo -->
   <div style="position:absolute;top:0;left:0;width:200px;height:2px;background:#f97316;"></div>
 
+  ${mascote ? `<img src="${mascote}" style="position:absolute;bottom:-10px;right:-24px;height:420px;z-index:1;filter:drop-shadow(0 12px 28px rgba(0,0,0,0.6));">` : ''}
+
   <!-- Label -->
-  <div style="font-size:11px;font-weight:700;color:#f97316;letter-spacing:4px;text-transform:uppercase;margin-bottom:48px;">💬  ME CONTA, SENSEI</div>
+  <div style="font-size:11px;font-weight:700;color:#f97316;letter-spacing:4px;text-transform:uppercase;margin-bottom:48px;position:relative;z-index:2;">💬  ME CONTA, SENSEI</div>
 
   <!-- Pergunta -->
-  <div style="font-size:60px;font-weight:900;color:#ffffff;line-height:1.0;letter-spacing:-2px;margin-bottom:8px;text-transform:uppercase;">${pergunta}</div>
+  <div style="font-size:60px;font-weight:900;color:#ffffff;line-height:1.0;letter-spacing:-2px;margin-bottom:8px;text-transform:uppercase;position:relative;z-index:2;max-width:${mascote ? '720px' : 'none'};">${pergunta}</div>
 
   <!-- Linha laranja -->
   <div style="width:60px;height:2px;background:#f97316;margin-bottom:44px;"></div>
 
   <!-- Opções estilo lista editorial -->
-  <div style="border-top:1px solid #1c1c1e;margin-bottom:36px;">
+  <div style="border-top:1px solid #1c1c1e;margin-bottom:36px;position:relative;z-index:2;max-width:${mascote ? '700px' : 'none'};">
     ${opcoesList}
   </div>
 

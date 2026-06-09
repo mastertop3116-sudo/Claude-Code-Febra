@@ -2,7 +2,7 @@
 // Estética: fundo escuro, opções com bordas, linguagem direta de comunidade
 const { getTexture } = require('../../textures');
 
-module.exports = function templateEngajamento({ pergunta, opcoes, contexto, cta, textura = 'halftone', bgImage = null }) {
+module.exports = function templateEngajamento({ pergunta, opcoes, contexto, cta, textura = 'halftone', bgImage = null, mascote = null }) {
   const estilos = [
     { border: 'rgba(249,115,22,0.5)', bg: 'rgba(249,115,22,0.07)', letra: '#f97316', num: 'A' },
     { border: 'rgba(255,255,255,0.12)', bg: 'rgba(255,255,255,0.04)', letra: '#94a3b8', num: 'B' },
@@ -35,7 +35,9 @@ module.exports = function templateEngajamento({ pergunta, opcoes, contexto, cta,
   <!-- Linha laranja topo -->
   <div style="position:absolute;top:0;left:0;width:100%;height:4px;background:linear-gradient(90deg,#f97316,#ea580c,transparent);z-index:3;"></div>
 
-  <div style="position:relative;z-index:4;display:flex;flex-direction:column;justify-content:center;">
+  ${mascote ? `<img src="${mascote}" style="position:absolute;bottom:-10px;right:-24px;height:420px;z-index:3;filter:drop-shadow(0 12px 28px rgba(0,0,0,0.6));">` : ''}
+
+  <div style="position:relative;z-index:4;display:flex;flex-direction:column;justify-content:center;max-width:${mascote ? '720px' : 'none'};">
 
     <!-- Badge -->
     <div style="display:inline-flex;align-items:center;gap:10px;border:1.5px solid rgba(249,115,22,0.5);border-radius:4px;padding:8px 18px;margin-bottom:36px;width:fit-content;">

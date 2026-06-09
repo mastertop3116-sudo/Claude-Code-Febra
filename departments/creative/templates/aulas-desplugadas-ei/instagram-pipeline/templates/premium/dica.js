@@ -1,5 +1,5 @@
 // Template: DICA DO TATAME — Premium (fundo preto, tipografia limpa, detalhe laranja fino)
-module.exports = function templateDica({ titulo, dica, destaque, resposta, cta }) {
+module.exports = function templateDica({ titulo, dica, destaque, resposta, cta, mascote = null }) {
   const linhas = (resposta || '').split('\n').map(l => l.trim()).filter(Boolean);
   const linhasHtml = linhas.map(l =>
     `<div style="display:flex;align-items:baseline;gap:16px;margin-bottom:18px;">
@@ -16,17 +16,19 @@ module.exports = function templateDica({ titulo, dica, destaque, resposta, cta }
   <!-- Linha laranja horizontal topo -->
   <div style="position:absolute;top:0;left:0;width:200px;height:2px;background:#f97316;"></div>
 
+  ${mascote ? `<img src="${mascote}" style="position:absolute;bottom:-10px;right:-22px;height:450px;z-index:1;filter:drop-shadow(0 12px 28px rgba(0,0,0,0.6));">` : ''}
+
   <!-- Label categoria -->
-  <div style="font-size:11px;font-weight:700;color:#f97316;letter-spacing:4px;text-transform:uppercase;margin-bottom:48px;">🥋  DICA DO TATAME</div>
+  <div style="font-size:11px;font-weight:700;color:#f97316;letter-spacing:4px;text-transform:uppercase;margin-bottom:48px;position:relative;z-index:2;">🥋  DICA DO TATAME</div>
 
   <!-- Título -->
-  <div style="font-size:64px;font-weight:900;color:#ffffff;line-height:1.0;letter-spacing:-2px;margin-bottom:40px;">${titulo}</div>
+  <div style="font-size:${mascote ? '56px' : '64px'};font-weight:900;color:#ffffff;line-height:1.0;letter-spacing:-2px;margin-bottom:40px;position:relative;z-index:2;max-width:${mascote ? '640px' : 'none'};">${titulo}</div>
 
   <!-- Texto da dica -->
-  <div style="font-size:21px;color:#71717a;line-height:1.7;margin-bottom:44px;max-width:760px;border-left:1px solid #27272a;padding-left:24px;">${dica}</div>
+  <div style="font-size:21px;color:#71717a;line-height:1.7;margin-bottom:44px;max-width:${mascote ? '560px' : '760px'};border-left:1px solid #27272a;padding-left:24px;position:relative;z-index:2;">${dica}</div>
 
   <!-- Destaque -->
-  <div style="margin-bottom:28px;">
+  <div style="margin-bottom:28px;position:relative;z-index:2;max-width:${mascote ? '600px' : 'none'};">
     <div style="font-size:11px;font-weight:700;color:#f97316;letter-spacing:3px;text-transform:uppercase;margin-bottom:20px;">${destaque}</div>
     ${linhasHtml}
   </div>

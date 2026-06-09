@@ -12,7 +12,7 @@ module.exports = function templateProduto({ gancho, problema, solucao, prova, ct
   <!-- Gradiente laranja superior -->
   <div style="position:absolute;top:0;right:0;width:600px;height:400px;background:radial-gradient(ellipse at top right,rgba(249,115,22,0.18) 0%,transparent 70%);pointer-events:none;z-index:2;"></div>
   <!-- Gradiente inferior esquerdo -->
-  <div style="position:absolute;bottom:0;left:0;width:400px;height:300px;background:radial-gradient(ellipse at bottom left,rgba(29,78,216,0.12) 0%,transparent 70%);pointer-events:none;z-index:2;"></div>
+  <div style="position:absolute;bottom:0;left:0;width:400px;height:300px;background:radial-gradient(ellipse at bottom left,rgba(249,115,22,0.10) 0%,transparent 70%);pointer-events:none;z-index:2;"></div>
 
   <!-- Linha laranja topo -->
   <div style="position:absolute;top:0;left:0;width:100%;height:4px;background:linear-gradient(90deg,#f97316,#ea580c,transparent);z-index:3;"></div>

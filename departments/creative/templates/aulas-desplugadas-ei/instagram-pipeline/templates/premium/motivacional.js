@@ -1,5 +1,5 @@
 // Template: MOTIVACIONAL — Premium (tipografia maximalista, fundo preto puro, respiro)
-module.exports = function templateMotivacional({ frase, contexto, cta }) {
+module.exports = function templateMotivacional({ frase, contexto, cta, mascote = null }) {
   return `
 <div style="width:1080px;height:1080px;background:#000000;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:96px 104px;">
 
@@ -11,17 +11,19 @@ module.exports = function templateMotivacional({ frase, contexto, cta }) {
   <!-- Aspas decorativas grandes -->
   <div style="position:absolute;top:60px;right:80px;font-size:240px;color:#0d0d0d;font-weight:900;line-height:1;font-family:Georgia,serif;pointer-events:none;user-select:none;">"</div>
 
+  ${mascote ? `<img src="${mascote}" style="position:absolute;bottom:-14px;right:-16px;height:650px;z-index:1;filter:drop-shadow(0 14px 30px rgba(0,0,0,0.6));">` : ''}
+
   <!-- Label -->
-  <div style="font-size:11px;font-weight:700;color:#f97316;letter-spacing:4px;text-transform:uppercase;margin-bottom:64px;">🥋  PARA O SENSEI</div>
+  <div style="font-size:11px;font-weight:700;color:#f97316;letter-spacing:4px;text-transform:uppercase;margin-bottom:${mascote ? '40px' : '64px'};position:relative;z-index:2;">🥋  PARA O SENSEI</div>
 
   <!-- Frase principal -->
-  <div style="font-size:80px;font-weight:900;color:#ffffff;line-height:0.95;letter-spacing:-3px;margin-bottom:56px;text-transform:uppercase;position:relative;z-index:1;">${frase}</div>
+  <div style="font-size:${mascote ? '64px' : '80px'};font-weight:900;color:#ffffff;line-height:0.95;letter-spacing:-3px;margin-bottom:${mascote ? '40px' : '56px'};text-transform:uppercase;position:relative;z-index:2;max-width:${mascote ? '600px' : 'none'};">${frase}</div>
 
   <!-- Linha laranja -->
-  <div style="width:80px;height:3px;background:#f97316;margin-bottom:44px;"></div>
+  <div style="width:80px;height:3px;background:#f97316;margin-bottom:44px;position:relative;z-index:2;"></div>
 
   <!-- Contexto -->
-  <div style="font-size:22px;color:#52525b;line-height:1.75;max-width:820px;margin-bottom:64px;">${contexto}</div>
+  <div style="font-size:22px;color:#52525b;line-height:1.75;max-width:${mascote ? '500px' : '820px'};margin-bottom:64px;position:relative;z-index:2;">${contexto}</div>
 
   <!-- CTA -->
   <div style="display:inline-flex;align-items:center;gap:16px;">
