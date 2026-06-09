@@ -66,33 +66,37 @@ async function gerarManha(dia, doAno, dataStr, contextoIA = '') {
   const texturaIdx = dia % TEXTURAS_POR_DIA.length;
   const ang        = ANGULOS_CARROSSEL[doAno % ANGULOS_CARROSSEL.length];
 
-  const prompt = `Você é um sensei experiente de jiu-jitsu infantil (crianças de 4 a 12 anos) e especialista em conteúdo para Instagram.
-Crie um carrossel RICO e ESPECÍFICO para senseis, instrutores e donos de academia. Data: ${dataStr}.
+  const prompt = `Você é FAIXA-PRETA de jiu-jitsu com 15 anos formando crianças de 4 a 12 anos — conhecido por aulas lotadas e turmas que não largam o tatame. Escreva um carrossel de Instagram para OUTROS senseis, instrutores e donos de academia. Data: ${dataStr}.
 
 ÂNGULO DE HOJE: ${ang.tema}.
 FORMATO: ${ang.formato}.
 
-Regras de qualidade (MUITO IMPORTANTE):
-- Conteúdo REAL e ÚTIL, com exemplos concretos do tatame. NADA de frase genérica, óbvia ou repetida.
-- Seja específico: nomes de situações, faixas etárias, falas que o sensei pode usar, exemplos práticos.
-- Cada slide de conteúdo deve ENTREGAR algo aplicável, não só "seja paciente".
+PADRÃO DE QUALIDADE (inegociável):
+- Cada slide entrega UMA ideia que o sensei aplica JÁ na próxima aula.
+- Toda dica tem um MECANISMO CONCRETO: o nome de uma brincadeira/exercício, um número (minutos, repetições, idade), uma FALA exata pro sensei usar (entre aspas), ou uma cena real do tatame.
+- Profundidade de quem vive o tatame. Cada slide com um mecanismo DIFERENTE.
+
+PROIBIDO (genérico que não entrega nada): "seja paciente", "cada criança é única", "respeite o tempo", "crie um ambiente acolhedor", "incentive a criança", "torne divertido" — sem dizer COMO. E as palavras "simplesmente" e "revolucionário".
+
+EXEMPLO RUIM: "Mantenha a turma engajada. Torne a aula divertida e dinâmica."
+EXEMPLO BOM: "Quebre a aula em blocos de 8 minutos e troque técnica por brincadeira (ex: 'pega-pega de joelhos'). Anuncie a troca com contagem regressiva — a turma volta a atenção na hora."
 
 Retorne SOMENTE JSON com esta estrutura exata:
 {
   "badge": "rótulo curto do carrossel (2-4 palavras, ex: '${ang.badge}')",
   "emoji": "1 emoji relevante ao tema",
   "slides": [
-    {"tipo":"capa","titulo":"título forte com número quando fizer sentido (ex: '6 curiosidades que...', '5 erros que...')","texto":"subtítulo curto que gera curiosidade (máx 16 palavras)"},
-    {"tipo":"conteudo","titulo":"título do ponto 1 (4-7 palavras)","texto":"explicação prática, específica e com exemplo (28 a 42 palavras)"},
-    {"tipo":"conteudo","titulo":"título do ponto 2 (4-7 palavras)","texto":"explicação prática, específica e com exemplo (28 a 42 palavras)"},
-    {"tipo":"conteudo","titulo":"título do ponto 3 (4-7 palavras)","texto":"explicação prática, específica e com exemplo (28 a 42 palavras)"},
-    {"tipo":"conteudo","titulo":"título do ponto 4 (4-7 palavras)","texto":"explicação prática, específica e com exemplo (28 a 42 palavras)"},
-    {"tipo":"conteudo","titulo":"título do ponto 5 (4-7 palavras)","texto":"explicação prática, específica e com exemplo (28 a 42 palavras)"},
-    {"tipo":"cta","titulo":"chamada para ação (máx 8 palavras)","texto":"incentivo a salvar e compartilhar com outros senseis (máx 18 palavras)"}
+    {"tipo":"capa","titulo":"título com NÚMERO + benefício específico que gera curiosidade (ex: '6 erros que esvaziam a sua turma', '5 brincadeiras que ensinam queda sem medo')","texto":"subtítulo que aumenta a curiosidade ou promete o resultado (máx 16 palavras)"},
+    {"tipo":"conteudo","titulo":"título do ponto, direto (4-7 palavras)","texto":"a dica COM mecanismo concreto (brincadeira/número/fala exata/cena real) (30 a 44 palavras)"},
+    {"tipo":"conteudo","titulo":"...","texto":"... (30 a 44 palavras, mecanismo diferente)"},
+    {"tipo":"conteudo","titulo":"...","texto":"... (30 a 44 palavras, mecanismo diferente)"},
+    {"tipo":"conteudo","titulo":"...","texto":"... (30 a 44 palavras, mecanismo diferente)"},
+    {"tipo":"conteudo","titulo":"...","texto":"... (30 a 44 palavras, mecanismo diferente)"},
+    {"tipo":"cta","titulo":"chamada para ação (máx 8 palavras)","texto":"incentivo a salvar e marcar outro sensei (máx 18 palavras)"}
   ]
 }
 
-Gere de 5 a 6 slides de conteúdo (não menos que 5). Tom: direto, experiente, de quem vive o tatame.${contextoIA}`;
+Gere de 5 a 6 slides de conteúdo (nunca menos que 5). Tom: direto, experiente, generoso.${contextoIA}`;
 
   const resp  = await client.chat.completions.create({
     model:           'gpt-4o-mini',
@@ -167,16 +171,21 @@ async function gerarNoite(dia, doAno, dataStr, contextoIA = '') {
 }`;
   }
 
-  const prompt = `Você é um sensei experiente de jiu-jitsu infantil e criador de conteúdo para Instagram.
+  const prompt = `Você é FAIXA-PRETA de jiu-jitsu com 15 anos formando crianças de 4 a 12 anos, criando conteúdo para Instagram.
 Tipo de post: ${tipo}. Data: ${dataStr}.
 FOCO DE HOJE: ${foco}.
 
-Crie conteúdo ESPECÍFICO e ÚTIL para senseis que ensinam crianças de 4 a 12 anos.
-Evite o óbvio e o genérico — traga exemplos reais do tatame.
+PADRÃO DE QUALIDADE (inegociável):
+- Conteúdo ESPECÍFICO e aplicável: traga um mecanismo concreto — nome de brincadeira/exercício, um número (minutos, idade, repetições), uma FALA exata pro sensei usar, ou uma cena real do tatame.
+- PROIBIDO genérico: "seja paciente", "cada criança é única", "torne divertido", "incentive" — sem dizer COMO. E as palavras "simplesmente"/"revolucionário".
+${tipo === 'motivacional' ? '- Mesmo sendo motivacional, ancore numa cena concreta do tatame (não só frase de efeito vazia).' : ''}
+${tipo === 'dica' ? '- Cada um dos 3 itens da resposta = uma ação concreta e diferente (não 3 versões da mesma coisa).' : ''}
+${tipo === 'engajamento' ? '- A pergunta deve ser específica e gerar opinião dividida; as opções, situações reais que o sensei reconhece.' : ''}
+
 Retorne SOMENTE JSON com esta estrutura exata:
 ${schema}
 
-Tom: autêntico, direto, de quem vive o tatame todo dia.${contextoIA}`;
+Tom: autêntico, direto, generoso, de quem vive o tatame todo dia.${contextoIA}`;
 
   const resp  = await client.chat.completions.create({
     model:           'gpt-4o-mini',

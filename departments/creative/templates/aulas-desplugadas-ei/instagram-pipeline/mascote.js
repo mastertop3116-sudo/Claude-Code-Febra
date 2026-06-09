@@ -15,9 +15,23 @@ const FAIXA_POR_ESTILO = {
   color:   'laranja',
 };
 
+// Todas as poses -web disponíveis de uma faixa: jj-laranja-web.png + jj-laranja-2-web.png...
+function posesDaFaixa(faixa) {
+  const lista = [];
+  const principal = path.join(DIR, `jj-${faixa}-web.png`);
+  if (fs.existsSync(principal)) lista.push(principal);
+  for (let n = 2; n <= 9; n++) {
+    const p = path.join(DIR, `jj-${faixa}-${n}-web.png`);
+    if (fs.existsSync(p)) lista.push(p);
+  }
+  return lista;
+}
+
+// Escolhe uma pose da faixa (sorteia quando há mais de uma → variedade visual)
 function caminho(faixa) {
-  const f = path.join(DIR, `jj-${faixa}-web.png`);
-  return fs.existsSync(f) ? f : null;
+  const poses = posesDaFaixa(faixa);
+  if (!poses.length) return null;
+  return poses[Math.floor(Math.random() * poses.length)];
 }
 
 // Retorna o mascote como data URI base64 (vai direto no src do <img>).
