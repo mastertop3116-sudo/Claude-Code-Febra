@@ -2,7 +2,7 @@
 // tipo: 'capa' | 'conteudo' | 'cta'
 const { getTexture } = require('../../textures');
 
-module.exports = function templateSlide({ tipo, titulo, texto, numero, total, textura = 'grunge', badge = 'Dica do Tatame', emoji = '🥋' }) {
+module.exports = function templateSlide({ tipo, titulo, texto, numero, total, textura = 'grunge', badge = 'Dica do Tatame', emoji = '🥋', mascote = null }) {
 
   const overlay = (extra = '') => `
   ${getTexture(textura)}
@@ -24,37 +24,41 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, te
 
   // ── CAPA ─────────────────────────────────────────────────────────────────
   if (tipo === 'capa') {
+    const temMascote = !!mascote;
     return `
 <div style="width:1080px;height:1080px;background:#0a0a0f;position:relative;overflow:hidden;">
   ${overlay(`
   <div style="position:absolute;top:0;right:0;width:680px;height:680px;background:radial-gradient(ellipse at top right,rgba(249,115,22,0.22) 0%,transparent 60%);z-index:2;pointer-events:none;"></div>
   `)}
 
-  <div style="position:absolute;top:0;left:0;width:100%;height:calc(100% - 100px);z-index:4;display:flex;flex-direction:column;justify-content:center;padding:0 96px;">
+  ${temMascote ? `<img src="${mascote}" style="position:absolute;bottom:-12px;right:-18px;height:720px;z-index:3;filter:drop-shadow(0 14px 34px rgba(0,0,0,0.6));">` : ''}
+
+  <div style="position:absolute;top:0;left:0;width:100%;height:calc(100% - 100px);z-index:4;display:flex;flex-direction:column;justify-content:${temMascote ? 'flex-start' : 'center'};padding:${temMascote ? '150px 96px 0' : '0 96px'};">
 
     <!-- Badge -->
-    <div style="display:inline-flex;align-items:center;gap:12px;border:1.5px solid rgba(249,115,22,0.7);border-radius:3px;padding:10px 24px;margin-bottom:52px;width:fit-content;">
+    <div style="display:inline-flex;align-items:center;gap:12px;border:1.5px solid rgba(249,115,22,0.7);border-radius:3px;padding:10px 24px;margin-bottom:${temMascote ? '36px' : '52px'};width:fit-content;">
       <span style="font-size:18px;">${emoji}</span>
       <span style="font-size:12px;font-weight:800;color:#f97316;letter-spacing:3.5px;text-transform:uppercase;">${badge}</span>
     </div>
 
     <!-- Título -->
-    <div style="font-size:72px;font-weight:900;color:#ffffff;line-height:0.92;letter-spacing:-2.5px;margin-bottom:40px;text-transform:uppercase;">${titulo}</div>
+    <div style="font-size:72px;font-weight:900;color:#ffffff;line-height:0.92;letter-spacing:-2.5px;margin-bottom:36px;text-transform:uppercase;max-width:${temMascote ? '560px' : 'none'};">${titulo}</div>
 
     <!-- Divisor -->
-    <div style="width:64px;height:4px;background:#f97316;margin-bottom:44px;"></div>
+    <div style="width:64px;height:4px;background:#f97316;margin-bottom:${temMascote ? '32px' : '44px'};"></div>
 
     <!-- Subtítulo -->
-    <div style="font-size:28px;color:#94a3b8;line-height:1.6;max-width:800px;">${texto}</div>
+    <div style="font-size:28px;color:#94a3b8;line-height:1.6;max-width:${temMascote ? '430px' : '800px'};">${texto}</div>
   </div>
 
+  ${temMascote ? '' : `
   <!-- ARRASTA -->
   <div style="position:absolute;bottom:96px;right:96px;display:flex;align-items:center;gap:14px;z-index:5;">
     <span style="font-size:13px;font-weight:800;color:#f97316;letter-spacing:3px;text-transform:uppercase;">Arrasta</span>
     <svg width="28" height="18" viewBox="0 0 28 18" fill="none">
       <path d="M0 9H24M24 9L16 1M24 9L16 17" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-  </div>
+  </div>`}
 
   ${dots(1)}
 </div>`;
@@ -103,6 +107,21 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, te
 
   // ── CTA ───────────────────────────────────────────────────────────────────
   if (tipo === 'cta') {
+    if (mascote) {
+      return `
+<div style="width:1080px;height:1080px;background:#0a0a0f;position:relative;overflow:hidden;">
+  ${overlay(`<div style="position:absolute;top:0;right:0;width:700px;height:700px;background:radial-gradient(ellipse at top right,rgba(249,115,22,0.2) 0%,transparent 60%);z-index:2;pointer-events:none;"></div>`)}
+  <img src="${mascote}" style="position:absolute;bottom:-12px;right:-18px;height:680px;z-index:3;filter:drop-shadow(0 14px 34px rgba(0,0,0,0.6));">
+  <div style="position:absolute;top:0;left:0;width:100%;height:calc(100% - 100px);z-index:4;display:flex;flex-direction:column;justify-content:center;padding:0 96px;">
+    <div style="font-size:13px;font-weight:800;color:#f97316;letter-spacing:3.5px;text-transform:uppercase;margin-bottom:28px;">${emoji}  ${badge}</div>
+    <div style="font-size:60px;font-weight:900;color:#ffffff;line-height:0.95;letter-spacing:-2.5px;margin-bottom:28px;text-transform:uppercase;max-width:540px;">${titulo}</div>
+    <div style="width:64px;height:4px;background:#f97316;margin-bottom:32px;"></div>
+    <div style="font-size:24px;color:#94a3b8;line-height:1.55;max-width:430px;margin-bottom:42px;">${texto}</div>
+    <div style="background:#f97316;border-radius:4px;padding:24px 40px;width:fit-content;"><span style="font-size:26px;font-weight:900;color:#000000;letter-spacing:0.5px;">💾 Salva esse carrossel!</span></div>
+  </div>
+  ${dots(total)}
+</div>`;
+    }
     return `
 <div style="width:1080px;height:1080px;background:#0a0a0f;position:relative;overflow:hidden;">
   ${overlay(`

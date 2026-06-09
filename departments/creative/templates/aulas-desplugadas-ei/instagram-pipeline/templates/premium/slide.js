@@ -2,7 +2,7 @@
 // Preto #000000, tipografia limpa, detalhes finos de laranja. Elegante e minimalista.
 // tipo: 'capa' | 'conteudo' | 'cta'
 
-module.exports = function templateSlide({ tipo, titulo, texto, numero, total, badge = 'Dica do Tatame', emoji = '🥋' }) {
+module.exports = function templateSlide({ tipo, titulo, texto, numero, total, badge = 'Dica do Tatame', emoji = '🥋', mascote = null }) {
 
   // Detalhes laranja finos (linha vertical esquerda + risco horizontal no topo) — assinatura do Premium
   const detalhes = `
@@ -23,30 +23,34 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, ba
 
   // ── CAPA ───────────────────────────────────────────────────────────────────
   if (tipo === 'capa') {
+    const temMascote = !!mascote;
     return `
-<div style="width:1080px;height:1080px;background:#000000;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 104px;">
+<div style="width:1080px;height:1080px;background:#000000;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:${temMascote ? 'flex-start' : 'center'};padding:${temMascote ? '150px 104px 0' : '0 104px'};">
   ${detalhes}
   <div style="position:absolute;top:0;right:0;width:560px;height:560px;background:radial-gradient(ellipse at top right,rgba(249,115,22,0.14) 0%,transparent 62%);z-index:1;"></div>
 
+  ${temMascote ? `<img src="${mascote}" style="position:absolute;bottom:-12px;right:-18px;height:720px;z-index:2;filter:drop-shadow(0 14px 34px rgba(0,0,0,0.6));">` : ''}
+
   <!-- Label categoria -->
-  <div style="font-size:12px;font-weight:700;color:#f97316;letter-spacing:5px;text-transform:uppercase;margin-bottom:46px;z-index:4;">${emoji}&nbsp;&nbsp;${badge}</div>
+  <div style="font-size:12px;font-weight:700;color:#f97316;letter-spacing:5px;text-transform:uppercase;margin-bottom:${temMascote ? '34px' : '46px'};z-index:4;">${emoji}&nbsp;&nbsp;${badge}</div>
 
   <!-- Título -->
-  <div style="font-size:78px;font-weight:900;color:#ffffff;line-height:0.98;letter-spacing:-2.5px;margin-bottom:40px;z-index:4;">${titulo}</div>
+  <div style="font-size:78px;font-weight:900;color:#ffffff;line-height:0.98;letter-spacing:-2.5px;margin-bottom:36px;z-index:4;max-width:${temMascote ? '560px' : 'none'};">${titulo}</div>
 
   <!-- Divisor fino -->
-  <div style="width:72px;height:2px;background:#f97316;margin-bottom:42px;z-index:4;"></div>
+  <div style="width:72px;height:2px;background:#f97316;margin-bottom:${temMascote ? '30px' : '42px'};z-index:4;"></div>
 
   <!-- Subtítulo -->
-  <div style="font-size:27px;color:#a1a1aa;line-height:1.6;max-width:820px;font-weight:400;z-index:4;">${texto}</div>
+  <div style="font-size:27px;color:#a1a1aa;line-height:1.6;max-width:${temMascote ? '430px' : '820px'};font-weight:400;z-index:4;">${texto}</div>
 
+  ${temMascote ? '' : `
   <!-- ARRASTA -->
   <div style="position:absolute;bottom:104px;right:104px;display:flex;align-items:center;gap:14px;z-index:5;">
     <span style="font-size:12px;font-weight:700;color:#f97316;letter-spacing:4px;text-transform:uppercase;">Arrasta</span>
     <svg width="28" height="16" viewBox="0 0 28 18" fill="none">
       <path d="M0 9H24M24 9L16 1M24 9L16 17" stroke="#f97316" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-  </div>
+  </div>`}
 
   ${dots(1)}
 </div>`;
@@ -83,6 +87,20 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, ba
 
   // ── CTA ────────────────────────────────────────────────────────────────────
   if (tipo === 'cta') {
+    if (mascote) {
+      return `
+<div style="width:1080px;height:1080px;background:#000000;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 104px;">
+  ${detalhes}
+  <div style="position:absolute;top:0;right:0;width:560px;height:560px;background:radial-gradient(ellipse at top right,rgba(249,115,22,0.14) 0%,transparent 62%);z-index:1;"></div>
+  <img src="${mascote}" style="position:absolute;bottom:-12px;right:-18px;height:680px;z-index:2;filter:drop-shadow(0 14px 34px rgba(0,0,0,0.6));">
+  <div style="font-size:12px;font-weight:700;color:#f97316;letter-spacing:5px;text-transform:uppercase;margin-bottom:30px;z-index:4;">${emoji}&nbsp;&nbsp;${badge}</div>
+  <div style="font-size:62px;font-weight:900;color:#ffffff;line-height:1.0;letter-spacing:-2px;margin-bottom:28px;z-index:4;max-width:540px;">${titulo}</div>
+  <div style="width:72px;height:2px;background:#f97316;margin-bottom:30px;z-index:4;"></div>
+  <div style="font-size:24px;color:#a1a1aa;line-height:1.6;max-width:430px;margin-bottom:42px;z-index:4;">${texto}</div>
+  <div style="background:#f97316;border-radius:3px;padding:24px 40px;width:fit-content;z-index:4;"><span style="font-size:26px;font-weight:900;color:#000000;letter-spacing:0.5px;">💾 Salva esse carrossel!</span></div>
+  ${dots(total)}
+</div>`;
+    }
     return `
 <div style="width:1080px;height:1080px;background:#000000;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:0 104px;">
   ${detalhes}

@@ -6,6 +6,7 @@ const os           = require('os');
 const config       = require('./config');
 const { getFontStyle } = require('./fonts');
 const { gerarFundo } = require('./gerar-bg-ia');
+const { urlMascote } = require('./mascote');
 
 function carregarTemplate(tipo, estilo) {
   const estilos = ['dark', 'color', 'premium'];
@@ -41,10 +42,12 @@ function garantirOutputDir() {
 }
 
 async function gerarPost(entrada, bgBase64 = null) {
-  const { tipo, estilo = 'dark', fontes = [], conteudo } = entrada;
+  const { tipo, estilo = 'dark', faixa, fontes = [], conteudo } = entrada;
 
   const templateFn = carregarTemplate(tipo, estilo);
   if (!templateFn) throw new Error(`Template desconhecido: "${tipo}" / "${estilo}"`);
+
+  const mascote = urlMascote({ faixa, estilo });
 
   // Salva fundo 3D em arquivo temporário (base64 vem pronto do pipeline em paralelo)
   // O fundo 3D só entra no estilo Dark — Premium (preto liso) e Color (card branco) têm visual próprio.
@@ -62,7 +65,7 @@ async function gerarPost(entrada, bgBase64 = null) {
   }
 
   // Passa bgImage=null para o template (fundo via CSS), sem embutir base64
-  const html = buildHtml(templateFn({ ...conteudo, bgImage: null }), fontes, bgFilePath);
+  const html = buildHtml(templateFn({ ...conteudo, bgImage: null, mascote }), fontes, bgFilePath);
   garantirOutputDir();
 
   const timestamp  = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
@@ -88,10 +91,12 @@ async function gerarPost(entrada, bgBase64 = null) {
 }
 
 async function gerarCarrossel(entrada) {
-  const { estilo = 'dark', fontes = [], textura = 'grunge', badge, emoji, slides } = entrada;
+  const { estilo = 'dark', faixa, fontes = [], textura = 'grunge', badge, emoji, slides } = entrada;
 
   const slideFn = carregarTemplate('slide', estilo);
   if (!slideFn) throw new Error(`Template de slide desconhecido para estilo "${estilo}"`);
+
+  const mascote = urlMascote({ faixa, estilo }); // só entra na capa e no CTA
 
   garantirOutputDir();
 
@@ -106,7 +111,8 @@ async function gerarCarrossel(entrada) {
 
   for (let i = 0; i < slides.length; i++) {
     const slide = slides[i];
-    const bodyHtml = slideFn({ ...slide, total, textura, badge, emoji });
+    const ehCapaOuCta = slide.tipo === 'capa' || slide.tipo === 'cta';
+    const bodyHtml = slideFn({ ...slide, total, textura, badge, emoji, mascote: ehCapaOuCta ? mascote : null });
     const html = buildHtml(bodyHtml, fontes);
 
     const page = await browser.newPage();

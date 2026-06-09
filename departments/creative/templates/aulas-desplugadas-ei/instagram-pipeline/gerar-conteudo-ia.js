@@ -15,6 +15,9 @@ const FONTES_POR_DIA   = [['bebas'], ['anton'], ['gagalin'], ['oswald'], ['bebas
 const TEXTURAS_POR_DIA = ['grunge', 'halftone', 'noise', 'grunge', 'halftone', 'noise', 'grunge'];
 const ESTILOS_POR_DIA  = ['dark', 'premium', 'color', 'dark', 'premium', 'color', 'dark']; // revezamento visual
 
+// Faixa do mascote 3D — gira por dia-do-ano contando a evolução branca → preta (todas existem)
+const FAIXAS_POR_DIA   = ['branca', 'cinza', 'amarela', 'laranja', 'verde', 'azul', 'roxa', 'marrom', 'preta', 'vermelha'];
+
 // Tipos de post da noite (post único) — varia o formato visual
 const TIPOS_NOITE = ['motivacional', 'dica', 'engajamento', 'dica', 'motivacional', 'produto', 'engajamento'];
 
@@ -111,6 +114,7 @@ Gere de 5 a 6 slides de conteúdo (não menos que 5). Tom: direto, experiente, d
   return {
     tipo:    'carrossel',
     estilo:  ESTILOS_POR_DIA[dia % ESTILOS_POR_DIA.length],
+    faixa:   FAIXAS_POR_DIA[doAno % FAIXAS_POR_DIA.length],
     fontes:  FONTES_POR_DIA[fonteIdx],
     textura: TEXTURAS_POR_DIA[texturaIdx],
     badge:   g.badge || ang.badge,
@@ -182,7 +186,7 @@ Tom: autêntico, direto, de quem vive o tatame todo dia.${contextoIA}`;
   });
 
   const g = JSON.parse(resp.choices[0].message.content);
-  return { tipo, estilo, fontes, textura, conteudo: g };
+  return { tipo, estilo, faixa: FAIXAS_POR_DIA[doAno % FAIXAS_POR_DIA.length], fontes, textura, conteudo: g };
 }
 
 async function gerarConteudo(periodo) {
