@@ -29,7 +29,7 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, ba
   ${detalhes}
   <div style="position:absolute;top:0;right:0;width:560px;height:560px;background:radial-gradient(ellipse at top right,rgba(249,115,22,0.14) 0%,transparent 62%);z-index:1;"></div>
 
-  ${temMascote ? `<img src="${mascote}" style="position:absolute;bottom:-12px;right:-18px;height:720px;z-index:2;filter:drop-shadow(0 14px 34px rgba(0,0,0,0.6));">` : ''}
+  ${temMascote ? `<img src="${mascote}" style="position:absolute;bottom:8px;right:-12px;height:700px;z-index:2;filter:drop-shadow(0 14px 34px rgba(0,0,0,0.6));">` : ''}
 
   <!-- Label categoria -->
   <div style="font-size:12px;font-weight:700;color:#f97316;letter-spacing:5px;text-transform:uppercase;margin-bottom:${temMascote ? '34px' : '46px'};z-index:4;">${emoji}&nbsp;&nbsp;${badge}</div>
@@ -92,7 +92,7 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, ba
 <div style="width:1080px;height:1080px;background:#000000;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 104px;">
   ${detalhes}
   <div style="position:absolute;top:0;right:0;width:560px;height:560px;background:radial-gradient(ellipse at top right,rgba(249,115,22,0.14) 0%,transparent 62%);z-index:1;"></div>
-  <img src="${mascote}" style="position:absolute;bottom:-12px;right:-18px;height:680px;z-index:2;filter:drop-shadow(0 14px 34px rgba(0,0,0,0.6));">
+  <img src="${mascote}" style="position:absolute;bottom:8px;right:-12px;height:650px;z-index:2;filter:drop-shadow(0 14px 34px rgba(0,0,0,0.6));">
   <div style="font-size:12px;font-weight:700;color:#f97316;letter-spacing:5px;text-transform:uppercase;margin-bottom:30px;z-index:4;">${emoji}&nbsp;&nbsp;${badge}</div>
   <div style="font-size:62px;font-weight:900;color:#ffffff;line-height:1.0;letter-spacing:-2px;margin-bottom:28px;z-index:4;max-width:540px;">${titulo}</div>
   <div style="width:72px;height:2px;background:#f97316;margin-bottom:30px;z-index:4;"></div>

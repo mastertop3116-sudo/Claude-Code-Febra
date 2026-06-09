@@ -9,7 +9,7 @@ module.exports = function templateMotivacional({ frase, contexto, cta, mascote =
   <div style="position:absolute;top:72px;right:72px;font-size:38px;opacity:0.8;transform:rotate(10deg);">🏆</div>
   <div style="position:absolute;bottom:72px;left:72px;font-size:36px;opacity:0.75;transform:rotate(6deg);">💪</div>
   <div style="position:absolute;bottom:80px;right:68px;font-size:40px;opacity:0.8;transform:rotate(-8deg);">⭐</div>`}
-  ${m ? `<img src="${mascote}" style="position:absolute;bottom:-8px;right:0;height:780px;z-index:2;filter:drop-shadow(0 16px 30px rgba(0,0,0,0.32));">` : ''}
+  ${m ? `<img src="${mascote}" style="position:absolute;bottom:28px;right:18px;height:660px;z-index:2;filter:drop-shadow(0 16px 30px rgba(0,0,0,0.32));">` : ''}
   <div style="background:rgba(255,255,255,0.97);border-radius:28px;padding:${m ? '52px 56px' : '60px 64px'};width:100%;max-width:${m ? '600px' : '940px'};box-shadow:0 24px 72px rgba(0,0,0,0.4);position:relative;z-index:3;text-align:${m ? 'left' : 'center'};">
     ${m ? '' : '<div style="font-size:72px;margin-bottom:24px;line-height:1;">🥋</div>'}
     <div style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#f97316,#ea580c);border-radius:50px;padding:10px 24px;margin-bottom:${m ? '24px' : '32px'};">

@@ -31,7 +31,7 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, te
   <div style="position:absolute;top:0;right:0;width:680px;height:680px;background:radial-gradient(ellipse at top right,rgba(249,115,22,0.22) 0%,transparent 60%);z-index:2;pointer-events:none;"></div>
   `)}
 
-  ${temMascote ? `<img src="${mascote}" style="position:absolute;bottom:-12px;right:-18px;height:720px;z-index:3;filter:drop-shadow(0 14px 34px rgba(0,0,0,0.6));">` : ''}
+  ${temMascote ? `<img src="${mascote}" style="position:absolute;bottom:8px;right:-12px;height:700px;z-index:3;filter:drop-shadow(0 14px 34px rgba(0,0,0,0.6));">` : ''}
 
   <div style="position:absolute;top:0;left:0;width:100%;height:calc(100% - 100px);z-index:4;display:flex;flex-direction:column;justify-content:${temMascote ? 'flex-start' : 'center'};padding:${temMascote ? '150px 96px 0' : '0 96px'};">
 
@@ -111,7 +111,7 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, te
       return `
 <div style="width:1080px;height:1080px;background:#0a0a0f;position:relative;overflow:hidden;">
   ${overlay(`<div style="position:absolute;top:0;right:0;width:700px;height:700px;background:radial-gradient(ellipse at top right,rgba(249,115,22,0.2) 0%,transparent 60%);z-index:2;pointer-events:none;"></div>`)}
-  <img src="${mascote}" style="position:absolute;bottom:-12px;right:-18px;height:680px;z-index:3;filter:drop-shadow(0 14px 34px rgba(0,0,0,0.6));">
+  <img src="${mascote}" style="position:absolute;bottom:8px;right:-12px;height:650px;z-index:3;filter:drop-shadow(0 14px 34px rgba(0,0,0,0.6));">
   <div style="position:absolute;top:0;left:0;width:100%;height:calc(100% - 100px);z-index:4;display:flex;flex-direction:column;justify-content:center;padding:0 96px;">
     <div style="font-size:13px;font-weight:800;color:#f97316;letter-spacing:3.5px;text-transform:uppercase;margin-bottom:28px;">${emoji}  ${badge}</div>
     <div style="font-size:60px;font-weight:900;color:#ffffff;line-height:0.95;letter-spacing:-2.5px;margin-bottom:28px;text-transform:uppercase;max-width:540px;">${titulo}</div>

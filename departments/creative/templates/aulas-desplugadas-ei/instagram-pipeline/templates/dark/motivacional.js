@@ -19,7 +19,7 @@ module.exports = function templateMotivacional({ frase, contexto, cta, textura =
   <!-- Linha laranja topo -->
   <div style="position:absolute;top:0;left:0;width:100%;height:4px;background:linear-gradient(90deg,#f97316,#ea580c,transparent);z-index:3;"></div>
 
-  ${mascote ? `<img src="${mascote}" style="position:absolute;bottom:-14px;right:-16px;height:650px;z-index:3;filter:drop-shadow(0 14px 30px rgba(0,0,0,0.6));">` : ''}
+  ${mascote ? `<img src="${mascote}" style="position:absolute;bottom:10px;right:-12px;height:620px;z-index:3;filter:drop-shadow(0 14px 30px rgba(0,0,0,0.6));">` : ''}
 
   <div style="position:relative;z-index:4;display:flex;flex-direction:column;justify-content:center;max-width:${mascote ? '600px' : 'none'};">
 
