@@ -48,30 +48,30 @@ async function openaiJson(prompt, systemInstruction = null) {
   return r.choices[0].message.content
 }
 
-async function openaiImage(prompt, size = '1024x1024') {
-  // Try DALL-E 3 first; fall back to DALL-E 2 if the model isn't available on this key
-  let model = 'dall-e-3'
-  let effectiveSize = size
+async function openaiImage(prompt, size = '1024x1024', quality = 'medium') {
+  // Modelo de imagem ATUAL da OpenAI (gpt-image-2). Fallback p/ gpt-image-1 se indisponível.
+  let model = process.env.IMG_MODEL || 'gpt-image-2'
   let r
   try {
-    r = await _getClient().images.generate({ model, prompt, n: 1, size: effectiveSize, quality: 'standard' })
+    r = await _getClient().images.generate({ model, prompt, n: 1, size, quality })
   } catch (e) {
-    if (/does not exist/i.test(e.message) || e.status === 400) {
-      console.warn('[openai] DALL-E 3 indisponível — usando DALL-E 2 como fallback')
-      model = 'dall-e-2'
-      effectiveSize = '1024x1024'
-      r = await _getClient().images.generate({ model, prompt: prompt.slice(0, 1000), n: 1, size: effectiveSize })
-    } else {
-      throw e
-    }
+    console.warn('[openai] ' + model + ' indisponível — tentando gpt-image-1:', String(e.message).slice(0, 80))
+    model = 'gpt-image-1'
+    r = await _getClient().images.generate({ model, prompt, n: 1, size, quality })
   }
-  const url = r.data[0].url
-  if (!url) throw new Error('DALL-E não retornou URL')
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`fetch imagem HTTP ${res.status}`)
-  const buf = Buffer.from(await res.arrayBuffer())
+  const d = r.data[0]
+  let buf
+  if (d.b64_json) {
+    buf = Buffer.from(d.b64_json, 'base64')          // gpt-image-1 devolve base64
+  } else if (d.url) {
+    const res = await fetch(d.url)                   // dall-e devolve URL
+    if (!res.ok) throw new Error(`fetch imagem HTTP ${res.status}`)
+    buf = Buffer.from(await res.arrayBuffer())
+  } else {
+    throw new Error('imagem não retornada')
+  }
   if (buf.length < 5000) throw new Error(`imagem suspeita: ${buf.length} bytes`)
-  _logCost({ service: 'openai', model, units: 1, cost_usd: model === 'dall-e-3' ? PRICE_IMG : 0.018 })
+  _logCost({ service: 'openai', model, units: 1, cost_usd: PRICE_IMG })
   return buf
 }
 

@@ -174,4 +174,38 @@ Pedido do Rodrigo: os posts estavam sempre iguais (sempre Dark, sempre "5 dicas 
 
 ---
 
+## Atualização 2026-06-09 — UPGRADE visual: mascote 3D nos posts
+
+Pedido do Rodrigo: dar um upgrade nas imagens usando o que já temos. Solução: usar o **mascote 3D de jiu-jitsu** (de `assets/mascotes`, 10 faixas, 820×820 transparente). Sem gerar imagem nova (API de imagem está travada).
+
+- **Novo: `mascote.js`** — acha o mascote por faixa/estilo e devolve como **base64** (à prova de falha no Puppeteer; `file://` é bloqueado e tem espaço no caminho "Rodrigo Cruz").
+- **Carrossel:** mascote na **capa** (imagem do feed) e no **CTA**; telas de conteúdo do meio ficam limpas (sem cansar do personagem).
+- **Posts de noite:** mascote em motivacional/dica/engajamento dos 3 estilos. Dark/Premium = mascote no canto + texto estreitado. Color = card branco reduzido + mascote do lado (redesenho). **Produto fica limpo** (layout denso de venda).
+- **Revezamento de faixa por dia** (`FAIXAS_POR_DIA`, por dia-do-ano): branca → cinza → amarela → laranja → verde → azul → roxa → marrom → preta → vermelha. Conta a "evolução do aluno".
+- **Bug corrigido:** brilho **azul** no produto Dark trocado por laranja (regra "nunca azul").
+- Commits: e36dce9 (carrossel) e 6e2d097 (noite). No ar no Render.
+- **Ferramentas de prévia (locais, não usadas em produção):** `proto-mascote.js` (capa/CTA), `proto-noite.js` (posts de noite), `gerar-amostras.js`. Amostras em `Downloads/AMOSTRAS-INSTAGRAM-JIUJITSU`.
+
+---
+
+## Revisão de qualidade 2026-06-09 (tarde) — pedido do Rodrigo
+
+Revisei o conjunto completo (3 estilos × carrossel cheio + posts de noite) contra o padrão de qualidade ("sem buraco no topo nem no meio", conteúdo de verdade). Achados e correções:
+
+- ✅ **Telas de conteúdo do meio (Dark/Premium) estavam VAZIAS** — título+texto centralizados com muito espaço morto em cima e embaixo. **Corrigido:** conteúdo distribuído de cima a baixo (passo no topo, título+corpo no meio, assinatura "Dinâmicas de Jiu-Jitsu" embaixo) + número decorativo maior preenchendo a direita + fontes maiores (título 74, corpo 31). Testado com texto curto e longo, sem overflow. Commit 6e1863f.
+- ✅ **Color já preenchia bem** (card branco grande) — sem mudança.
+- ✅ Mascote: na frente do card, no espaço vazio, aterrado (sombra de chão) — commits 3b18cb2 + 12418f2.
+- ✅ Post de venda (produto) cheio e sem mascote (de propósito).
+- Conteúdo da IA conferido: específico e útil (segue as regras de copy do vault — número + benefício, gancho→dicas→CTA).
+
+Amostras atualizadas em `Downloads/AMOSTRAS-INSTAGRAM-JIUJITSU` (carrosséis completos por estilo + posts de noite).
+
+### Melhoria de conteúdo + variedade de imagem (mesmo dia, commit 4c933cd)
+
+- ✅ **Conteúdo muito mais forte** (`gerar-conteudo-ia.js`): persona faixa-preta com 15 anos; cada dica agora exige um **mecanismo concreto** — nome de brincadeira ('pega-pega de joelhos'), número (8 min, 1 minuto), **fala exata** pro sensei usar, ou cena real. Proíbe genérico ("seja paciente"...) com lista + exemplo bom×ruim. Capa = número + benefício específico (regras de copy do vault). Resultado conferido: bem mais específico e aplicável.
+- ✅ **Variedade de pose do mascote** (`mascote.js`): agora SORTEIA a pose quando a faixa tem mais de uma. Processei 3 poses extras de **laranja** do catálogo (rembg + enquadramento normalizado) → `jj-laranja-2/3/4-web.png`. Orange tem 4 poses. Dá pra adicionar mais poses por faixa depois (é só pôr `jj-<faixa>-N-web.png`).
+- Catálogo de jiu-jitsu: 36 imagens.
+
+---
+
 *Arquivo criado em 2026-05-26. Atualizar quando houver mudança na estrutura ou nos arquivos.*

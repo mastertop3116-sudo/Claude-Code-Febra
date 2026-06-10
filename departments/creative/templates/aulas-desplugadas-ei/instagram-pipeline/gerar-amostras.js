@@ -17,21 +17,21 @@ function mover(de, para) { fs.copyFileSync(de, para); fs.unlinkSync(de); }
 
 // ── conteúdo de carrossel via IA ───────────────────────────────────────────────
 async function genCarrossel(temaInstrucao, badgeSugerido) {
-  const prompt = `Você é um sensei experiente de jiu-jitsu infantil (4 a 12 anos) e criador de conteúdo para Instagram.
-Crie um carrossel RICO e ESPECÍFICO sobre: ${temaInstrucao}.
-Conteúdo real e aplicável, com exemplos do tatame. Nada genérico.
+  const prompt = `Você é FAIXA-PRETA de jiu-jitsu com 15 anos formando crianças de 4 a 12 anos. Crie um carrossel de Instagram sobre: ${temaInstrucao}.
+PADRÃO: cada slide entrega UMA ideia aplicável JÁ na próxima aula, com MECANISMO concreto (nome de brincadeira, número, fala exata pro sensei entre aspas, ou cena real). PROIBIDO genérico ("seja paciente", "torne divertido" sem dizer como) e as palavras "simplesmente"/"revolucionário".
+EXEMPLO BOM: "Quebre a aula em blocos de 8 minutos e troque técnica por brincadeira (ex: 'pega-pega de joelhos'). Anuncie com contagem regressiva — a turma volta a atenção na hora."
 Retorne SOMENTE JSON:
 {
  "badge":"rótulo curto (2-4 palavras, ex: '${badgeSugerido}')",
  "emoji":"1 emoji",
  "slides":[
-   {"tipo":"capa","titulo":"título forte com número quando fizer sentido","texto":"subtítulo curto que gera curiosidade (máx 16 palavras)"},
-   {"tipo":"conteudo","titulo":"título do ponto (4-7 palavras)","texto":"explicação prática e específica com exemplo (28 a 42 palavras)"},
-   {"tipo":"conteudo","titulo":"...","texto":"..."},
-   {"tipo":"conteudo","titulo":"...","texto":"..."},
-   {"tipo":"conteudo","titulo":"...","texto":"..."},
-   {"tipo":"conteudo","titulo":"...","texto":"..."},
-   {"tipo":"cta","titulo":"chamada para ação (máx 8 palavras)","texto":"incentivo a salvar e compartilhar (máx 18 palavras)"}
+   {"tipo":"capa","titulo":"título com NÚMERO + benefício específico que gera curiosidade","texto":"subtítulo que aumenta a curiosidade (máx 16 palavras)"},
+   {"tipo":"conteudo","titulo":"título do ponto (4-7 palavras)","texto":"a dica COM mecanismo concreto (30 a 44 palavras)"},
+   {"tipo":"conteudo","titulo":"...","texto":"... (mecanismo diferente)"},
+   {"tipo":"conteudo","titulo":"...","texto":"... (mecanismo diferente)"},
+   {"tipo":"conteudo","titulo":"...","texto":"... (mecanismo diferente)"},
+   {"tipo":"conteudo","titulo":"...","texto":"... (mecanismo diferente)"},
+   {"tipo":"cta","titulo":"chamada para ação (máx 8 palavras)","texto":"incentivo a salvar e marcar outro sensei (máx 18 palavras)"}
  ]
 }
 Gere 5 a 6 slides de conteúdo.`;
