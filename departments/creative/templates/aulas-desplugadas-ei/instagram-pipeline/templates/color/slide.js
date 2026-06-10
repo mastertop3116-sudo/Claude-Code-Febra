@@ -1,7 +1,11 @@
 // Template: SLIDE DE CARROSSEL — Color (paleta da marca: laranja quente + card branco)
 // tipo: 'capa' | 'conteudo' | 'cta'
 
+const { destacar, limpar } = require('../../destaque');
+
 module.exports = function templateSlide({ tipo, titulo, texto, numero, total, badge = 'Dica do Tatame', emoji = '🥋', mascote = null }) {
+  titulo = destacar(titulo, { fallback: true }); // palavra-chave marcada com *asteriscos* vira laranja
+  texto  = limpar(texto);
 
   const BG = 'linear-gradient(135deg,#fb923c 0%,#f97316 42%,#ea580c 78%,#9a3412 100%)';
 
@@ -20,7 +24,8 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, ba
       return `<div style="width:${w};height:8px;border-radius:4px;background:${bg};"></div>`;
     }).join('');
     return `
-    <div style="position:absolute;bottom:42px;left:0;width:100%;display:flex;justify-content:center;align-items:center;gap:8px;z-index:5;">${items}</div>`;
+    <div style="position:absolute;bottom:42px;left:0;width:100%;display:flex;justify-content:center;align-items:center;gap:8px;z-index:5;">${items}</div>
+    <div style="position:absolute;bottom:38px;left:52px;font-size:12px;font-weight:800;color:rgba(255,255,255,0.55);letter-spacing:1.5px;z-index:5;">@jiujitsudinamicas</div>`;
   };
 
   // ── CAPA ───────────────────────────────────────────────────────────────────

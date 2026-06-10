@@ -19,6 +19,7 @@ function mover(de, para) { fs.copyFileSync(de, para); fs.unlinkSync(de); }
 async function genCarrossel(temaInstrucao, badgeSugerido) {
   const prompt = `Você é FAIXA-PRETA de jiu-jitsu com 15 anos formando crianças de 4 a 12 anos. Crie um carrossel de Instagram sobre: ${temaInstrucao}.
 PADRÃO: cada slide entrega UMA ideia aplicável JÁ na próxima aula, com MECANISMO concreto (nome de brincadeira, número, fala exata pro sensei entre aspas, ou cena real). PROIBIDO genérico ("seja paciente", "torne divertido" sem dizer como) e as palavras "simplesmente"/"revolucionário".
+DESTAQUE: em todo título, marque a expressão mais importante entre *asteriscos* (UMA por título, 1-3 palavras — vira laranja no post).
 EXEMPLO BOM: "Quebre a aula em blocos de 8 minutos e troque técnica por brincadeira (ex: 'pega-pega de joelhos'). Anuncie com contagem regressiva — a turma volta a atenção na hora."
 Retorne SOMENTE JSON:
 {
@@ -57,6 +58,7 @@ async function genNoite(tipo) {
     produto:      `{"gancho":"gancho sobre a dor de montar aula do zero (máx 12 palavras)","problema":"a dor antes (máx 14 palavras)","solucao":"como fica depois (máx 14 palavras)","prova":"prova concreta, ex +250 dinâmicas (máx 14 palavras)","urgencia":"urgência/bônus (máx 10 palavras)","cta":"cta curto (máx 6 palavras)"}`,
   };
   const prompt = `Você é um sensei de jiu-jitsu infantil criando um post (${tipo}) para Instagram. Específico e útil, sem clichê.
+No campo de título principal (titulo/frase/pergunta/gancho), marque a expressão mais importante entre *asteriscos* (UMA, 1-3 palavras).
 Retorne SOMENTE JSON: ${schemas[tipo]}`;
   const r = await client.chat.completions.create({
     model: 'gpt-4o-mini', messages: [{ role: 'user', content: prompt }],

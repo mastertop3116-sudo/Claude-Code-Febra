@@ -30,7 +30,7 @@ module.exports = function templateDica({ titulo, dica, destaque, resposta, cta, 
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;">
       <div style="font-size:17px;font-weight:700;color:#f97316;">${cta}</div>
-      <div style="font-size:13px;font-weight:700;color:#a8a29e;text-align:right;">Dinâmicas de<br>Jiu-Jitsu 🥋</div>
+      <div style="font-size:13px;font-weight:700;color:#a8a29e;text-align:right;">@jiujitsudinamicas</div>
     </div>
   </div>
 </div>`;

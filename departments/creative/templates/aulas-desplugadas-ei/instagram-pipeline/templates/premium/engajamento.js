@@ -42,7 +42,7 @@ module.exports = function templateEngajamento({ pergunta, opcoes, contexto, cta,
   </div>
 
   <!-- Marca rodapé -->
-  <div style="position:absolute;bottom:40px;right:104px;font-size:10px;font-weight:700;color:#27272a;letter-spacing:3px;text-transform:uppercase;">Dinâmicas · Jiu-Jitsu</div>
+  <div style="position:absolute;bottom:40px;right:104px;font-size:10px;font-weight:700;color:#27272a;letter-spacing:3px;text-transform:uppercase;">@jiujitsudinamicas</div>
 
 </div>`;
 };

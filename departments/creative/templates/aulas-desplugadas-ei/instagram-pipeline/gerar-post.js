@@ -7,6 +7,19 @@ const config       = require('./config');
 const { getFontStyle } = require('./fonts');
 const { gerarFundo } = require('./gerar-bg-ia');
 const { urlMascote } = require('./mascote');
+const { destacar, limpar } = require('./destaque');
+
+// Campos de título ganham destaque laranja (*palavra*); o resto só perde os asteriscos
+const CAMPOS_DESTAQUE = ['titulo', 'frase', 'pergunta', 'gancho'];
+function formatarConteudo(conteudo = {}) {
+  const out = {};
+  for (const [k, v] of Object.entries(conteudo)) {
+    if (typeof v === 'string') out[k] = CAMPOS_DESTAQUE.includes(k) ? destacar(v, { fallback: true }) : limpar(v);
+    else if (Array.isArray(v))  out[k] = v.map(i => (typeof i === 'string' ? limpar(i) : i));
+    else out[k] = v;
+  }
+  return out;
+}
 
 function carregarTemplate(tipo, estilo) {
   const estilos = ['dark', 'color', 'premium'];
@@ -65,7 +78,7 @@ async function gerarPost(entrada, bgBase64 = null) {
   }
 
   // Passa bgImage=null para o template (fundo via CSS), sem embutir base64
-  const html = buildHtml(templateFn({ ...conteudo, bgImage: null, mascote }), fontes, bgFilePath);
+  const html = buildHtml(templateFn({ ...formatarConteudo(conteudo), bgImage: null, mascote }), fontes, bgFilePath);
   garantirOutputDir();
 
   const timestamp  = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);

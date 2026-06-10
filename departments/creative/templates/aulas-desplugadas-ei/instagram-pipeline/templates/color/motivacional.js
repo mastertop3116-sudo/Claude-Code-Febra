@@ -24,7 +24,7 @@ module.exports = function templateMotivacional({ frase, contexto, cta, mascote =
     <div style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#1c1917,#ea580c,#f97316);border-radius:50px;padding:16px 36px;">
       <span style="font-size:17px;font-weight:900;color:white;">${cta}</span>
     </div>
-    <div style="margin-top:26px;font-size:13px;font-weight:700;color:#bbb;letter-spacing:1px;">Dinâmicas de Jiu-Jitsu 🥋</div>
+    <div style="margin-top:26px;font-size:13px;font-weight:700;color:#bbb;letter-spacing:1px;">@jiujitsudinamicas</div>
   </div>
 </div>`;
 };

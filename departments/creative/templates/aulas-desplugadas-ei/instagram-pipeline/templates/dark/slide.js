@@ -1,8 +1,11 @@
 // Template: SLIDE DE CARROSSEL — Dark Fighter
 // tipo: 'capa' | 'conteudo' | 'cta'
 const { getTexture } = require('../../textures');
+const { destacar, limpar } = require('../../destaque');
 
 module.exports = function templateSlide({ tipo, titulo, texto, numero, total, textura = 'grunge', badge = 'Dica do Tatame', emoji = '🥋', mascote = null }) {
+  titulo = destacar(titulo, { fallback: true }); // palavra-chave marcada com *asteriscos* vira laranja
+  texto  = limpar(texto);
 
   const overlay = (extra = '') => `
   ${getTexture(textura)}
@@ -19,7 +22,7 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, te
     }).join('');
     return `
     <div style="position:absolute;bottom:44px;left:96px;display:flex;align-items:center;gap:8px;z-index:5;">${items}</div>
-    <div style="position:absolute;bottom:48px;right:96px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.15);letter-spacing:2.5px;text-transform:uppercase;z-index:5;">Dinâmicas · Jiu-Jitsu</div>`;
+    <div style="position:absolute;bottom:48px;right:96px;font-size:12px;font-weight:700;color:rgba(255,255,255,0.28);letter-spacing:2px;z-index:5;">@jiujitsudinamicas</div>`;
   };
 
   // ── CAPA ─────────────────────────────────────────────────────────────────
@@ -100,7 +103,7 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, te
     <!-- BASE: assinatura -->
     <div style="display:flex;align-items:center;gap:14px;">
       <div style="width:46px;height:4px;background:#f97316;"></div>
-      <span style="font-size:16px;font-weight:800;color:rgba(255,255,255,0.3);letter-spacing:2px;text-transform:uppercase;">Dinâmicas de Jiu-Jitsu</span>
+      <span style="font-size:17px;font-weight:800;color:rgba(255,255,255,0.34);letter-spacing:1.5px;">@jiujitsudinamicas</span>
     </div>
 
   </div>

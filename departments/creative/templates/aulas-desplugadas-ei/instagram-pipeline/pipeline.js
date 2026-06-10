@@ -9,9 +9,15 @@ const { uploadImagem }              = require('./upload');
 const { postar, postarCarrossel }   = require('./instagram');
 const { gerarFundo, TIPOS_NOITE }   = require('./gerar-bg-ia');
 
+const { limpar } = require('./destaque');
+
 const hashtags = config.marca.hashtags.join(' ');
 
-function montarCaption(tipo, conteudo) {
+function montarCaption(tipo, conteudoBruto) {
+  // Remove os *asteriscos* de destaque (são só pro visual, não pra legenda)
+  const conteudo = {};
+  for (const [k, v] of Object.entries(conteudoBruto || {})) conteudo[k] = typeof v === 'string' ? limpar(v) : v;
+
   const intro = {
     dica:        `💡 ${conteudo.titulo || ''}\n\n${conteudo.dica || ''}`,
     produto:     `${conteudo.gancho || ''}\n\n${conteudo.solucao || ''}`,
@@ -25,7 +31,7 @@ function montarCaption(tipo, conteudo) {
 
 function montarCaptionCarrossel(entrada) {
   const capa = entrada.slides[0];
-  return `${capa.titulo}\n\n${capa.texto}\n\n💾 Salva esse carrossel e aplica na sua próxima aula!\n\n${hashtags}`;
+  return `${limpar(capa.titulo)}\n\n${limpar(capa.texto)}\n\n💾 Salva esse carrossel e aplica na sua próxima aula!\n\n${hashtags}`;
 }
 
 async function executar(periodo, diaSemana) {

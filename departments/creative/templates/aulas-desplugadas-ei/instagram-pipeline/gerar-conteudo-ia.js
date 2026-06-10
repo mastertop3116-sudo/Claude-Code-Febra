@@ -31,6 +31,8 @@ const ANGULOS_CARROSSEL = [
   { tema: 'dicas de pedagogia para prender a atenção e manter a disciplina de uma turma de crianças',            badge: 'Domine a Turma',   formato: 'cada slide: uma técnica de gestão de turma com exemplo' },
   { tema: 'mitos e verdades sobre o jiu-jitsu para crianças, para tranquilizar os pais e atrair matrículas',     badge: 'Mito ou Verdade?', formato: 'cada slide: uma afirmação marcada como MITO ou VERDADE + explicação' },
   { tema: 'benefícios reais do jiu-jitsu no desenvolvimento da criança: foco, disciplina, respeito, autoconfiança', badge: 'Muito Além do Tatame', formato: 'cada slide: um benefício + como ele aparece no dia a dia da criança' },
+  { tema: 'como o jiu-jitsu blinda a criança contra o bullying: confiança, postura e defesa pessoal sem violência (fala com PAIS e senseis)', badge: 'Contra o Bullying', formato: 'cada slide: uma mudança real que o tatame provoca na criança que sofre ou pode sofrer bullying, com cena concreta' },
+  { tema: 'sinais de evolução que os PAIS percebem em casa quando o filho treina jiu-jitsu (disciplina, escola, sono, autoconfiança)', badge: 'Visto em Casa',     formato: 'cada slide: um sinal concreto que o pai ou a mãe nota em casa + o que no treino causa isso' },
 ];
 
 // Focos de conteúdo do post único da NOITE — gira por dia-do-ano
@@ -81,12 +83,20 @@ PROIBIDO (genérico que não entrega nada): "seja paciente", "cada criança é �
 EXEMPLO RUIM: "Mantenha a turma engajada. Torne a aula divertida e dinâmica."
 EXEMPLO BOM: "Quebre a aula em blocos de 8 minutos e troque técnica por brincadeira (ex: 'pega-pega de joelhos'). Anuncie a troca com contagem regressiva — a turma volta a atenção na hora."
 
+DESTAQUE VISUAL: em TODO título (capa e slides de conteúdo), marque a expressão mais importante entre *asteriscos* — exatamente UMA por título, de 1 a 3 palavras (ela aparece em laranja no post). Ex: "6 erros que *esvaziam* a sua turma".
+
+FÓRMULAS DE CAPA COMPROVADAS (use a que encaixar no ângulo):
+- "X erros que [avatar] comete *sem saber*"
+- "Por que [resultado] não acontece (e *o que fazer*)"
+- "[N] passos para [resultado] *a partir de hoje*"
+- "Como [resultado] em [tempo] *sem [objeção]*"
+
 Retorne SOMENTE JSON com esta estrutura exata:
 {
   "badge": "rótulo curto do carrossel (2-4 palavras, ex: '${ang.badge}')",
   "emoji": "1 emoji relevante ao tema",
   "slides": [
-    {"tipo":"capa","titulo":"título com NÚMERO + benefício específico que gera curiosidade (ex: '6 erros que esvaziam a sua turma', '5 brincadeiras que ensinam queda sem medo')","texto":"subtítulo que aumenta a curiosidade ou promete o resultado (máx 16 palavras)"},
+    {"tipo":"capa","titulo":"título com NÚMERO + benefício específico que gera curiosidade, com *destaque* marcado","texto":"subtítulo que aumenta a curiosidade ou promete o resultado (máx 16 palavras)"},
     {"tipo":"conteudo","titulo":"título do ponto, direto (4-7 palavras)","texto":"a dica COM mecanismo concreto (brincadeira/número/fala exata/cena real) (30 a 44 palavras)"},
     {"tipo":"conteudo","titulo":"...","texto":"... (30 a 44 palavras, mecanismo diferente)"},
     {"tipo":"conteudo","titulo":"...","texto":"... (30 a 44 palavras, mecanismo diferente)"},
@@ -178,6 +188,7 @@ FOCO DE HOJE: ${foco}.
 PADRÃO DE QUALIDADE (inegociável):
 - Conteúdo ESPECÍFICO e aplicável: traga um mecanismo concreto — nome de brincadeira/exercício, um número (minutos, idade, repetições), uma FALA exata pro sensei usar, ou uma cena real do tatame.
 - PROIBIDO genérico: "seja paciente", "cada criança é única", "torne divertido", "incentive" — sem dizer COMO. E as palavras "simplesmente"/"revolucionário".
+- DESTAQUE VISUAL: no campo de título principal (titulo/frase/pergunta/gancho), marque a expressão mais importante entre *asteriscos* — exatamente UMA, de 1 a 3 palavras (vira laranja no post).
 ${tipo === 'motivacional' ? '- Mesmo sendo motivacional, ancore numa cena concreta do tatame (não só frase de efeito vazia).' : ''}
 ${tipo === 'dica' ? '- Cada um dos 3 itens da resposta = uma ação concreta e diferente (não 3 versões da mesma coisa).' : ''}
 ${tipo === 'engajamento' ? '- A pergunta deve ser específica e gerar opinião dividida; as opções, situações reais que o sensei reconhece.' : ''}

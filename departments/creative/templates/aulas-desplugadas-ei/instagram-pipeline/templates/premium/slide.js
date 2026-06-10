@@ -1,8 +1,11 @@
 // Template: SLIDE DE CARROSSEL — Premium
 // Preto #000000, tipografia limpa, detalhes finos de laranja. Elegante e minimalista.
 // tipo: 'capa' | 'conteudo' | 'cta'
+const { destacar, limpar } = require('../../destaque');
 
 module.exports = function templateSlide({ tipo, titulo, texto, numero, total, badge = 'Dica do Tatame', emoji = '🥋', mascote = null }) {
+  titulo = destacar(titulo, { fallback: true }); // palavra-chave marcada com *asteriscos* vira laranja
+  texto  = limpar(texto);
 
   // Detalhes laranja finos (linha vertical esquerda + risco horizontal no topo) — assinatura do Premium
   const detalhes = `
@@ -18,7 +21,7 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, ba
     }).join('');
     return `
     <div style="position:absolute;bottom:48px;left:104px;display:flex;align-items:center;gap:8px;z-index:5;">${items}</div>
-    <div style="position:absolute;bottom:50px;right:104px;font-size:10px;font-weight:700;color:rgba(255,255,255,0.18);letter-spacing:3px;text-transform:uppercase;z-index:5;">Dinâmicas · Jiu-Jitsu</div>`;
+    <div style="position:absolute;bottom:50px;right:104px;font-size:12px;font-weight:700;color:rgba(255,255,255,0.30);letter-spacing:2px;z-index:5;">@jiujitsudinamicas</div>`;
   };
 
   // ── CAPA ───────────────────────────────────────────────────────────────────
@@ -82,7 +85,7 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, ba
   <!-- BASE: assinatura -->
   <div style="display:flex;align-items:center;gap:14px;z-index:4;">
     <div style="width:46px;height:3px;background:#f97316;"></div>
-    <span style="font-size:17px;font-weight:700;color:#52525b;letter-spacing:1.5px;text-transform:uppercase;">Dinâmicas de Jiu-Jitsu</span>
+    <span style="font-size:17px;font-weight:700;color:#71717a;letter-spacing:1.5px;">@jiujitsudinamicas</span>
   </div>
 
   ${dots(numero)}

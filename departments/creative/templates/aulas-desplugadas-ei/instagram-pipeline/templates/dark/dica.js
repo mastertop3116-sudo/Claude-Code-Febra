@@ -45,6 +45,6 @@ module.exports = function templateDica({ titulo, dica, destaque, resposta, cta, 
 
   </div>
 
-  <div style="position:absolute;bottom:40px;right:88px;font-size:12px;font-weight:700;color:rgba(255,255,255,0.2);letter-spacing:2px;text-transform:uppercase;z-index:4;">Dinâmicas · Jiu-Jitsu</div>
+  <div style="position:absolute;bottom:40px;right:88px;font-size:12px;font-weight:700;color:rgba(255,255,255,0.2);letter-spacing:2px;text-transform:uppercase;z-index:4;">@jiujitsudinamicas</div>
 </div>`;
 };
