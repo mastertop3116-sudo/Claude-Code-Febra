@@ -33,6 +33,9 @@ const PALETAS_NICHO = [
   // 5. Moda / Estilo / Imagem Pessoal
   { palavras: ['moda','estilo','looks','roupas','consultoria de imagem','guarda-roupa','tendência','outfit','cápsula','visagismo','personal stylist'], primaria: '#c084fc', secundaria: '#e9d5ff', bg: '#120718' },
 
+  // 5.5 Fotografia / Foto com celular / Audiovisual — paleta LIMPA e elegante (estética fotográfica neutra).
+  { palavras: ['fotografia','fotógrafo','fotografo','fotografos','fotograf','foto com celular','câmera','camera','lightroom','lente','ensaio fotográfico','retrato','edição de foto','mobile photography','smartphone'], primaria: '#475569', secundaria: '#cbd5e1', bg: '#0b1016' },
+
   // 6. Espiritualidade / Fé / Cristão / Devocional
   { palavras: ['espiritualidade','fé','bíblia','deus','oração','devocional','cristão','cristã','missão','igreja','evangelho','palavra','cura','ungido','profecia'], primaria: '#d97706', secundaria: '#fbbf24', bg: '#181000' },
 
@@ -184,6 +187,7 @@ const ESTILO_PALETAS = {
   jovem:   { primaria: '#6d28d9', secundaria: '#a78bfa', bg: '#160f2e' }, // vibrante, descolado
   adulto:  { primaria: '#245574', secundaria: '#7fb0cc', bg: '#0d1b26' }, // profissional, sóbrio
   premium: { primaria: '#b0852f', secundaria: '#e0c477', bg: '#1a1611' }, // elegante, dourado
+  clean:   { primaria: '#3f4654', secundaria: '#9aa3b2', bg: '#0d1014' }, // minimalista, neutro (a capa Clean é clara)
 };
 
 // Cores que o CLIENTE pode escolher na mão (vence a cor automática do nicho). Cada uma já é um par bonito.
@@ -261,6 +265,7 @@ function getPromptSchema(tipo, extensao, params = {}) {
 {
   "titulo": "título poderoso e específico (máx 12 palavras, sem ponto final)",
   "subtitulo": "subtítulo que reforça o benefício principal (máx 20 palavras)",
+  "categoria": "categoria/nicho LIMPO em 2 a 3 palavras pra aparecer na capa — ex: 'Fotografia no Celular', 'Finanças Pessoais', 'Jiu-Jitsu Infantil'. NUNCA copie o pedido do usuário (nada de 'quero criar um ebook...'), só a categoria limpa e profissional.",
   "autor": "nome do autor",
   "introducao": "em 1ª pessoa — ESTRUTURA OBRIGATÓRIA: (1) abra com cena específica vivida pelo autor ('Quando eu tinha X anos e...', ou 'Num domingo às 23h, eu...'); (2) descreva o momento de virada com detalhe sensorial; (3) apresente o problema central do nicho com número; (4) explique o que este e-book entrega e por que é diferente; (5) cite 1 caso real com nome brasileiro, resultado com número e prazo. (220 a 300 palavras — NUNCA menos que 200)",
   "capitulos": [
@@ -695,6 +700,8 @@ Tema central: ${tema || nicho}
 Tom: ${tom}
 Extensão: ${extensao}
 Autor: ${autor}
+
+⚠️ O "Nicho/Tema central" acima pode vir como um PEDIDO informal do usuário (ex: "quero criar um ebook sobre fotografia para iniciantes que usam celular"). ENTENDA a intenção e gere "titulo", "subtitulo" e "categoria" LIMPOS e profissionais — NUNCA copie o texto do usuário literalmente. A CAPA jamais pode mostrar algo como "quero criar um ebook...".
 
 ${schema}${IDIOMA_INSTR}
 

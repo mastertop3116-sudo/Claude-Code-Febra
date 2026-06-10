@@ -314,7 +314,7 @@ app.post("/api/estudio/ebook", auth.exigirLogin, async (req, res) => {
   // Imagens ilustradas por IA (opcional, +créditos a 3/imagem). 'capa' = 1 imagem; 'total' = capa + 4 capítulos = 5 imagens.
   const ILUS = ["nenhuma", "capa", "total"];
   const ilustracao = ILUS.includes(b.ilustracao) ? b.ilustracao : "nenhuma";
-  const EST = ["auto", "jovem", "adulto", "premium"];
+  const EST = ["auto", "jovem", "adulto", "premium", "clean"];
   const estilo = EST.includes(b.estilo) ? b.estilo : "auto";   // estilo visual escolhido pelo lead
   const CORES_OK = ["verde", "azul", "laranja", "rosa", "roxo", "vermelho", "turquesa", "dourado", "grafite"];
   const cor = CORES_OK.includes(b.cor) ? b.cor : null;          // cor escolhida na mão (vence a automática); vazio = automática

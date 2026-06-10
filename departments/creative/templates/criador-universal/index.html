@@ -1180,6 +1180,19 @@ body {
   color: rgba(207,200,187,0.7);
 }
 
+/* ───────── CLEAN / MINIMALISTA (claro, muito respiro — pra fotografia, design, etc.) ───────── */
+.cv-clean { background: linear-gradient(180deg, #ffffff 0%, #f5f5f3 100%); }
+.cv-clean-in { position: relative; z-index: 5; flex: 1; display: flex; flex-direction: column; padding: 32mm 22mm 24mm; }
+.cv-clean .cl-eyebrow { font-family: 'Inter', sans-serif; font-weight: 600; font-size: 9.5pt; letter-spacing: 4px; text-transform: uppercase; color: color-mix(in srgb, var(--p, #3f4654) 75%, #000); }
+.cv-clean-body { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.cv-clean .cl-kicker { font-family: 'Inter', sans-serif; font-weight: 500; font-size: 10.5pt; letter-spacing: 3px; text-transform: uppercase; color: color-mix(in srgb, var(--p, #3f4654) 60%, #666); margin-bottom: 7mm; }
+.cv-clean .cl-title { font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 40pt; line-height: 1.12; color: #18181b; letter-spacing: -0.2px; }
+.cv-clean .cl-line { width: 24mm; height: 0.5mm; margin: 9mm 0 7mm; background: var(--p, #3f4654); }
+.cv-clean .cl-sub { font-family: 'Inter', sans-serif; font-weight: 400; font-size: 13pt; line-height: 1.5; color: #52525b; max-width: 150mm; }
+.cv-clean-foot { display: flex; align-items: baseline; justify-content: space-between; margin-top: 18mm; border-top: 0.3mm solid rgba(0,0,0,0.1); padding-top: 6mm; }
+.cv-clean .cl-author { font-family: 'Inter', sans-serif; font-weight: 600; font-size: 9pt; letter-spacing: 2px; text-transform: uppercase; color: #71717a; }
+.cv-clean .cl-year { font-family: 'Inter', sans-serif; font-size: 8pt; letter-spacing: 1px; color: #a1a1aa; }
+
 /* ══════════════════════ CONTRACAPA (mesmo kit visual da capa) ══════════════════════ */
 .contracapa {
   width: 210mm;
@@ -1647,7 +1660,7 @@ body {
   {
     const _t    = esc(d.titulo || '');
     const _sub  = esc(d.subtitulo || '');
-    const _kick = esc(d.nicho || d.tema || '');
+    const _kick = esc(d.categoria || '');   // categoria LIMPA da IA — nunca o texto cru que o usuário digitou
     const _au   = esc(d.autor || '');
     const _lt   = esc(d.label_tipo || '');
     const _tl   = (d.titulo || '').length;
@@ -1662,6 +1675,23 @@ body {
           <div class="m-rule"></div>
           ${_sub ? `<div class="m-sub">${_sub}</div>` : ''}
           <div class="m-author">por ${_au} &middot; ${d.ano}</div>
+        </div>
+      </div></div>`;
+    } else if (d.estilo === 'clean') {
+      const cz = _tl > 44 ? 28 : _tl > 34 ? 33 : _tl > 24 ? 38 : 43;
+      html += `<div class="page"><div class="cv-cover cv-clean">
+        <div class="cv-clean-in">
+          <div class="cl-eyebrow">${_lt}</div>
+          <div class="cv-clean-body">
+            ${_kick ? `<div class="cl-kicker">${_kick}</div>` : ''}
+            <h1 class="cl-title" style="font-size:${cz}pt">${_t}</h1>
+            <div class="cl-line"></div>
+            ${_sub ? `<div class="cl-sub">${_sub}</div>` : ''}
+          </div>
+          <div class="cv-clean-foot">
+            <div class="cl-author">por ${_au}</div>
+            <div class="cl-year">${d.ano}</div>
+          </div>
         </div>
       </div></div>`;
     } else {
