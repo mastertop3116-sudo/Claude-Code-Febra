@@ -90,8 +90,9 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, ba
     <div style="font-size:50px;font-weight:900;color:#1c1917;line-height:1.04;letter-spacing:-1.5px;margin-bottom:24px;">${titulo}</div>
     <div style="width:64px;height:5px;background:#f97316;border-radius:3px;margin-bottom:28px;"></div>
     <div style="font-size:23px;color:#57534e;line-height:1.6;margin-bottom:36px;">${texto}</div>
-    <div style="background:linear-gradient(135deg,#f97316,#ea580c);border-radius:50px;padding:20px 36px;width:fit-content;">
-      <span style="font-size:24px;font-weight:900;color:white;letter-spacing:0.5px;">💾 Salva esse carrossel!</span>
+    <div style="display:inline-flex;align-items:center;gap:16px;background:linear-gradient(135deg,#f97316,#ea580c);border-radius:50px;padding:22px 40px;width:fit-content;box-shadow:0 12px 28px rgba(234,88,12,0.35);">
+      <span style="font-size:26px;font-weight:900;color:white;letter-spacing:0.5px;">Salva esse carrossel</span>
+      <svg width="28" height="18" viewBox="0 0 28 18" fill="none"><path d="M0 9H24M24 9L16 1M24 9L16 17" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
   </div>
   ${dots(total)}
@@ -107,7 +108,7 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, ba
     <div style="width:72px;height:5px;background:#f97316;border-radius:3px;margin:0 auto 28px;"></div>
     <div style="font-size:24px;color:#57534e;line-height:1.6;margin-bottom:40px;">${texto}</div>
     <div style="background:linear-gradient(135deg,#f97316,#ea580c);border-radius:50px;padding:22px 0;">
-      <span style="font-size:26px;font-weight:900;color:white;letter-spacing:0.5px;">💾 Salva esse carrossel!</span>
+      <span style="font-size:26px;font-weight:900;color:white;letter-spacing:0.5px;">Salva esse carrossel ➜</span>
     </div>
   </div>
   ${dots(total)}

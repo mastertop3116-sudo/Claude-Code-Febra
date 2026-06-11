@@ -22,7 +22,7 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, te
     }).join('');
     return `
     <div style="position:absolute;bottom:44px;left:96px;display:flex;align-items:center;gap:8px;z-index:5;">${items}</div>
-    ${comMarca ? '<div style="position:absolute;bottom:48px;right:96px;font-size:12px;font-weight:700;color:rgba(255,255,255,0.28);letter-spacing:2px;z-index:5;">@jiujitsudinamicas</div>' : ''}`;
+    ${comMarca ? '<div style="position:absolute;bottom:48px;right:96px;font-size:12px;font-weight:700;color:rgba(255,255,255,0.45);letter-spacing:2px;z-index:5;">@jiujitsudinamicas</div>' : ''}`;
   };
 
   // ── CAPA ─────────────────────────────────────────────────────────────────
@@ -119,12 +119,28 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, te
 <div style="width:1080px;height:1080px;background:#0a0a0f;position:relative;overflow:hidden;">
   ${overlay(`<div style="position:absolute;top:0;right:0;width:700px;height:700px;background:radial-gradient(ellipse at top right,rgba(249,115,22,0.2) 0%,transparent 60%);z-index:2;pointer-events:none;"></div>`)}
   <img src="${mascote}" style="position:absolute;bottom:8px;right:-12px;height:650px;z-index:3;filter:drop-shadow(0 14px 34px rgba(0,0,0,0.6));">
-  <div style="position:absolute;top:0;left:0;width:100%;height:calc(100% - 100px);z-index:4;display:flex;flex-direction:column;justify-content:center;padding:0 96px;">
-    <div style="font-size:13px;font-weight:800;color:#f97316;letter-spacing:3.5px;text-transform:uppercase;margin-bottom:28px;">${emoji}  ${badge}</div>
-    <div style="font-size:60px;font-weight:900;color:#ffffff;line-height:0.95;letter-spacing:-2.5px;margin-bottom:28px;text-transform:uppercase;max-width:540px;">${titulo}</div>
-    <div style="width:64px;height:4px;background:#f97316;margin-bottom:32px;"></div>
-    <div style="font-size:24px;color:#94a3b8;line-height:1.55;max-width:430px;margin-bottom:42px;">${texto}</div>
-    <div style="background:#f97316;border-radius:4px;padding:24px 40px;width:fit-content;"><span style="font-size:26px;font-weight:900;color:#000000;letter-spacing:0.5px;">💾 Salva esse carrossel!</span></div>
+
+  <!-- Distribuído de cima a baixo: badge / título+texto / botão -->
+  <div style="position:absolute;top:0;left:0;width:100%;height:calc(100% - 100px);z-index:4;display:flex;flex-direction:column;justify-content:space-between;padding:120px 96px 44px;">
+
+    <!-- TOPO: badge igual ao da capa (consistência) -->
+    <div style="display:inline-flex;align-items:center;gap:12px;border:1.5px solid rgba(249,115,22,0.7);border-radius:3px;padding:10px 24px;width:fit-content;">
+      <span style="font-size:18px;">${emoji}</span>
+      <span style="font-size:12px;font-weight:800;color:#f97316;letter-spacing:3.5px;text-transform:uppercase;">${badge}</span>
+    </div>
+
+    <!-- MEIO: título com o mesmo peso das outras telas -->
+    <div>
+      <div style="font-size:72px;font-weight:900;color:#ffffff;line-height:0.95;letter-spacing:-2.5px;margin-bottom:30px;text-transform:uppercase;max-width:560px;">${titulo}</div>
+      <div style="width:64px;height:4px;background:#f97316;margin-bottom:30px;"></div>
+      <div style="font-size:26px;color:#94a3b8;line-height:1.6;max-width:440px;">${texto}</div>
+    </div>
+
+    <!-- BASE: botão robusto com seta -->
+    <div style="display:inline-flex;align-items:center;gap:18px;background:#f97316;border-radius:4px;padding:28px 44px;width:fit-content;box-shadow:0 14px 36px rgba(249,115,22,0.3);">
+      <span style="font-size:29px;font-weight:900;color:#000000;letter-spacing:0.5px;">Salva esse carrossel</span>
+      <svg width="30" height="20" viewBox="0 0 28 18" fill="none"><path d="M0 9H24M24 9L16 1M24 9L16 17" stroke="#000000" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
   </div>
   ${dots(total)}
 </div>`;
@@ -154,7 +170,7 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, te
 
   <!-- Botão CTA fixo no fundo — nunca some -->
   <div style="position:absolute;bottom:100px;left:96px;right:96px;z-index:5;background:#f97316;border-radius:4px;padding:30px 0;display:flex;align-items:center;justify-content:center;">
-    <span style="font-size:28px;font-weight:900;color:#000000;letter-spacing:0.5px;">💾 Salva esse carrossel!</span>
+    <span style="font-size:28px;font-weight:900;color:#000000;letter-spacing:0.5px;">Salva esse carrossel ➜</span>
   </div>
 
   ${dots(total)}

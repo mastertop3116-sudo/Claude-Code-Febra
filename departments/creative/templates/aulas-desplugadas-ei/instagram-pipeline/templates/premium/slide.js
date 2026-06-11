@@ -21,7 +21,7 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, ba
     }).join('');
     return `
     <div style="position:absolute;bottom:48px;left:104px;display:flex;align-items:center;gap:8px;z-index:5;">${items}</div>
-    ${comMarca ? '<div style="position:absolute;bottom:50px;right:104px;font-size:12px;font-weight:700;color:rgba(255,255,255,0.30);letter-spacing:2px;z-index:5;">@jiujitsudinamicas</div>' : ''}`;
+    ${comMarca ? '<div style="position:absolute;bottom:50px;right:104px;font-size:12px;font-weight:700;color:rgba(255,255,255,0.45);letter-spacing:2px;z-index:5;">@jiujitsudinamicas</div>' : ''}`;
   };
 
   // ── CAPA ───────────────────────────────────────────────────────────────────
@@ -96,15 +96,26 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, ba
   if (tipo === 'cta') {
     if (mascote) {
       return `
-<div style="width:1080px;height:1080px;background:#000000;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 104px;">
+<div style="width:1080px;height:1080px;background:#000000;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:120px 104px 144px;">
   ${detalhes}
   <div style="position:absolute;top:0;right:0;width:560px;height:560px;background:radial-gradient(ellipse at top right,rgba(249,115,22,0.14) 0%,transparent 62%);z-index:1;"></div>
   <img src="${mascote}" style="position:absolute;bottom:8px;right:-12px;height:650px;z-index:2;filter:drop-shadow(0 14px 34px rgba(0,0,0,0.6));">
-  <div style="font-size:12px;font-weight:700;color:#f97316;letter-spacing:5px;text-transform:uppercase;margin-bottom:30px;z-index:4;">${emoji}&nbsp;&nbsp;${badge}</div>
-  <div style="font-size:62px;font-weight:900;color:#ffffff;line-height:1.0;letter-spacing:-2px;margin-bottom:28px;z-index:4;max-width:540px;">${titulo}</div>
-  <div style="width:72px;height:2px;background:#f97316;margin-bottom:30px;z-index:4;"></div>
-  <div style="font-size:24px;color:#a1a1aa;line-height:1.6;max-width:430px;margin-bottom:42px;z-index:4;">${texto}</div>
-  <div style="background:#f97316;border-radius:3px;padding:24px 40px;width:fit-content;z-index:4;"><span style="font-size:26px;font-weight:900;color:#000000;letter-spacing:0.5px;">💾 Salva esse carrossel!</span></div>
+
+  <!-- TOPO: label -->
+  <div style="font-size:13px;font-weight:700;color:#f97316;letter-spacing:5px;text-transform:uppercase;z-index:4;">${emoji}&nbsp;&nbsp;${badge}</div>
+
+  <!-- MEIO: título no peso das outras telas -->
+  <div style="z-index:4;">
+    <div style="font-size:72px;font-weight:900;color:#ffffff;line-height:0.98;letter-spacing:-2.5px;margin-bottom:30px;max-width:560px;">${titulo}</div>
+    <div style="width:72px;height:2px;background:#f97316;margin-bottom:30px;"></div>
+    <div style="font-size:26px;color:#a1a1aa;line-height:1.6;max-width:440px;">${texto}</div>
+  </div>
+
+  <!-- BASE: botão robusto com seta -->
+  <div style="display:inline-flex;align-items:center;gap:18px;background:#f97316;border-radius:3px;padding:28px 44px;width:fit-content;z-index:4;box-shadow:0 14px 36px rgba(249,115,22,0.25);">
+    <span style="font-size:29px;font-weight:900;color:#000000;letter-spacing:0.5px;">Salva esse carrossel</span>
+    <svg width="30" height="20" viewBox="0 0 28 18" fill="none"><path d="M0 9H24M24 9L16 1M24 9L16 17" stroke="#000000" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
   ${dots(total)}
 </div>`;
     }
@@ -127,7 +138,7 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, ba
 
   <!-- Botão CTA -->
   <div style="position:absolute;bottom:104px;left:104px;right:104px;z-index:5;background:#f97316;border-radius:3px;padding:28px 0;display:flex;align-items:center;justify-content:center;">
-    <span style="font-size:27px;font-weight:900;color:#000000;letter-spacing:0.5px;">💾 Salva esse carrossel!</span>
+    <span style="font-size:27px;font-weight:900;color:#000000;letter-spacing:0.5px;">Salva esse carrossel ➜</span>
   </div>
 
   ${dots(total)}
