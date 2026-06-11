@@ -12,7 +12,7 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, ba
     <div style="position:absolute;left:0;top:0;width:3px;height:100%;background:linear-gradient(180deg,transparent 0%,#f97316 28%,#f97316 72%,transparent 100%);z-index:3;"></div>
     <div style="position:absolute;top:0;left:0;width:220px;height:2px;background:#f97316;z-index:3;"></div>`;
 
-  const dots = (atual) => {
+  const dots = (atual, comMarca = true) => {
     const items = Array.from({ length: total }, (_, i) => {
       const ativo = i + 1 === atual;
       const w  = ativo ? '28px' : '6px';
@@ -21,7 +21,7 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, ba
     }).join('');
     return `
     <div style="position:absolute;bottom:48px;left:104px;display:flex;align-items:center;gap:8px;z-index:5;">${items}</div>
-    <div style="position:absolute;bottom:50px;right:104px;font-size:12px;font-weight:700;color:rgba(255,255,255,0.30);letter-spacing:2px;z-index:5;">@jiujitsudinamicas</div>`;
+    ${comMarca ? '<div style="position:absolute;bottom:50px;right:104px;font-size:12px;font-weight:700;color:rgba(255,255,255,0.30);letter-spacing:2px;z-index:5;">@jiujitsudinamicas</div>' : ''}`;
   };
 
   // ── CAPA ───────────────────────────────────────────────────────────────────
@@ -88,7 +88,7 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, ba
     <span style="font-size:17px;font-weight:700;color:#71717a;letter-spacing:1.5px;">@jiujitsudinamicas</span>
   </div>
 
-  ${dots(numero)}
+  ${dots(numero, false)}
 </div>`;
   }
 
