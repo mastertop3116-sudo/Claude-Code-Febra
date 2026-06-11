@@ -35,7 +35,7 @@ module.exports = function templateEngajamento({ pergunta, opcoes, contexto, cta,
   <!-- Linha laranja topo -->
   <div style="position:absolute;top:0;left:0;width:100%;height:4px;background:linear-gradient(90deg,#f97316,#ea580c,transparent);z-index:3;"></div>
 
-  ${mascote ? `<img src="${mascote}" style="position:absolute;bottom:16px;right:-18px;height:410px;z-index:3;filter:drop-shadow(0 12px 28px rgba(0,0,0,0.6));">` : ''}
+  ${mascote ? `<div style="position:absolute;bottom:-200px;right:-170px;width:740px;height:740px;background:radial-gradient(circle at center,rgba(249,115,22,0.28) 0%,rgba(249,115,22,0.10) 45%,transparent 70%);z-index:2;pointer-events:none;"></div><img src="${mascote}" style="position:absolute;bottom:16px;right:-18px;height:410px;z-index:3;filter:drop-shadow(0 12px 28px rgba(0,0,0,0.6));">` : ''}
 
   <div style="position:relative;z-index:4;display:flex;flex-direction:column;justify-content:center;max-width:${mascote ? '720px' : 'none'};">
 

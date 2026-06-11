@@ -3,6 +3,14 @@
 const { getTexture } = require('../../textures');
 const { destacar, limpar } = require('../../destaque');
 
+// Tipografia oversized: o título se adapta ao comprimento pra dominar o quadro
+function tamanhoTitulo(t) {
+  const len = String(t || '').replace(/<[^>]+>/g, '').length;
+  if (len > 48) return 76;
+  if (len > 32) return 92;
+  return 108;
+}
+
 module.exports = function templateSlide({ tipo, titulo, texto, numero, total, textura = 'grunge', badge = 'Dica do Tatame', emoji = '🥋', mascote = null }) {
   titulo = destacar(titulo, { fallback: true }); // palavra-chave marcada com *asteriscos* vira laranja
   texto  = limpar(texto);
@@ -28,40 +36,80 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, te
   // ── CAPA ─────────────────────────────────────────────────────────────────
   if (tipo === 'capa') {
     const temMascote = !!mascote;
+    if (temMascote) {
+      const tam = tamanhoTitulo(titulo);
+      return `
+<div style="width:1080px;height:1080px;background:#0a0a0f;position:relative;overflow:hidden;">
+  ${overlay()}
+
+  <!-- PALCO: glow laranja central atrás do mascote -->
+  <div style="position:absolute;bottom:-300px;left:50%;transform:translateX(-50%);width:1040px;height:1040px;background:radial-gradient(circle at center,rgba(249,115,22,0.40) 0%,rgba(249,115,22,0.13) 44%,transparent 70%);z-index:2;pointer-events:none;"></div>
+  <!-- Formas decorativas -->
+  <div style="position:absolute;top:170px;right:64px;width:150px;height:150px;border:3px solid rgba(249,115,22,0.30);border-radius:50%;z-index:2;"></div>
+  <div style="position:absolute;bottom:300px;right:120px;width:54px;height:54px;background:rgba(249,115,22,0.20);border-radius:50%;z-index:2;"></div>
+  <div style="position:absolute;bottom:380px;left:54px;width:100px;height:100px;border:2px solid rgba(255,255,255,0.10);border-radius:50%;z-index:2;"></div>
+
+  <!-- TÍTULO GIGANTE centralizado (o mascote cobre só o miolo da última linha) -->
+  <div style="position:absolute;top:192px;left:50px;width:980px;z-index:3;font-size:${tam}px;font-weight:900;color:#ffffff;line-height:0.96;letter-spacing:-3px;text-transform:uppercase;text-align:center;text-shadow:0 10px 40px rgba(0,0,0,0.55);">${titulo}</div>
+
+  <!-- MASCOTE central, na frente do título -->
+  <img src="${mascote}" style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);height:712px;z-index:4;filter:drop-shadow(0 18px 44px rgba(0,0,0,0.65));">
+
+  <!-- SELO rotacionado (badge) -->
+  <div style="position:absolute;top:88px;left:96px;transform:rotate(-3deg);background:#f97316;border-radius:6px;padding:13px 28px;z-index:5;box-shadow:0 12px 30px rgba(249,115,22,0.38);">
+    <span style="font-size:16px;font-weight:900;color:#000000;letter-spacing:3px;text-transform:uppercase;">${emoji}  ${badge}</span>
+  </div>
+
+  <!-- @ no topo direito -->
+  <div style="position:absolute;top:104px;right:96px;font-size:14px;font-weight:700;color:rgba(255,255,255,0.45);letter-spacing:2px;z-index:5;">@jiujitsudinamicas</div>
+
+  <!-- SUBTÍTULO em pílula de vidro (camada da frente) -->
+  <div style="position:absolute;bottom:150px;left:64px;max-width:330px;background:rgba(20,20,28,0.55);border:1px solid rgba(255,255,255,0.16);border-radius:16px;padding:22px 26px;z-index:5;backdrop-filter:blur(3px);">
+    <span style="font-size:24px;color:#e2e8f0;line-height:1.5;">${texto}</span>
+  </div>
+
+  <!-- ARRASTA -->
+  <div style="position:absolute;bottom:160px;right:84px;display:flex;align-items:center;gap:14px;z-index:5;background:rgba(249,115,22,0.14);border:1.5px solid rgba(249,115,22,0.55);border-radius:50px;padding:16px 28px;">
+    <span style="font-size:15px;font-weight:800;color:#f97316;letter-spacing:3px;text-transform:uppercase;">Arrasta</span>
+    <svg width="30" height="19" viewBox="0 0 28 18" fill="none">
+      <path d="M0 9H24M24 9L16 1M24 9L16 17" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  ${dots(1, false)}
+</div>`;
+    }
     return `
 <div style="width:1080px;height:1080px;background:#0a0a0f;position:relative;overflow:hidden;">
   ${overlay(`
   <div style="position:absolute;top:0;right:0;width:680px;height:680px;background:radial-gradient(ellipse at top right,rgba(249,115,22,0.22) 0%,transparent 60%);z-index:2;pointer-events:none;"></div>
   `)}
 
-  ${temMascote ? `<img src="${mascote}" style="position:absolute;bottom:8px;right:-12px;height:700px;z-index:3;filter:drop-shadow(0 14px 34px rgba(0,0,0,0.6));">` : ''}
-
-  <div style="position:absolute;top:0;left:0;width:100%;height:calc(100% - 100px);z-index:4;display:flex;flex-direction:column;justify-content:${temMascote ? 'flex-start' : 'center'};padding:${temMascote ? '150px 96px 0' : '0 96px'};">
+  <div style="position:absolute;top:0;left:0;width:100%;height:calc(100% - 100px);z-index:4;display:flex;flex-direction:column;justify-content:center;padding:0 96px;">
 
     <!-- Badge -->
-    <div style="display:inline-flex;align-items:center;gap:12px;border:1.5px solid rgba(249,115,22,0.7);border-radius:3px;padding:10px 24px;margin-bottom:${temMascote ? '36px' : '52px'};width:fit-content;">
+    <div style="display:inline-flex;align-items:center;gap:12px;border:1.5px solid rgba(249,115,22,0.7);border-radius:3px;padding:10px 24px;margin-bottom:52px;width:fit-content;">
       <span style="font-size:18px;">${emoji}</span>
       <span style="font-size:12px;font-weight:800;color:#f97316;letter-spacing:3.5px;text-transform:uppercase;">${badge}</span>
     </div>
 
     <!-- Título -->
-    <div style="font-size:72px;font-weight:900;color:#ffffff;line-height:0.92;letter-spacing:-2.5px;margin-bottom:36px;text-transform:uppercase;max-width:${temMascote ? '560px' : 'none'};">${titulo}</div>
+    <div style="font-size:72px;font-weight:900;color:#ffffff;line-height:0.92;letter-spacing:-2.5px;margin-bottom:36px;text-transform:uppercase;">${titulo}</div>
 
     <!-- Divisor -->
-    <div style="width:64px;height:4px;background:#f97316;margin-bottom:${temMascote ? '32px' : '44px'};"></div>
+    <div style="width:64px;height:4px;background:#f97316;margin-bottom:44px;"></div>
 
     <!-- Subtítulo -->
-    <div style="font-size:28px;color:#94a3b8;line-height:1.6;max-width:${temMascote ? '430px' : '800px'};">${texto}</div>
+    <div style="font-size:28px;color:#94a3b8;line-height:1.6;max-width:800px;">${texto}</div>
   </div>
 
-  ${temMascote ? '' : `
   <!-- ARRASTA -->
   <div style="position:absolute;bottom:96px;right:96px;display:flex;align-items:center;gap:14px;z-index:5;">
     <span style="font-size:13px;font-weight:800;color:#f97316;letter-spacing:3px;text-transform:uppercase;">Arrasta</span>
     <svg width="28" height="18" viewBox="0 0 28 18" fill="none">
       <path d="M0 9H24M24 9L16 1M24 9L16 17" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-  </div>`}
+  </div>
 
   ${dots(1)}
 </div>`;
@@ -115,34 +163,42 @@ module.exports = function templateSlide({ tipo, titulo, texto, numero, total, te
   // ── CTA ───────────────────────────────────────────────────────────────────
   if (tipo === 'cta') {
     if (mascote) {
+      const tam = tamanhoTitulo(titulo);
       return `
 <div style="width:1080px;height:1080px;background:#0a0a0f;position:relative;overflow:hidden;">
-  ${overlay(`<div style="position:absolute;top:0;right:0;width:700px;height:700px;background:radial-gradient(ellipse at top right,rgba(249,115,22,0.2) 0%,transparent 60%);z-index:2;pointer-events:none;"></div>`)}
-  <img src="${mascote}" style="position:absolute;bottom:8px;right:-12px;height:650px;z-index:3;filter:drop-shadow(0 14px 34px rgba(0,0,0,0.6));">
+  ${overlay()}
 
-  <!-- Distribuído de cima a baixo: badge / título+texto / botão -->
-  <div style="position:absolute;top:0;left:0;width:100%;height:calc(100% - 100px);z-index:4;display:flex;flex-direction:column;justify-content:space-between;padding:120px 96px 44px;">
+  <!-- PALCO: glow laranja central -->
+  <div style="position:absolute;bottom:-300px;left:50%;transform:translateX(-50%);width:1040px;height:1040px;background:radial-gradient(circle at center,rgba(249,115,22,0.40) 0%,rgba(249,115,22,0.13) 44%,transparent 70%);z-index:2;pointer-events:none;"></div>
+  <div style="position:absolute;top:170px;right:64px;width:150px;height:150px;border:3px solid rgba(249,115,22,0.30);border-radius:50%;z-index:2;"></div>
+  <div style="position:absolute;bottom:380px;left:54px;width:100px;height:100px;border:2px solid rgba(255,255,255,0.10);border-radius:50%;z-index:2;"></div>
 
-    <!-- TOPO: badge igual ao da capa (consistência) -->
-    <div style="display:inline-flex;align-items:center;gap:12px;border:1.5px solid rgba(249,115,22,0.7);border-radius:3px;padding:10px 24px;width:fit-content;">
-      <span style="font-size:18px;">${emoji}</span>
-      <span style="font-size:12px;font-weight:800;color:#f97316;letter-spacing:3.5px;text-transform:uppercase;">${badge}</span>
-    </div>
+  <!-- TÍTULO GIGANTE centralizado -->
+  <div style="position:absolute;top:192px;left:50px;width:980px;z-index:3;font-size:${tam}px;font-weight:900;color:#ffffff;line-height:0.96;letter-spacing:-3px;text-transform:uppercase;text-align:center;text-shadow:0 10px 40px rgba(0,0,0,0.55);">${titulo}</div>
 
-    <!-- MEIO: título com o mesmo peso das outras telas -->
-    <div>
-      <div style="font-size:72px;font-weight:900;color:#ffffff;line-height:0.95;letter-spacing:-2.5px;margin-bottom:30px;text-transform:uppercase;max-width:560px;">${titulo}</div>
-      <div style="width:64px;height:4px;background:#f97316;margin-bottom:30px;"></div>
-      <div style="font-size:26px;color:#94a3b8;line-height:1.6;max-width:440px;">${texto}</div>
-    </div>
+  <!-- MASCOTE central -->
+  <img src="${mascote}" style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);height:712px;z-index:4;filter:drop-shadow(0 18px 44px rgba(0,0,0,0.65));">
 
-    <!-- BASE: botão robusto com seta -->
-    <div style="display:inline-flex;align-items:center;gap:18px;background:#f97316;border-radius:4px;padding:28px 44px;width:fit-content;box-shadow:0 14px 36px rgba(249,115,22,0.3);">
-      <span style="font-size:29px;font-weight:900;color:#000000;letter-spacing:0.5px;">Salva esse carrossel</span>
-      <svg width="30" height="20" viewBox="0 0 28 18" fill="none"><path d="M0 9H24M24 9L16 1M24 9L16 17" stroke="#000000" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
+  <!-- SELO rotacionado -->
+  <div style="position:absolute;top:88px;left:96px;transform:rotate(-3deg);background:#f97316;border-radius:6px;padding:13px 28px;z-index:5;box-shadow:0 12px 30px rgba(249,115,22,0.38);">
+    <span style="font-size:16px;font-weight:900;color:#000000;letter-spacing:3px;text-transform:uppercase;">${emoji}  ${badge}</span>
   </div>
-  ${dots(total)}
+
+  <!-- @ no topo direito -->
+  <div style="position:absolute;top:104px;right:96px;font-size:14px;font-weight:700;color:rgba(255,255,255,0.45);letter-spacing:2px;z-index:5;">@jiujitsudinamicas</div>
+
+  <!-- TEXTO em pílula de vidro -->
+  <div style="position:absolute;bottom:150px;left:64px;max-width:330px;background:rgba(20,20,28,0.55);border:1px solid rgba(255,255,255,0.16);border-radius:16px;padding:22px 26px;z-index:5;backdrop-filter:blur(3px);">
+    <span style="font-size:24px;color:#e2e8f0;line-height:1.5;">${texto}</span>
+  </div>
+
+  <!-- BOTÃO herói -->
+  <div style="position:absolute;bottom:150px;right:64px;display:inline-flex;align-items:center;gap:16px;background:#f97316;border-radius:50px;padding:24px 36px;z-index:5;box-shadow:0 16px 40px rgba(249,115,22,0.45);">
+    <span style="font-size:25px;font-weight:900;color:#000000;letter-spacing:0.5px;">Salva esse carrossel</span>
+    <svg width="30" height="20" viewBox="0 0 28 18" fill="none"><path d="M0 9H24M24 9L16 1M24 9L16 17" stroke="#000000" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+
+  ${dots(total, false)}
 </div>`;
     }
     return `

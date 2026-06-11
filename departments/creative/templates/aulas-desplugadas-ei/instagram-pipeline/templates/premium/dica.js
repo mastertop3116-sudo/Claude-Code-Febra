@@ -16,7 +16,7 @@ module.exports = function templateDica({ titulo, dica, destaque, resposta, cta, 
   <!-- Linha laranja horizontal topo -->
   <div style="position:absolute;top:0;left:0;width:200px;height:2px;background:#f97316;"></div>
 
-  ${mascote ? `<img src="${mascote}" style="position:absolute;bottom:16px;right:-14px;height:440px;z-index:1;filter:drop-shadow(0 12px 28px rgba(0,0,0,0.6));">` : ''}
+  ${mascote ? `<div style="position:absolute;bottom:-200px;right:-170px;width:740px;height:740px;background:radial-gradient(circle at center,rgba(249,115,22,0.22) 0%,rgba(249,115,22,0.08) 45%,transparent 70%);z-index:0;pointer-events:none;"></div><img src="${mascote}" style="position:absolute;bottom:16px;right:-14px;height:440px;z-index:1;filter:drop-shadow(0 12px 28px rgba(0,0,0,0.6));">` : ''}
 
   <!-- Label categoria -->
   <div style="font-size:11px;font-weight:700;color:#f97316;letter-spacing:4px;text-transform:uppercase;margin-bottom:48px;position:relative;z-index:2;">🥋  DICA DO TATAME</div>

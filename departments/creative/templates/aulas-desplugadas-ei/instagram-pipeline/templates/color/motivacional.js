@@ -10,7 +10,7 @@ module.exports = function templateMotivacional({ frase, contexto, cta, mascote =
   <div style="position:absolute;top:72px;right:72px;font-size:38px;opacity:0.8;transform:rotate(10deg);">🏆</div>
   <div style="position:absolute;bottom:72px;left:72px;font-size:36px;opacity:0.75;transform:rotate(6deg);">💪</div>
   <div style="position:absolute;bottom:80px;right:68px;font-size:40px;opacity:0.8;transform:rotate(-8deg);">⭐</div>`}
-  ${m ? `<div style="position:absolute;bottom:30px;left:648px;width:350px;height:52px;background:radial-gradient(ellipse at center,rgba(0,0,0,0.30) 0%,transparent 70%);z-index:4;filter:blur(3px);"></div>
+  ${m ? `<div style="position:absolute;bottom:-200px;right:-170px;width:740px;height:740px;background:radial-gradient(circle at center,rgba(255,236,210,0.50) 0%,rgba(255,236,210,0.16) 45%,transparent 70%);z-index:1;pointer-events:none;"></div><div style="position:absolute;bottom:30px;left:648px;width:350px;height:52px;background:radial-gradient(ellipse at center,rgba(0,0,0,0.30) 0%,transparent 70%);z-index:4;filter:blur(3px);"></div>
   <img src="${mascote}" style="position:absolute;bottom:28px;right:-78px;height:650px;z-index:5;filter:drop-shadow(-12px 16px 20px rgba(0,0,0,0.22));">` : ''}
   <div style="background:rgba(255,255,255,0.97);border-radius:28px;padding:${m ? '52px 56px' : '60px 64px'};width:100%;max-width:${m ? '600px' : '940px'};box-shadow:0 24px 72px rgba(0,0,0,0.4);position:relative;z-index:3;text-align:${m ? 'left' : 'center'};">
     ${m ? '' : '<div style="font-size:72px;margin-bottom:24px;line-height:1;">🥋</div>'}

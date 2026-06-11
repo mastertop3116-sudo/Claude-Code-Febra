@@ -11,7 +11,7 @@ module.exports = function templateMotivacional({ frase, contexto, cta, mascote =
   <!-- Aspas decorativas grandes -->
   <div style="position:absolute;top:60px;right:80px;font-size:240px;color:#0d0d0d;font-weight:900;line-height:1;font-family:Georgia,serif;pointer-events:none;user-select:none;">"</div>
 
-  ${mascote ? `<img src="${mascote}" style="position:absolute;bottom:10px;right:-12px;height:620px;z-index:1;filter:drop-shadow(0 14px 30px rgba(0,0,0,0.6));">` : ''}
+  ${mascote ? `<div style="position:absolute;bottom:-200px;right:-170px;width:740px;height:740px;background:radial-gradient(circle at center,rgba(249,115,22,0.22) 0%,rgba(249,115,22,0.08) 45%,transparent 70%);z-index:0;pointer-events:none;"></div><img src="${mascote}" style="position:absolute;bottom:10px;right:-12px;height:620px;z-index:1;filter:drop-shadow(0 14px 30px rgba(0,0,0,0.6));">` : ''}
 
   <!-- Label -->
   <div style="font-size:11px;font-weight:700;color:#f97316;letter-spacing:4px;text-transform:uppercase;margin-bottom:${mascote ? '40px' : '64px'};position:relative;z-index:2;">🥋  PARA O SENSEI</div>
