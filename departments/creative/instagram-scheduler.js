@@ -58,6 +58,19 @@ function iniciar() {
     console.log('[instagram-scheduler] Robô de comentários PRONTO mas desligado (IG_COMENTARIOS_AUTO != true).');
   }
 
+  // Coleta de métricas — 1x/dia às 22h. Alimenta o dashboard e os "top performers"
+  // que a IA usa pra escrever conteúdo parecido com o que mais engaja.
+  cron.schedule('0 22 * * *', () => {
+    console.log('[instagram-scheduler] Coletando métricas diárias...');
+    try {
+      const { coletarEsalvar } = require('./templates/aulas-desplugadas-ei/instagram-pipeline/insights');
+      coletarEsalvar().catch(err => console.error('[instagram-scheduler] ERRO (métricas):', err.message));
+    } catch (e) {
+      console.warn('[instagram-scheduler] Métricas indisponíveis:', e.message);
+    }
+  }, { timezone: 'America/Sao_Paulo' });
+  console.log('[instagram-scheduler] Métricas diárias agendadas → 22:00 (America/Sao_Paulo)');
+
   if (config.posting.dryRun) {
     console.log('[instagram-scheduler] MODO DRY RUN — gera imagens mas não posta.');
   }
