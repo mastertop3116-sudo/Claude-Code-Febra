@@ -22,12 +22,25 @@ function respostaCompra(username) {
   return `${nome}que massa seu interesse! 🥋 São +250 dinâmicas prontas — Básico R$10 e Premium R$27 (com 3 bônus). O link tá na nossa bio. Qualquer dúvida, é só chamar! 👊`;
 }
 
+// Cartão de conhecimento do negócio — tudo que o robô pode afirmar com segurança
+const CONHECIMENTO = `SOBRE O NEGÓCIO (use só quando o comentário pedir; nunca invente além disso):
+- Produto: "+250 Dinâmicas de Jiu-Jitsu Infantil" — atividades e brincadeiras prontas pra aulas de jiu-jitsu com crianças de 4 a 12 anos, organizadas por faixa etária.
+- Preços: Básico R$10 · Premium R$27 (vem com 3 bônus). Compra pelo LINK NA BIO.
+- Entrega: 100% digital — chega no e-mail logo após a compra. Tem garantia de 7 dias.
+- Público: senseis, instrutores, donos de academia e pais.
+- Idade pra começar no jiu-jitsu: em geral a partir dos 4 anos, sempre com aula adaptada e lúdica.
+- Benefícios que podemos citar: disciplina, foco, confiança, defesa pessoal sem violência, ajuda contra bullying.
+- IMPORTANTE: não somos academia e não damos aulas (nem online) — vendemos o MATERIAL pronto pra quem dá as aulas.
+- NUNCA: prometer resultado garantido, dar conselho médico, falar mal de concorrente, passar link no comentário (sempre "link na bio").`;
+
 // Resposta amigável e contextual via IA (curta), com fallback se a IA falhar
 async function respostaIA(comentario, legenda) {
   try {
     const prompt = `Você é o social media da página @jiujitsudinamicas (jiu-jitsu infantil, para senseis, instrutores e pais).
 Responda o comentário abaixo de forma curta (máx 2 frases), calorosa, simpática e no tom de quem entende de tatame.
-Use no máximo 1 emoji. Não use hashtags. Não invente preços nem prometa nada. Em português do Brasil.
+Use no máximo 1 emoji. Não use hashtags. Não invente nada além do cartão abaixo. Em português do Brasil.
+
+${CONHECIMENTO}
 
 Legenda do post: "${(legenda || '').slice(0, 200)}"
 Comentário: "${comentario}"
