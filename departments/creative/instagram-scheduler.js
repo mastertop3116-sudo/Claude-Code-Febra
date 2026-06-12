@@ -44,8 +44,8 @@ function iniciar() {
   agendar(horarioNoite, 'noite');
 
   // Robô de comentários — responde automaticamente a cada 30 minutos.
-  // DESLIGADO por padrão. Liga com a variável IG_COMENTARIOS_AUTO=true (ou trocando o default aqui).
-  const comentariosAuto = process.env.IG_COMENTARIOS_AUTO === 'true';
+  // LIGADO por padrão desde 2026-06-11 (autorizado pelo Rodrigo). Desliga com IG_COMENTARIOS_AUTO=false.
+  const comentariosAuto = process.env.IG_COMENTARIOS_AUTO !== 'false';
   if (responderComentarios && comentariosAuto) {
     cron.schedule('*/30 * * * *', () => {
       console.log('[instagram-scheduler] Rodando robô de comentários...');

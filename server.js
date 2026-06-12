@@ -3037,7 +3037,7 @@ app.get('/instagram-responder-comentarios', async (req, res) => {
 });
 
 // ── HEALTH CHECK ─────────────────────────────────────────────────────────────
-app.get('/health', (req, res) => res.json({ status: 'ok', ts: Date.now() }));
+app.get('/health', (req, res) => res.json({ status: 'ok', ts: Date.now(), comentariosAuto: process.env.IG_COMENTARIOS_AUTO !== 'false' }));
 
 // ══════════════════════════════════════════════════════════════════════════════
 // MAX CRIADOR — Gerador unificado de entregáveis digitais (qualquer nicho)
