@@ -13,7 +13,7 @@ Com +250 dinâmicas prontas você mantém as crianças engajadas do aquecimento 
 
 Arraste para ver como funciona 👉
 
-🥋 Básico: R$10 | Premium R$27 (+ 3 bônus grátis)
+🥋 Básico: R$10 | Premium R$19,90 (+ 3 bônus grátis)
 🔗 Link na bio para garantir o seu
 
 #jiujitsu #jiujitsuinfantil #sensei #professor #tatame #artesmarciais #jiujitsubrasil #aulainfantil #academia #treinador #jiujitsulife #educacaofisica #bncc #dinamicas #jiujitsukids`;

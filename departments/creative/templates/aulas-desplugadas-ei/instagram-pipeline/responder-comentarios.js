@@ -19,14 +19,14 @@ const INTENCAO_COMPRA = /(pre[çc]o|valor|quanto|qto|qnt|quanto custa|comprar|ad
 // Resposta pronta pra quem demonstra interesse de compra
 function respostaCompra(username) {
   const nome = username ? `@${username} ` : '';
-  return `${nome}que massa seu interesse! 🥋 São +250 dinâmicas prontas — Básico R$10 e Premium R$27 (com 3 bônus). O link tá na nossa bio. Qualquer dúvida, é só chamar! 👊`;
+  return `${nome}que massa seu interesse! 🥋 São +250 dinâmicas prontas — Básico R$10 e Premium R$19,90 (com 3 bônus). O link tá na nossa bio. Qualquer dúvida, é só chamar! 👊`;
 }
 
 // Cartão de conhecimento do negócio — tudo que o robô pode afirmar com segurança
 const CONHECIMENTO = `SOBRE O NEGÓCIO (use só quando o comentário pedir; nunca invente além disso):
 - Produto: "+250 Dinâmicas de Jiu-Jitsu Infantil" — atividades e brincadeiras prontas pra aulas de jiu-jitsu com crianças de 4 a 12 anos, organizadas por faixa etária.
-- Preços: Básico R$10 · Premium R$27 (vem com 3 bônus). Compra pelo LINK NA BIO.
-- Entrega: 100% digital — chega no e-mail logo após a compra. Tem garantia de 7 dias.
+- Preços: Básico R$10 · Premium R$19,90 (vem com 3 bônus). Compra pelo LINK NA BIO.
+- Entrega: acesso à ÁREA DE MEMBROS com todo o manual, liberado logo após a compra (dados de acesso chegam por e-mail). Garantia de 7 dias.
 - Público: senseis, instrutores, donos de academia e pais.
 - Idade pra começar no jiu-jitsu: em geral a partir dos 4 anos, sempre com aula adaptada e lúdica.
 - Benefícios que podemos citar: disciplina, foco, confiança, defesa pessoal sem violência, ajuda contra bullying.

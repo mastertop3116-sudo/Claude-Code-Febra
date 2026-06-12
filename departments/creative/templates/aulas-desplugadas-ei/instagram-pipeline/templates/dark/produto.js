@@ -27,7 +27,7 @@ module.exports = function templateProduto({ gancho, problema, solucao, prova, ct
       </div>
       <div style="text-align:right;">
         <div style="font-size:13px;color:#475569;font-weight:600;text-decoration:line-through;">De R$97</div>
-        <div style="font-size:52px;font-weight:900;color:#f97316;line-height:1;letter-spacing:-2px;">R$27</div>
+        <div style="font-size:52px;font-weight:900;color:#f97316;line-height:1;letter-spacing:-2px;">R$19,90</div>
       </div>
     </div>
 

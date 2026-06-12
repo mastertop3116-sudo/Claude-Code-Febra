@@ -1,6 +1,6 @@
 // Carrossel Jiu-Jitsu — Dark Fighter
 // Usa o template slide.js existente (preto #0a0a0f + laranja #f97316)
-// Conteúdo: produto +250 Dinâmicas de Jiu-Jitsu | R$10 básico / R$27 premium
+// Conteúdo: produto +250 Dinâmicas de Jiu-Jitsu | R$10 básico / R$19,90 premium
 
 const puppeteer = require('puppeteer');
 const templateSlide = require('./templates/dark/slide');
@@ -73,7 +73,7 @@ const slides = [
   templateSlide({
     tipo: 'cta',
     titulo: 'Transforme sua aula hoje.',
-    texto: 'Básico R$10 · Premium R$27 · Garantia de 7 dias · Link na bio.',
+    texto: 'Básico R$10 · Premium R$19,90 · Garantia de 7 dias · Link na bio.',
     badge: 'Oferta Especial',
     emoji: '🥋',
     numero: TOTAL,
