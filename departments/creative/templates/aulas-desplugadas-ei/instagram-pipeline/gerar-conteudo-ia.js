@@ -2,9 +2,7 @@
 // Chamado pelo pipeline antes de gerar imagem — evita repetição, sempre fresco
 // Revezа 3 estilos visuais (dark/premium/color) e MUITOS ângulos de conteúdo.
 
-const OpenAI = require('openai');
-
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const { gerarJSON } = require('./ia'); // OpenAI com fallback automático pro Claude
 
 function carregarInsights() {
   try { return require('./insights'); } catch (e) { return null; }
@@ -108,14 +106,7 @@ Retorne SOMENTE JSON com esta estrutura exata:
 
 Gere de 5 a 6 slides de conteúdo (nunca menos que 5). Tom: direto, experiente, generoso.${contextoIA}`;
 
-  const resp  = await client.chat.completions.create({
-    model:           'gpt-4o-mini',
-    messages:        [{ role: 'user', content: prompt }],
-    response_format: { type: 'json_object' },
-    temperature:     0.9,
-  });
-
-  const g = JSON.parse(resp.choices[0].message.content);
+  const g = await gerarJSON(prompt, { temperature: 0.9 });
 
   // Monta a lista garantindo capa única, cta única e numeração correta
   const raw       = Array.isArray(g.slides) ? g.slides : [];
@@ -198,14 +189,7 @@ ${schema}
 
 Tom: autêntico, direto, generoso, de quem vive o tatame todo dia.${contextoIA}`;
 
-  const resp  = await client.chat.completions.create({
-    model:           'gpt-4o-mini',
-    messages:        [{ role: 'user', content: prompt }],
-    response_format: { type: 'json_object' },
-    temperature:     0.9,
-  });
-
-  const g = JSON.parse(resp.choices[0].message.content);
+  const g = await gerarJSON(prompt, { temperature: 0.9 });
   return { tipo, estilo, faixa: FAIXAS_POR_DIA[doAno % FAIXAS_POR_DIA.length], fontes, textura, conteudo: g };
 }
 

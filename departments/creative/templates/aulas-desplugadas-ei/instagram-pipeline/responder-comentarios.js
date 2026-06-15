@@ -4,11 +4,10 @@
 // limite por rodada, e só comentários dos últimos N dias.
 
 const axios  = require('axios');
-const OpenAI = require('openai');
 const config = require('./config');
+const { gerarTexto } = require('./ia'); // OpenAI com fallback automático pro Claude
 
 const BASE = 'https://graph.facebook.com/v19.0';
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const TOKEN = () => config.instagram.accessToken;
 const ACCT  = () => config.instagram.accountId;
@@ -46,13 +45,7 @@ Legenda do post: "${(legenda || '').slice(0, 200)}"
 Comentário: "${comentario}"
 
 Escreva só a resposta, sem aspas.`;
-    const resp = await client.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.8,
-      max_tokens: 90,
-    });
-    let txt = (resp.choices[0].message.content || '').trim().replace(/^["']|["']$/g, '');
+    let txt = (await gerarTexto(prompt, { temperature: 0.8, maxTokens: 90 })).replace(/^["']|["']$/g, '');
     return txt.slice(0, 240) || 'Valeu pelo comentário! 🥋';
   } catch (e) {
     return 'Valeu demais pelo comentário! 🥋👊';
