@@ -1,5 +1,5 @@
 // Renderiza posts e carrosséis em PNG via Puppeteer
-const puppeteer    = require('puppeteer');
+const puppeteer    = require('./puppeteer-compat'); // prod: puppeteer-core+sparticuz; dev: puppeteer
 const path         = require('path');
 const fs           = require('fs');
 const os           = require('os');
