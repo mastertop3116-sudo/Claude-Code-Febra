@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["nodejs_20", "chromium", "nss", "atk", "cups", "gtk3", "alsa-lib"]
+nixPkgs = ["nodejs_22", "chromium", "nss", "atk", "cups", "gtk3", "alsa-lib", "unzip", "gnutar"]
 
 [variables]
 PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = "true"
