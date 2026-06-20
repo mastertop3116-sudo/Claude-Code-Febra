@@ -1477,7 +1477,7 @@ app.post("/api/gerar-pdf", async (req, res) => {
       const { buildHTML } = require(genPath);
       const html = buildHTML(kitData);
 
-      const puppeteer = require("puppeteer");
+      const puppeteer = (await import("puppeteer")).default;
       const browser = await puppeteer.launch({ headless: "new", args: ["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage"] });
       const page = await browser.newPage();
       await page.setContent(html, { waitUntil: "networkidle0", timeout: 30000 });
@@ -1642,7 +1642,7 @@ Sem explicações. Sem markdown. Apenas HTML + META.`;
       }, null, 2), "utf8");
 
       set(80, "Renderizando preview do PDF...");
-      const puppeteer = require("puppeteer");
+      const puppeteer = (await import("puppeteer")).default;
       const browser = await puppeteer.launch({ headless: "new", args: ["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage"] });
       const page = await browser.newPage();
       await page.setContent(html, { waitUntil: "networkidle0", timeout: 30000 });
@@ -1754,7 +1754,7 @@ Responda APENAS com o HTML completo começando com <!DOCTYPE html> e terminando 
         const html = completion.choices[0].message.content.trim()
           .replace(/^```html\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/, "");
 
-        const puppeteer = require("puppeteer");
+        const puppeteer = (await import("puppeteer")).default;
         const browser = await puppeteer.launch({ headless: "new", args: ["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage"] });
         const page = await browser.newPage();
         await page.setContent(html, { waitUntil: "networkidle0", timeout: 30000 });
@@ -1942,11 +1942,11 @@ Responda APENAS com o HTML completo começando com <!DOCTYPE html> e terminando 
     let browser;
     const LAUNCH_ARGS = ["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage","--disable-gpu","--font-render-hinting=none"];
     if (process.env.NODE_ENV === "production" || process.env.RENDER) {
-      const chromium = require("@sparticuz/chromium");
-      const puppeteerCore = require("puppeteer-core");
+      const chromium = (await import("@sparticuz/chromium")).default;
+      const puppeteerCore = (await import("puppeteer-core")).default;
       browser = await puppeteerCore.launch({ args: [...chromium.args, ...LAUNCH_ARGS], executablePath: await chromium.executablePath(), headless: chromium.headless });
     } else {
-      const puppeteer = require("puppeteer");
+      const puppeteer = (await import("puppeteer")).default;
       browser = await puppeteer.launch({ headless: "new", args: LAUNCH_ARGS });
     }
     const page = await browser.newPage();

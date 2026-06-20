@@ -998,15 +998,15 @@ async function renderizarPDF(conteudo, params) {
   const ARGS = ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--font-render-hinting=none', `--force-device-scale-factor=${DSF}`];
 
   if (isProd) {
-    const chromium      = require('@sparticuz/chromium');
-    const puppeteerCore = require('puppeteer-core');
+    const chromium      = (await import('@sparticuz/chromium')).default;
+    const puppeteerCore = (await import('puppeteer-core')).default;
     browser = await puppeteerCore.launch({
       args: [...chromium.args, ...ARGS],
       executablePath: await chromium.executablePath(),
       headless: chromium.headless,
     });
   } else {
-    const puppeteer = require('puppeteer');
+    const puppeteer = (await import('puppeteer')).default;
     browser = await puppeteer.launch({ headless: 'new', args: ARGS });
   }
 
@@ -1165,11 +1165,11 @@ async function renderizarEbookPremium(conteudo, params) {
   const ARGS = ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--font-render-hinting=none'];
   let browser;
   if (isProd) {
-    const chromium = require('@sparticuz/chromium');
-    const puppeteerCore = require('puppeteer-core');
+    const chromium = (await import('@sparticuz/chromium')).default;
+    const puppeteerCore = (await import('puppeteer-core')).default;
     browser = await puppeteerCore.launch({ args: [...chromium.args, ...ARGS], executablePath: await chromium.executablePath(), headless: chromium.headless });
   } else {
-    const puppeteer = require('puppeteer');
+    const puppeteer = (await import('puppeteer')).default;
     browser = await puppeteer.launch({ headless: 'new', args: ARGS });
   }
   try {

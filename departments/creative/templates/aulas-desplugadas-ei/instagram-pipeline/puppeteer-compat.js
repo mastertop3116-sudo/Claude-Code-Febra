@@ -1,15 +1,16 @@
 // puppeteer-compat.js
 // Lança o browser de forma compatível com produção (Render / VPS Coolify).
-// Em produção usa puppeteer-core + @sparticuz/chromium (require CJS — evita o
-// require('puppeteer') que quebra com o puppeteer@25, que virou ES Module).
-// Em dev local (Windows) usa o puppeteer normal.
-// Importante: NÃO faz require de puppeteer/puppeteer-core no topo — só dentro do
-// launch() — pra carregar este módulo não disparar o erro de ESM no boot.
+// puppeteer@25 E puppeteer-core@25 são ES Modules — require() quebra nos dois.
+// Por isso usamos import() DINÂMICO (funciona pra ESM a partir de CommonJS).
+// Em produção: puppeteer-core + @sparticuz/chromium (mesmo caminho do NexusPDF/Criador).
+// Em dev local: puppeteer normal.
+// Nada é importado no topo — só dentro do launch() — pra carregar este módulo
+// não disparar nada (o instagram-scheduler exige isso no boot).
 module.exports = {
   async launch(opts = {}) {
     if (process.env.NODE_ENV === 'production' || process.env.RENDER) {
-      const chromium = require('@sparticuz/chromium');
-      const pc = require('puppeteer-core');
+      const chromium = (await import('@sparticuz/chromium')).default;
+      const pc = (await import('puppeteer-core')).default;
       return pc.launch({
         ...opts,
         args: [...chromium.args, ...(opts.args || [])],
@@ -17,7 +18,7 @@ module.exports = {
         headless: chromium.headless,
       });
     }
-    const puppeteer = require('puppeteer');
+    const puppeteer = (await import('puppeteer')).default;
     return puppeteer.launch(opts);
   },
 };

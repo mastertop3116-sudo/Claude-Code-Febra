@@ -26,8 +26,8 @@ async function getBrowser() {
 
   // Em produção (Render/Lambda), usar @sparticuz/chromium
   if (process.env.NODE_ENV === "production" || process.env.RENDER) {
-    const chromium = require("@sparticuz/chromium");
-    const puppeteerCore = require("puppeteer-core");
+    const chromium = (await import("@sparticuz/chromium")).default;
+    const puppeteerCore = (await import("puppeteer-core")).default;
     _browser = await puppeteerCore.launch({
       args: [...chromium.args, ...LAUNCH_ARGS],
       executablePath: await chromium.executablePath(),
@@ -35,7 +35,7 @@ async function getBrowser() {
     });
   } else {
     // Local: usar puppeteer normal com Chrome local
-    const puppeteer = require("puppeteer");
+    const puppeteer = (await import("puppeteer")).default;
     const executablePath = await puppeteer.executablePath().catch(() => undefined);
     _browser = await puppeteer.launch({
       headless: "new",
