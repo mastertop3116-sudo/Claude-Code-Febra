@@ -223,9 +223,10 @@ function definirCreditos(userId, { creditos, somar } = {}) {
   const u = lista.find(x => x.id === userId);
   if (!u) return { ok: false, error: 'Usuário não encontrado.' };
   const n = parseInt(creditos);
-  if (isNaN(n) || n < 0) return { ok: false, error: 'Quantidade de créditos inválida.' };
+  if (isNaN(n)) return { ok: false, error: 'Quantidade de créditos inválida.' };
+  if (!somar && n < 0) return { ok: false, error: 'Quantidade de créditos inválida.' };
   const base = (typeof u.creditos === 'number') ? u.creditos : Math.max(0, saldoCreditos(u));
-  u.creditos = somar ? base + n : n;
+  u.creditos = Math.max(0, somar ? base + n : n);  // permite TIRAR (somar negativo) sem deixar saldo < 0
   delete u.limites; delete u.uso; delete u.usoMes;
   salvarUsuarios(lista);
   return { ok: true, creditos: u.creditos };
