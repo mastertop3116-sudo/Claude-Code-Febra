@@ -140,31 +140,31 @@ app.post("/api/conta/senha", auth.exigirLogin, (req, res) => {
   res.status(r.ok ? 200 : 400).json(r);
 });
 // Admin: criar usuário
-app.post("/api/usuarios", auth.exigirAdmin, (req, res) => {
+app.post("/api/usuarios", auth.exigirAdminOuChave, (req, res) => {
   const { nome, login, senha, papel } = req.body || {};
   const r = auth.criarUsuarioPersistido(nome, login, senha, papel);
   res.status(r.ok ? 200 : 400).json(r);
 });
 // Admin: redefinir a senha de um usuário
-app.post("/api/usuarios/:id/senha", auth.exigirAdmin, (req, res) => {
+app.post("/api/usuarios/:id/senha", auth.exigirAdminOuChave, (req, res) => {
   const r = auth.trocarSenha(req.params.id, (req.body || {}).nova);
   res.status(r.ok ? 200 : 400).json(r);
 });
 // Admin: definir/somar os CRÉDITOS de um usuário. Ex: { creditos: 100 } ou { creditos: 50, somar: true }
-app.post("/api/usuarios/:id/creditos", auth.exigirAdmin, (req, res) => {
+app.post("/api/usuarios/:id/creditos", auth.exigirAdminOuChave, (req, res) => {
   const b = req.body || {};
   const r = auth.definirCreditos(req.params.id, { creditos: b.creditos, somar: !!b.somar });
   res.status(r.ok ? 200 : 400).json(r);
 });
 // Admin: remover usuário (não pode remover a si mesmo)
-app.delete("/api/usuarios/:id", auth.exigirAdmin, (req, res) => {
+app.delete("/api/usuarios/:id", auth.exigirAdminOuChave, (req, res) => {
   if (req.params.id === req.usuario.id) return res.status(400).json({ error: "Você não pode remover a si mesmo." });
   const r = auth.removerUsuario(req.params.id);
   res.status(r.ok ? 200 : 400).json(r);
 });
 
 // Admin: gerar LINK DE DEMONSTRAÇÃO (acesso por X horas, sem senha, com créditos de teste)
-app.post("/api/demo", auth.exigirAdmin, (req, res) => {
+app.post("/api/demo", auth.exigirAdminOuChave, (req, res) => {
   const b = req.body || {};
   const r = auth.criarDemo({ horas: b.horas, creditos: b.creditos });
   if (!r.ok) return res.status(400).json(r);
