@@ -2052,6 +2052,10 @@ Responda APENAS com o HTML completo começando com <!DOCTYPE html> e terminando 
   });
 })();
 
+// SEGURANÇA (Max, seguranca-onda1): o painel interno (cérebro do Rodrigo + rotas que gastam IA)
+// estava TODO aberto sem login. Uma linha protege as 16 rotas /api/dashboard/* de uma vez.
+app.use('/api/dashboard', auth.exigirAdmin);
+
 app.get('/api/dashboard/config', (req, res) => {
   const { SECTORS, CONSELHO } = require('./core/departments');
   res.json({ sectors: SECTORS, conselho: CONSELHO });
