@@ -26,6 +26,20 @@ function _buscaFundo(obj, teste, prof = 0) {
 
 router.post("/ggcheckout", async (req, res) => {
   try {
+    // SEGURANÇA (Max, seguranca-onda1): sem isto, qualquer um podia forjar "pagamento aprovado"
+    // e ganhar conta paga de graça. NÃO-DESTRUTIVO: se GG_WEBHOOK_SECRET não existir, funciona
+    // como antes (só avisa no log). Quando o Rodrigo setar o segredo no Render + ?k=SEGREDO na URL
+    // do webhook no painel do GG, forjados são bloqueados sem afetar pagamentos reais.
+    const _segredo = process.env.GG_WEBHOOK_SECRET;
+    if (_segredo) {
+      const _recebido = req.query.k || req.query.secret || req.headers["x-webhook-secret"] || "";
+      if (_recebido !== _segredo) {
+        console.warn("[webhook GG] segredo inválido — pedido rejeitado (possível forjado).");
+        return res.status(401).json({ error: "unauthorized" });
+      }
+    } else {
+      console.warn("[webhook GG] ⚠️ GG_WEBHOOK_SECRET não definido — aceita qualquer origem. Setar no Render pra blindar.");
+    }
     const payload = req.body;
     const evento = payload.event || payload.type || "desconhecido";
 
