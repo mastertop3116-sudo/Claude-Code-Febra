@@ -669,9 +669,9 @@ const STATE = {
 document.addEventListener('DOMContentLoaded', () => {
   // Acesso pela DOMINANCE: link /plania?u=ID&s=ASSINATURA → entra JÁ LIBERADO, sem digitar código.
   const _p = new URLSearchParams(location.search);
-  const _u = _p.get('u'), _s = _p.get('s');
+  const _u = _p.get('u'), _s = _p.get('s'), _e = _p.get('e'), _exp = _p.get('exp');
   if (_u && _s) {
-    STATE.dom = { u: _u, s: _s };
+    STATE.dom = { u: _u, e: _e || undefined, exp: _exp || undefined, s: _s };
     STATE.tokenValido = true;
     const ta = document.querySelector('.token-area'); if (ta) ta.style.display = 'none';
   }

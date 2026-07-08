@@ -2795,12 +2795,18 @@ app.post('/api/plania/ativar', async (req, res) => {
 // Valida o "selo de acesso" da DOMINANCE (área de membros do Carlinhos): a Dominance
 // monta um link assinado (HMAC do id do membro com um segredo só dela e nosso). Assim o
 // membro abre o PlanIA JÁ LIBERADO, sem digitar token. Ninguém de fora consegue forjar.
-function validarSeloDominance(u, s) {
+function validarSeloDominance(u, e, exp, s) {
+  // Formato oficial (lib/members/plania-link.js da Dominance):
+  //   payload = `${memberId}.${email}.${exp}` assinado HMAC-SHA256 com o segredo
+  //   compartilhado; e = email em base64url; exp = unix (link expira em 24h).
   const segredo = process.env.PLANIA_DOMINANCE_SECRET;
-  if (!segredo || !u || !s) return false;
+  if (!segredo || !u || !exp || !s) return false;
+  if (Number(exp) < Math.floor(Date.now() / 1000)) return false; // link vencido
   try {
     const crypto = require('crypto');
-    const esperado = crypto.createHmac('sha256', segredo).update(String(u)).digest('hex');
+    const email = e ? Buffer.from(String(e), 'base64url').toString('utf8') : '';
+    const payload = `${String(u)}.${email}.${String(exp)}`;
+    const esperado = crypto.createHmac('sha256', segredo).update(payload).digest('hex');
     const a = Buffer.from(esperado), b = Buffer.from(String(s));
     return a.length === b.length && crypto.timingSafeEqual(a, b);
   } catch (_) { return false; }
@@ -2820,7 +2826,7 @@ app.post('/api/plania/gerar', async (req, res) => {
   let modoDemo = true;
 
   // Acesso vindo da DOMINANCE (link assinado): libera sem token — quem controla quem comprou é a Dominance.
-  if (dom && dom.u && dom.s && validarSeloDominance(dom.u, dom.s)) {
+  if (dom && dom.u && dom.s && validarSeloDominance(dom.u, dom.e, dom.exp, dom.s)) {
     modoDemo = false;
   } else if (token) {
     try {
