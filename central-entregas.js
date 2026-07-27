@@ -274,6 +274,12 @@ h3{font-size:.68rem;color:var(--text-2);margin:16px 0 8px;text-transform:upperca
 .grp summary::-webkit-details-marker{display:none}
 #tAcessos{display:none}body.ac-on #tVendas{display:none}body.ac-on .col-side{display:none}body.ac-on #tAcessos{display:block}
 .vazio{color:var(--text-2);text-align:center;padding:18px;font-size:.85rem}
+body.claro{--bg:#f3f4f9;--surface:#fff;--elevated:#fff;--overlay:#eef0f7;--border:rgba(20,25,50,.10);--border-md:rgba(20,25,50,.18);--text:#1b2032;--text-2:#5b6178;--text-3:#9aa0b5;--nexus-dim:rgba(99,102,241,.10)}
+body.claro::after{opacity:.02}
+body.claro #statusbar,body.claro #sidebar,body.claro #mob{background:rgba(255,255,255,.97)}
+body.claro .hero h1{background:linear-gradient(135deg,#232840,#5b6178);-webkit-background-clip:text}
+body.claro .cp{color:#4649c9}
+body.claro .venda,body.claro .stat,body.claro .painel,body.claro .ac{box-shadow:0 2px 12px rgba(20,25,50,.05)}
 #mob{display:none}
 body.embed #statusbar,body.embed #sidebar,body.embed #mob{display:none !important}
 body.embed #shell{padding-top:0}
@@ -360,6 +366,7 @@ function fil(v){v=v.toLowerCase();document.querySelectorAll('.ac').forEach(e=>e.
 function filV(v){v=v.toLowerCase();const tem=v.length>0;if(tem)document.getElementById('grpAntes').setAttribute('open','');let vis=0;document.querySelectorAll('details.venda').forEach(e=>{const m=(e.dataset.n||'').includes(v);e.style.display=m?'block':'none';if(m)vis++});
 document.querySelectorAll('#tVendas h3').forEach(h=>{let n=h.nextElementSibling,acha=false;while(n&&n.tagName!=='H3'){if(n.matches&&n.matches('details.venda')&&n.style.display!=='none'){acha=true;break}if(n.querySelector){const c=[...n.querySelectorAll('details.venda')].some(x=>x.style.display!=='none');if(c){acha=true;break}}n=n.nextElementSibling}h.style.display=(!tem||acha)?'block':'none'});
 let z=document.getElementById('zero');if(!z){z=document.createElement('div');z.id='zero';z.className='vazio';z.textContent='nenhuma venda com esse nome nos últimos 3 dias — pede pro Max conferir';document.getElementById('tVendas').appendChild(z)}z.style.display=(tem&&vis===0)?'block':'none'}
+if(localStorage.getItem('nx-tema')!=='escuro')document.body.classList.add('claro');
 setInterval(()=>{const d=new Date(Date.now()-3*3600000);document.getElementById('sbClock').textContent=d.toISOString().slice(11,19)},1000);
 (function(){const hh=new Date(Date.now()-3*3600000).getUTCHours();document.getElementById('oi').textContent=(hh<12?'Bom dia':hh<18?'Boa tarde':'Boa noite')+', Rodrigo'})();
 setTimeout(()=>location.reload(), 600000);
@@ -367,6 +374,12 @@ setTimeout(()=>location.reload(), 600000);
 </body></html>`;
 
   return { html, dados: { gerado: new Date().toISOString(), placar: { total, entregues: ok, login_antigo: antigas, sem_entrega: semEntrega, bumps_pendentes: bumpsPend }, receita_hoje: receitaHoje, vendas_hoje: vHoje.length, sessao_pronta: sp, vendas: linhas } };
+}
+
+const PIN = process.env.CENTRAL_PIN || "";
+function comPin(req) { return !PIN || req.query.k === PIN || req.headers["x-pin"] === PIN; }
+function pedeSenha(res) {
+  res.status(401).send(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:sans-serif;background:#f5f6fa;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}form{background:#fff;padding:28px;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.10);text-align:center}input{padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:16px;text-align:center;letter-spacing:.3em}button{margin-top:10px;padding:12px 22px;border:0;border-radius:10px;background:#6366f1;color:#fff;font-weight:700;font-size:15px;cursor:pointer;display:block;width:100%}</style></head><body><form onsubmit="event.preventDefault();const u=new URL(location);u.searchParams.set('k',document.getElementById('s').value);location=u">🔒<br><br><input id="s" type="password" placeholder="senha"/><button>Entrar</button></form></body></html>`);
 }
 
 let cache = { t: 0, html: "", dados: null };
@@ -379,6 +392,7 @@ async function fresco() {
 }
 
 router.get("/" + SLUG, async (req, res) => {
+  if (!comPin(req)) return pedeSenha(res);
   try {
     let h = (await fresco()).html;
     if (req.query.embed) h = h.replace("<body>", '<body class="embed">');
@@ -387,7 +401,8 @@ router.get("/" + SLUG, async (req, res) => {
   }
   catch (e) { res.status(500).send("Central indisponível agora: " + String(e).slice(0, 120)); }
 });
-router.get("/" + SLUG + "/dados.json", async (_req, res) => {
+router.get("/" + SLUG + "/dados.json", async (req, res) => {
+  if (!comPin(req)) return res.status(401).json({ erro: "senha" });
   try { res.json((await fresco()).dados); }
   catch (e) { res.status(500).json({ erro: String(e).slice(0, 120) }); }
 });
@@ -444,12 +459,33 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);font
 .msg .hh{display:block;font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--text-3);margin-top:4px;text-align:right}
 .vazio{color:var(--text-2);text-align:center;margin:auto;font-size:.85rem}
 @media(max-width:860px){#lista{width:100%}body.aberto #lista{display:none}#chat{display:none}body.aberto #chat{display:flex}body.aberto #voltar{display:inline-block}}
+#composer{display:none;border-top:1px solid var(--border);background:var(--surface);padding:10px 12px;gap:8px;align-items:center}
+#composer.on{display:flex}
+#composer button.ferramenta{background:none;border:1px solid var(--border);color:var(--text-3);border-radius:9px;width:38px;height:38px;cursor:not-allowed;font-size:1rem}
+#cx-texto{flex:1;background:var(--elevated);border:1px solid var(--border);border-radius:20px;padding:10px 16px;color:var(--text);font-size:.88rem;font-family:'Outfit',sans-serif;outline:none}
+#cx-texto:focus{border-color:rgba(37,211,102,.5)}
+#cx-enviar{background:#25D366;border:0;color:#04140a;border-radius:50%;width:40px;height:40px;font-size:1.1rem;cursor:pointer;font-weight:900}
+#cx-enviar:disabled{opacity:.4;cursor:not-allowed}
+#cx-aviso{display:none;border-top:1px solid var(--border);background:var(--surface);padding:10px 14px;font-size:.74rem;color:var(--text-2)}
+#cx-aviso.on{display:block}
+#cx-aviso .chip{display:inline-block;border:1px dashed var(--border-md);border-radius:8px;padding:4px 10px;margin:4px 6px 0 0;color:var(--text-3);font-size:.7rem}
+body.claro{--bg:#f3f4f9;--surface:#fff;--elevated:#f6f7fb;--border:rgba(20,25,50,.10);--border-md:rgba(20,25,50,.18);--text:#1b2032;--text-2:#5b6178;--text-3:#9aa0b5}
+body.claro .msg.out{background:#d8f7e5;border-color:#b4ecc9;color:#0c3d22}
+body.claro .msg.in{background:#fff;border-color:rgba(20,25,50,.12)}
+body.claro .aviso{background:#eef0fb}
 </style></head><body>
 <div class="aviso">👁 Modo leitura — a Sofia continua atendendo sozinha. Quando ela for só nossa, este é o lugar de responder. Atualiza a cada 2 min.</div>
 <div id="duo">
 <div id="lista"></div>
 <div id="chat"><div id="chat-head"><button id="voltar" onclick="document.body.classList.remove('aberto')">←</button><span id="chat-nome"></span></div>
-<div id="msgs"><div class="vazio">👈 escolha uma conversa</div></div></div>
+<div id="msgs"><div class="vazio">👈 escolha uma conversa</div></div>
+<div id="composer">
+  <button class="ferramenta" title="Anexos (imagem, áudio, arquivo) chegam na próxima atualização — porta nova pedida ao time técnico" disabled>📎</button>
+  <input id="cx-texto" placeholder="Responder como Sofia…" onkeydown="if(event.key==='Enter')enviar()"/>
+  <button id="cx-enviar" onclick="enviar()">➤</button>
+</div>
+<div id="cx-aviso"></div>
+</div>
 </div>
 <script>
 const CONVAS = ${DADOS};
@@ -469,15 +505,180 @@ function abrir(i){
   const box=document.getElementById('msgs'); box.scrollTop=box.scrollHeight;
   document.body.classList.add('aberto');
 }
-setTimeout(()=>location.reload(), 120000);
+if(localStorage.getItem('nx-tema')!=='escuro')document.body.classList.add('claro');
+const K = new URLSearchParams(location.search).get('k')||'';
+let ATUAL = null;
+function janelaAberta(c){
+  const ult = [...c.ms].reverse().find(m=>m.d==='in');
+  return ult ? (Date.now()-new Date(ult.h).getTime()) < 24*3600000 : false;
+}
+const _abrir = abrir;
+abrir = function(i){
+  _abrir(i); ATUAL = i;
+  const c = CONVAS[i], ok = janelaAberta(c);
+  document.getElementById('composer').classList.toggle('on', ok);
+  const av = document.getElementById('cx-aviso');
+  av.classList.toggle('on', !ok);
+  if(!ok) av.innerHTML = '⏳ <b>Conversa fora da janela de 24h do WhatsApp</b> — mensagem livre não é permitida pela Meta. O envio de MODELOS aprovados por aqui chega na próxima atualização (porta nova já pedida ao time técnico):<br>'+
+    ['cart_recovery_t1','cart_recovery_t2','cart_recovery_t3'].map(t=>'<span class="chip">📄 '+t+'</span>').join('');
+};
+async function enviar(){
+  const cx = document.getElementById('cx-texto'), bt = document.getElementById('cx-enviar');
+  const texto = cx.value.trim();
+  if(!texto || ATUAL==null) return;
+  bt.disabled = true;
+  try{
+    const r = await fetch(location.pathname + '/enviar?k=' + encodeURIComponent(K), {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ patient_id: CONVAS[ATUAL].id, text: texto })
+    });
+    const d = await r.json().catch(()=>({}));
+    if(r.ok){
+      cx.value='';
+      const box = document.getElementById('msgs');
+      box.insertAdjacentHTML('beforeend', '<div class="msg out">'+texto.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'<span class="hh">agora · ✓ enviada pela Sofia</span></div>');
+      box.scrollTop = box.scrollHeight;
+    } else { alert('Não foi: ' + (d.erro || r.status)); }
+  } catch(e){ alert('Falha de rede — tenta de novo'); }
+  bt.disabled = false;
+}
+setTimeout(()=>location.reload(), 180000);
 </script></body></html>`;
 }
 let cacheW = { t: 0, html: "" };
-router.get("/whats-" + SLUG.replace("central-", ""), async (_req, res) => {
+router.get("/whats-" + SLUG.replace("central-", ""), async (req, res) => {
+  if (!comPin(req)) return pedeSenha(res);
   try {
     if (Date.now() - cacheW.t > 2 * 60000 || !cacheW.html) cacheW = { t: Date.now(), html: await montarWhats() };
     res.set("Cache-Control", "no-cache").send(cacheW.html);
   } catch (e) { res.status(500).send("WhatsApp indisponível: " + String(e).slice(0, 120)); }
+});
+
+// envio de texto livre PELA SOFIA (mesma porta dos robôs do plantão)
+router.post("/whats-" + SLUG.replace("central-", "") + "/enviar", express.json(), async (req, res) => {
+  if (!comPin(req)) return res.status(401).json({ erro: "senha" });
+  const { patient_id, text } = req.body || {};
+  if (!patient_id || !String(text || "").trim()) return res.status(400).json({ erro: "faltou mensagem ou destinatário" });
+  try {
+    const r = await fetch("https://www.dominancestudio.com.br/api/v1/agent/send", {
+      method: "POST",
+      headers: { Authorization: "Bearer " + (process.env.SOFIA_TOKEN || ""), "Content-Type": "application/json" },
+      body: JSON.stringify({ patient_id, text: String(text).trim() }),
+    });
+    const corpo = await r.json().catch(() => ({}));
+    cacheW.t = 0; // conversa muda: próxima carga vem fresca
+    res.status(r.ok ? 200 : 502).json(r.ok ? { ok: true } : { erro: corpo.error || ("Meta recusou (" + r.status + ")") });
+  } catch (e) { res.status(502).json({ erro: String(e).slice(0, 100) }); }
+});
+
+// ═══ FINANCEIRO DO DIA — banco de vendas × UTMify (gastos) × imposto ═══
+const UTMIFY_URL = process.env.UTMIFY_MCP_URL || "";
+const PAINEIS_UTM = { "682e5acce4e4e7748bb669ae": "TO", "69685cb9af5f797b4a89f7db": "Desplugadas", "69c1e3332cc7808546f6e544": "Jiu-Jitsu" };
+const IMPOSTO_PCT = parseFloat(process.env.IMPOSTO_PCT || "10");
+async function utmify(nome, args) {
+  const r = await fetch(UTMIFY_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json, text/event-stream", "User-Agent": "curl/8.5.0" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name: nome, arguments: args } }),
+  });
+  const d = await r.json();
+  const t = d?.result?.content?.[0]?.text || "{}";
+  if (d?.result?.isError) throw new Error(String(t).slice(0, 150));
+  return JSON.parse(t);
+}
+async function gastosUtmify(deDias) {
+  const hoje = new Date(Date.now() - 3 * 3600000);
+  const fmt = x => x.toISOString().slice(0, 10);
+  const faixa = { from: fmt(new Date(hoje.getTime() - deDias * 86400000)), to: fmt(new Date(hoje.getTime() + 86400000)) };
+  const paineis = [];
+  for (const [dash, nome] of Object.entries(PAINEIS_UTM)) {
+    try {
+      const camps = (await utmify("get_meta_ad_objects", { dashboardId: dash, dateRange: faixa, level: "campaign" })).results || [];
+      let gasto = 0, receitaUtm = 0, vendas = 0;
+      for (const c of camps) {
+        gasto += (c.totalSpent || c.spend || 0) / 100;      // UTMify manda em centavos
+        receitaUtm += (c.revenue || 0) / 100;
+        vendas += c.approvedOrdersCount || 0;
+      }
+      paineis.push({ nome, gasto: +gasto.toFixed(2), receita_utm: +receitaUtm.toFixed(2), vendas, roas: gasto ? +(receitaUtm / gasto).toFixed(2) : null });
+    } catch (e) { paineis.push({ nome, erro: String(e).slice(0, 80) }); }
+  }
+  const gastoTotal = paineis.reduce((s, p) => s + (p.gasto || 0), 0);
+  return { faixa, paineis, gasto_total: +gastoTotal.toFixed(2) };
+}
+async function montarFinanceiro() {
+  const [dHoje, u1, u7] = await Promise.all([fresco(), gastosUtmify(0), gastosUtmify(7)]);
+  const dd = dHoje.dados;
+  const receita = parseFloat(String(dd.receita_hoje).replace(",", ".")) || 0;
+  const gasto = u1.gasto_total;
+  const imposto = +(receita * IMPOSTO_PCT / 100).toFixed(2);
+  const lucro = +(receita - gasto - imposto).toFixed(2);
+  const fmtR = v => "R$ " + (v == null ? "—" : v.toFixed(2).replace(".", ","));
+  const receita7 = null; // banco: janela da central é 3 dias; 7d fica por conta da UTMify
+  const linhaPainel = p => p.erro
+    ? `<tr><td>${p.nome}</td><td colspan="4" style="color:var(--text-3)">sem leitura (${p.erro})</td></tr>`
+    : `<tr><td><b>${p.nome}</b></td><td>${fmtR(p.gasto)}</td><td>${fmtR(p.receita_utm)}</td><td>${p.vendas}</td><td>${p.roas ?? "—"}</td></tr>`;
+  const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Financeiro do Dia — NEXUS OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Bricolage+Grotesque:wght@800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04040a;--surface:#090914;--elevated:#0e0e1c;--border:rgba(255,255,255,0.09);--border-md:rgba(255,255,255,0.15);
+--text:#eeeef8;--text-2:#8888b0;--text-3:#44445e;--nexus:#6366f1;--ok:#34d399;--warn:#fbbf24;--bad:#ef4444}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);font-size:15px;padding:22px 26px 50px}
+body.claro{--bg:#f3f4f9;--surface:#fff;--elevated:#fff;--border:rgba(20,25,50,.10);--border-md:rgba(20,25,50,.18);--text:#1b2032;--text-2:#5b6178;--text-3:#9aa0b5}
+.hero h1{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(1.5rem,3.6vw,2.3rem);font-weight:800;letter-spacing:-1px}
+.hero .data{color:var(--text-3);font-size:.8rem;margin-top:3px;text-transform:capitalize}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px;margin:20px 0}
+.stat{background:var(--elevated);border:1px solid var(--border);border-radius:14px;padding:16px 16px 13px;position:relative;overflow:hidden}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--cor,#6366f1)}
+.stat b{display:block;font-family:'JetBrains Mono',monospace;font-size:1.4rem;letter-spacing:-.5px;color:var(--cor,#818cf8)}
+.stat span{font-size:.7rem;color:var(--text-2);font-weight:500}
+.stat .sub{display:block;font-size:.62rem;color:var(--text-3);margin-top:3px}
+.painel{background:var(--elevated);border:1px solid var(--border);border-radius:14px;padding:15px 16px;margin-top:14px}
+.painel h4{font-size:.76rem;font-weight:700;margin-bottom:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-2)}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+td,th{padding:8px 8px;border-bottom:1px solid var(--border);text-align:left}
+th{font-size:.64rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3)}
+td b{font-weight:700}
+.nota{font-size:.7rem;color:var(--text-3);margin-top:10px;line-height:1.5}
+</style></head><body>
+<div class="hero"><h1 id="oi">Resumo do dia</h1><div class="data">${new Date(Date.now() - 3 * 3600000).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" })} · imposto estimado em ${IMPOSTO_PCT}%</div></div>
+<div class="stats">
+  <div class="stat" style="--cor:#818cf8"><b>${fmtR(receita)}</b><span>Receita hoje (banco de vendas)</span><span class="sub">${dd.vendas_hoje} vendas · fonte: GG/Dominance</span></div>
+  <div class="stat" style="--cor:#fb923c"><b>${fmtR(gasto)}</b><span>Gasto em anúncios hoje</span><span class="sub">fonte: UTMify (${u1.paineis.filter(p=>!p.erro).length}/${u1.paineis.length} painéis)</span></div>
+  <div class="stat" style="--cor:#fbbf24"><b>${fmtR(imposto)}</b><span>Imposto estimado (${IMPOSTO_PCT}%)</span><span class="sub">ajustável — me diga a alíquota real</span></div>
+  <div class="stat" style="--cor:${lucro >= 0 ? "#34d399" : "#ef4444"}"><b>${fmtR(lucro)}</b><span>Lucro líquido estimado hoje</span><span class="sub">receita − anúncios − imposto</span></div>
+</div>
+<div class="painel"><h4>Por painel de tráfego · HOJE</h4>
+<table><tr><th>Oferta</th><th>Gasto</th><th>Receita (UTMify)</th><th>Vendas</th><th>ROAS</th></tr>
+${u1.paineis.map(linhaPainel).join("")}</table></div>
+<div class="painel"><h4>Últimos 7 dias (UTMify)</h4>
+<table><tr><th>Oferta</th><th>Gasto</th><th>Receita (UTMify)</th><th>Vendas</th><th>ROAS</th></tr>
+${u7.paineis.map(linhaPainel).join("")}
+<tr><td><b>TOTAL</b></td><td><b>${fmtR(u7.gasto_total)}</b></td><td><b>${fmtR(u7.paineis.reduce((s,p)=>s+(p.receita_utm||0),0))}</b></td><td><b>${u7.paineis.reduce((s,p)=>s+(p.vendas||0),0)}</b></td><td></td></tr></table></div>
+<div class="nota">⚠️ A receita da UTMify subdimensiona (não soma todos os bumps) — o número OFICIAL de receita é o do banco (primeiro cartão). Gasto cobre os painéis TO, Desplugadas e Jiu; se houver tráfego fora deles (ex.: Fisio em painel próprio), me avisa que eu adiciono. Atualiza a cada 5 min.</div>
+<script>
+if(localStorage.getItem('nx-tema')!=='escuro')document.body.classList.add('claro');
+(function(){const hh=new Date(Date.now()-3*3600000).getUTCHours();document.getElementById('oi').textContent=(hh<12?'Bom dia':hh<18?'Boa tarde':'Boa noite')+', Rodrigo — resumo do dia'})();
+setTimeout(()=>location.reload(), 300000);
+</script></body></html>`;
+  return { html, dados: { receita_hoje: receita, gasto_hoje: gasto, imposto, lucro, paineis_hoje: u1.paineis, sete_dias: u7 } };
+}
+let cacheF = { t: 0, html: "", dados: null };
+async function frescoFin() {
+  if (Date.now() - cacheF.t > 5 * 60000 || !cacheF.html) { const m = await montarFinanceiro(); cacheF = { t: Date.now(), html: m.html, dados: m.dados }; }
+  return cacheF;
+}
+router.get("/financeiro-" + SLUG.replace("central-", ""), async (req, res) => {
+  if (!comPin(req)) return pedeSenha(res);
+  try { res.set("Cache-Control", "no-cache").send((await frescoFin()).html); }
+  catch (e) { res.status(500).send("Financeiro indisponível: " + String(e).slice(0, 140)); }
+});
+router.get("/financeiro-" + SLUG.replace("central-", "") + "/dados.json", async (req, res) => {
+  if (!comPin(req)) return res.status(401).json({ erro: "senha" });
+  try { res.json((await frescoFin()).dados); } catch (e) { res.status(500).json({ erro: String(e).slice(0, 140) }); }
 });
 
 module.exports = router;

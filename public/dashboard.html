@@ -707,6 +707,19 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
 .cm-btn:hover{background:rgba(255,255,255,.06);color:var(--text)}
 .cm-btn.danger{color:#ef4444;border-color:rgba(239,68,68,.25);background:rgba(239,68,68,.07)}
 .cm-btn.danger:hover{background:rgba(239,68,68,.15)}
+
+/* ═══ TEMA CLARO (padrão) ═══ */
+body.claro{--bg:#f3f4f9;--surface:#ffffff;--elevated:#ffffff;--overlay:#eef0f7;
+--border:rgba(20,25,50,.10);--border-md:rgba(20,25,50,.18);--border-hi:rgba(20,25,50,.28);
+--text:#1b2032;--text-2:#5b6178;--text-3:#9aa0b5;--nexus-dim:rgba(99,102,241,.10);--card-glow:rgba(99,102,241,.10)}
+body.claro::after{opacity:.018}
+body.claro #statusbar{background:rgba(255,255,255,.97);border-bottom-color:rgba(99,102,241,.22);box-shadow:0 1px 18px rgba(99,102,241,.08)}
+body.claro .sb-logo-name{background:linear-gradient(135deg,#2a2f45,#6a7086);-webkit-background-clip:text}
+body.claro #sidebar,body.claro aside{background:var(--surface)}
+body.claro .sb-item:hover{background:rgba(20,25,50,.05)}
+body.claro .sb-item.active{background:rgba(99,102,241,.10)}
+body.claro #splash{background:var(--bg)}
+body.claro .topbar{background:var(--surface)}
 </style>
 </head>
 <body>
@@ -749,7 +762,6 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
   <nav class="sb-nav">
     <div class="sb-group-label">NEXUS</div>
     <div class="sb-item active" data-view="briefing" style="--item-color:var(--nexus)"><span class="sb-icon">☀️</span><span class="sb-label">Briefing do Dia</span></div>
-    <div class="sb-item" data-view="overview" style="--item-color:var(--nexus)"><span class="sb-icon">📊</span><span class="sb-label">Métricas</span></div>
     <div class="sb-group-label">BRN VENDAS</div>
     <div class="sb-item" data-view="brn-overview" style="--item-color:var(--brn)"><span class="sb-icon">🤝</span><span class="sb-label">Visão Geral</span></div>
     <div class="sb-item" data-view="central" style="--item-color:var(--brn)"><span class="sb-icon">📦</span><span class="sb-label">Central de Entregas</span></div>
@@ -759,14 +771,14 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
     <div class="sb-item" data-view="brn-jiujitsu" style="--item-color:var(--brn)"><span class="sb-icon">🥋</span><span class="sb-label">Jiu-Jitsu</span></div>
     <div class="sb-item" data-view="brn-kit-kids" style="--item-color:#f97316"><span class="sb-icon">🏅</span><span class="sb-label">Kit Retenção Kids</span></div>
     <div class="sb-item" data-view="brn-despluga" style="--item-color:var(--brn)"><span class="sb-icon">📚</span><span class="sb-label">Kit Despluga Pro</span></div>
+    <div class="sb-group-label">ESTÚDIO</div>
+    <div class="sb-item" data-view="maquina" style="--item-color:#f472b6"><span class="sb-icon">🎬</span><span class="sb-label">Máquina de Criativos</span></div>
     <div class="sb-group-label">CRIADOR</div>
     <a class="sb-item" href="/criador" target="_blank" style="--item-color:var(--primary);text-decoration:none;color:inherit"><span class="sb-icon">✨</span><span class="sb-label">MAX Criador</span></a>
     <div class="sb-group-label">NEXUSPDF</div>
     <div class="sb-item" data-view="nexuspdf" style="--item-color:#a855f7"><span class="sb-icon">📄</span><span class="sb-label">Gerador de PDFs</span></div>
     <div class="sb-group-label">SISTEMA</div>
     <div class="sb-item" data-view="gastos" style="--item-color:#f59e0b"><span class="sb-icon">💸</span><span class="sb-label">Gastos de API</span></div>
-    <div class="sb-item" data-view="integrations" style="--item-color:#64748b"><span class="sb-icon">🔌</span><span class="sb-label">Integrações</span></div>
-    <a class="sb-item" href="/editor" target="_blank" style="--item-color:#f472b6;text-decoration:none;color:inherit"><span class="sb-icon">🎬</span><span class="sb-label">Editor de Vídeo</span></a>
   </nav>
   <div class="sb-bottom">
     <div class="sb-item" onclick="openSettings()" style="--item-color:var(--text-2)">
@@ -1097,6 +1109,14 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
   </div>
 
   <!-- BRN OVERVIEW -->
+  <div id="view-maquina" class="view">
+    <div class="topbar">
+      <span class="topbar-icon">🎬</span>
+      <div><div class="topbar-title" style="color:#f472b6">MÁQUINA DE CRIATIVOS</div><div class="topbar-desc">Estúdio: revisar, aprovar e enviar criativos (roda na VPS)</div></div>
+      <div class="topbar-spacer"></div>
+    </div>
+    <iframe id="maquinaFrame" style="flex:1;border:0;width:100%;background:transparent"></iframe>
+  </div>
   <div id="view-acessos" class="view">
     <div class="topbar">
       <span class="topbar-icon">📋</span>
@@ -1800,7 +1820,7 @@ const CONSELHO_CFG = {
   paulo: {name:'Paulo Vieira',emoji:'🎯',color:'#a855f7'},
 };
 
-const STATIC_VIEWS = new Set(['central','acessos','whats','briefing','overview','integrations','all-sectors','conselho','brn-overview','brn-jiujitsu','brn-despluga','radar','pipeline','biblioteca','board','cerebro','nexuspdf','gastos']);
+const STATIC_VIEWS = new Set(['central','acessos','whats','maquina','briefing','overview','integrations','all-sectors','conselho','brn-overview','brn-jiujitsu','brn-despluga','radar','pipeline','biblioteca','board','cerebro','nexuspdf','gastos']);
 
 // ─── STATE ─────────────────────────────────────
 let currentView = 'briefing';
@@ -1906,7 +1926,7 @@ const VIEW_TITLES = {
   integrations:'Integrações','brn-overview':'BRN VENDAS',
   'brn-jiujitsu':'Jiu-Jitsu','brn-despluga':'Kit Despluga Pro',
   nexuspdf:'Gerador de PDFs',gastos:'Gastos de API',board:'Board de Ofertas',
-  central:'Central de Entregas',acessos:'Copie & Cole',whats:'WhatsApp · Sofia',
+  central:'Central de Entregas',acessos:'Copie & Cole',whats:'WhatsApp · Sofia',maquina:'Máquina de Criativos',
 };
 
 function navigate(view){
@@ -1919,7 +1939,13 @@ function navigate(view){
   currentView = view;
   const titleEl = document.getElementById('statusbar-title');
   if(titleEl) titleEl.textContent = VIEW_TITLES[view] || (SECTOR_CFG[view]?.name || 'MAX');
-  if(view==='briefing'){ loadMetrics(); loadBriefing(); }
+  if(view==='briefing'){
+    const v=document.getElementById('view-briefing');
+    if(!v.dataset.fin){ v.dataset.fin='1';
+      v.innerHTML = '<div class="topbar"><span class="topbar-icon">☀️</span><div><div class="topbar-title">BRIEFING DO DIA</div><div class="topbar-desc">Receita do banco × gastos da UTMify × imposto — o número que importa</div></div><div class="topbar-spacer"></div><span class="topbar-badge" style="color:var(--brn);border-color:rgba(16,185,129,.3)">AO VIVO</span></div>'+
+        '<iframe id="finFrame" style="flex:1;border:0;width:100%;background:transparent" src="/financeiro-r7x2m9k4?k='+encodeURIComponent(NXK)+'"></iframe>';
+    }
+  }
   else if(view==='overview'){ loadMetrics(); loadIgMetricas(); }
   else if(view==='gastos'){ loadGastos(); }
   else if(view==='integrations'){ if(!intLoaded) loadIntegrations(); }
@@ -1930,17 +1956,40 @@ function navigate(view){
   else if(view==='board'){ loadBoard(); }
   else if(view==='all-sectors'){ loadNotas(); }
   else if(view==='nexuspdf'){ npdfInit(); }
-  else if(view==='central'){ const f=document.getElementById('centralFrame'); if(f && !f.getAttribute('src')) f.src='/central-r7x2m9k4?embed=1'; }
-  else if(view==='acessos'){ const f=document.getElementById('acessosFrame'); if(f && !f.getAttribute('src')) f.src='/central-r7x2m9k4?embed=1&aba=acessos'; }
-  else if(view==='whats'){ const f=document.getElementById('whatsFrame'); if(f && !f.getAttribute('src')) f.src='/whats-r7x2m9k4'; }
+  else if(view==='central'){ const f=document.getElementById('centralFrame'); if(f && !f.getAttribute('src')) f.src='/central-r7x2m9k4?embed=1&k='+encodeURIComponent(NXK); }
+  else if(view==='acessos'){ const f=document.getElementById('acessosFrame'); if(f && !f.getAttribute('src')) f.src='/central-r7x2m9k4?embed=1&aba=acessos&k='+encodeURIComponent(NXK); }
+  else if(view==='whats'){ const f=document.getElementById('whatsFrame'); if(f && !f.getAttribute('src')) f.src='/whats-r7x2m9k4?k='+encodeURIComponent(NXK); }
+  else if(view==='maquina'){ const f=document.getElementById('maquinaFrame'); if(f && !f.getAttribute('src')) f.src='https://feof-cloud-filing-emma.trycloudflare.com/estudio'; }
   else if(!STATIC_VIEWS.has(view) && !historyLoaded[view]){ loadHistory(view); }
 }
 window.navigate = navigate;
 
+// ── senha do painel (uma vez; os dados só abrem com ela) ──
+let NXK = localStorage.getItem('nxk') || '';
+if(!NXK){ NXK = prompt('🔒 Senha do painel:') || ''; localStorage.setItem('nxk', NXK); }
+
+// ── tema claro/escuro (claro é o padrão) ──
+function aplicarTemaNx(){
+  const claro = localStorage.getItem('nx-tema') !== 'escuro';
+  document.body.classList.toggle('claro', claro);
+  const b = document.getElementById('temaBtn'); if(b) b.textContent = claro ? '🌙' : '☀️';
+}
+function alternarTemaNx(){
+  localStorage.setItem('nx-tema', localStorage.getItem('nx-tema') === 'escuro' ? 'claro' : 'escuro');
+  aplicarTemaNx();
+  document.querySelectorAll('iframe').forEach(f=>{ try{ if(f.src) f.contentWindow.location.reload(); }catch(e){} });
+}
+(function(){
+  const sb = document.getElementById('statusbar');
+  if(sb){ const b = document.createElement('button'); b.id='temaBtn'; b.className='sb-cmd-hint'; b.style.cursor='pointer'; b.onclick=alternarTemaNx; sb.appendChild(b); }
+  aplicarTemaNx();
+  navigate('briefing');   // o Briefing novo (financeiro) já abre carregado
+})();
+
 // receita REAL do dia na barra de status (fonte única: banco de vendas)
 async function receitaReal(){
   try{
-    const d = await (await fetch('/central-r7x2m9k4/dados.json')).json();
+    const d = await (await fetch('/central-r7x2m9k4/dados.json?k='+encodeURIComponent(NXK))).json();
     const el = document.getElementById('statusbar-revenue');
     if(el && d.receita_hoje != null) el.textContent = 'R$ ' + d.receita_hoje + ' hoje';
   }catch(e){}
