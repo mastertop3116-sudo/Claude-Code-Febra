@@ -720,6 +720,16 @@ body.claro .sb-item:hover{background:rgba(20,25,50,.05)}
 body.claro .sb-item.active{background:rgba(99,102,241,.10)}
 body.claro #splash{background:var(--bg)}
 body.claro .topbar{background:var(--surface)}
+
+/* ═══ CELULAR: menu em gaveta ═══ */
+#menuBtn{display:none}
+@media(max-width:900px){
+  #menuBtn{display:inline-flex;align-items:center;justify-content:center;background:none;border:1px solid var(--border);border-radius:8px;color:var(--text-2);width:34px;height:30px;font-size:16px;cursor:pointer;flex-shrink:0}
+  aside#sidebar,#sidebar{position:fixed;left:0;top:var(--statusbar-h);bottom:0;z-index:900;transform:translateX(-105%);transition:transform .25s;box-shadow:8px 0 40px rgba(0,0,0,.35)}
+  body.menu-aberto #sidebar{transform:translateX(0)}
+  #main{margin-left:0 !important}
+  #statusbar-title{display:none}
+}
 </style>
 </head>
 <body>
@@ -763,22 +773,16 @@ body.claro .topbar{background:var(--surface)}
     <div class="sb-group-label">NEXUS</div>
     <div class="sb-item active" data-view="briefing" style="--item-color:var(--nexus)"><span class="sb-icon">☀️</span><span class="sb-label">Briefing do Dia</span></div>
     <div class="sb-group-label">BRN VENDAS</div>
-    <div class="sb-item" data-view="brn-overview" style="--item-color:var(--brn)"><span class="sb-icon">🤝</span><span class="sb-label">Visão Geral</span></div>
     <div class="sb-item" data-view="central" style="--item-color:var(--brn)"><span class="sb-icon">📦</span><span class="sb-label">Central de Entregas</span></div>
     <div class="sb-item" data-view="acessos" style="--item-color:var(--brn)"><span class="sb-icon">📋</span><span class="sb-label">Copie &amp; Cole</span></div>
     <div class="sb-item" data-view="whats" style="--item-color:#25D366"><span class="sb-icon">💬</span><span class="sb-label">WhatsApp · Sofia</span></div>
     <a class="sb-item" href="https://sessao-pronta-to.netlify.app" target="_blank" style="--item-color:#e07a3e;text-decoration:none;color:inherit"><span class="sb-icon">🧩</span><span class="sb-label">Sessão Pronta</span></a>
-    <div class="sb-item" data-view="brn-jiujitsu" style="--item-color:var(--brn)"><span class="sb-icon">🥋</span><span class="sb-label">Jiu-Jitsu</span></div>
-    <div class="sb-item" data-view="brn-kit-kids" style="--item-color:#f97316"><span class="sb-icon">🏅</span><span class="sb-label">Kit Retenção Kids</span></div>
-    <div class="sb-item" data-view="brn-despluga" style="--item-color:var(--brn)"><span class="sb-icon">📚</span><span class="sb-label">Kit Despluga Pro</span></div>
     <div class="sb-group-label">ESTÚDIO</div>
     <div class="sb-item" data-view="maquina" style="--item-color:#f472b6"><span class="sb-icon">🎬</span><span class="sb-label">Máquina de Criativos</span></div>
     <div class="sb-group-label">CRIADOR</div>
     <a class="sb-item" href="/criador" target="_blank" style="--item-color:var(--primary);text-decoration:none;color:inherit"><span class="sb-icon">✨</span><span class="sb-label">MAX Criador</span></a>
     <div class="sb-group-label">NEXUSPDF</div>
     <div class="sb-item" data-view="nexuspdf" style="--item-color:#a855f7"><span class="sb-icon">📄</span><span class="sb-label">Gerador de PDFs</span></div>
-    <div class="sb-group-label">SISTEMA</div>
-    <div class="sb-item" data-view="gastos" style="--item-color:#f59e0b"><span class="sb-icon">💸</span><span class="sb-label">Gastos de API</span></div>
   </nav>
   <div class="sb-bottom">
     <div class="sb-item" onclick="openSettings()" style="--item-color:var(--text-2)">
@@ -1981,6 +1985,12 @@ function alternarTemaNx(){
 }
 (function(){
   const sb = document.getElementById('statusbar');
+  if(sb){ const mb=document.createElement('button'); mb.id='menuBtn'; mb.textContent='☰';
+    mb.onclick=()=>document.body.classList.toggle('menu-aberto');
+    sb.insertBefore(mb, sb.firstChild);
+    document.addEventListener('click',e=>{ if(document.body.classList.contains('menu-aberto') && !e.target.closest('#sidebar') && !e.target.closest('#menuBtn')) document.body.classList.remove('menu-aberto'); });
+    document.querySelectorAll('#sidebar [data-view]').forEach(el=>el.addEventListener('click',()=>document.body.classList.remove('menu-aberto')));
+  }
   if(sb){ const b = document.createElement('button'); b.id='temaBtn'; b.className='sb-cmd-hint'; b.style.cursor='pointer'; b.onclick=alternarTemaNx; sb.appendChild(b); }
   aplicarTemaNx();
   navigate('briefing');   // o Briefing novo (financeiro) já abre carregado
