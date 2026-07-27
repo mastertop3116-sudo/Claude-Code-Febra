@@ -275,6 +275,10 @@ h3{font-size:.68rem;color:var(--text-2);margin:16px 0 8px;text-transform:upperca
 #tAcessos{display:none}body.ac-on #tVendas{display:none}body.ac-on .col-side{display:none}body.ac-on #tAcessos{display:block}
 .vazio{color:var(--text-2);text-align:center;padding:18px;font-size:.85rem}
 #mob{display:none}
+body.embed #statusbar,body.embed #sidebar,body.embed #mob{display:none !important}
+body.embed #shell{padding-top:0}
+body.embed #conteudo{margin-left:0;padding:16px 20px 40px;max-width:none}
+body.embed .hero{display:none}
 @media(max-width:980px){
   #sidebar{display:none}
   #conteudo{margin-left:0;padding:18px 14px 84px}
@@ -374,8 +378,8 @@ async function fresco() {
   return cache;
 }
 
-router.get("/" + SLUG, async (_req, res) => {
-  try { res.set("Cache-Control", "no-cache").send((await fresco()).html); }
+router.get("/" + SLUG, async (req, res) => {
+  try { let h = (await fresco()).html; if (req.query.embed) h = h.replace("<body>", '<body class="embed">'); res.set("Cache-Control", "no-cache").send(h); }
   catch (e) { res.status(500).send("Central indisponível agora: " + String(e).slice(0, 120)); }
 });
 router.get("/" + SLUG + "/dados.json", async (_req, res) => {

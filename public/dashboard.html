@@ -766,7 +766,7 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
     <div class="sb-item" data-view="conselho" style="--item-color:var(--c-cons)"><span class="sb-icon">👑</span><span class="sb-label">Conselho de Titãs</span></div>
     <div class="sb-group-label">BRN VENDAS</div>
     <div class="sb-item" data-view="brn-overview" style="--item-color:var(--brn)"><span class="sb-icon">🤝</span><span class="sb-label">Visão Geral</span></div>
-    <a class="sb-item" href="/central-r7x2m9k4" style="--item-color:var(--brn);text-decoration:none"><span class="sb-icon">📦</span><span class="sb-label">Central de Entregas</span></a>
+    <div class="sb-item" data-view="central" style="--item-color:var(--brn)"><span class="sb-icon">📦</span><span class="sb-label">Central de Entregas</span></div>
     <div class="sb-item" data-view="brn-jiujitsu" style="--item-color:var(--brn)"><span class="sb-icon">🥋</span><span class="sb-label">Jiu-Jitsu</span></div>
     <div class="sb-item" data-view="brn-kit-kids" style="--item-color:#f97316"><span class="sb-icon">🏅</span><span class="sb-label">Kit Retenção Kids</span></div>
     <div class="sb-item" data-view="brn-despluga" style="--item-color:var(--brn)"><span class="sb-icon">📚</span><span class="sb-label">Kit Despluga Pro</span></div>
@@ -1108,6 +1108,15 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
   </div>
 
   <!-- BRN OVERVIEW -->
+  <div id="view-central" class="view">
+    <div class="topbar">
+      <span class="topbar-icon">📦</span>
+      <div><div class="topbar-title" style="color:var(--brn)">CENTRAL DE ENTREGAS</div><div class="topbar-desc">Cada venda com selo de entrega · acessos prontos · saúde do Sessão Pronta</div></div>
+      <div class="topbar-spacer"></div>
+      <span class="topbar-badge" style="color:var(--brn);border-color:rgba(16,185,129,.3)">AO VIVO</span>
+    </div>
+    <iframe id="centralFrame" style="flex:1;border:0;width:100%;background:transparent"></iframe>
+  </div>
   <div id="view-brn-overview" class="view">
     <div class="topbar">
       <span class="topbar-icon">🤝</span>
@@ -1785,7 +1794,7 @@ const CONSELHO_CFG = {
   paulo: {name:'Paulo Vieira',emoji:'🎯',color:'#a855f7'},
 };
 
-const STATIC_VIEWS = new Set(['briefing','overview','integrations','all-sectors','conselho','brn-overview','brn-jiujitsu','brn-despluga','radar','pipeline','biblioteca','board','cerebro','nexuspdf','gastos']);
+const STATIC_VIEWS = new Set(['central','briefing','overview','integrations','all-sectors','conselho','brn-overview','brn-jiujitsu','brn-despluga','radar','pipeline','biblioteca','board','cerebro','nexuspdf','gastos']);
 
 // ─── STATE ─────────────────────────────────────
 let currentView = 'briefing';
@@ -1891,6 +1900,7 @@ const VIEW_TITLES = {
   integrations:'Integrações','brn-overview':'BRN VENDAS',
   'brn-jiujitsu':'Jiu-Jitsu','brn-despluga':'Kit Despluga Pro',
   nexuspdf:'Gerador de PDFs',gastos:'Gastos de API',board:'Board de Ofertas',
+  central:'Central de Entregas',
 };
 
 function navigate(view){
@@ -1914,6 +1924,7 @@ function navigate(view){
   else if(view==='board'){ loadBoard(); }
   else if(view==='all-sectors'){ loadNotas(); }
   else if(view==='nexuspdf'){ npdfInit(); }
+  else if(view==='central'){ const f=document.getElementById('centralFrame'); if(f && !f.getAttribute('src')) f.src='/central-r7x2m9k4?embed=1'; }
   else if(!STATIC_VIEWS.has(view) && !historyLoaded[view]){ loadHistory(view); }
 }
 window.navigate = navigate;
