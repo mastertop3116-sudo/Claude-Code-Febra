@@ -1994,7 +1994,7 @@ async function receitaReal(){
     if(el && d.receita_hoje != null) el.textContent = 'R$ ' + d.receita_hoje + ' hoje';
   }catch(e){}
 }
-receitaReal(); setInterval(receitaReal, 5*60000);
+setTimeout(receitaReal, 4000); setTimeout(receitaReal, 15000); setInterval(receitaReal, 5*60000);
 
 document.querySelectorAll('[data-view]').forEach(el=>{
   el.addEventListener('click',()=>{ if(el.dataset.view) navigate(el.dataset.view); });
