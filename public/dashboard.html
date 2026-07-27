@@ -750,23 +750,12 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
     <div class="sb-group-label">NEXUS</div>
     <div class="sb-item active" data-view="briefing" style="--item-color:var(--nexus)"><span class="sb-icon">☀️</span><span class="sb-label">Briefing do Dia</span></div>
     <div class="sb-item" data-view="overview" style="--item-color:var(--nexus)"><span class="sb-icon">📊</span><span class="sb-label">Métricas</span></div>
-    <div class="sb-item" data-view="radar" style="--item-color:var(--c-grow)"><span class="sb-icon">🎯</span><span class="sb-label">Radar</span></div>
-    <div class="sb-item" data-view="pipeline" style="--item-color:var(--c-mono)"><span class="sb-icon">📦</span><span class="sb-label">Pipeline</span></div>
-    <div class="sb-item" data-view="biblioteca" style="--item-color:var(--c-cont)"><span class="sb-icon">🗂️</span><span class="sb-label">Biblioteca</span></div>
-    <div class="sb-item" data-view="cerebro" style="--item-color:var(--nexus)"><span class="sb-icon">🧠</span><span class="sb-label">Cérebro</span></div>
-    <div class="sb-item" data-view="board" style="--item-color:#f472b6"><span class="sb-icon">🃏</span><span class="sb-label">Board de Ofertas</span></div>
-    <div class="sb-group-label">SETORES · MAX</div>
-    <div class="sb-item" data-view="fabrica-produtos" style="--item-color:var(--c-prod)"><span class="sb-icon">🏭</span><span class="sb-label">Fábrica de Produtos</span></div>
-    <div class="sb-item" data-view="fabrica-conteudo" style="--item-color:var(--c-cont)"><span class="sb-icon">✍️</span><span class="sb-label">Fábrica de Conteúdo</span></div>
-    <div class="sb-item" data-view="motor-monetizacao" style="--item-color:var(--c-mono)"><span class="sb-icon">💰</span><span class="sb-label">Motor Monetização</span></div>
-    <div class="sb-item" data-view="lab-ux" style="--item-color:var(--c-ux)"><span class="sb-icon">🔬</span><span class="sb-label">Lab de UX</span></div>
-    <div class="sb-item" data-view="engenharia" style="--item-color:var(--c-eng)"><span class="sb-icon">⚙️</span><span class="sb-label">Engenharia</span></div>
-    <div class="sb-item" data-view="crescimento" style="--item-color:var(--c-grow)"><span class="sb-icon">📈</span><span class="sb-label">Crescimento</span></div>
-    <div class="sb-item" data-view="all-sectors" style="--item-color:var(--c-all)"><span class="sb-icon">⚡</span><span class="sb-label">Todos os Setores</span></div>
-    <div class="sb-item" data-view="conselho" style="--item-color:var(--c-cons)"><span class="sb-icon">👑</span><span class="sb-label">Conselho de Titãs</span></div>
     <div class="sb-group-label">BRN VENDAS</div>
     <div class="sb-item" data-view="brn-overview" style="--item-color:var(--brn)"><span class="sb-icon">🤝</span><span class="sb-label">Visão Geral</span></div>
     <div class="sb-item" data-view="central" style="--item-color:var(--brn)"><span class="sb-icon">📦</span><span class="sb-label">Central de Entregas</span></div>
+    <div class="sb-item" data-view="acessos" style="--item-color:var(--brn)"><span class="sb-icon">📋</span><span class="sb-label">Copie &amp; Cole</span></div>
+    <div class="sb-item" data-view="whats" style="--item-color:#25D366"><span class="sb-icon">💬</span><span class="sb-label">WhatsApp · Sofia</span></div>
+    <a class="sb-item" href="https://sessao-pronta-to.netlify.app" target="_blank" style="--item-color:#e07a3e;text-decoration:none;color:inherit"><span class="sb-icon">🧩</span><span class="sb-label">Sessão Pronta</span></a>
     <div class="sb-item" data-view="brn-jiujitsu" style="--item-color:var(--brn)"><span class="sb-icon">🥋</span><span class="sb-label">Jiu-Jitsu</span></div>
     <div class="sb-item" data-view="brn-kit-kids" style="--item-color:#f97316"><span class="sb-icon">🏅</span><span class="sb-label">Kit Retenção Kids</span></div>
     <div class="sb-item" data-view="brn-despluga" style="--item-color:var(--brn)"><span class="sb-icon">📚</span><span class="sb-label">Kit Despluga Pro</span></div>
@@ -1108,6 +1097,23 @@ table.int-table tr:hover td{background:rgba(255,255,255,.02)}
   </div>
 
   <!-- BRN OVERVIEW -->
+  <div id="view-acessos" class="view">
+    <div class="topbar">
+      <span class="topbar-icon">📋</span>
+      <div><div class="topbar-title" style="color:var(--brn)">COPIE &amp; COLE</div><div class="topbar-desc">Todos os produtos e bumps — link + senha prontos pro WhatsApp</div></div>
+      <div class="topbar-spacer"></div>
+    </div>
+    <iframe id="acessosFrame" style="flex:1;border:0;width:100%;background:transparent"></iframe>
+  </div>
+  <div id="view-whats" class="view">
+    <div class="topbar">
+      <span class="topbar-icon">💬</span>
+      <div><div class="topbar-title" style="color:#25D366">WHATSAPP · SOFIA</div><div class="topbar-desc">Conversas com clientes ao vivo (leitura) — a Sofia segue atendendo sozinha</div></div>
+      <div class="topbar-spacer"></div>
+      <span class="topbar-badge" style="color:#25D366;border-color:rgba(37,211,102,.3)">AO VIVO</span>
+    </div>
+    <iframe id="whatsFrame" style="flex:1;border:0;width:100%;background:transparent"></iframe>
+  </div>
   <div id="view-central" class="view">
     <div class="topbar">
       <span class="topbar-icon">📦</span>
@@ -1794,7 +1800,7 @@ const CONSELHO_CFG = {
   paulo: {name:'Paulo Vieira',emoji:'🎯',color:'#a855f7'},
 };
 
-const STATIC_VIEWS = new Set(['central','briefing','overview','integrations','all-sectors','conselho','brn-overview','brn-jiujitsu','brn-despluga','radar','pipeline','biblioteca','board','cerebro','nexuspdf','gastos']);
+const STATIC_VIEWS = new Set(['central','acessos','whats','briefing','overview','integrations','all-sectors','conselho','brn-overview','brn-jiujitsu','brn-despluga','radar','pipeline','biblioteca','board','cerebro','nexuspdf','gastos']);
 
 // ─── STATE ─────────────────────────────────────
 let currentView = 'briefing';
@@ -1900,7 +1906,7 @@ const VIEW_TITLES = {
   integrations:'Integrações','brn-overview':'BRN VENDAS',
   'brn-jiujitsu':'Jiu-Jitsu','brn-despluga':'Kit Despluga Pro',
   nexuspdf:'Gerador de PDFs',gastos:'Gastos de API',board:'Board de Ofertas',
-  central:'Central de Entregas',
+  central:'Central de Entregas',acessos:'Copie & Cole',whats:'WhatsApp · Sofia',
 };
 
 function navigate(view){
@@ -1925,9 +1931,21 @@ function navigate(view){
   else if(view==='all-sectors'){ loadNotas(); }
   else if(view==='nexuspdf'){ npdfInit(); }
   else if(view==='central'){ const f=document.getElementById('centralFrame'); if(f && !f.getAttribute('src')) f.src='/central-r7x2m9k4?embed=1'; }
+  else if(view==='acessos'){ const f=document.getElementById('acessosFrame'); if(f && !f.getAttribute('src')) f.src='/central-r7x2m9k4?embed=1&aba=acessos'; }
+  else if(view==='whats'){ const f=document.getElementById('whatsFrame'); if(f && !f.getAttribute('src')) f.src='/whats-r7x2m9k4'; }
   else if(!STATIC_VIEWS.has(view) && !historyLoaded[view]){ loadHistory(view); }
 }
 window.navigate = navigate;
+
+// receita REAL do dia na barra de status (fonte única: banco de vendas)
+async function receitaReal(){
+  try{
+    const d = await (await fetch('/central-r7x2m9k4/dados.json')).json();
+    const el = document.getElementById('statusbar-revenue');
+    if(el && d.receita_hoje != null) el.textContent = 'R$ ' + d.receita_hoje + ' hoje';
+  }catch(e){}
+}
+receitaReal(); setInterval(receitaReal, 5*60000);
 
 document.querySelectorAll('[data-view]').forEach(el=>{
   el.addEventListener('click',()=>{ if(el.dataset.view) navigate(el.dataset.view); });

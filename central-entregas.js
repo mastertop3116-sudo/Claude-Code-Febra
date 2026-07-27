@@ -379,12 +379,105 @@ async function fresco() {
 }
 
 router.get("/" + SLUG, async (req, res) => {
-  try { let h = (await fresco()).html; if (req.query.embed) h = h.replace("<body>", '<body class="embed">'); res.set("Cache-Control", "no-cache").send(h); }
+  try {
+    let h = (await fresco()).html;
+    if (req.query.embed) h = h.replace("<body>", '<body class="embed">');
+    if (req.query.aba === "acessos") h = h.replace("</body>", "<script>aba(1)</script></body>");
+    res.set("Cache-Control", "no-cache").send(h);
+  }
   catch (e) { res.status(500).send("Central indisponível agora: " + String(e).slice(0, 120)); }
 });
 router.get("/" + SLUG + "/dados.json", async (_req, res) => {
   try { res.json((await fresco()).dados); }
   catch (e) { res.status(500).json({ erro: String(e).slice(0, 120) }); }
+});
+
+// ═══ WHATSAPP · SOFIA (leitura) — conversas direto do banco, sem mexer na Sofia ═══
+async function montarWhats() {
+  const desde = new Date(Date.now() - 72 * 3600000).toISOString();
+  const msgs = await get(`conversation_messages?clinic_id=eq.${CLINIC}&created_at=gte.${desde}&select=clinic_patient_id,direction,text,created_at&order=created_at.asc&limit=1000`);
+  const ids = [...new Set(msgs.map(m => m.clinic_patient_id).filter(Boolean))];
+  const pacientes = [];
+  for (let i = 0; i < ids.length; i += 50) {
+    const lote = ids.slice(i, i + 50).join(",");
+    pacientes.push(...await get(`clinic_patients?id=in.(${lote})&select=id,name,phone`));
+  }
+  const porId = Object.fromEntries(pacientes.map(p => [p.id, p]));
+  const conversas = {};
+  for (const m of msgs) {
+    if (!m.clinic_patient_id) continue;
+    (conversas[m.clinic_patient_id] = conversas[m.clinic_patient_id] || []).push(
+      { d: m.direction, t: String(m.text || "").slice(0, 1200), h: m.created_at });
+  }
+  const lista = Object.entries(conversas).map(([id, ms]) => ({
+    id, nome: nomeBonito(porId[id]?.name), fone: "…" + suf(porId[id]?.phone),
+    ultima: ms[ms.length - 1], total: ms.length, ms,
+  })).sort((a, b) => (a.ultima.h < b.ultima.h ? 1 : -1));
+  const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  const DADOS = JSON.stringify(lista.map(c => ({ ...c, ms: c.ms.map(m => ({ ...m, t: esc(m.t) })), nome: esc(c.nome) })));
+
+  return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WhatsApp · Sofia — NEXUS OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04040a;--surface:#090914;--elevated:#0e0e1c;--border:rgba(255,255,255,0.09);--border-md:rgba(255,255,255,0.15);
+--text:#eeeef8;--text-2:#8888b0;--text-3:#44445e;--nexus:#6366f1;--brn:#10b981}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);font-size:14px;height:100vh;display:flex;flex-direction:column}
+.aviso{padding:9px 16px;background:rgba(99,102,241,0.10);border-bottom:1px solid var(--border);font-size:.72rem;color:var(--text-2)}
+#duo{flex:1;display:flex;min-height:0}
+#lista{width:320px;border-right:1px solid var(--border);overflow-y:auto;background:var(--surface);flex-shrink:0}
+.conv{padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.conv:hover{background:var(--elevated)}
+.conv.on{background:rgba(99,102,241,0.12);border-left:3px solid var(--nexus)}
+.conv b{font-size:.86rem;display:flex;justify-content:space-between;gap:8px}
+.conv b span{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--text-3);font-weight:500}
+.conv .prev{font-size:.72rem;color:var(--text-2);margin-top:3px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+#chat{flex:1;display:flex;flex-direction:column;min-width:0}
+#chat-head{padding:11px 16px;border-bottom:1px solid var(--border);background:var(--surface);font-weight:700;font-size:.9rem;display:none}
+#voltar{display:none;background:none;border:1px solid var(--border);color:var(--text-2);border-radius:8px;padding:4px 10px;margin-right:10px;cursor:pointer;font-family:'Outfit',sans-serif}
+#msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:72%;padding:9px 13px;border-radius:14px;font-size:.82rem;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.msg.out{align-self:flex-end;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.25);border-bottom-right-radius:4px}
+.msg.in{align-self:flex-start;background:var(--elevated);border:1px solid var(--border);border-bottom-left-radius:4px}
+.msg .hh{display:block;font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--text-3);margin-top:4px;text-align:right}
+.vazio{color:var(--text-2);text-align:center;margin:auto;font-size:.85rem}
+@media(max-width:860px){#lista{width:100%}body.aberto #lista{display:none}#chat{display:none}body.aberto #chat{display:flex}body.aberto #voltar{display:inline-block}}
+</style></head><body>
+<div class="aviso">👁 Modo leitura — a Sofia continua atendendo sozinha. Quando ela for só nossa, este é o lugar de responder. Atualiza a cada 2 min.</div>
+<div id="duo">
+<div id="lista"></div>
+<div id="chat"><div id="chat-head"><button id="voltar" onclick="document.body.classList.remove('aberto')">←</button><span id="chat-nome"></span></div>
+<div id="msgs"><div class="vazio">👈 escolha uma conversa</div></div></div>
+</div>
+<script>
+const CONVAS = ${DADOS};
+const hh = iso => new Date(new Date(iso).getTime()-3*3600000).toISOString().slice(11,16);
+const dd = iso => new Date(new Date(iso).getTime()-3*3600000).toISOString().slice(5,10).split('-').reverse().join('/');
+document.getElementById('lista').innerHTML = CONVAS.map((c,i)=>
+  \`<div class="conv" id="cv-\${i}" onclick="abrir(\${i})"><b>\${c.nome} <span>\${dd(c.ultima.h)} \${hh(c.ultima.h)}</span></b>
+  <div class="prev">\${c.ultima.d==='out'?'🤖 ':''}\${c.ultima.t.slice(0,90)}</div></div>\`).join('') || '<div class="vazio" style="margin:30px">nenhuma conversa nas últimas 72h</div>';
+function abrir(i){
+  document.querySelectorAll('.conv').forEach(e=>e.classList.remove('on'));
+  document.getElementById('cv-'+i).classList.add('on');
+  const c = CONVAS[i];
+  document.getElementById('chat-head').style.display='flex';
+  document.getElementById('chat-nome').textContent = c.nome + ' · ' + c.fone;
+  document.getElementById('msgs').innerHTML = c.ms.map(m=>
+    \`<div class="msg \${m.d==='out'?'out':'in'}">\${m.t}<span class="hh">\${dd(m.h)} \${hh(m.h)}</span></div>\`).join('');
+  const box=document.getElementById('msgs'); box.scrollTop=box.scrollHeight;
+  document.body.classList.add('aberto');
+}
+setTimeout(()=>location.reload(), 120000);
+</script></body></html>`;
+}
+let cacheW = { t: 0, html: "" };
+router.get("/whats-" + SLUG.replace("central-", ""), async (_req, res) => {
+  try {
+    if (Date.now() - cacheW.t > 2 * 60000 || !cacheW.html) cacheW = { t: Date.now(), html: await montarWhats() };
+    res.set("Cache-Control", "no-cache").send(cacheW.html);
+  } catch (e) { res.status(500).send("WhatsApp indisponível: " + String(e).slice(0, 120)); }
 });
 
 module.exports = router;
