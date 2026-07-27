@@ -14,6 +14,9 @@ app.use(express.json({ limit: "8mb", verify: (req, _, buf) => { req.rawBody = bu
 // ──────────────────────────────────────────
 // Bot do Telegram em modo webhook
 // ──────────────────────────────────────────
+process.on("unhandledRejection", e => console.error("[seguranca] promessa sem tratamento:", String(e && e.stack || e).slice(0, 300)));
+process.on("uncaughtException", e => console.error("[seguranca] excecao solta:", String(e && e.stack || e).slice(0, 300)));
+
 const TelegramBot = require("node-telegram-bot-api");
 const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN);
 
@@ -27,8 +30,14 @@ async function registerWebhook() {
     return;
   }
   const webhookUrl = `${url}/telegram`;
-  await bot.setWebHook(webhookUrl);
-  console.log(`[Bot] Webhook registrado: ${webhookUrl}`);
+  try {
+    await bot.setWebHook(webhookUrl);
+    console.log(`[Bot] Webhook registrado: ${webhookUrl}`);
+  } catch (e) {
+    // Telegram fora do ar NÃO pode derrubar o dashboard (queda de 27/07: ETELEGRAM 502 em loop)
+    console.error(`[Bot] Telegram indisponível (${String(e.message || e).slice(0, 80)}) — nova tentativa em 60s`);
+    setTimeout(() => registerWebhook().catch(() => {}), 60000);
+  }
 }
 
 // Recebe updates do Telegram
@@ -3188,8 +3197,8 @@ app.listen(PORT, async () => {
   // Carrega os logins do banco que não some (Supabase) — antes de atender
   try { console.log('[auth] iniciar →', JSON.stringify(await auth.iniciar())); }
   catch (e) { console.error('[auth] iniciar falhou:', e.message); }
-  await runMigrations();
-  await registerWebhook();
+  try { await runMigrations(); } catch (e) { console.error("[migrations] falhou:", e.message); }
+  try { await registerWebhook(); } catch (e) { console.error("[bot] registro falhou:", e.message); }
 
   // Instagram pipeline — posts automáticos @jiujitsudinamicas
   try {
