@@ -371,6 +371,7 @@ app.post("/api/estudio/ebook", auth.exigirLogin, async (req, res) => {
   }
 });
 
+app.use(require("./central-entregas"));
 app.use(express.static(path.join(__dirname, "public"), { maxAge: "1h" }));
 app.use("/fonts", express.static(path.join(__dirname, "assets/fonts"), { maxAge: "7d" }));
 
