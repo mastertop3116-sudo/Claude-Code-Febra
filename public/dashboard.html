@@ -1341,9 +1341,8 @@ let revenueLineChart = null;
   setTimeout(()=>{
     fill.style.width='100%';
     setTimeout(()=>{
-      document.getElementById('splash').classList.add('hidden');
-      loadMetrics();
-      loadBriefing();
+      const sp=document.getElementById('splash'); if(sp) sp.classList.add('hidden');
+      // views antigas foram removidas — o Briefing agora é o financeiro (iframe próprio)
     },400);
   },900);
 })();
@@ -1458,6 +1457,10 @@ function navigate(view){
   else if(!STATIC_VIEWS.has(view) && !historyLoaded[view]){ loadHistory(view); }
 }
 window.navigate = navigate;
+
+// telas antigas removidas: silencia chamadas órfãs (nada de erro de script no painel)
+['loadMetrics','loadBriefing','loadIgMetricas','loadRadar','loadPipeline','loadBiblioteca','loadCerebro','loadBoard','loadNotas','loadHistory','loadGastos','loadIntegrations','npdfInit','reloadMetrics']
+  .forEach(fn => { if (typeof window[fn] !== 'function') window[fn] = () => {}; });
 
 // ── senha do painel (uma vez; os dados só abrem com ela) ──
 // quem chegou aqui JÁ passou pela porta da frente (cookie nxk) — sem segundo pedido de senha
