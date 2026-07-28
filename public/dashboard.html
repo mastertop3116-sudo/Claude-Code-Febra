@@ -720,6 +720,20 @@ body.claro .sb-item:hover{background:rgba(20,25,50,.05)}
 body.claro .sb-item.active{background:rgba(99,102,241,.10)}
 body.claro #splash{background:var(--bg)}
 body.claro .topbar{background:var(--surface)}
+/* legibilidade (bronca 28/07: "difícil de ler") */
+body.claro .sb-label{color:#2a3045;font-weight:600}
+body.claro .sb-item{color:#2a3045}
+body.claro .sb-item:hover .sb-label{color:#0f1424}
+body.claro .sb-item.active .sb-label{color:#141a2e;font-weight:700}
+body.claro .sb-group-label{color:#6d7490;font-weight:800;letter-spacing:2px}
+body.claro .sb-icon{filter:none;opacity:1}
+body.claro .topbar-title{color:#141a2e}
+body.claro .topbar-desc{color:#5b6178}
+body.claro .sb-collapse-btn{color:#5b6178;border-color:rgba(20,25,50,.14)}
+body.claro #statusbar-title{color:#5b6178}
+body.claro .sb-clock{color:#6d7490}
+body.claro .sb-cmd-hint{color:#5b6178;border-color:rgba(20,25,50,.16)}
+body.claro .modal,body.claro .settings-panel,body.claro .sp-panel{background:#fff;color:#1b2032}
 
 /* ═══ CELULAR: menu em gaveta ═══ */
 #menuBtn{display:none}
@@ -1453,7 +1467,7 @@ function navigate(view){
   else if(view==='central'){ const f=document.getElementById('centralFrame'); if(f && !f.getAttribute('src')) f.src='/central-r7x2m9k4?embed=1'; }
   else if(view==='acessos'){ const f=document.getElementById('acessosFrame'); if(f && !f.getAttribute('src')) f.src='/central-r7x2m9k4?embed=1&aba=acessos'; }
   else if(view==='whats'){ const f=document.getElementById('whatsFrame'); if(f && !f.getAttribute('src')) f.src='/whats-r7x2m9k4'; }
-  else if(view==='maquina'){ const f=document.getElementById('maquinaFrame'); if(f && !f.getAttribute('src')) f.src='https://feof-cloud-filing-emma.trycloudflare.com/estudio'; }
+  else if(view==='maquina'){ const f=document.getElementById('maquinaFrame'); if(f && !f.getAttribute('src')) f.src='/ir-maquina'; }
   else if(!STATIC_VIEWS.has(view) && !historyLoaded[view]){ loadHistory(view); }
 }
 window.navigate = navigate;

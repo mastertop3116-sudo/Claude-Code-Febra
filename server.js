@@ -394,6 +394,15 @@ app.use((req, res, next) => {
   res.status(401).send(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NEXUS OS</title><style>body{font-family:'Outfit',system-ui,sans-serif;background:#f3f4f9;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}form{background:#fff;padding:32px;border-radius:18px;box-shadow:0 12px 44px rgba(20,25,50,.10);text-align:center;width:280px}h1{font-size:15px;letter-spacing:3px;color:#5b6178;margin:0 0 18px}input{width:100%;padding:13px;border:1.5px solid #e3e5ee;border-radius:11px;font-size:16px;text-align:center;letter-spacing:.3em;outline:none}button{margin-top:12px;padding:13px;border:0;border-radius:11px;background:#6366f1;color:#fff;font-weight:700;font-size:15px;cursor:pointer;width:100%}</style></head><body><form onsubmit="event.preventDefault();location.href=location.pathname+'?k='+encodeURIComponent(document.getElementById('s').value)"><h1>🔒 NEXUS OS</h1><input id="s" type="password" placeholder="senha" autofocus/><button>Entrar</button></form></body></html>`);
 });
 
+// Máquina de Criativos: entra no Estúdio da VPS sem pedir segundo login
+app.get("/ir-maquina", (req, res) => {
+  const dado = req.query.k || (req.headers.cookie || "").match(/nxk=([^;]+)/)?.[1];
+  if (!PIN_PAINEL || dado !== PIN_PAINEL) return res.status(401).send("acesso restrito");
+  const tok = process.env.ESTUDIO_ENTRADA_TOKEN || "";
+  if (!tok) return res.status(503).send("Estúdio sem token configurado — avise o Max");
+  res.redirect("https://feof-cloud-filing-emma.trycloudflare.com/entrar-estudio?t=" + encodeURIComponent(tok));
+});
+
 app.use(require("./central-entregas"));
 app.use(express.static(path.join(__dirname, "public"), { maxAge: "1h" }));
 app.use("/fonts", express.static(path.join(__dirname, "assets/fonts"), { maxAge: "7d" }));
