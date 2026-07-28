@@ -378,7 +378,11 @@ setTimeout(()=>location.reload(), 600000);
 
 const PIN = process.env.CENTRAL_PIN || "";
 // Sem senha configurada = NEGA (antes liberava — furo apontado pelo Clone 28/07)
-function comPin(req) { return !!PIN && (req.query.k === PIN || req.headers["x-pin"] === PIN); }
+function comPin(req) {
+  if (!PIN) return false;                                  // sem senha configurada = NEGA
+  const cook = (req.headers.cookie || "").match(/nxk=([^;]+)/);
+  return req.query.k === PIN || req.headers["x-pin"] === PIN || (cook && cook[1] === PIN);
+}
 function pedeSenha(res) {
   res.status(401).send(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:sans-serif;background:#f5f6fa;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}form{background:#fff;padding:28px;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.10);text-align:center}input{padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:16px;text-align:center;letter-spacing:.3em}button{margin-top:10px;padding:12px 22px;border:0;border-radius:10px;background:#6366f1;color:#fff;font-weight:700;font-size:15px;cursor:pointer;display:block;width:100%}</style></head><body><form onsubmit="event.preventDefault();const u=new URL(location);u.searchParams.set('k',document.getElementById('s').value);location=u">🔒<br><br><input id="s" type="password" placeholder="senha"/><button>Entrar</button></form></body></html>`);
 }

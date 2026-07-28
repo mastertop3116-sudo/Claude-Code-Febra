@@ -1438,7 +1438,7 @@ function navigate(view){
     const v=document.getElementById('view-briefing');
     if(!v.dataset.fin){ v.dataset.fin='1';
       v.innerHTML = '<div class="topbar"><span class="topbar-icon">☀️</span><div><div class="topbar-title">BRIEFING DO DIA</div><div class="topbar-desc">Receita do banco × gastos da UTMify × imposto — o número que importa</div></div><div class="topbar-spacer"></div><span class="topbar-badge" style="color:var(--brn);border-color:rgba(16,185,129,.3)">AO VIVO</span></div>'+
-        '<iframe id="finFrame" style="flex:1;border:0;width:100%;background:transparent" src="/financeiro-r7x2m9k4?k='+encodeURIComponent(NXK)+'"></iframe>';
+        '<iframe id="finFrame" style="flex:1;border:0;width:100%;background:transparent" src="/financeiro-r7x2m9k4"></iframe>';
     }
   }
   else if(view==='overview'){ loadMetrics(); loadIgMetricas(); }
@@ -1451,17 +1451,17 @@ function navigate(view){
   else if(view==='board'){ loadBoard(); }
   else if(view==='all-sectors'){ loadNotas(); }
   else if(view==='nexuspdf'){ npdfInit(); }
-  else if(view==='central'){ const f=document.getElementById('centralFrame'); if(f && !f.getAttribute('src')) f.src='/central-r7x2m9k4?embed=1&k='+encodeURIComponent(NXK); }
-  else if(view==='acessos'){ const f=document.getElementById('acessosFrame'); if(f && !f.getAttribute('src')) f.src='/central-r7x2m9k4?embed=1&aba=acessos&k='+encodeURIComponent(NXK); }
-  else if(view==='whats'){ const f=document.getElementById('whatsFrame'); if(f && !f.getAttribute('src')) f.src='/whats-r7x2m9k4?k='+encodeURIComponent(NXK); }
+  else if(view==='central'){ const f=document.getElementById('centralFrame'); if(f && !f.getAttribute('src')) f.src='/central-r7x2m9k4?embed=1'; }
+  else if(view==='acessos'){ const f=document.getElementById('acessosFrame'); if(f && !f.getAttribute('src')) f.src='/central-r7x2m9k4?embed=1&aba=acessos'; }
+  else if(view==='whats'){ const f=document.getElementById('whatsFrame'); if(f && !f.getAttribute('src')) f.src='/whats-r7x2m9k4'; }
   else if(view==='maquina'){ const f=document.getElementById('maquinaFrame'); if(f && !f.getAttribute('src')) f.src='https://feof-cloud-filing-emma.trycloudflare.com/estudio'; }
   else if(!STATIC_VIEWS.has(view) && !historyLoaded[view]){ loadHistory(view); }
 }
 window.navigate = navigate;
 
 // ── senha do painel (uma vez; os dados só abrem com ela) ──
-let NXK = localStorage.getItem('nxk') || '';
-if(!NXK){ NXK = prompt('🔒 Senha do painel:') || ''; localStorage.setItem('nxk', NXK); }
+// quem chegou aqui JÁ passou pela porta da frente (cookie nxk) — sem segundo pedido de senha
+const NXK = new URLSearchParams(location.search).get('k') || '';
 
 // ── tema claro/escuro (claro é o padrão) ──
 function aplicarTemaNx(){
@@ -1484,13 +1484,14 @@ function alternarTemaNx(){
   }
   if(sb){ const b = document.createElement('button'); b.id='temaBtn'; b.className='sb-cmd-hint'; b.style.cursor='pointer'; b.onclick=alternarTemaNx; sb.appendChild(b); }
   aplicarTemaNx();
+  if(new URLSearchParams(location.search).get('k')){ history.replaceState({}, '', location.pathname); }
   navigate('briefing');   // o Briefing novo (financeiro) já abre carregado
 })();
 
 // receita REAL do dia na barra de status (fonte única: banco de vendas)
 async function receitaReal(){
   try{
-    const d = await (await fetch('/central-r7x2m9k4/dados.json?k='+encodeURIComponent(NXK))).json();
+    const d = await (await fetch('/central-r7x2m9k4/dados.json')).json();
     const el = document.getElementById('statusbar-revenue');
     if(el && d.receita_hoje != null) el.textContent = 'R$ ' + d.receita_hoje + ' hoje';
   }catch(e){}
