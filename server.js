@@ -380,6 +380,20 @@ app.post("/api/estudio/ebook", auth.exigirLogin, async (req, res) => {
   }
 });
 
+// PORTA DA FRENTE — telas internas exigem a senha do painel (furo GRAVE achado 28/07:
+// /dashboard estava aberto na internet com senhas de área impressas no HTML).
+const PIN_PAINEL = process.env.CENTRAL_PIN || "";
+app.use((req, res, next) => {
+  const protegidas = ["/dashboard", "/editor"];
+  if (!protegidas.some(p => req.path === p || req.path.startsWith(p + "/"))) return next();
+  const dado = req.query.k || (req.headers.cookie || "").match(/nxk=([^;]+)/)?.[1];
+  if (PIN_PAINEL && dado === PIN_PAINEL) {
+    if (req.query.k) res.setHeader("Set-Cookie", `nxk=${PIN_PAINEL}; Path=/; Max-Age=2592000; HttpOnly; SameSite=Lax`);
+    return next();
+  }
+  res.status(401).send(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NEXUS OS</title><style>body{font-family:'Outfit',system-ui,sans-serif;background:#f3f4f9;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}form{background:#fff;padding:32px;border-radius:18px;box-shadow:0 12px 44px rgba(20,25,50,.10);text-align:center;width:280px}h1{font-size:15px;letter-spacing:3px;color:#5b6178;margin:0 0 18px}input{width:100%;padding:13px;border:1.5px solid #e3e5ee;border-radius:11px;font-size:16px;text-align:center;letter-spacing:.3em;outline:none}button{margin-top:12px;padding:13px;border:0;border-radius:11px;background:#6366f1;color:#fff;font-weight:700;font-size:15px;cursor:pointer;width:100%}</style></head><body><form onsubmit="event.preventDefault();const u=new URL(location);u.searchParams.set('k',document.getElementById('s').value);location=u"><h1>🔒 NEXUS OS</h1><input id="s" type="password" placeholder="senha" autofocus/><button>Entrar</button></form></body></html>`);
+});
+
 app.use(require("./central-entregas"));
 app.use(express.static(path.join(__dirname, "public"), { maxAge: "1h" }));
 app.use("/fonts", express.static(path.join(__dirname, "assets/fonts"), { maxAge: "7d" }));

@@ -843,195 +843,22 @@ body.claro .topbar{background:var(--surface)}
   </div>
 
   <!-- OVERVIEW / MÉTRICAS -->
-  <div id="view-overview" class="view">
-    <div class="topbar">
-      <span class="topbar-icon">📊</span>
-      <div><div class="topbar-title">Métricas</div><div class="topbar-desc">Receita · UTMify · GG Checkout</div></div>
-      <div class="topbar-spacer"></div>
-      <span class="topbar-badge" style="color:var(--nexus);border-color:rgba(99,102,241,.3)">NEXUS FORGE</span>
-    </div>
-    <div class="overview-scroll">
-      <div class="section-heading">Visão Geral</div>
-      <div class="stats-row" id="stats-row">
-        <div class="stat-card skeleton" style="height:90px;--card-accent:var(--nexus)"></div>
-        <div class="stat-card skeleton" style="height:90px;--card-accent:var(--nexus)"></div>
-        <div class="stat-card skeleton" style="height:90px;--card-accent:var(--nexus)"></div>
-        <div class="stat-card skeleton" style="height:90px;--card-accent:var(--nexus)"></div>
-      </div>
-      <div class="metrics-charts-row">
-        <div class="goal-card">
-          <div class="goal-ring-wrap">
-            <canvas id="goal-ring-canvas" width="100" height="100"></canvas>
-            <div class="goal-ring-center"><div class="goal-pct" id="goal-pct-text">0%</div><div class="goal-lbl">Meta</div></div>
-          </div>
-          <div class="goal-info">
-            <div class="goal-info-val" id="goal-info-val">R$ 0</div>
-            <div class="goal-info-sub" id="goal-info-sub">de R$ 10.000</div>
-          </div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-card-title">Receita · 7 dias</div>
-          <div class="chart-wrap"><canvas id="revenue-chart"></canvas></div>
-        </div>
-      </div>
-      <div class="section-heading" style="margin-top:4px">Ações Rápidas</div>
-      <div class="quick-actions">
-        <div class="qa-card" onclick="navigate('all-sectors')"><div class="qa-icon">⚡</div><div><div class="qa-label">Todos os Setores</div><div class="qa-desc">6 departamentos em paralelo</div></div></div>
-        <div class="qa-card" onclick="navigate('conselho')"><div class="qa-icon">👑</div><div><div class="qa-label">Conselho de Titãs</div><div class="qa-desc">Elon · Bezos · Hang · Paulo Vieira</div></div></div>
-        <div class="qa-card" onclick="window.open('/criar','_blank')"><div class="qa-icon">⬡</div><div><div class="qa-label">Nexus Forge Studio</div><div class="qa-desc">Ebooks, roteiros e entregáveis</div></div></div>
-      </div>
-      <!-- INSTAGRAM PERFORMANCE -->
-      <div class="section-heading" style="margin-top:4px">Instagram · Jiu-Jitsu</div>
-      <div class="ig-overview-panel" id="ig-overview-panel">
-        <div class="ig-ov-header">
-          <div class="ig-ov-logo">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-          </div>
-          <span class="ig-ov-title">Desempenho dos Posts</span>
-          <button class="ig-ov-refresh" onclick="loadIgMetricas()" title="Atualizar">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
-          </button>
-        </div>
-        <div id="ig-ov-body">
-          <div class="ig-ov-loading">Carregando métricas…</div>
-        </div>
-      </div>
-
-      <div class="section-heading">Produtos · UTMify</div>
-      <div class="products-grid" id="products-grid">
-        <div class="product-mini skeleton" style="height:110px"></div>
-        <div class="product-mini skeleton" style="height:110px"></div>
-        <div class="product-mini skeleton" style="height:110px"></div>
-      </div>
-    </div>
-  </div>
+  <!-- view-overview removida 28/07: tela morta que publicava senhas no código-fonte (parecer do Clone) -->
 
   <!-- BOARD DE OFERTAS -->
-  <div id="view-board" class="view">
-    <div class="topbar">
-      <span class="topbar-icon">🃏</span>
-      <div><div class="topbar-title">Board de Ofertas</div><div class="topbar-desc">Organize e detalhe cada oferta — arraste entre colunas</div></div>
-      <div class="topbar-spacer"></div>
-      <button class="topbar-badge" style="color:var(--c-ux);border-color:rgba(244,114,182,.3);cursor:pointer;background:rgba(244,114,182,.07);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px" onclick="addBoardCol()">+ Coluna</button>
-    </div>
-    <div class="board-scroll">
-      <div class="board-board" id="board-board"></div>
-    </div>
-  </div>
+  <!-- view-board removida 28/07: tela morta que publicava senhas no código-fonte (parecer do Clone) -->
 
   <!-- RADAR -->
-  <div id="view-radar" class="view">
-    <div class="topbar">
-      <span class="topbar-icon">🎯</span>
-      <div><div class="topbar-title">Radar de Oportunidades</div><div class="topbar-desc">MAX analisa o mercado e aponta 3 nichos para explorar</div></div>
-      <div class="topbar-spacer"></div>
-      <span class="topbar-badge" style="color:var(--c-grow);border-color:rgba(251,146,60,.3)">MAX</span>
-    </div>
-    <div class="radar-scroll">
-      <div class="radar-header">
-        <div class="section-heading" style="margin-bottom:0">Oportunidades Detectadas</div>
-        <button class="radar-regen-btn" onclick="loadRadar(true)">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
-          Regenerar
-        </button>
-      </div>
-      <div class="radar-grid" id="radar-grid">
-        <div class="radar-card skeleton" style="height:140px"></div>
-        <div class="radar-card skeleton" style="height:140px"></div>
-        <div class="radar-card skeleton" style="height:140px"></div>
-      </div>
-    </div>
-  </div>
+  <!-- view-radar removida 28/07: tela morta que publicava senhas no código-fonte (parecer do Clone) -->
 
   <!-- PIPELINE -->
-  <div id="view-pipeline" class="view">
-    <div class="topbar">
-      <span class="topbar-icon">📦</span>
-      <div><div class="topbar-title">Pipeline de Produtos</div><div class="topbar-desc">Acompanhe cada ideia do conceito ao lançamento</div></div>
-      <div class="topbar-spacer"></div>
-      <span class="topbar-badge" style="color:var(--c-mono);border-color:rgba(251,191,36,.3)">KANBAN</span>
-    </div>
-    <div class="pipeline-scroll">
-      <div class="pipeline-board" id="pipeline-board">
-        <div class="pipe-col" id="pipe-col-ideia" ondragover="pipeDragOver(event,'ideia')" ondrop="pipeDrop(event,'ideia')" ondragleave="pipeDragLeave(event)">
-          <div class="pipe-col-head"><div class="pipe-col-color" style="background:#6366f1"></div><div class="pipe-col-title">Ideia</div><span class="pipe-col-count" id="count-ideia">0</span></div>
-          <div class="pipe-col-body" id="body-ideia"></div>
-          <button class="pipe-add-btn" onclick="pipeAddCard('ideia')">+ Adicionar</button>
-        </div>
-        <div class="pipe-col" id="pipe-col-estruturando" ondragover="pipeDragOver(event,'estruturando')" ondrop="pipeDrop(event,'estruturando')" ondragleave="pipeDragLeave(event)">
-          <div class="pipe-col-head"><div class="pipe-col-color" style="background:#fbbf24"></div><div class="pipe-col-title">Estruturando</div><span class="pipe-col-count" id="count-estruturando">0</span></div>
-          <div class="pipe-col-body" id="body-estruturando"></div>
-          <button class="pipe-add-btn" onclick="pipeAddCard('estruturando')">+ Adicionar</button>
-        </div>
-        <div class="pipe-col" id="pipe-col-producao" ondragover="pipeDragOver(event,'producao')" ondrop="pipeDrop(event,'producao')" ondragleave="pipeDragLeave(event)">
-          <div class="pipe-col-head"><div class="pipe-col-color" style="background:#fb923c"></div><div class="pipe-col-title">Em Produção</div><span class="pipe-col-count" id="count-producao">0</span></div>
-          <div class="pipe-col-body" id="body-producao"></div>
-          <button class="pipe-add-btn" onclick="pipeAddCard('producao')">+ Adicionar</button>
-        </div>
-        <div class="pipe-col" id="pipe-col-aovivo" ondragover="pipeDragOver(event,'aovivo')" ondrop="pipeDrop(event,'aovivo')" ondragleave="pipeDragLeave(event)">
-          <div class="pipe-col-head"><div class="pipe-col-color" style="background:#34d399"></div><div class="pipe-col-title">Ao Vivo</div><span class="pipe-col-count" id="count-aovivo">0</span></div>
-          <div class="pipe-col-body" id="body-aovivo"></div>
-          <button class="pipe-add-btn" onclick="pipeAddCard('aovivo')">+ Adicionar</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- view-pipeline removida 28/07: tela morta que publicava senhas no código-fonte (parecer do Clone) -->
 
   <!-- BIBLIOTECA -->
-  <div id="view-biblioteca" class="view">
-    <div class="topbar">
-      <span class="topbar-icon">🗂️</span>
-      <div><div class="topbar-title">Biblioteca Nexus</div><div class="topbar-desc">Respostas salvas dos setores</div></div>
-      <div class="topbar-spacer"></div>
-      <span class="topbar-badge" style="color:var(--c-cont);border-color:rgba(167,139,250,.3)" id="bib-count-badge">0 itens</span>
-    </div>
-    <div class="bib-scroll">
-      <div class="bib-search-wrap">
-        <input class="bib-search" placeholder="Buscar na biblioteca..." oninput="loadBiblioteca(this.value)">
-      </div>
-      <div class="bib-list" id="bib-list">
-        <div class="bib-empty">Nenhuma resposta salva ainda.<br>Clique em "Salvar" em qualquer resposta do MAX para guardar aqui.</div>
-      </div>
-    </div>
-  </div>
+  <!-- view-biblioteca removida 28/07: tela morta que publicava senhas no código-fonte (parecer do Clone) -->
 
   <!-- CEREBRO -->
-  <div id="view-cerebro" class="view">
-    <div class="topbar">
-      <span class="topbar-icon">🧠</span>
-      <div><div class="topbar-title">Cérebro</div><div class="topbar-desc">Base de conhecimento injetada no MAX e nos setores</div></div>
-      <div class="topbar-spacer"></div>
-      <span class="topbar-badge" style="color:var(--nexus);border-color:rgba(99,102,241,.3)" id="cerebro-count-badge">0 documentos</span>
-    </div>
-    <div class="cerebro-scroll">
-      <div class="cerebro-form">
-        <div class="cerebro-form-title">📄 Adicionar conhecimento</div>
-        <div class="cerebro-row">
-          <select id="cerebro-tipo" class="cerebro-input cerebro-select">
-            <option value="avatar">Avatar / Público</option>
-            <option value="script">Script / Roteiro</option>
-            <option value="pesquisa">Pesquisa de Mercado</option>
-            <option value="depoimento">Depoimento / Prova Social</option>
-            <option value="estrategia">Estratégia</option>
-            <option value="geral">Geral</option>
-          </select>
-          <input id="cerebro-titulo" class="cerebro-input" placeholder="Título (ex: Avatar Mãe Jiu-Jitsu)" maxlength="120">
-        </div>
-        <textarea id="cerebro-conteudo" class="cerebro-textarea" placeholder="Cole aqui o conteúdo: descrição de avatar, pesquisa, depoimento, script... O MAX vai usar isso como contexto nas respostas."></textarea>
-        <div style="margin-top:12px;display:flex;align-items:center;gap:12px">
-          <button class="cerebro-save-btn" onclick="saveCerebro()">Salvar no Cérebro</button>
-          <span id="cerebro-save-msg" style="font-size:12px;color:var(--text-3)"></span>
-        </div>
-      </div>
-      <div class="cerebro-list-header">
-        <span class="cerebro-list-title">Documentos salvos</span>
-        <input class="cerebro-search" id="cerebro-search" placeholder="Buscar..." oninput="loadCerebro(this.value)">
-      </div>
-      <div class="cerebro-items" id="cerebro-list">
-        <div class="cerebro-empty">Nenhum documento ainda.</div>
-      </div>
-    </div>
-  </div>
+  <!-- view-cerebro removida 28/07: tela morta que publicava senhas no código-fonte (parecer do Clone) -->
 
   <!-- SECTOR CHAT VIEWS (geradas por JS) -->
 
@@ -1147,243 +974,16 @@ body.claro .topbar{background:var(--surface)}
     </div>
     <iframe id="centralFrame" style="flex:1;border:0;width:100%;background:transparent"></iframe>
   </div>
-  <div id="view-brn-overview" class="view">
-    <div class="topbar">
-      <span class="topbar-icon">🤝</span>
-      <div><div class="topbar-title" style="color:var(--brn)">BRN VENDAS</div><div class="topbar-desc">Infoprodutos low ticket · Rodrigo &amp; Bruno</div></div>
-      <div class="topbar-spacer"></div>
-      <span class="topbar-badge" style="color:var(--brn);border-color:rgba(16,185,129,.3)">CAROL BOT</span>
-    </div>
-    <div class="brn-scroll">
-      <div class="brn-hero">
-        <div><div class="brn-hero-badge">BRN VENDAS</div><div class="brn-hero-sub">Bot de vendas IA no WhatsApp · 2 produtos ativos</div></div>
-        <div class="brn-hero-partner">Rodrigo + Bruno</div>
-      </div>
-      <div class="section-heading">Produtos Ativos</div>
-      <div class="brn-products">
-        <div class="brn-card" onclick="navigate('brn-jiujitsu')" style="--bc-color:var(--c-prod);--bc-bg:rgba(52,211,153,0.04)">
-          <div class="brn-card-top"><div class="brn-card-emoji">🥋</div><div class="brn-card-name">Dinâmicas de Jiu-Jitsu</div><div class="brn-card-desc">+250 dinâmicas práticas para professores</div></div>
-          <div class="brn-card-bottom"><div class="brn-tickets"><div class="bt premium">Premium R$27</div><div class="bt">Recup. R$19,90</div><div class="bt">Básico R$10</div></div></div>
-        </div>
-        <div class="brn-card" onclick="navigate('brn-despluga')" style="--bc-color:var(--brn);--bc-bg:rgba(16,185,129,0.04)">
-          <div class="brn-card-top"><div class="brn-card-emoji">📚</div><div class="brn-card-name">Kit Despluga Pro</div><div class="brn-card-desc">+500 atividades desplugadas BNCC</div></div>
-          <div class="brn-card-bottom"><div class="brn-tickets"><div class="bt premium">Premium R$27</div><div class="bt">Recup. R$17,90</div><div class="bt">Básico R$10</div></div></div>
-        </div>
-      </div>
-      <div class="section-heading">Info Operacional</div>
-      <div class="brn-links">
-        <div class="brn-link-card"><div class="bl-label">Bot CAROL</div><div class="bl-value">WhatsApp — script de atendimento IA</div></div>
-        <div class="brn-link-card"><div class="bl-label">Checkout</div><div class="bl-value">GG Checkout · Pix + cartão</div></div>
-        <div class="brn-link-card"><div class="bl-label">Recebedor Pix</div><div class="bl-value" style="color:var(--brn)">RODRIGO ROGER SILVA CRUZ</div></div>
-        <div class="brn-link-card"><div class="bl-label">Contato Suporte</div><div class="bl-value">mastertop3116@gmail.com</div></div>
-      </div>
-    </div>
-  </div>
+  <!-- view-brn-overview removida 28/07: tela morta que publicava senhas no código-fonte (parecer do Clone) -->
 
   <!-- BRN JIU-JITSU -->
-  <div id="view-brn-jiujitsu" class="view">
-    <div class="topbar">
-      <span class="topbar-icon">🥋</span>
-      <div><div class="topbar-title">Dinâmicas de Jiu-Jitsu</div><div class="topbar-desc">BRN VENDAS · +250 dinâmicas para professores</div></div>
-      <div class="topbar-spacer"></div>
-      <span class="topbar-badge" style="color:var(--c-prod);border-color:rgba(52,211,153,.3)">ATIVO</span>
-    </div>
-    <div class="brn-detail-scroll">
-      <div class="detail-header"><div class="detail-emoji">🥋</div><div><div class="detail-name">Dinâmicas de Jiu-Jitsu</div><div class="detail-nicho">Professores de Jiu-Jitsu · Público infantil e adulto</div></div></div>
-      <div class="section-heading">Estrutura de Preços</div>
-      <div class="pricing-grid">
-        <div class="price-card featured"><div class="pc-label">Premium</div><div class="pc-price">R$27</div><div class="pc-note">+ 3 bônus inclusos</div><a class="pc-link" href="https://ggcheckout.com.br/checkout/v5/wS3VUYi7LXGVN1gaDkzz" target="_blank">Link de Compra</a></div>
-        <div class="price-card"><div class="pc-label">Recuperação</div><div class="pc-price" style="font-size:18px">R$19,90</div><div class="pc-note">Após objeção de preço</div><a class="pc-link" style="background:var(--elevated);color:var(--brn);border:1px solid rgba(16,185,129,.3)" href="https://www.ggcheckout.com/checkout/v5/lgLfIj546p8rnNxbyemz" target="_blank">Link Recuperação</a></div>
-        <div class="price-card"><div class="pc-label">Básico</div><div class="pc-price" style="font-size:18px">R$10</div><div class="pc-note">Última opção</div><a class="pc-link" style="background:var(--elevated);color:var(--brn);border:1px solid rgba(16,185,129,.3)" href="https://www.ggcheckout.com/checkout/v5/U5cywWzxZVWT5yxnZoCo" target="_blank">Link Básico</a></div>
-      </div>
-      <div class="section-heading">Acesso do Cliente</div>
-      <div class="info-grid">
-        <div class="info-card"><div class="ic-label">Área de Membros</div><div class="ic-value" style="color:var(--brn)">areadinamicas.netlify.app</div><div class="ic-copy" onclick="copyText('https://areadinamicas.netlify.app/')">📋 Copiar URL</div></div>
-        <div class="info-card"><div class="ic-label">Senha de Acesso</div><div class="ic-value" style="color:var(--brn);font-size:18px;font-weight:700">jiujitsu2026</div><div class="ic-copy" onclick="copyText('jiujitsu2026')">📋 Copiar senha</div></div>
-        <div class="info-card" style="grid-column:1/-1"><div class="ic-label">Bônus do Premium</div><div style="margin-top:6px;display:flex;gap:10px;flex-wrap:wrap"><span class="bt">🥊 Certificado de Jiu-Jiteiro</span><span class="bt">🎮 Jogos de Luta Interativos</span><span class="bt">💪 100 Drills de Preparação Física</span></div></div>
-      </div>
-
-      <!-- INSTAGRAM PIPELINE -->
-      <div class="ig-panel">
-
-        <!-- CABEÇALHO -->
-        <div class="ig-panel-header">
-          <div class="ig-panel-header-left">
-            <div class="ig-panel-logo">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-            </div>
-            <div>
-              <div class="ig-panel-title">Instagram Automático</div>
-              <div class="ig-panel-sub">Posts todos os dias · <span style="color:#f97316">19:00 noite</span> · <span style="color:#facc15">09:00 manhã</span></div>
-            </div>
-          </div>
-          <div class="ig-panel-status-dot"><span class="ig-dot-pulse"></span> automático</div>
-        </div>
-
-        <!-- BOTÕES PRINCIPAIS -->
-        <div class="ig-main-btns">
-          <button class="ig-btn-primary ig-btn-noite" onclick="igAction('noite')" id="ig-btn-noite">
-            <div class="ig-btn-p-top">
-              <span class="ig-btn-p-emoji">🌙</span>
-              <span class="ig-btn-p-badge">19:00</span>
-            </div>
-            <div class="ig-btn-p-label">Postar Noite</div>
-            <div class="ig-btn-p-desc">Post único com fundo 3D cartoon</div>
-          </button>
-          <button class="ig-btn-primary ig-btn-manha" onclick="igAction('manha')" id="ig-btn-manha">
-            <div class="ig-btn-p-top">
-              <span class="ig-btn-p-emoji">☀️</span>
-              <span class="ig-btn-p-badge ig-badge-yellow">09:00</span>
-            </div>
-            <div class="ig-btn-p-label">Postar Manhã</div>
-            <div class="ig-btn-p-desc">Carrossel educativo com slides</div>
-          </button>
-        </div>
-
-        <!-- BOTÕES SECUNDÁRIOS -->
-        <div class="ig-sec-btns">
-          <button class="ig-btn-sec" onclick="igAction('insights')" id="ig-btn-insights">
-            <span style="font-size:15px">📊</span>
-            <span>Coletar Métricas</span>
-          </button>
-          <button class="ig-btn-sec ig-btn-sec-muted" onclick="igAction('fundos')" id="ig-btn-fundos">
-            <span style="font-size:15px">🖼️</span>
-            <span>Regenerar Fundos 3D</span>
-          </button>
-        </div>
-
-        <!-- LOG DE STATUS -->
-        <div id="ig-log" style="display:none">
-          <div class="ig-log-bar">
-            <div class="ig-log-spinner" id="ig-spinner"></div>
-            <span id="ig-log-title" style="font-size:12px;font-weight:600;color:var(--text)"></span>
-          </div>
-          <div id="ig-log-msg" class="ig-log-msg"></div>
-        </div>
-
-      </div>
-
-    </div>
-  </div>
+  <!-- view-brn-jiujitsu removida 28/07: tela morta que publicava senhas no código-fonte (parecer do Clone) -->
 
   <!-- KIT RETENCAO KIDS -->
-  <div id="view-brn-kit-kids" class="view">
-    <div class="topbar">
-      <span class="topbar-icon">🏅</span>
-      <div><div class="topbar-title">Kit Retenção Kids</div><div class="topbar-desc">BRN VENDAS · Upsell Jiu-Jitsu · Sistema de retenção de alunos infantis</div></div>
-      <div class="topbar-spacer"></div>
-      <span class="topbar-badge" style="color:#f97316;border-color:rgba(249,115,22,.3)">ATIVO</span>
-    </div>
-    <div class="brn-detail-scroll">
-      <div class="detail-header"><div class="detail-emoji">🏅</div><div><div class="detail-name">Kit Retenção Kids</div><div class="detail-nicho">Senseis de Jiu-Jitsu · Retenção de alunos infantis</div></div></div>
-
-      <div class="section-heading">Estrutura de Preços</div>
-      <div class="pricing-grid">
-        <div class="price-card featured"><div class="pc-label">Kit Completo</div><div class="pc-price">R$47</div><div class="pc-note">Upsell pós-compra Jiu-Jitsu</div><a class="pc-link" href="#" target="_blank" style="opacity:.5;pointer-events:none">Aguardando Bruno</a></div>
-        <div class="price-card"><div class="pc-label">Recuperação</div><div class="pc-price" style="font-size:18px">R$27</div><div class="pc-note">Após objeção de preço</div><a class="pc-link" style="background:var(--elevated);color:#f97316;border:1px solid rgba(249,115,22,.3);opacity:.5;pointer-events:none" href="#">Aguardando Bruno</a></div>
-      </div>
-
-      <div class="section-heading">Acesso do Cliente (Área de Membros)</div>
-      <div class="info-grid">
-        <div class="info-card">
-          <div class="ic-label">Kit Unificado (URL principal)</div>
-          <div class="ic-value" style="color:#f97316;font-size:13px">claude-code-febra.onrender.com/kit-retencao-kids/kit.html</div>
-          <div class="ic-copy" onclick="copyText('https://claude-code-febra.onrender.com/kit-retencao-kids/kit.html')">📋 Copiar URL</div>
-        </div>
-        <div class="info-card">
-          <div class="ic-label">Plataforma</div>
-          <div class="ic-value" style="color:#f97316">Dominance Studio</div>
-          <div style="font-size:11px;color:var(--text-3);margin-top:4px">Carlos configura os módulos</div>
-        </div>
-        <div class="info-card" style="grid-column:1/-1">
-          <div class="ic-label">5 Materiais do Kit</div>
-          <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
-            <a class="bt" href="https://claude-code-febra.onrender.com/kit-retencao-kids/kit.html" target="_blank">💬 Mensagens WhatsApp</a>
-            <a class="bt" href="https://claude-code-febra.onrender.com/kit-retencao-kids/kit.html" target="_blank">📓 Caderneta do Aluno</a>
-            <a class="bt" href="https://claude-code-febra.onrender.com/kit-retencao-kids/kit.html" target="_blank">📋 Protocolo 90 Dias</a>
-            <a class="bt" href="https://claude-code-febra.onrender.com/kit-retencao-kids/kit.html" target="_blank">🏅 Kit de Conquistas</a>
-            <a class="bt" href="https://claude-code-febra.onrender.com/kit-retencao-kids/kit.html" target="_blank">✉️ Carta de Boas-Vindas</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-heading">Prévia do Kit (Área do Cliente)</div>
-      <div style="border-radius:12px;overflow:hidden;border:1px solid rgba(249,115,22,.25);margin-bottom:24px;background:var(--surface)">
-        <div style="background:rgba(249,115,22,.08);padding:10px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(249,115,22,.15)">
-          <span style="font-size:0.75rem;color:#f97316;font-weight:700;text-transform:uppercase;letter-spacing:1px">Prévia — Área do Cliente</span>
-          <div style="flex:1"></div>
-          <a href="https://claude-code-febra.onrender.com/kit-retencao-kids/kit.html" target="_blank" style="font-size:0.75rem;color:#f97316;text-decoration:none;border:1px solid rgba(249,115,22,.3);padding:4px 10px;border-radius:6px">↗ Abrir em nova aba</a>
-        </div>
-        <iframe src="https://claude-code-febra.onrender.com/kit-retencao-kids/kit.html" style="width:100%;height:520px;border:none;display:block" title="Kit Retenção Kids"></iframe>
-      </div>
-
-      <div class="section-heading">Sofia IA — Treinamento</div>
-      <div class="info-grid">
-        <div class="info-card">
-          <div class="ic-label">Script de Treinamento</div>
-          <div class="ic-value" style="color:#f97316;font-size:13px">vault/produtos/kit-retencao-kids/sofia-treinamento.md</div>
-          <div class="ic-copy" onclick="copyText('https://raw.githubusercontent.com/mastertop3116-sudo/Claude-Code-Febra/main/vault/produtos/kit-retencao-kids/sofia-treinamento.md')">📋 Copiar URL Raw</div>
-        </div>
-        <div class="info-card">
-          <div class="ic-label">Status Sofia</div>
-          <div class="ic-value" style="color:#22c55e">3 chunks indexados</div>
-          <div style="font-size:11px;color:var(--text-3);margin-top:4px">Carlos já indexou na Dominance</div>
-        </div>
-        <div class="info-card">
-          <div class="ic-label">Upsell Cron</div>
-          <div class="ic-value" style="color:#22c55e">Configurado</div>
-          <div style="font-size:11px;color:var(--text-3);margin-top:4px">Diário 10h BRT · alunos 30+ dias</div>
-        </div>
-      </div>
-
-      <div class="section-heading">Pendências</div>
-      <div style="background:var(--elevated);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:24px">
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <div style="display:flex;align-items:flex-start;gap:12px;padding:10px;border-radius:8px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.15)">
-            <span style="font-size:1rem;flex-shrink:0">⏳</span>
-            <div><div style="font-size:0.85rem;font-weight:600;color:#fbbf24">Bruno — Criar checkout GGCheckout</div><div style="font-size:0.78rem;color:var(--text-3);margin-top:2px">R$47 principal · R$27 recuperação · Enviar links para Carlos</div></div>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:12px;padding:10px;border-radius:8px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.15)">
-            <span style="font-size:1rem;flex-shrink:0">⏳</span>
-            <div><div style="font-size:0.85rem;font-weight:600;color:#fbbf24">Carlos — Configurar módulos na Dominance</div><div style="font-size:0.78rem;color:var(--text-3);margin-top:2px">Substituir links dos PDFs pelo kit.html unificado</div></div>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:12px;padding:10px;border-radius:8px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15)">
-            <span style="font-size:1rem;flex-shrink:0">✅</span>
-            <div><div style="font-size:0.85rem;font-weight:600;color:#22c55e">5 materiais interativos — Concluído</div><div style="font-size:0.78rem;color:var(--text-3);margin-top:2px">Kit unificado em uma única página web</div></div>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:12px;padding:10px;border-radius:8px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15)">
-            <span style="font-size:1rem;flex-shrink:0">✅</span>
-            <div><div style="font-size:0.85rem;font-weight:600;color:#22c55e">Sofia IA treinada — Concluído</div><div style="font-size:0.78rem;color:var(--text-3);margin-top:2px">Script indexado + upsell cron configurado</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- view-brn-kit-kids removida 28/07: tela morta que publicava senhas no código-fonte (parecer do Clone) -->
 
   <!-- BRN DESPLUGA -->
-  <div id="view-brn-despluga" class="view">
-    <div class="topbar">
-      <span class="topbar-icon">📚</span>
-      <div><div class="topbar-title">Kit Despluga Pro</div><div class="topbar-desc">BRN VENDAS · +500 atividades desplugadas BNCC</div></div>
-      <div class="topbar-spacer"></div>
-      <span class="topbar-badge" style="color:var(--brn);border-color:rgba(16,185,129,.3)">ATIVO</span>
-    </div>
-    <div class="brn-detail-scroll">
-      <div class="detail-header"><div class="detail-emoji">📚</div><div><div class="detail-name">Kit Despluga Pro</div><div class="detail-nicho">Professoras do Ensino Fundamental · Pensamento Computacional BNCC</div></div></div>
-      <div class="section-heading">Estrutura de Preços</div>
-      <div class="pricing-grid">
-        <div class="price-card featured"><div class="pc-label">Kit Completo</div><div class="pc-price">R$27</div><div class="pc-note">+ 4 bônus inclusos</div><a class="pc-link" href="https://ggcheckout.app/checkout/v5/Nxbc5ow9sG4bxjZaYT1i" target="_blank">Link de Compra</a></div>
-        <div class="price-card"><div class="pc-label">Recuperação</div><div class="pc-price" style="font-size:18px">R$17,90</div><div class="pc-note">Após objeção de preço</div><a class="pc-link" style="background:var(--elevated);color:var(--brn);border:1px solid rgba(16,185,129,.3)" href="https://ggcheckout.app/checkout/v5/LpRmHzX7GSv9qlS0zKdw" target="_blank">Link Recuperação</a></div>
-        <div class="price-card"><div class="pc-label">Básico</div><div class="pc-price" style="font-size:18px">R$10</div><div class="pc-note">100 atividades · sem bônus</div><a class="pc-link" style="background:var(--elevated);color:var(--brn);border:1px solid rgba(16,185,129,.3)" href="https://ggcheckout.app/checkout/v5/d3reJiARwhAh5TJH7YFK" target="_blank">Link Básico</a></div>
-      </div>
-      <div class="section-heading">Acesso do Cliente</div>
-      <div class="info-grid">
-        <div class="info-card"><div class="ic-label">Área de Membros</div><div class="ic-value" style="color:var(--brn)">areadespluga.netlify.app/area/</div><div class="ic-copy" onclick="copyText('https://areadespluga.netlify.app/area/')">📋 Copiar URL</div></div>
-        <div class="info-card"><div class="ic-label">Senha de Acesso</div><div class="ic-value" style="color:var(--brn);font-size:18px;font-weight:700">2026</div><div class="ic-copy" onclick="copyText('2026')">📋 Copiar senha</div></div>
-        <div class="info-card" style="grid-column:1/-1"><div class="ic-label">Bônus do Kit Completo</div><div style="margin-top:6px;display:flex;gap:10px;flex-wrap:wrap"><span class="bt">🌐 Ponte Digital</span><span class="bt">🎥 Práticas Avançadas (AR + Chroma Key)</span><span class="bt">📖 Storytelling &amp; Lógica</span><span class="bt">📋 Guia BNCC Comentado</span></div></div>
-      </div>
-    </div>
-  </div>
+  <!-- view-brn-despluga removida 28/07: tela morta que publicava senhas no código-fonte (parecer do Clone) -->
 
   <!-- NEXUSPDF ADM -->
   <div id="view-nexuspdf" class="view">
@@ -1534,118 +1134,9 @@ body.claro .topbar{background:var(--surface)}
 
   <!-- INTEGRAÇÕES -->
   <!-- GASTOS DE API -->
-  <div id="view-gastos" class="view">
-    <div class="topbar">
-      <span class="topbar-icon">💸</span>
-      <div><div class="topbar-title">Gastos de API</div><div class="topbar-desc">OpenAI · ElevenLabs · Gamma · DALL-E — rastreado automaticamente</div></div>
-      <div class="topbar-spacer"></div>
-      <span class="topbar-badge" style="color:#f59e0b;border-color:rgba(245,158,11,.3)" id="gastos-total-badge">CARREGANDO</span>
-    </div>
-    <div class="gastos-scroll">
-      <div class="section-heading">Total por Serviço</div>
-      <div class="gastos-summary" id="gastos-summary">
-        <div class="gasto-card skeleton" style="height:80px"></div>
-        <div class="gasto-card skeleton" style="height:80px"></div>
-        <div class="gasto-card skeleton" style="height:80px"></div>
-        <div class="gasto-card skeleton" style="height:80px"></div>
-      </div>
-      <div class="gastos-chart-wrap">
-        <div class="gastos-chart-title">
-          Gasto diário por serviço
-          <select id="gastos-days-select" onchange="loadGastos()">
-            <option value="7">Últimos 7 dias</option>
-            <option value="30" selected>Últimos 30 dias</option>
-            <option value="90">Últimos 90 dias</option>
-          </select>
-        </div>
-        <div class="gastos-canvas-wrap"><canvas id="gastos-chart"></canvas></div>
-      </div>
-      <div class="gastos-note">
-        💡 Os valores são calculados com base nos preços oficiais de cada API em maio/2025: OpenAI GPT-4o Mini ($0,15/1M tokens entrada · $0,60/1M saída), DALL-E 3 ($0,04/imagem), ElevenLabs (estimativa $0,0003/caractere), Gamma ($0,01/crédito). Taxa de câmbio aproximada: R$ 5,10/USD.
-      </div>
-    </div>
-  </div>
+  <!-- view-gastos removida 28/07: tela morta que publicava senhas no código-fonte (parecer do Clone) -->
 
-  <div id="view-integrations" class="view">
-    <div class="topbar">
-      <span class="topbar-icon">🔌</span>
-      <div><div class="topbar-title">Integrações</div><div class="topbar-desc">Status das conexões ativas · APIs e webhooks</div></div>
-      <div class="topbar-spacer"></div>
-      <span class="topbar-badge" style="color:#64748b;border-color:rgba(100,116,139,.3)" id="int-badge">CARREGANDO</span>
-    </div>
-    <div class="int-scroll">
-      <div class="int-summary">
-        <div class="int-summary-stat"><div class="iss-val" id="int-connected-count">—</div><div class="iss-lbl">Conectadas</div></div>
-        <div class="int-summary-divider"></div>
-        <div class="int-summary-stat"><div class="iss-val" id="int-total-count">5</div><div class="iss-lbl">Total</div></div>
-        <div class="int-summary-spacer"></div>
-        <button class="int-refresh-btn" onclick="loadIntegrations()">
-          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
-          Atualizar status
-        </button>
-      </div>
-      <div class="section-heading">Integrações Ativas</div>
-      <div class="int-grid" id="int-grid">
-        <div class="int-card skeleton" style="height:180px"></div>
-        <div class="int-card skeleton" style="height:180px"></div>
-        <div class="int-card skeleton" style="height:180px"></div>
-      </div>
-      <div class="section-heading">Últimas Vendas · GG Checkout</div>
-      <div class="int-table-wrap">
-        <div class="int-table-header"><span class="int-table-title">Webhook Events</span><span style="font-size:11px;color:var(--text-3)" id="int-sales-updated"></span></div>
-        <div id="int-sales-body"><div class="int-empty">Carregando eventos...</div></div>
-      </div>
-      <!-- PENDÊNCIAS -->
-      <div class="pend-section">
-        <div class="section-heading">Pendências</div>
-        <div class="pend-list">
-          <div class="pend-card" style="--pc-color:#fbbf24">
-            <div class="pend-card-bar"></div>
-            <div class="pend-card-body">
-              <div class="pend-card-head"><span style="font-size:20px">🔗</span><div class="pend-title">Conectar Claude Code do Bruno ao Nexus</div><div class="pend-badge">PENDENTE</div></div>
-              <div class="pend-desc">Para o Bruno poder usar os setores da Nexus diretamente no Claude Code dele, ele precisa rodar <strong>um único comando</strong> no terminal do computador dele.</div>
-              <div class="pend-steps">
-                <div class="pend-step"><div class="pend-step-num">1</div><div>Abrir o terminal no computador dele (Prompt de Comando ou PowerShell)</div></div>
-                <div class="pend-step"><div class="pend-step-num">2</div><div>Rodar o comando abaixo — ele cadastra o Nexus como ferramenta nativa:</div></div>
-              </div>
-              <div class="pend-code" id="mcp-cmd-text">
-                <span>claude mcp add nexus-control https://claude-code-febra.onrender.com/mcp/sse --header "x-api-key: nexus-primo-2026"</span>
-                <button class="pend-copy" onclick="copyMcpCmd()">Copiar</button>
-              </div>
-              <div class="pend-steps" style="margin-top:10px">
-                <div class="pend-step"><div class="pend-step-num">3</div><div>Pronto. Na próxima conversa do Claude Code dele, as ferramentas <strong>nexus_chat</strong>, <strong>nexus_consenso</strong>, <strong>nexus_conselho</strong>, <strong>nexus_metricas</strong> e <strong>nexus_produtos_brn</strong> aparecem automaticamente.</div></div>
-              </div>
-              <div class="pend-note">⚠️ O servidor pode demorar ~30 segundos para responder na primeira vez do dia (Render gratuito entra em modo de espera). Se der erro, tente de novo após 1 minuto.</div>
-            </div>
-          </div>
-          <div class="pend-card" style="--pc-color:#f97316">
-            <div class="pend-card-bar"></div>
-            <div class="pend-card-body">
-              <div class="pend-card-head"><span style="font-size:20px">📊</span><div class="pend-title">Configurar UTMify (fazer junto com Bruno)</div><div class="pend-badge" style="color:#f97316;background:rgba(249,115,22,.08);border-color:rgba(249,115,22,.2)">AGUARDANDO</div></div>
-              <div class="pend-desc">Para ver dados de tráfego pago aqui no dashboard, o Bruno precisa adicionar a <strong>chave de API do UTMify</strong> nas configurações do servidor.</div>
-              <div class="pend-steps">
-                <div class="pend-step"><div class="pend-step-num">1</div><div>No painel do UTMify → <strong>Configurações → API</strong> → copiar a chave</div></div>
-                <div class="pend-step"><div class="pend-step-num">2</div><div>No Render (<a href="https://render.com" target="_blank" style="color:var(--nexus)">render.com</a>) → serviço <strong>claude-code-febra</strong> → <strong>Environment</strong> → adicionar variável:</div></div>
-              </div>
-              <div class="pend-code"><span>UTMIFY_API_KEY = <em style="color:#fcd34d">colar a chave aqui</em></span></div>
-              <div class="pend-steps" style="margin-top:10px">
-                <div class="pend-step"><div class="pend-step-num">3</div><div>Clicar em <strong>Save Changes</strong> no Render — o servidor reinicia e a integração ativa automaticamente</div></div>
-              </div>
-            </div>
-          </div>
-          <div class="pend-card" style="--pc-color:#8b5cf6">
-            <div class="pend-card-bar"></div>
-            <div class="pend-card-body">
-              <div class="pend-card-head"><span style="font-size:20px">🔑</span><div class="pend-title">Trocar a chave de acesso do MCP (opcional)</div><div class="pend-badge" style="color:#8b5cf6;background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.2)">OPCIONAL</div></div>
-              <div class="pend-desc">A chave atual (<strong>nexus-primo-2026</strong>) é pública. Para segurança, troque por uma senha sua no Render.</div>
-              <div class="pend-code"><span>MCP_API_KEY = <em style="color:#fcd34d">sua-senha-secreta-aqui</em></span></div>
-              <div class="pend-note" style="margin-top:10px">Depois de trocar, o Bruno precisa rodar o mesmo comando acima substituindo <strong>nexus-primo-2026</strong> pela nova senha.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- view-integrations removida 28/07: tela morta que publicava senhas no código-fonte (parecer do Clone) -->
 
 </main>
 </div>
@@ -2811,7 +2302,7 @@ function reloadMetrics(){ metricsLoaded=false; loadMetrics(); closeSettings(); s
 window.reloadMetrics=reloadMetrics;
 
 function copyMcpCmd(){
-  const cmd=`claude mcp add nexus-control https://claude-code-febra.onrender.com/mcp/sse --header "x-api-key: nexus-primo-2026"`;
+  const cmd=`claude mcp add nexus-control https://claude-code-febra.onrender.com/mcp/sse --header "x-api-key: PECA_A_CHAVE_AO_MAX"`;
   navigator.clipboard.writeText(cmd).then(()=>{ const btn=document.querySelector('#mcp-cmd-text .pend-copy'); if(btn){const o=btn.textContent;btn.textContent='Copiado!';setTimeout(()=>btn.textContent=o,2000);}}).catch(()=>{});
 }
 window.copyMcpCmd=copyMcpCmd;

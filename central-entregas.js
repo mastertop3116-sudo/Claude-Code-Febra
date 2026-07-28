@@ -377,7 +377,8 @@ setTimeout(()=>location.reload(), 600000);
 }
 
 const PIN = process.env.CENTRAL_PIN || "";
-function comPin(req) { return !PIN || req.query.k === PIN || req.headers["x-pin"] === PIN; }
+// Sem senha configurada = NEGA (antes liberava — furo apontado pelo Clone 28/07)
+function comPin(req) { return !!PIN && (req.query.k === PIN || req.headers["x-pin"] === PIN); }
 function pedeSenha(res) {
   res.status(401).send(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:sans-serif;background:#f5f6fa;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}form{background:#fff;padding:28px;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.10);text-align:center}input{padding:12px;border:1.5px solid #ddd;border-radius:10px;font-size:16px;text-align:center;letter-spacing:.3em}button{margin-top:10px;padding:12px 22px;border:0;border-radius:10px;background:#6366f1;color:#fff;font-weight:700;font-size:15px;cursor:pointer;display:block;width:100%}</style></head><body><form onsubmit="event.preventDefault();const u=new URL(location);u.searchParams.set('k',document.getElementById('s').value);location=u">🔒<br><br><input id="s" type="password" placeholder="senha"/><button>Entrar</button></form></body></html>`);
 }
@@ -489,11 +490,12 @@ body.claro .aviso{background:#eef0fb}
 </div>
 <script>
 const CONVAS = ${DADOS};
+const limpo = s => { const d=document.createElement('div'); d.innerHTML=String(s); return (d.textContent||'').replace(/[<>]/g,''); };
 const hh = iso => new Date(new Date(iso).getTime()-3*3600000).toISOString().slice(11,16);
 const dd = iso => new Date(new Date(iso).getTime()-3*3600000).toISOString().slice(5,10).split('-').reverse().join('/');
 document.getElementById('lista').innerHTML = CONVAS.map((c,i)=>
   \`<div class="conv" id="cv-\${i}" onclick="abrir(\${i})"><b>\${c.nome} <span>\${dd(c.ultima.h)} \${hh(c.ultima.h)}</span></b>
-  <div class="prev">\${c.ultima.d==='out'?'🤖 ':''}\${c.ultima.t.slice(0,90)}</div></div>\`).join('') || '<div class="vazio" style="margin:30px">nenhuma conversa nas últimas 72h</div>';
+  <div class="prev">\${c.ultima.d==='out'?'🤖 ':''}\${limpo(c.ultima.t).slice(0,90)}</div></div>\`).join('') || '<div class="vazio" style="margin:30px">nenhuma conversa nas últimas 72h</div>';
 function abrir(i){
   document.querySelectorAll('.conv').forEach(e=>e.classList.remove('on'));
   document.getElementById('cv-'+i).classList.add('on');
@@ -589,7 +591,8 @@ async function utmify(nome, args) {
 async function gastosUtmify(deDias) {
   const hoje = new Date(Date.now() - 3 * 3600000);
   const fmt = x => x.toISOString().slice(0, 10);
-  const faixa = { from: fmt(new Date(hoje.getTime() - deDias * 86400000)), to: fmt(new Date(hoje.getTime() + 86400000)) };
+  // janela exata: hoje = só hoje; 7 dias = hoje e os 6 anteriores (nunca o futuro)
+  const faixa = { from: fmt(new Date(hoje.getTime() - Math.max(0, deDias - (deDias ? 1 : 0)) * 86400000)), to: fmt(hoje) };
   const paineis = [];
   for (const [dash, nome] of Object.entries(PAINEIS_UTM)) {
     try {
@@ -612,7 +615,9 @@ async function montarFinanceiro() {
   const receita = parseFloat(String(dd.receita_hoje).replace(",", ".")) || 0;
   const gasto = u1.gasto_total;
   const imposto = +(receita * IMPOSTO_PCT / 100).toFixed(2);
-  const lucro = +(receita - gasto - imposto).toFixed(2);
+  const falhos = u1.paineis.filter(p => p.erro);
+  const gastoCompleto = falhos.length === 0;
+  const lucro = gastoCompleto ? +(receita - gasto - imposto).toFixed(2) : null;
   const fmtR = v => "R$ " + (v == null ? "—" : v.toFixed(2).replace(".", ","));
   const receita7 = null; // banco: janela da central é 3 dias; 7d fica por conta da UTMify
   const linhaPainel = p => p.erro
@@ -647,9 +652,9 @@ td b{font-weight:700}
 <div class="hero"><h1 id="oi">Resumo do dia</h1><div class="data">${new Date(Date.now() - 3 * 3600000).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" })} · imposto estimado em ${IMPOSTO_PCT}%</div></div>
 <div class="stats">
   <div class="stat" style="--cor:#818cf8"><b>${fmtR(receita)}</b><span>Receita hoje (banco de vendas)</span><span class="sub">${dd.vendas_hoje} vendas · fonte: GG/Dominance</span></div>
-  <div class="stat" style="--cor:#fb923c"><b>${fmtR(gasto)}</b><span>Gasto em anúncios hoje</span><span class="sub">fonte: UTMify (${u1.paineis.filter(p=>!p.erro).length}/${u1.paineis.length} painéis)</span></div>
+  <div class="stat" style="--cor:${gastoCompleto ? "#fb923c" : "#ef4444"}"><b>${gastoCompleto ? fmtR(gasto) : "⚠️ incompleto"}</b><span>Gasto em anúncios hoje</span><span class="sub">${gastoCompleto ? `fonte: UTMify (${u1.paineis.length}/${u1.paineis.length} painéis)` : `FALHOU em ${falhos.length} de ${u1.paineis.length} painéis — número não confiável`}</span></div>
   <div class="stat" style="--cor:#fbbf24"><b>${fmtR(imposto)}</b><span>Imposto estimado (${IMPOSTO_PCT}%)</span><span class="sub">ajustável — me diga a alíquota real</span></div>
-  <div class="stat" style="--cor:${lucro >= 0 ? "#34d399" : "#ef4444"}"><b>${fmtR(lucro)}</b><span>Lucro líquido estimado hoje</span><span class="sub">receita − anúncios − imposto</span></div>
+  <div class="stat" style="--cor:${!gastoCompleto ? "#ef4444" : (lucro >= 0 ? "#34d399" : "#ef4444")}"><b>${gastoCompleto ? fmtR(lucro) : "— sem número"}</b><span>Lucro líquido estimado hoje</span><span class="sub">${gastoCompleto ? "receita − anúncios − imposto" : "🚫 NÃO calculo lucro com gasto incompleto — decisão de verba precisa de dado inteiro"}</span></div>
 </div>
 <div class="painel"><h4>Por painel de tráfego · HOJE</h4>
 <table><tr><th>Oferta</th><th>Gasto</th><th>Receita (UTMify)</th><th>Vendas</th><th>ROAS</th></tr>
@@ -664,7 +669,7 @@ if(localStorage.getItem('nx-tema')!=='escuro')document.body.classList.add('claro
 (function(){const hh=new Date(Date.now()-3*3600000).getUTCHours();document.getElementById('oi').textContent=(hh<12?'Bom dia':hh<18?'Boa tarde':'Boa noite')+', Rodrigo — resumo do dia'})();
 setTimeout(()=>location.reload(), 300000);
 </script></body></html>`;
-  return { html, dados: { receita_hoje: receita, gasto_hoje: gasto, imposto, lucro, paineis_hoje: u1.paineis, sete_dias: u7 } };
+  return { html, dados: { receita_hoje: receita, gasto_hoje: gasto, gasto_completo: gastoCompleto, imposto, lucro, paineis_hoje: u1.paineis, sete_dias: u7 } };
 }
 let cacheF = { t: 0, html: "", dados: null };
 async function frescoFin() {
