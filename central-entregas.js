@@ -129,7 +129,7 @@ async function montar() {
     const txt = depois.map(m => m.text || "").join("\n");
     const fam = familia(v.product_name);
     const temArea = /netlify\.app/.test(txt);
-    const temPasta = /drive\.google\.com\/drive\/folders|drive\.google\.com\/open\?id=/.test(txt);
+    const temPasta = /drive\.google\.com\/drive\/folders|drive\.google\.com\/open\?id=|drive\.google\.com\/file\/d\//.test(txt);  // arquivo do Drive (bônus) também é entrega
     const temDominance = /dominancestudio\.com\.br\/membros/.test(txt);
     const bumpEntregue = BUMP_IDS.some(id => txt.includes(id)) || /material extra que você garantiu/i.test(txt);
     const planos = PLANOS[fam] || [];
