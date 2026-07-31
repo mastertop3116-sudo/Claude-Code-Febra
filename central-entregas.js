@@ -595,8 +595,11 @@ async function utmify(nome, args) {
 async function gastosUtmify(deDias) {
   const hoje = new Date(Date.now() - 3 * 3600000);
   const fmt = x => x.toISOString().slice(0, 10);
-  // janela exata: hoje = só hoje; 7 dias = hoje e os 6 anteriores (nunca o futuro)
-  const faixa = { from: fmt(new Date(hoje.getTime() - Math.max(0, deDias - (deDias ? 1 : 0)) * 86400000)), to: fmt(hoje) };
+  // A UTMify usa data final ABERTA: "to" precisa ser AMANHÃ pra incluir hoje (regressão
+  // 31/07: com to=hoje o dia corrente sumia e a receita vinha negativa).
+  // hoje = só hoje · 7 dias = hoje + os 6 anteriores.
+  const inicio = new Date(hoje.getTime() - Math.max(0, deDias - (deDias ? 1 : 0)) * 86400000);
+  const faixa = { from: fmt(inicio), to: fmt(new Date(hoje.getTime() + 86400000)) };
   const paineis = [];
   for (const [dash, nome] of Object.entries(PAINEIS_UTM)) {
     try {
@@ -607,7 +610,11 @@ async function gastosUtmify(deDias) {
         receitaUtm += (c.revenue || 0) / 100;
         vendas += c.approvedOrdersCount || 0;
       }
-      paineis.push({ nome, gasto: +gasto.toFixed(2), receita_utm: +receitaUtm.toFixed(2), vendas, roas: gasto ? +(receitaUtm / gasto).toFixed(2) : null });
+      if (receitaUtm < 0 || (gasto === 0 && camps.length)) {
+        paineis.push({ nome, erro: 'dados inconsistentes na UTMify agora' });   // nunca calcular lucro com lixo
+      } else {
+        paineis.push({ nome, gasto: +gasto.toFixed(2), receita_utm: +receitaUtm.toFixed(2), vendas, roas: gasto ? +(receitaUtm / gasto).toFixed(2) : null });
+      }
     } catch (e) { paineis.push({ nome, erro: String(e).slice(0, 80) }); }
   }
   const gastoTotal = paineis.reduce((s, p) => s + (p.gasto || 0), 0);
