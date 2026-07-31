@@ -605,27 +605,35 @@ async function gastosUtmify(deDias) {
     try {
       const camps = (await utmify("get_meta_ad_objects", { dashboardId: dash, dateRange: faixa, level: "campaign" })).results || [];
       let gasto = 0, receitaUtm = 0, vendas = 0;
+      let impostoAds = 0, impostoProduto = 0, taxas = 0;
       for (const c of camps) {
         gasto += (c.totalSpent || c.spend || 0) / 100;      // UTMify manda em centavos
+        impostoAds += (c.metaAdsTax || 0) / 100;            // imposto sobre a verba de anúncio (real, da UTMify)
+        impostoProduto += (c.tax || 0) / 100;               // imposto de produto, se configurado lá
+        taxas += (c.fees || 0) / 100;                       // taxas de gateway, se configuradas
         receitaUtm += (c.revenue || 0) / 100;
         vendas += c.approvedOrdersCount || 0;
       }
       if (receitaUtm < 0 || (gasto === 0 && camps.length)) {
         paineis.push({ nome, erro: 'dados inconsistentes na UTMify agora' });   // nunca calcular lucro com lixo
       } else {
-        paineis.push({ nome, gasto: +gasto.toFixed(2), receita_utm: +receitaUtm.toFixed(2), vendas, roas: gasto ? +(receitaUtm / gasto).toFixed(2) : null });
+        paineis.push({ nome, gasto: +gasto.toFixed(2), imposto_ads: +impostoAds.toFixed(2), imposto_produto: +impostoProduto.toFixed(2), taxas: +taxas.toFixed(2), receita_utm: +receitaUtm.toFixed(2), vendas, roas: gasto ? +(receitaUtm / gasto).toFixed(2) : null });
       }
     } catch (e) { paineis.push({ nome, erro: String(e).slice(0, 80) }); }
   }
   const gastoTotal = paineis.reduce((s, p) => s + (p.gasto || 0), 0);
-  return { faixa, paineis, gasto_total: +gastoTotal.toFixed(2) };
+  const impostoAdsTotal = paineis.reduce((s, p) => s + (p.imposto_ads || 0), 0);
+  const impostoProdUtm = paineis.reduce((s, p) => s + (p.imposto_produto || 0), 0);
+  return { faixa, paineis, gasto_total: +gastoTotal.toFixed(2), imposto_ads_total: +impostoAdsTotal.toFixed(2), imposto_produto_utm: +impostoProdUtm.toFixed(2) };
 }
 async function montarFinanceiro() {
   const [dHoje, u1, u7] = await Promise.all([fresco(), gastosUtmify(0), gastosUtmify(7)]);
   const dd = dHoje.dados;
   const receita = parseFloat(String(dd.receita_hoje).replace(",", ".")) || 0;
   const gasto = u1.gasto_total;
-  const imposto = +(receita * IMPOSTO_PCT / 100).toFixed(2);
+  const impostoProduto = u1.imposto_produto_utm > 0 ? u1.imposto_produto_utm : +(receita * IMPOSTO_PCT / 100).toFixed(2);
+  const impostoAds = u1.imposto_ads_total || 0;
+  const imposto = +(impostoProduto + impostoAds).toFixed(2);
   const falhos = u1.paineis.filter(p => p.erro);
   const gastoCompleto = falhos.length === 0;
   const lucro = gastoCompleto ? +(receita - gasto - imposto).toFixed(2) : null;
@@ -660,11 +668,11 @@ th{font-size:.64rem;text-transform:uppercase;letter-spacing:.08em;color:var(--te
 td b{font-weight:700}
 .nota{font-size:.7rem;color:var(--text-3);margin-top:10px;line-height:1.5}
 </style></head><body>
-<div class="hero"><h1 id="oi">Resumo do dia</h1><div class="data">${new Date(Date.now() - 3 * 3600000).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" })} · imposto estimado em ${IMPOSTO_PCT}%</div></div>
+<div class="hero"><h1 id="oi">Resumo do dia</h1><div class="data">${new Date(Date.now() - 3 * 3600000).toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" })} · imposto de vendas em ${IMPOSTO_PCT}% + imposto de anúncios real da UTMify</div></div>
 <div class="stats">
   <div class="stat" style="--cor:#818cf8"><b>${fmtR(receita)}</b><span>Receita hoje (banco de vendas)</span><span class="sub">${dd.vendas_hoje} vendas · fonte: GG/Dominance</span></div>
   <div class="stat" style="--cor:${gastoCompleto ? "#fb923c" : "#ef4444"}"><b>${gastoCompleto ? fmtR(gasto) : "⚠️ incompleto"}</b><span>Gasto em anúncios hoje</span><span class="sub">${gastoCompleto ? `fonte: UTMify (${u1.paineis.length}/${u1.paineis.length} painéis)` : `FALHOU em ${falhos.length} de ${u1.paineis.length} painéis — número não confiável`}</span></div>
-  <div class="stat" style="--cor:#fbbf24"><b>${fmtR(imposto)}</b><span>Imposto estimado (${IMPOSTO_PCT}%)</span><span class="sub">ajustável — me diga a alíquota real</span></div>
+  <div class="stat" style="--cor:#fbbf24"><b>${fmtR(imposto)}</b><span>Impostos do dia</span><span class="sub">${fmtR(impostoProduto)} sobre vendas (${u1.imposto_produto_utm > 0 ? 'UTMify' : IMPOSTO_PCT + '%'}) + ${fmtR(impostoAds)} sobre anúncios (UTMify)</span></div>
   <div class="stat" style="--cor:${!gastoCompleto ? "#ef4444" : (lucro >= 0 ? "#34d399" : "#ef4444")}"><b>${gastoCompleto ? fmtR(lucro) : "— sem número"}</b><span>Lucro líquido estimado hoje</span><span class="sub">${gastoCompleto ? "receita − anúncios − imposto" : "🚫 NÃO calculo lucro com gasto incompleto — decisão de verba precisa de dado inteiro"}</span></div>
 </div>
 <div class="painel"><h4>Por painel de tráfego · HOJE</h4>
@@ -680,7 +688,7 @@ if(localStorage.getItem('nx-tema')!=='escuro')document.body.classList.add('claro
 (function(){const hh=new Date(Date.now()-3*3600000).getUTCHours();document.getElementById('oi').textContent=(hh<12?'Bom dia':hh<18?'Boa tarde':'Boa noite')+', Rodrigo — resumo do dia'})();
 setTimeout(()=>location.reload(), 300000);
 </script></body></html>`;
-  return { html, dados: { receita_hoje: receita, gasto_hoje: gasto, gasto_completo: gastoCompleto, imposto, lucro, paineis_hoje: u1.paineis, sete_dias: u7 } };
+  return { html, dados: { receita_hoje: receita, gasto_hoje: gasto, gasto_completo: gastoCompleto, imposto, imposto_produto: impostoProduto, imposto_ads: impostoAds, lucro, paineis_hoje: u1.paineis, sete_dias: u7 } };
 }
 let cacheF = { t: 0, html: "", dados: null };
 async function frescoFin() {
